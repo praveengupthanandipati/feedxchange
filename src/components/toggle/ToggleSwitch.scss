@@ -46,4 +46,9 @@
       transform: translateX(1.25rem);
     }
   }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.75;
+  }
 }

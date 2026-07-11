@@ -27,9 +27,6 @@
     @include m.flex(row, space-between, flex-start);
     flex-wrap: wrap;
     gap: v.$spacing-3;
-    padding-bottom: v.$spacing-4;
-    margin-bottom: v.$spacing-4;
-    border-bottom: 1px solid v.$color-border;
 
     h1 {
       font-size: v.$font-size-xl;
@@ -43,32 +40,100 @@
     }
   }
 
-  &__grid {
+  // ============================================================
+  // 75% content / 25% "next steps" layout
+  // ============================================================
+  &__layout {
     display: grid;
     grid-template-columns: 1fr;
     gap: v.$spacing-5;
-    margin: 0;
-
-    @include m.respond-to(md) {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    align-items: start;
 
     @include m.respond-to(lg) {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 3fr 1fr;
     }
   }
 
-  &__item {
-    dt {
-      color: v.$color-text-muted;
-      font-size: v.$font-size-sm;
-      margin: 0 0 v.$spacing-1;
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-5;
+    min-width: 0;
+  }
+
+  &__side {
+    @include m.respond-to(lg) {
+      position: sticky;
+      top: calc(4.5rem + #{v.$spacing-3} * 2);
+    }
+  }
+
+  &__side-card {
+    @include m.card(v.$spacing-5);
+
+    h3 {
+      font-size: v.$font-size-base;
+      margin: 0 0 v.$spacing-4;
+    }
+  }
+
+  &__next-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+  }
+
+  &__next-step {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    @include m.font-base(v.$font-weight-medium);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, border-color v.$transition-fast;
+
+    svg {
+      flex-shrink: 0;
+      color: v.$color-primary;
     }
 
-    dd {
-      @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-text;
-      margin: 0;
+    &:hover {
+      background-color: v.$color-bg-muted;
+      border-color: v.$color-primary;
     }
+  }
+}
+
+// ============================================================
+// Read-only field display (replaces form inputs on the detail view)
+// ============================================================
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-1;
+  min-width: 0;
+
+  &__label {
+    @include m.font-base(v.$font-weight-semibold);
+    font-size: v.$font-size-sm;
+    color: v.$color-text-muted;
+  }
+
+  &__value {
+    @include m.font-base(v.$font-weight-medium);
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    margin: 0;
+    word-break: break-word;
+    white-space: pre-line;
   }
 }

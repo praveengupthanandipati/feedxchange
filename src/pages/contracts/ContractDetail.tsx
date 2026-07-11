@@ -1,22 +1,41 @@
+import type { ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
-import { contracts, type Contract } from "./contracts.data";
+import {
+  FiArrowLeft,
+  FiTruck,
+  FiActivity,
+  FiFileText,
+  FiPackage,
+  FiEdit3,
+  FiDownload,
+  FiClock,
+} from "react-icons/fi";
+import { contracts } from "./contracts.data";
 import "./ContractDetail.scss";
+import "./NewContract.scss";
 
-const FIELDS: Array<{ label: string; key: keyof Contract }> = [
-  { label: "Seller", key: "seller" },
-  { label: "Buyer", key: "buyer" },
-  { label: "Product", key: "product" },
-  { label: "Qty", key: "qty" },
-  { label: "Arranged Qty", key: "aQty" },
-  { label: "Pending Qty", key: "pQty" },
-  { label: "Dispatched Qty", key: "dQty" },
-  { label: "Contract Rate", key: "cRate" },
-  { label: "GST %", key: "gst" },
-  { label: "Net Rate", key: "netRate" },
-  { label: "Delivery Type", key: "deliveryType" },
-  { label: "Payment Terms", key: "paymentTerms" },
-  { label: "Inland Freight", key: "iFreight" },
+interface DetailFieldProps {
+  label: string;
+  value: ReactNode;
+  full?: boolean;
+}
+
+const DetailField = ({ label, value, full }: DetailFieldProps) => (
+  <div className={`detail-field ${full ? "new-contract__grid--full" : ""}`}>
+    <span className="detail-field__label">{label}</span>
+    <p className="detail-field__value">{value || "—"}</p>
+  </div>
+);
+
+// TODO: wire these up to the real workflow actions once they exist.
+const NEXT_STEPS = [
+  { label: "Manage Trucks", icon: FiTruck },
+  { label: "Contract Status", icon: FiActivity },
+  { label: "Invoices", icon: FiFileText },
+  { label: "Dispatches", icon: FiPackage },
+  { label: "Add Amendment", icon: FiEdit3 },
+  { label: "Download PDF", icon: FiDownload },
+  { label: "View Activity Log", icon: FiClock },
 ];
 
 const ContractDetail = () => {
@@ -34,28 +53,166 @@ const ContractDetail = () => {
           <p>No contract found for id "{id}".</p>
         </div>
       ) : (
-        <div className="contract-detail__card">
-          <div className="contract-detail__header">
-            <div>
-              <h1>Contract {contract.id}</h1>
-              <p>{contract.date}</p>
+        <>
+          <div className="contract-detail__card">
+            <div className="contract-detail__header">
+              <div>
+                <h1>Contract {contract.id}</h1>
+                <p>{contract.date}</p>
+              </div>
+              <span
+                className={`contracts-table__status contracts-table__status--${contract.status.toLowerCase()}`}
+              >
+                {contract.status === "In-transit" ? "In-Transit" : contract.status}
+              </span>
             </div>
-            <span
-              className={`contracts-table__status contracts-table__status--${contract.status.toLowerCase()}`}
-            >
-              {contract.status === "In-transit" ? "In-Transit" : contract.status}
-            </span>
           </div>
 
-          <dl className="contract-detail__grid">
-            {FIELDS.map((field) => (
-              <div key={field.key} className="contract-detail__item">
-                <dt>{field.label}</dt>
-                <dd>{contract[field.key]}</dd>
+          <div className="contract-detail__layout">
+            <div className="contract-detail__main">
+              <section className="new-contract__section">
+                <h2 className="new-contract__section-title">1. Basic Details</h2>
+                <div className="new-contract__grid">
+                  <DetailField label="Date of Contract" value={contract.date} />
+                  <DetailField label="Seller" value={contract.seller} />
+                  <DetailField label="Buyer" value={contract.buyer} />
+                  <DetailField label="Product" value={contract.product} />
+
+                  <DetailField label="Quantity Measure" value={contract.quantityMeasure} />
+                  <DetailField label="Qty" value={contract.qty} />
+                  <DetailField label="PO Tolerance" value={contract.poTolerance} />
+                  <DetailField label="Delivery Type" value={contract.deliveryType} />
+
+                  <DetailField label="Contract Rate" value={contract.cRate} />
+                  <DetailField label="GST % Value" value={contract.gst} />
+                  <DetailField label="Net Rate" value={contract.netRate} />
+                  <DetailField label="Indicative Freight" value={contract.indicativeFreight} />
+
+                  <DetailField label="Inland Freight" value={contract.iFreight} />
+                  <DetailField label="Rate Remarks" value={contract.rateRemarks} full />
+                </div>
+              </section>
+
+              <section className="new-contract__section">
+                <h2 className="new-contract__section-title">2. Seller & Buyer</h2>
+                <div className="new-contract__conditions">
+                  <div className="new-contract__condition-card">
+                    <h3>Seller Conditions</h3>
+                    <div className="new-contract__grid new-contract__grid--condition">
+                      <DetailField
+                        label="Commission"
+                        value={contract.sellerConditions.commission}
+                      />
+                      <DetailField
+                        label="Delivery schedule"
+                        value={contract.sellerConditions.deliverySchedule}
+                      />
+                      <DetailField
+                        label="Quality Spec Source"
+                        value={contract.sellerConditions.qualitySpecSource}
+                        full
+                      />
+                      <DetailField
+                        label="Loading Address At"
+                        value={contract.sellerConditions.address}
+                        full
+                      />
+                      <DetailField
+                        label="Remarks / Special Conditions"
+                        value={contract.sellerConditions.remarks}
+                        full
+                      />
+                    </div>
+                  </div>
+
+                  <div className="new-contract__condition-card">
+                    <h3>Buyer Conditions</h3>
+                    <div className="new-contract__grid new-contract__grid--condition">
+                      <DetailField
+                        label="Commission"
+                        value={contract.buyerConditions.commission}
+                      />
+                      <DetailField
+                        label="Delivery schedule"
+                        value={contract.buyerConditions.deliverySchedule}
+                      />
+                      <DetailField
+                        label="Quality Spec Source"
+                        value={contract.buyerConditions.qualitySpecSource}
+                        full
+                      />
+                      <DetailField
+                        label="Delivery Address At"
+                        value={contract.buyerConditions.address}
+                        full
+                      />
+                      <DetailField
+                        label="Remarks / Special Conditions"
+                        value={contract.buyerConditions.remarks}
+                        full
+                      />
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="new-contract__section">
+                <h2 className="new-contract__section-title">3. Payments</h2>
+                <div className="new-contract__grid">
+                  <DetailField label="Payment terms" value={contract.paymentTerms} />
+                  <DetailField label="Remarks" value={contract.paymentRemarks} full />
+                </div>
+              </section>
+
+              <section className="new-contract__section">
+                <h2 className="new-contract__section-title">4. Settings</h2>
+                <table className="new-contract__settings-table">
+                  <thead>
+                    <tr>
+                      <th>Contract Setting Description</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <p className="new-contract__setting-title">Approval Status</p>
+                        <p className="new-contract__setting-description">
+                          You can not send the contract to buyer until it is approved
+                        </p>
+                      </td>
+                      <td>
+                        <span
+                          className={`contracts-table__status contracts-table__status--${
+                            contract.approved ? "open" : "pending"
+                          }`}
+                        >
+                          {contract.approved ? "Approved" : "Pending"}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+            </div>
+
+            <aside className="contract-detail__side">
+              <div className="contract-detail__side-card">
+                <h3>Next Steps</h3>
+                <ul className="contract-detail__next-steps">
+                  {NEXT_STEPS.map((step) => (
+                    <li key={step.label}>
+                      <button type="button" className="contract-detail__next-step">
+                        <step.icon aria-hidden />
+                        {step.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            ))}
-          </dl>
-        </div>
+            </aside>
+          </div>
+        </>
       )}
     </div>
   );

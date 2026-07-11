@@ -6,6 +6,7 @@ interface ToggleSwitchProps {
   onLabel?: string;
   offLabel?: string;
   ariaLabel?: string;
+  disabled?: boolean;
 }
 
 const ToggleSwitch = ({
@@ -14,6 +15,7 @@ const ToggleSwitch = ({
   onLabel = "Yes",
   offLabel = "No",
   ariaLabel,
+  disabled = false,
 }: ToggleSwitchProps) => {
   return (
     <button
@@ -21,6 +23,7 @@ const ToggleSwitch = ({
       role="switch"
       aria-checked={checked}
       aria-label={ariaLabel}
+      disabled={disabled}
       className={`toggle-switch ${checked ? "is-on" : ""}`}
       onClick={() => onChange(!checked)}
     >
