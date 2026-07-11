@@ -1,0 +1,309 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.header {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  position: sticky;
+  top: v.$spacing-3;
+  z-index: v.$z-index-sticky;
+  height: 4.5rem;
+  flex-shrink: 0;
+  padding: 0 v.$spacing-4;
+  background-color: v.$color-bg;
+  border-bottom: 1px solid v.$color-border;
+  border-top-left-radius: v.$radius-lg;
+  border-top-right-radius: v.$radius-lg;
+
+  @include m.respond-to(md) {
+    padding: 0 v.$spacing-6;
+  }
+
+  &__menu-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background: transparent;
+    color: v.$color-text;
+    font-size: 1.25rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+
+    @include m.respond-to(lg) {
+      display: none;
+    }
+  }
+
+  &__title {
+    @include m.font-heading(v.$font-weight-semibold);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: v.$font-size-base;
+    color: v.$color-text;
+    margin: 0;
+
+    @include m.respond-to(md) {
+      font-size: v.$font-size-xl;
+    }
+  }
+
+  &__actions {
+    @include m.flex(row, flex-end, center, v.$spacing-1);
+    flex-shrink: 0;
+
+    @include m.respond-to(md) {
+      gap: v.$spacing-2;
+    }
+  }
+
+  &__icon-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    position: relative;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background: transparent;
+    color: v.$color-text-muted;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-primary;
+    }
+  }
+
+  &__badge {
+    @include m.flex-center;
+    @include m.font-heading(v.$font-weight-semibold);
+    position: absolute;
+    top: 0.15rem;
+    right: 0.15rem;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    padding: 0 0.25rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-danger;
+    color: v.$color-white;
+    font-size: 0.65rem;
+    line-height: 1;
+    border: 2px solid v.$color-bg;
+  }
+
+  // ============================================================
+  // Notifications
+  // ============================================================
+  &__notifications {
+    position: relative;
+  }
+
+  &__dropdown--notifications {
+    width: 340px;
+    padding: v.$spacing-2 0;
+
+    // Anchoring to the trigger can push this off-screen on narrow phones —
+    // pin it to the viewport edges instead once space gets tight.
+    @include m.respond-below(sm) {
+      position: fixed;
+      top: calc(#{v.$spacing-3} + 4.5rem + #{v.$spacing-2});
+      left: v.$spacing-3;
+      right: v.$spacing-3;
+      width: auto;
+    }
+  }
+
+  &__notification-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 22rem;
+    overflow-y: auto;
+  }
+
+  &__notification {
+    @include m.flex(row, flex-start, flex-start, v.$spacing-3);
+    position: relative;
+    padding: v.$spacing-3 v.$spacing-4;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-50;
+    }
+
+    &.is-unread {
+      background-color: rgba(v.$color-orange, 0.06);
+
+      .header__notification-title {
+        font-weight: v.$font-weight-semibold;
+      }
+    }
+  }
+
+  &__notification-icon {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-gray-100;
+    color: v.$color-primary;
+    font-size: 1rem;
+  }
+
+  &__notification-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  &__notification-title {
+    @include m.font-base(v.$font-weight-regular);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+    white-space: normal;
+    line-height: v.$line-height-tight;
+  }
+
+  &__notification-time {
+    font-size: 0.75rem;
+    color: v.$color-text-muted;
+  }
+
+  &__notification-dot {
+    flex-shrink: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-top: 0.35rem;
+    margin-left: auto;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-orange;
+  }
+
+  &__notifications-more {
+    @include m.font-base(v.$font-weight-semibold);
+    width: 100%;
+    padding: v.$spacing-3 v.$spacing-4 v.$spacing-1;
+    border: none;
+    border-top: 1px solid v.$color-border;
+    margin-top: v.$spacing-1;
+    background: transparent;
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    text-align: center;
+    cursor: pointer;
+    transition: color v.$transition-fast;
+
+    &:hover {
+      color: v.$color-primary-dark;
+    }
+  }
+
+  // ============================================================
+  // User menu
+  // ============================================================
+  &__user {
+    position: relative;
+    margin-left: v.$spacing-2;
+  }
+
+  &__user-trigger {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    border: none;
+    background: transparent;
+    padding: v.$spacing-1;
+    border-radius: v.$radius-pill;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+  }
+
+  &__avatar {
+    @include m.flex-center;
+    @include m.font-heading(v.$font-weight-semibold);
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: v.$radius-pill;
+    background: linear-gradient(135deg, v.$color-navy 0%, v.$color-orange 100%);
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+  }
+
+  &__chevron {
+    color: v.$color-text-muted;
+    transition: transform v.$transition-fast;
+
+    &.is-open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + #{v.$spacing-2});
+    right: 0;
+    min-width: 200px;
+    list-style: none;
+    margin: 0;
+    padding: v.$spacing-2;
+    background-color: v.$color-bg;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    box-shadow: v.$shadow-lg;
+    z-index: v.$z-index-popover;
+  }
+
+  &__dropdown-heading {
+    @include m.font-heading(v.$font-weight-semibold);
+    padding: v.$spacing-2 v.$spacing-3;
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+    border-bottom: 1px solid v.$color-border;
+    margin-bottom: v.$spacing-1;
+    white-space: nowrap;
+  }
+
+  &__dropdown-item {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    @include m.font-base(v.$font-weight-medium);
+    width: 100%;
+    padding: v.$spacing-2 v.$spacing-3;
+    border: none;
+    border-radius: v.$radius-md;
+    background: transparent;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+
+    &--danger {
+      color: v.$color-danger;
+
+      &:hover {
+        background-color: rgba(v.$color-danger, 0.08);
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.toggle-switch {
+  @include m.flex(row, flex-start, center, v.$spacing-2);
+  @include m.focus-ring(v.$color-orange);
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+
+  &__track {
+    position: relative;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 1.5rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-gray-300;
+    transition: background-color v.$transition-fast;
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 0.15rem;
+    left: 0.15rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-white;
+    box-shadow: v.$shadow-sm;
+    transition: transform v.$transition-base;
+  }
+
+  &__label {
+    @include m.font-base(v.$font-weight-medium);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  &.is-on {
+    .toggle-switch__track {
+      background-color: v.$color-success;
+    }
+
+    .toggle-switch__thumb {
+      transform: translateX(1.25rem);
+    }
+  }
+}

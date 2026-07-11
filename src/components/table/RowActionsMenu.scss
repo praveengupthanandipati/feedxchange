@@ -1,0 +1,67 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.row-actions {
+  position: relative;
+  display: inline-flex;
+
+  &__trigger {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background: transparent;
+    color: v.$color-text-muted;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-primary;
+    }
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + #{v.$spacing-1});
+    right: 0;
+    min-width: 140px;
+    list-style: none;
+    margin: 0;
+    padding: v.$spacing-2;
+    background-color: v.$color-bg;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    box-shadow: v.$shadow-lg;
+    z-index: v.$z-index-popover;
+
+    button {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      @include m.font-base(v.$font-weight-medium);
+      width: 100%;
+      padding: v.$spacing-2 v.$spacing-3;
+      border: none;
+      border-radius: v.$radius-md;
+      background: transparent;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color v.$transition-fast;
+
+      &:hover {
+        background-color: v.$color-gray-100;
+      }
+    }
+  }
+
+  &__menu button.row-actions__item--danger {
+    color: v.$color-danger;
+
+    &:hover {
+      background-color: rgba(v.$color-danger, 0.08);
+    }
+  }
+}

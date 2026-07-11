@@ -1,0 +1,97 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  // border-radius: v.$radius-lg;
+  border: 1px solid v.$color-border;
+  scrollbar-width: thin;
+}
+
+.table {
+  width: 100%;
+  min-width: 1200px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: v.$font-size-sm;
+
+  th {
+    @include m.font-heading(v.$font-weight-semibold);
+    padding: v.$spacing-3 v.$spacing-4;
+    background-color: v.$color-navy!important;
+    color: v.$color-white!important;
+    font-size: v.$font-size-sm;
+    text-align: left;
+    white-space: nowrap;
+    user-select: none;
+
+    &.is-sortable {
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(v.$color-white, 0.08);
+      }
+    }
+  }
+
+  &__header-label {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__sort-icons {
+    display: inline-flex;
+    flex-direction: column;
+    margin-left: v.$spacing-2;
+    line-height: 0;
+
+    svg {
+      width: 0.7rem;
+      height: 0.7rem;
+      margin: -0.15rem 0;
+      color: rgba(v.$color-white, 0.4);
+
+      &.is-active {
+        color: v.$color-orange;
+      }
+    }
+  }
+
+  &__select-col {
+    width: 2.5rem;
+    text-align: center;
+
+    input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      accent-color: v.$color-primary;
+      cursor: pointer;
+    }
+  }
+
+  &__empty {
+    padding: v.$spacing-7;
+    text-align: center;
+    color: v.$color-text-muted;
+  }
+
+  tbody tr {
+    border-top: 1px solid v.$color-border;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-bg-muted;
+    }
+
+    &.is-selected {
+      background-color: rgba(v.$color-orange, 0.06);
+    }
+  }
+
+  td {
+    padding: v.$spacing-3 v.$spacing-4;
+    color: v.$color-text;
+    white-space: nowrap;
+  }
+}

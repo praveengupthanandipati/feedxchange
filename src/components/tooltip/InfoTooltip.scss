@@ -1,0 +1,45 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.3rem;
+  color: v.$color-gray-400;
+  cursor: help;
+
+  &:hover,
+  &:focus-visible {
+    color: v.$color-primary;
+
+    .info-tooltip__bubble {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  &__bubble {
+    position: absolute;
+    top: calc(100% + #{v.$spacing-2});
+    left: 50%;
+    z-index: v.$z-index-tooltip;
+    min-width: 9rem;
+    max-width: 14rem;
+    padding: v.$spacing-2 v.$spacing-3;
+    border-radius: v.$radius-md;
+    background-color: v.$color-navy-dark;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-regular;
+    line-height: v.$line-height-tight;
+    text-align: center;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -4px);
+    transition: opacity v.$transition-fast, transform v.$transition-fast, visibility v.$transition-fast;
+    pointer-events: none;
+  }
+}

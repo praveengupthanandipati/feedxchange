@@ -1,0 +1,79 @@
+@use "variables" as v;
+@use "mixins" as m;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%; // prevent iOS Safari auto-zoom on rotate
+  text-size-adjust: 100%;
+}
+
+body {
+  @include m.font-base;
+  font-size: v.$font-size-base;
+  line-height: v.$line-height-base;
+  color: v.$color-text;
+  background-color: v.$color-bg;
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @include m.font-heading;
+  color: v.$color-text;
+  margin-top: 0;
+}
+
+a {
+  color: v.$color-primary;
+
+  &:hover {
+    color: v.$color-primary-dark;
+  }
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  // gap: v.$spacing-3;
+  // padding: v.$spacing-3;
+  background-color: v.$color-navy-dark;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__body {
+    flex: 1;
+    padding: v.$spacing-4 v.$spacing-4 0;
+    background-color: v.$color-bg;
+
+    @include m.respond-to(md) {
+      padding: v.$spacing-6 v.$spacing-6 0;
+    }
+  }
+
+  &__backdrop {
+    display: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+
+    @include m.respond-below(lg) {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: v.$z-index-modal-backdrop;
+    }
+  }
+}

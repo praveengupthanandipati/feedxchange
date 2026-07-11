@@ -1,0 +1,294 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.new-contract {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+
+  // ============================================================
+  // Top bar
+  // ============================================================
+  &__topbar {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__topbar-left {
+    @include m.flex(row, flex-start, center, v.$spacing-4);
+    flex-wrap: wrap;
+  }
+
+  &__summary-toggle,
+  &__back {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      color: v.$color-primary-dark;
+      text-decoration: underline;
+    }
+  }
+
+  // ============================================================
+  // Summary bar
+  // ============================================================
+  &__summary {
+    @include m.card(v.$spacing-5);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    span {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+
+    strong {
+      @include m.font-heading(v.$font-weight-semibold);
+      color: v.$color-text;
+    }
+  }
+
+  &__error {
+    background-color: rgba(v.$color-danger, 0.08);
+    color: v.$color-danger;
+    border-radius: v.$radius-md;
+    padding: v.$spacing-3 v.$spacing-4;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  // ============================================================
+  // Sections
+  // ============================================================
+  &__section {
+    @include m.card(v.$spacing-5);
+  }
+
+  &__section-title {
+    color: v.$color-primary;
+    font-size: v.$font-size-lg;
+    margin: 0 0 v.$spacing-5;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    &--condition {
+      @include m.respond-to(lg) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  }
+
+  &__grid--full {
+    grid-column: 1 / -1;
+  }
+
+  // ============================================================
+  // Seller / Buyer conditions
+  // ============================================================
+  &__conditions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-5;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__condition-card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    padding: v.$spacing-4;
+
+    h3 {
+      color: v.$color-primary;
+      font-size: v.$font-size-base;
+      margin: 0 0 v.$spacing-4;
+      padding-bottom: v.$spacing-3;
+      border-bottom: 1px solid v.$color-border;
+    }
+  }
+
+  // ============================================================
+  // Settings table
+  // ============================================================
+  &__settings-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+    font-size: v.$font-size-sm;
+
+    th {
+      background-color: v.$color-bg-muted;
+      text-align: left;
+      padding: v.$spacing-3 v.$spacing-4;
+      color: v.$color-text-muted;
+      font-weight: v.$font-weight-semibold;
+      border-bottom: 1px solid v.$color-border;
+    }
+
+    td {
+      padding: v.$spacing-4;
+      border-bottom: 1px solid v.$color-border;
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  &__setting-title {
+    @include m.font-base(v.$font-weight-semibold);
+    color: v.$color-text;
+    margin: 0 0 v.$spacing-1;
+  }
+
+  &__setting-description {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__setting-value {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+  }
+
+  &__setting-status {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  // ============================================================
+  // Actions
+  // ============================================================
+  &__actions {
+    @include m.flex(row, flex-end, center, v.$spacing-3);
+  }
+
+  &__cancel {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    height: 2.75rem;
+    padding: 0 v.$spacing-5;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: none;
+
+    &:hover {
+      background-color: v.$color-gray-50;
+    }
+  }
+
+  &__submit {
+    @include m.flex-center;
+    @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2.75rem;
+    padding: 0 v.$spacing-6;
+    font-size: v.$font-size-sm;
+  }
+}
+
+// ============================================================
+// Shared form-field styling — reused across every input/select/textarea
+// ============================================================
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  min-width: 0;
+
+  &__label {
+    @include m.font-base(v.$font-weight-semibold);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  &__required {
+    color: v.$color-danger;
+  }
+
+  &__control {
+    @include m.font-base;
+    height: 2.75rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+
+    &:disabled {
+      background-color: v.$color-gray-50;
+      color: v.$color-text-muted;
+      cursor: not-allowed;
+    }
+  }
+
+  textarea.form-field__control {
+    height: auto;
+    min-height: 5.5rem;
+    padding: v.$spacing-3;
+    resize: vertical;
+  }
+}

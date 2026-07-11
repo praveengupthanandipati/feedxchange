@@ -1,0 +1,138 @@
+// ============================================================
+// Brand colors — sampled directly from src/assets/img/logo.png
+// ============================================================
+$color-navy: #1b3664; // logo wordmark / background panel
+$color-orange: #faa41a; // logo background panel / accent
+$color-white: #ffffff; // logo "X" cutout + dot
+
+// Tints & shades derived from the brand colors
+$color-navy-dark: #12263f; // pressed / active states
+$color-navy-light: #2c4d84; // hover on dark surfaces
+$color-orange-dark: #d98a12; // pressed / active states
+$color-orange-light: #ffc25c; // hover, highlights, badges
+
+// Semantic aliases — reference these in components, not the raw colors above
+$color-primary: $color-navy;
+$color-primary-dark: $color-navy-dark;
+$color-primary-light: $color-navy-light;
+
+$color-secondary: $color-orange;
+$color-secondary-dark: $color-orange-dark;
+$color-secondary-light: $color-orange-light;
+
+$color-accent: $color-orange;
+
+// Neutrals
+$color-black: #0d1117;
+$color-gray-900: #1a1d24;
+$color-gray-800: #2b2f38;
+$color-gray-700: #40454f;
+$color-gray-600: #5a606b;
+$color-gray-500: #767c87;
+$color-gray-400: #9ea4ad;
+$color-gray-300: #c4c8ce;
+$color-gray-200: #e1e4e8;
+$color-gray-100: #f2f4f6;
+$color-gray-50: #f9fafb;
+
+// Feedback / status colors
+$color-success: #2e9e5b;
+$color-danger: #e0483c;
+$color-warning: $color-orange;
+$color-info: #2f8fd6;
+
+// Text & surface
+$color-text: $color-gray-900;
+$color-text-muted: $color-gray-600;
+$color-text-inverse: $color-white;
+$color-bg: $color-white;
+$color-bg-muted: $color-gray-50;
+$color-border: $color-gray-200;
+
+// ============================================================
+// Typography
+// ============================================================
+// Inter: highly hinted, variable-weight body face with wide
+// engine support (Chrome/Firefox/Safari/Edge, iOS & Android WebView).
+// Poppins: geometric, rounded-friendly display face that echoes
+// the logo's wordmark for headings/branding.
+// Both stacks end in the platform's native UI font so text never
+// falls back to an unstyled serif while a web font is loading.
+$font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+  "Apple Color Emoji", "Segoe UI Emoji";
+$font-family-heading: "Poppins", #{$font-family-base};
+$font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+  monospace;
+
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+$font-size-base: 1rem; // 16px
+$font-size-sm: 0.875rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 1.875rem;
+$font-size-4xl: 2.25rem;
+$font-size-5xl: 3rem;
+
+$line-height-tight: 1.2;
+$line-height-base: 1.5;
+$line-height-loose: 1.75;
+
+// ============================================================
+// Spacing scale (rem-based, 4px baseline)
+// ============================================================
+$spacer: 1rem;
+$spacing-1: $spacer * 0.25; // 4px
+$spacing-2: $spacer * 0.5; // 8px
+$spacing-3: $spacer * 0.75; // 12px
+$spacing-4: $spacer; // 16px
+$spacing-5: $spacer * 1.5; // 24px
+$spacing-6: $spacer * 2; // 32px
+$spacing-7: $spacer * 3; // 48px
+$spacing-8: $spacer * 4; // 64px
+
+// ============================================================
+// Radius, shadow & motion
+// ============================================================
+$radius-sm: 0.25rem;
+$radius-md: 0.5rem;
+$radius-lg: 1rem;
+$radius-pill: 999px;
+
+$shadow-sm: 0 1px 2px rgba($color-black, 0.06);
+$shadow-md: 0 4px 12px rgba($color-navy, 0.12);
+$shadow-lg: 0 12px 32px rgba($color-navy, 0.18);
+
+$transition-fast: 0.15s ease-in-out;
+$transition-base: 0.25s ease-in-out;
+$transition-slow: 0.4s ease-in-out;
+
+// ============================================================
+// Breakpoints — mirrors Bootstrap's grid so both systems agree
+// ============================================================
+$breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+);
+
+// ============================================================
+// Z-index scale
+// ============================================================
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;

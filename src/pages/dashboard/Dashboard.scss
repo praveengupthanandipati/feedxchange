@@ -1,0 +1,435 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+
+  &__stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: v.$spacing-5;
+    }
+
+    @include m.respond-to(xl) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-5;
+    align-items: stretch;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  &__side {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-5;
+  }
+
+  &__footer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: v.$spacing-5;
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+// ============================================================
+// Shared card shell
+// ============================================================
+.dashboard-card {
+  @include m.card;
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__title {
+    font-size: v.$font-size-lg;
+    margin: 0;
+  }
+
+  &__sort {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    border: none;
+    background: transparent;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    strong {
+      color: v.$color-text;
+      font-weight: v.$font-weight-semibold;
+    }
+
+    &:hover {
+      color: v.$color-primary;
+    }
+  }
+}
+
+// ============================================================
+// Stat cards
+// ============================================================
+.dashboard-stat {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+  }
+
+  &__value {
+    @include m.font-heading(v.$font-weight-bold);
+    font-size: v.$font-size-2xl;
+    margin: 0;
+  }
+
+  &__label {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: v.$spacing-1 0 0;
+  }
+
+  &__visual {
+    flex-shrink: 0;
+  }
+
+  &__delta {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    margin: 0;
+
+    span {
+      color: v.$color-text-muted;
+      font-weight: v.$font-weight-regular;
+      margin-left: v.$spacing-1;
+    }
+
+    &--up {
+      color: v.$color-success;
+    }
+
+    &--down {
+      color: v.$color-danger;
+    }
+  }
+}
+
+// ============================================================
+// Sales analytics
+// ============================================================
+.dashboard-analytics {
+  &__summary {
+    display: flex;
+    gap: v.$spacing-6;
+    padding-bottom: v.$spacing-4;
+    margin-bottom: v.$spacing-4;
+    border-bottom: 1px solid v.$color-border;
+  }
+
+  &__figure {
+    @include m.font-heading(v.$font-weight-bold);
+    font-size: v.$font-size-xl;
+    color: v.$color-primary;
+    margin: 0;
+  }
+
+  &__caption {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: v.$spacing-1 0 0;
+  }
+
+  &__chart {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+  }
+
+  &__legend {
+    @include m.flex(row, center, center, v.$spacing-5);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+
+    li {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      font-size: v.$font-size-sm;
+      color: v.$color-text-muted;
+    }
+
+    span {
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: v.$radius-pill;
+    }
+  }
+}
+
+// ============================================================
+// Campaign banner
+// ============================================================
+.dashboard-banner {
+  background: linear-gradient(135deg, v.$color-navy 0%, v.$color-navy-dark 100%);
+  color: v.$color-white;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__icon {
+    @include m.flex-center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: v.$radius-md;
+    background: rgba(v.$color-white, 0.12);
+    color: v.$color-orange-light;
+    font-size: 1.25rem;
+  }
+
+  &__text {
+    @include m.font-heading(v.$font-weight-medium);
+    font-size: v.$font-size-lg;
+    line-height: v.$line-height-tight;
+    margin: 0;
+
+    strong {
+      font-weight: v.$font-weight-bold;
+    }
+
+    svg {
+      vertical-align: middle;
+    }
+  }
+
+  &__cta {
+    @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    align-self: flex-start;
+    padding: v.$spacing-3 v.$spacing-5;
+    font-size: v.$font-size-sm;
+  }
+}
+
+// ============================================================
+// Top selling products
+// ============================================================
+.dashboard-products {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: v.$spacing-2;
+    align-items: center;
+  }
+
+  &__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: v.$radius-pill;
+  }
+
+  &__name {
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  &__bar {
+    grid-column: 1 / -1;
+    height: 6px;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-gray-100;
+    overflow: hidden;
+  }
+
+  &__bar-fill {
+    display: block;
+    height: 100%;
+    border-radius: v.$radius-pill;
+  }
+}
+
+// ============================================================
+// Top users
+// ============================================================
+.dashboard-users {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__item {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+  }
+
+  &__avatar {
+    @include m.flex-center;
+    @include m.font-heading(v.$font-weight-semibold);
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: v.$radius-pill;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    margin: 0;
+  }
+
+  &__location {
+    @include m.flex(row, flex-start, center, 0.25rem);
+    color: v.$color-text-muted;
+    font-size: 0.75rem;
+    margin: 0.15rem 0 0;
+  }
+
+  &__status {
+    flex-shrink: 0;
+    padding: 0.2rem 0.65rem;
+    border-radius: v.$radius-pill;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+
+    &--success {
+      background-color: rgba(v.$color-success, 0.12);
+      color: v.$color-success;
+    }
+
+    &--cancel {
+      background-color: rgba(v.$color-danger, 0.1);
+      color: v.$color-danger;
+    }
+  }
+
+  &__amount {
+    @include m.flex(row, flex-end, center, 0.25rem);
+    flex-shrink: 0;
+    width: 5.5rem;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+
+    &--up {
+      color: v.$color-success;
+    }
+
+    &--down {
+      color: v.$color-danger;
+    }
+  }
+}
+
+// ============================================================
+// Recent activity
+// ============================================================
+.dashboard-activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+
+  &__item {
+    display: flex;
+    gap: v.$spacing-3;
+  }
+
+  &__dot {
+    flex-shrink: 0;
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-top: 0.35rem;
+    border-radius: v.$radius-pill;
+    border: 2px solid v.$color-primary;
+  }
+
+  &__time {
+    font-size: 0.75rem;
+    color: v.$color-text-muted;
+    margin: 0 0 0.25rem;
+  }
+
+  &__text {
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+    line-height: v.$line-height-base;
+    margin: 0;
+  }
+}
+
+// ============================================================
+// Social source
+// ============================================================
+.dashboard-social {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: v.$spacing-3;
+  padding: v.$spacing-4 0;
+
+  &__icon {
+    @include m.flex-center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: v.$radius-pill;
+    background-color: #1877f2;
+    color: v.$color-white;
+    font-size: 1.25rem;
+  }
+
+  &__figure {
+    @include m.font-heading(v.$font-weight-semibold);
+    margin: 0;
+  }
+
+  &__description {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    max-width: 26rem;
+    margin: 0;
+  }
+}

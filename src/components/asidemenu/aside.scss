@@ -1,0 +1,393 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+$aside-width: 272px;
+$aside-width-collapsed: 84px;
+$aside-item-height: 2.75rem;
+
+.aside {
+  position: sticky;
+  top: v.$spacing-3;
+  display: flex;
+  flex-direction: column;
+  width: $aside-width;
+  height: calc(100vh - #{v.$spacing-3 * 2});
+  background-color: v.$color-navy-dark;
+  color: rgba(v.$color-white, 0.85);
+  transition: width v.$transition-base, transform v.$transition-base;
+  overflow: hidden;
+
+  // Off-canvas drawer below `lg` — the expand/collapse rail only makes
+  // sense once there's a persistent sidebar column to shrink.
+  @include m.respond-below(lg) {
+    position: fixed;
+    inset: 0 auto 0 0;
+    top: 0;
+    width: $aside-width;
+    height: 100vh;
+    border-radius: 0;
+    transform: translateX(-100%);
+    z-index: v.$z-index-modal;
+  }
+
+  &--mobile-open {
+    @include m.respond-below(lg) {
+      transform: translateX(0);
+    }
+  }
+
+  &--collapsed {
+    width: $aside-width-collapsed;
+
+    .aside__section-title,
+    .aside-item__label,
+    .aside-item__chevron {
+      opacity: 0;
+      width: 0;
+    }
+
+    .aside-item__children.is-open {
+      max-height: 0;
+    }
+
+    // The collapsed icon-rail is a desktop affordance; the mobile drawer
+    // always shows the full, labeled menu regardless of desktop state.
+    @include m.respond-below(lg) {
+      width: $aside-width;
+
+      .aside__section-title,
+      .aside-item__label,
+      .aside-item__chevron {
+        opacity: 1;
+        width: auto;
+      }
+    }
+  }
+
+  // ============================================================
+  // Brand / collapse toggle
+  // ============================================================
+  &__brand {
+    @include m.flex(row, space-between, center);
+    flex-shrink: 0;
+    padding: v.$spacing-5 v.$spacing-4;
+    min-height: 4.5rem;
+  }
+
+  &__logo {
+    max-width: 200px;
+    height: auto;
+  }
+
+  &__logo-icon {
+    width: 2rem;
+    height: 2rem;
+    margin-inline: auto;
+  }
+
+  &__toggle {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid rgba(v.$color-white, 0.16);
+    border-radius: v.$radius-pill;
+    background: rgba(v.$color-white, 0.06);
+    color: v.$color-white;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, transform v.$transition-base;
+    @include m.focus-ring(v.$color-orange);
+
+    &:hover {
+      background: rgba(v.$color-white, 0.14);
+    }
+
+    svg {
+      transition: transform v.$transition-base;
+
+      &.is-rotated {
+        transform: rotate(180deg);
+      }
+    }
+
+    // Collapsing to an icon rail is a desktop affordance only.
+    @include m.respond-below(lg) {
+      display: none;
+    }
+  }
+
+  &__mobile-close {
+    @include m.flex-center;
+    display: none;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid rgba(v.$color-white, 0.16);
+    border-radius: v.$radius-pill;
+    background: rgba(v.$color-white, 0.06);
+    color: v.$color-white;
+    cursor: pointer;
+    @include m.focus-ring(v.$color-orange);
+
+    &:hover {
+      background: rgba(v.$color-white, 0.14);
+    }
+
+    @include m.respond-below(lg) {
+      display: flex;
+    }
+  }
+
+  // ============================================================
+  // Nav sections
+  // ============================================================
+  &__nav {
+    flex: 1;
+    min-height: 0;
+    padding: 0 v.$spacing-3 v.$spacing-5;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: v.$radius-pill;
+    }
+
+    &.is-scrolling {
+      scrollbar-color: rgba(v.$color-white, 0.35) transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(v.$color-white, 0.35);
+      }
+    }
+  }
+
+  &__section {
+    margin-top: v.$spacing-5;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  &__section-title {
+    @include m.font-heading(v.$font-weight-semibold);
+    font-size: v.$font-size-sm * 0.85;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(v.$color-orange-light, 0.85);
+    padding: 0 v.$spacing-3;
+    margin: 0 0 v.$spacing-2;
+    white-space: nowrap;
+    transition: opacity v.$transition-fast;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+  }
+
+  // ============================================================
+  // CTA footer
+  // ============================================================
+  &__footer {
+    flex-shrink: 0;
+    padding: v.$spacing-4 v.$spacing-3;
+  }
+
+  &__cta {
+    @include m.flex-center;
+    @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
+    @include m.font-heading(v.$font-weight-semibold);
+    width: 100%;
+    gap: v.$spacing-2;
+    height: $aside-item-height;
+    font-size: v.$font-size-sm;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+}
+
+// ============================================================
+// Individual nav item (leaf, parent w/ accordion, collapsed flyout)
+// ============================================================
+.aside-item {
+  position: relative;
+
+  &__link {
+    @include m.flex(row, flex-start, center);
+    @include m.font-base(v.$font-weight-medium);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    height: $aside-item-height;
+    padding: 0 v.$spacing-3;
+    gap: v.$spacing-3;
+    border: none;
+    border-radius: v.$radius-md;
+    background: transparent;
+    color: rgba(v.$color-white, 0.8);
+    font-size: v.$font-size-sm;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background: rgba(v.$color-white, 0.08);
+      color: v.$color-white;
+    }
+
+    &.is-active {
+      background: v.$color-white;
+      color: v.$color-navy;
+      font-weight: v.$font-weight-semibold;
+
+      .aside-item__icon {
+        color: v.$color-orange;
+      }
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  &__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity v.$transition-fast;
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    width: 0.9rem;
+    height: 0.9rem;
+    margin-left: auto;
+    transition: transform v.$transition-base, opacity v.$transition-fast;
+
+    &.is-open {
+      transform: rotate(180deg);
+    }
+  }
+
+  // Accordion sub-list — expanded (non-collapsed) mode
+  &__children {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height v.$transition-base;
+
+    &.is-open {
+      max-height: 20rem;
+    }
+  }
+
+  &__child-link {
+    @include m.font-base;
+    display: block;
+    margin: v.$spacing-1 0 0 2.6rem;
+    padding: v.$spacing-2 v.$spacing-3;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    color: rgba(v.$color-white, 0.65);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background: rgba(v.$color-white, 0.08);
+      color: v.$color-white;
+    }
+
+    &.is-active {
+      color: v.$color-orange-light;
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  // Flyout — portaled to <body> so it can escape the sidebar's own
+  // scroll container; position is computed in JS via getBoundingClientRect
+  // and toggled on hover with a short close delay (see AsideMenuItem.tsx).
+  &__flyout {
+    position: fixed;
+    min-width: 200px;
+    background: v.$color-navy;
+    border: 1px solid rgba(v.$color-white, 0.1);
+    border-radius: v.$radius-md;
+    box-shadow: v.$shadow-lg;
+    padding: v.$spacing-2;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-4px);
+    transition: opacity v.$transition-fast, transform v.$transition-fast, visibility v.$transition-fast;
+    z-index: v.$z-index-popover;
+
+    &.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+  }
+
+  &__flyout-title {
+    @include m.font-heading(v.$font-weight-semibold);
+    font-size: v.$font-size-sm;
+    color: v.$color-white;
+    padding: v.$spacing-2 v.$spacing-3;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  &__flyout-children {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .aside-item__child-link {
+      margin-left: 0;
+    }
+  }
+
+}
+
+.aside--collapsed .aside-item__link {
+  position: relative;
+  padding: 0;
+
+  .aside-item__icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  // Mobile drawer always shows the full labeled menu — undo the
+  // icon-rail centering so the icon sits back in normal flow.
+  @include m.respond-below(lg) {
+    padding: 0 v.$spacing-3;
+
+    .aside-item__icon {
+      position: static;
+      transform: none;
+    }
+  }
+}
