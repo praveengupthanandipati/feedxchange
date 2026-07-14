@@ -6,6 +6,9 @@ import Dashboard from './pages/dashboard/Dashboard'
 import Contracts from './pages/contracts/Contracts'
 import ContractDetail from './pages/contracts/ContractDetail'
 import NewContract from './pages/contracts/NewContract'
+import Businessowners from './pages/usermanagement/businessowners/Businessowners'
+import BusinessOwnerDetail from './pages/usermanagement/businessowners/BusinessOwnerDetail'
+import Newbusiness from './pages/usermanagement/businessowners/Newbusiness'
 
 function App() {
   return (
@@ -13,11 +16,15 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route element={<AppLayout />}>
+
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/contracts/:id" element={<ContractDetail />} />
           <Route path="/contracts/new" element={<NewContract />} />
+          <Route path="/business-owners" element={<Businessowners />} />
+          <Route path="/business-owners/:id" element={<BusinessOwnerDetail />} />
+          <Route path="/business-owners/new" element={<Newbusiness />} />
         </Route>
       </Routes>
     </Router>

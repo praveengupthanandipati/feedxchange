@@ -7,6 +7,11 @@
   gap: v.$spacing-5;
   padding-bottom: v.$spacing-6;
 
+  // Leave room for the fixed mobile action bar so it doesn't cover content.
+  @include m.respond-below(md) {
+    padding-bottom: 5.5rem;
+  }
+
   // ============================================================
   // Top bar
   // ============================================================
@@ -209,6 +214,25 @@
   // ============================================================
   &__actions {
     @include m.flex(row, flex-end, center, v.$spacing-3);
+
+    // Pin the primary actions to the bottom of the viewport on mobile,
+    // where scrolling past them to find "Create" is poor UX.
+    @include m.respond-below(md) {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: v.$z-index-sticky;
+      padding: v.$spacing-3 v.$spacing-4;
+      background-color: v.$color-bg;
+      border-top: 1px solid v.$color-border;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
+
+      .new-contract__cancel,
+      .new-contract__submit {
+        flex: 1;
+      }
+    }
   }
 
   &__cancel {

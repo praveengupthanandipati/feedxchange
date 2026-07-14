@@ -379,15 +379,4 @@ $aside-item-height: 2.75rem;
     left: 50%;
     transform: translateX(-50%);
   }
-
-  // Mobile drawer always shows the full labeled menu — undo the
-  // icon-rail centering so the icon sits back in normal flow.
-  @include m.respond-below(lg) {
-    padding: 0 v.$spacing-3;
-
-    .aside-item__icon {
-      position: static;
-      transform: none;
-    }
-  }
 }

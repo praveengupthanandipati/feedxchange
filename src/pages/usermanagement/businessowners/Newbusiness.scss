@@ -1,0 +1,435 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.new-business {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+
+  // Leave room for the fixed mobile action bar so it doesn't cover content.
+  @include m.respond-below(md) {
+    padding-bottom: 5.5rem;
+  }
+
+  &__topbar {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__topbar-left {
+    @include m.flex(row, flex-start, center, v.$spacing-4);
+    flex-wrap: wrap;
+  }
+
+  &__completion {
+    font-size: v.$font-size-sm;
+    color: v.$color-text-muted;
+
+    strong {
+      color: v.$color-primary;
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__back {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    text-decoration: none;
+
+    &:hover {
+      color: v.$color-primary-dark;
+      text-decoration: underline;
+    }
+  }
+}
+
+// ============================================================
+// Accordion sections (1. Business Profile / 2. Contact & Address)
+// ============================================================
+.accordion-section {
+  &__header {
+    @include m.flex(row, space-between, center);
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+
+    .new-contract__section-title {
+      margin: 0;
+    }
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    color: v.$color-text-muted;
+    transition: transform v.$transition-fast;
+  }
+
+  &.is-open .accordion-section__chevron {
+    transform: rotate(180deg);
+  }
+
+  &__body {
+    margin-top: v.$spacing-5;
+  }
+}
+
+// Shared sub-heading style — used by every section that groups repeatable
+// entries under a labeled sub-block (Contact & Address, Bank Details, Documents).
+.form-subheading {
+  color: v.$color-primary;
+  font-size: v.$font-size-base;
+  margin: 0 0 v.$spacing-4;
+  padding-bottom: v.$spacing-3;
+  border-bottom: 1px solid v.$color-border;
+}
+
+// ============================================================
+// 2. Contact & Address
+// ============================================================
+.contact-address {
+  &__subsections {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-5;
+  }
+}
+
+// ============================================================
+// Repeatable card-style entries (Additional Contacts / Address)
+// ============================================================
+.repeatable-entries {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-top: v.$spacing-4;
+
+  &__add {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    align-self: flex-start;
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    font-size: v.$font-size-sm;
+    margin-top: v.$spacing-4;
+  }
+}
+
+.repeatable-entry {
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  padding: v.$spacing-4;
+
+  &__delete {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    margin-top: v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-danger;
+    color: v.$color-white;
+    cursor: pointer;
+    transition: filter v.$transition-fast;
+
+    &:hover {
+      filter: brightness(0.92);
+    }
+
+    // Placed as a natural grid item alongside fields (Bank Details / Documents)
+    // rather than below the whole grid — don't stretch to fill the 1fr track.
+    &--inline {
+      justify-self: start;
+      align-self: end;
+      margin-top: 0;
+    }
+  }
+
+  &__radio {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-medium);
+    margin-top: v.$spacing-4;
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+    cursor: pointer;
+
+    input {
+      width: 1rem;
+      height: 1rem;
+      accent-color: v.$color-primary;
+      cursor: pointer;
+    }
+  }
+
+  &__radio-label {
+    color: v.$color-primary;
+    font-weight: v.$font-weight-semibold;
+  }
+}
+
+// ============================================================
+// Field variants: input + inline action button, error/hint text, file input
+// ============================================================
+.form-field {
+  &__with-action {
+    display: flex;
+
+    .form-field__control {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-right: none;
+    }
+  }
+
+  &__action {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 2.75rem;
+    border: 1px solid v.$color-border;
+    border-left: 1px solid v.$color-primary;
+    border-top-right-radius: v.$radius-md;
+    border-bottom-right-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-primary;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-50;
+    }
+  }
+
+  &__error {
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    margin: v.$spacing-1 0 0;
+  }
+
+  &__hint {
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    margin: v.$spacing-3 0 0;
+  }
+
+  &__file {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    position: relative;
+    height: 2.75rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    overflow: hidden;
+  }
+
+  &__file-btn {
+    @include m.font-base(v.$font-weight-semibold);
+    flex-shrink: 0;
+    border: none;
+    border-right: 1px solid v.$color-border;
+    background: transparent;
+    color: v.$color-primary;
+    padding-right: v.$spacing-3;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+  }
+
+  &__file-name {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+  }
+}
+
+// ============================================================
+// Empty state for repeatable sections
+// ============================================================
+.empty-rows {
+  @include m.flex(row, space-between, center);
+  flex-wrap: wrap;
+  gap: v.$spacing-3;
+  margin-top: v.$spacing-4;
+  padding: v.$spacing-4;
+  border: 1px dashed v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg-muted;
+
+  &__message {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__add {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    font-size: v.$font-size-sm;
+  }
+}
+
+// ============================================================
+// 5. Profile Settings
+// ============================================================
+.profile-settings-table {
+  margin-top: v.$spacing-4;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  overflow: hidden;
+
+  &__header,
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: v.$spacing-4;
+    padding: v.$spacing-3 v.$spacing-4;
+  }
+
+  &__header {
+    background-color: v.$color-bg-muted;
+
+    span {
+      @include m.font-base(v.$font-weight-semibold);
+      font-size: v.$font-size-sm;
+      color: v.$color-text;
+    }
+
+    span:last-child {
+      justify-self: end;
+    }
+  }
+
+  &__row {
+    border-top: 1px solid v.$color-border;
+  }
+
+  &__title {
+    @include m.font-base(v.$font-weight-semibold);
+    margin: 0;
+    font-size: v.$font-size-base;
+    color: v.$color-text;
+  }
+
+  &__hint {
+    margin: v.$spacing-1 0 0;
+    font-size: v.$font-size-sm;
+    color: v.$color-text-muted;
+  }
+
+  &__value {
+    justify-self: end;
+  }
+}
+
+// ============================================================
+// Repeatable product rows (Brokerage Charges / Capacity)
+// ============================================================
+.repeatable-rows {
+  margin-top: v.$spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+
+  &__header {
+    display: none;
+
+    @include m.respond-to(sm) {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) auto;
+      gap: v.$spacing-3;
+      padding: 0 v.$spacing-1;
+
+      span {
+        color: v.$color-text-muted;
+        font-size: v.$font-size-sm;
+        font-weight: v.$font-weight-semibold;
+      }
+    }
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    align-items: center;
+    padding: v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(3, 1fr) auto;
+      border: none;
+      padding: 0 v.$spacing-1;
+    }
+
+    // Keep the Product dropdown's width fixed to its grid column, whether a
+    // long product name is selected or the short placeholder is showing.
+    .searchable-select {
+      min-width: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    justify-self: start;
+
+    @include m.respond-to(sm) {
+      justify-self: center;
+    }
+  }
+
+  &__delete,
+  &__add {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    cursor: pointer;
+    transition: filter v.$transition-fast;
+
+    &:hover {
+      filter: brightness(0.92);
+    }
+  }
+
+  &__delete {
+    background-color: rgba(v.$color-danger, 0.12);
+    color: v.$color-danger;
+  }
+
+  &__add {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+  }
+}

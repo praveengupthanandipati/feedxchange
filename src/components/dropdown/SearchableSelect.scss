@@ -19,6 +19,12 @@
     font-size: v.$font-size-sm;
     cursor: pointer;
 
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     svg {
       flex-shrink: 0;
       color: v.$color-text-muted;
@@ -31,6 +37,16 @@
 
     &:hover {
       border-color: v.$color-primary;
+    }
+
+    &:disabled {
+      background-color: v.$color-gray-50;
+      color: v.$color-text-muted;
+      cursor: not-allowed;
+
+      &:hover {
+        border-color: v.$color-border;
+      }
     }
   }
 
@@ -61,6 +77,24 @@
       background: transparent;
       font-size: v.$font-size-sm;
       color: v.$color-text;
+    }
+  }
+
+  &__add {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-orange, 0.12);
+    color: v.$color-orange-dark;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: rgba(v.$color-orange, 0.22);
     }
   }
 

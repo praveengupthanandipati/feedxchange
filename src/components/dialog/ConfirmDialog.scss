@@ -1,0 +1,81 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.confirm-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-backdrop;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-4;
+}
+
+.confirm-dialog {
+  @include m.card(v.$spacing-6);
+  position: relative;
+  z-index: v.$z-index-modal;
+  width: 100%;
+  max-width: 24rem;
+  text-align: center;
+
+  &__icon {
+    @include m.flex-center;
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto v.$spacing-4;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-danger, 0.12);
+    color: v.$color-danger;
+    font-size: 1.5rem;
+  }
+
+  &__title {
+    font-size: v.$font-size-lg;
+    margin: 0 0 v.$spacing-2;
+  }
+
+  &__message {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0 0 v.$spacing-5;
+  }
+
+  &__actions {
+    @include m.flex(row, center, center, v.$spacing-3);
+  }
+
+  &__cancel,
+  &__confirm {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex: 1;
+    height: 2.5rem;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+  }
+
+  &__cancel {
+    background-color: v.$color-white;
+    color: v.$color-text;
+    border: 1px solid v.$color-border;
+
+    &:hover {
+      background-color: v.$color-gray-50;
+    }
+  }
+
+  &__confirm {
+    background-color: v.$color-danger;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: darken(v.$color-danger, 8%);
+    }
+  }
+}

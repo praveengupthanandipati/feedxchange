@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiChevronDown, FiSearch } from "react-icons/fi";
+import { FiChevronDown, FiPlus, FiSearch } from "react-icons/fi";
 import "./SearchableSelect.scss";
 
 export interface SearchableSelectOption {
@@ -13,6 +13,9 @@ interface SearchableSelectProps {
   onChange: (value: string) => void;
   placeholder?: string;
   ariaLabel?: string;
+  /** When true, shows a "+" button beside the search box that saves the typed text as a new option, appended to the end of the list. */
+  allowCustom?: boolean;
+  disabled?: boolean;
 }
 
 const SearchableSelect = ({
@@ -21,19 +24,26 @@ const SearchableSelect = ({
   onChange,
   placeholder = "Select...",
   ariaLabel,
+  allowCustom = false,
+  disabled = false,
 }: SearchableSelectProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [customOptions, setCustomOptions] = useState<SearchableSelectOption[]>([]);
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const selectedLabel = options.find((option) => option.value === value)?.label;
+  // Custom items are saved here and always rendered at the end of the list.
+  const allOptions = useMemo(() => [...options, ...customOptions], [options, customOptions]);
+
+  const knownLabel = allOptions.find((option) => option.value === value)?.label;
+  const selectedLabel = knownLabel ?? (allowCustom && value ? value : undefined);
 
   const filteredOptions = useMemo(() => {
-    if (!query.trim()) return options;
+    if (!query.trim()) return allOptions;
     const q = query.trim().toLowerCase();
-    return options.filter((option) => option.label.toLowerCase().includes(q));
-  }, [options, query]);
+    return allOptions.filter((option) => option.label.toLowerCase().includes(q));
+  }, [allOptions, query]);
 
   useEffect(() => {
     if (!open) return;
@@ -69,6 +79,24 @@ const SearchableSelect = ({
     setQuery("");
   };
 
+  // Saves the typed query as a new option (or selects it if it already exists).
+  const handleAddCustom = () => {
+    const label = query.trim();
+    if (!label) return;
+
+    const existing = allOptions.find(
+      (option) => option.label.toLowerCase() === label.toLowerCase(),
+    );
+    if (existing) {
+      handleSelect(existing);
+      return;
+    }
+
+    const newOption: SearchableSelectOption = { value: label, label };
+    setCustomOptions((prev) => [...prev, newOption]);
+    handleSelect(newOption);
+  };
+
   return (
     <div className="searchable-select" ref={rootRef}>
       <button
@@ -78,6 +106,7 @@ const SearchableSelect = ({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={ariaLabel}
+        disabled={disabled}
       >
         <span>{selectedLabel ?? placeholder}</span>
         <FiChevronDown className={open ? "is-open" : ""} aria-hidden />
@@ -92,8 +121,25 @@ const SearchableSelect = ({
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search..."
+              placeholder={allowCustom ? "Search or add new..." : "Search..."}
+              onKeyDown={(event) => {
+                if (allowCustom && event.key === "Enter") {
+                  event.preventDefault();
+                  handleAddCustom();
+                }
+              }}
             />
+            {allowCustom && (
+              <button
+                type="button"
+                className="searchable-select__add"
+                onClick={handleAddCustom}
+                aria-label="Add custom item"
+                title="Save as new option"
+              >
+                <FiPlus aria-hidden />
+              </button>
+            )}
           </div>
           <ul className="searchable-select__options" role="listbox">
             {filteredOptions.length === 0 ? (
