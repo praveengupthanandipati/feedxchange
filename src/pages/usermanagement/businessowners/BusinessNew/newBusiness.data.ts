@@ -1,6 +1,6 @@
 // TODO: replace with real reference data once the business masters are wired up.
 
-import { indianStates } from "./businessOwners.data";
+import { indianStates } from "../BusinessList/businessOwners.data";
 
 export const lineOfBusinessOptions = [
   { value: "feed-trading", label: "Feed Trading" },

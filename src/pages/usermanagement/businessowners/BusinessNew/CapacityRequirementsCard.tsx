@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
-import SearchableSelect from "../../../components/dropdown/SearchableSelect";
-import ConfirmDialog from "../../../components/dialog/ConfirmDialog";
+import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
-import { productOptions } from "../../contracts/newContract.data";
+import { productOptions } from "../../../contracts/newContract.data";
 
 interface CapacityRow {
   id: string;

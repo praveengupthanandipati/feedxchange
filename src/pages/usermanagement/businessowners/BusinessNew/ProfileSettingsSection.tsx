@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ToggleSwitch from "../../../components/toggle/ToggleSwitch";
+import ToggleSwitch from "../../../../components/toggle/ToggleSwitch";
 import { profileSettingDefinitions } from "./newBusiness.data";
 
 const ProfileSettingsSection = () => {

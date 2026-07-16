@@ -1,5 +1,5 @@
 import { FiSearch, FiX } from "react-icons/fi";
-import SearchableSelect from "../../../components/dropdown/SearchableSelect";
+import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import { businessTypeOptions, stateOptions } from "./businessOwners.data";
 
 interface BusinessOwnersFiltersProps {

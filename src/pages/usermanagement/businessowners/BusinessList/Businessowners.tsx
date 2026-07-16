@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
-import Table from "../../../components/table/Table";
-import type { TableColumn } from "../../../components/table/table.types";
+import Table from "../../../../components/table/Table";
+import type { TableColumn } from "../../../../components/table/table.types";
 import BusinessOwnersFilters from "./BusinessOwnersFilters";
 import Pagination from "./Pagination";
 import { buildBusinessOwnerColumns } from "./businessOwners.columns";

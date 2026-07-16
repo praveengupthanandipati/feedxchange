@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
-import SearchableSelect from "../../../components/dropdown/SearchableSelect";
-import InfoTooltip from "../../../components/tooltip/InfoTooltip";
+import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import InfoTooltip from "../../../../components/tooltip/InfoTooltip";
 import AccordionSection from "./AccordionSection";
 import BrokerageChargesCard from "./BrokerageChargesCard";
 import CapacityRequirementsCard from "./CapacityRequirementsCard";
@@ -23,7 +23,7 @@ import {
   districtOptions,
   stateOptions,
 } from "./newBusiness.data";
-import "../../contracts/NewContract.scss";
+import "../../../contracts/NewContract.scss";
 import "./Newbusiness.scss";
 
 const TRACKED_FIELD_COUNT = 14;

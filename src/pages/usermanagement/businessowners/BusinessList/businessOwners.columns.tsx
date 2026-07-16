@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import type { TableColumn } from "../../../components/table/table.types";
-import RowActionsMenu from "../../../components/table/RowActionsMenu";
+import type { TableColumn } from "../../../../components/table/table.types";
+import RowActionsMenu from "../../../../components/table/RowActionsMenu";
 import type { BusinessOwner } from "./businessOwners.data";
 
 const StatusBadge = ({ status }: { status: BusinessOwner["status"] }) => (

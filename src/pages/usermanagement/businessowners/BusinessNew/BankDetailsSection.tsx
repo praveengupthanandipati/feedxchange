@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiSearch, FiTrash2 } from "react-icons/fi";
-import SearchableSelect from "../../../components/dropdown/SearchableSelect";
-import ConfirmDialog from "../../../components/dialog/ConfirmDialog";
+import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
 import { accountTypeOptions, ifscLookup } from "./newBusiness.data";
 

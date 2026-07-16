@@ -6,9 +6,9 @@ import Dashboard from './pages/dashboard/Dashboard'
 import Contracts from './pages/contracts/Contracts'
 import ContractDetail from './pages/contracts/ContractDetail'
 import NewContract from './pages/contracts/NewContract'
-import Businessowners from './pages/usermanagement/businessowners/Businessowners'
-import BusinessOwnerDetail from './pages/usermanagement/businessowners/BusinessOwnerDetail'
-import Newbusiness from './pages/usermanagement/businessowners/Newbusiness'
+import Businessowners from './pages/usermanagement/businessowners/BusinessList/Businessowners'
+import BusinessOwnerDetail from './pages/usermanagement/businessowners/BusinessView/BusinessOwnerDetail'
+import Newbusiness from './pages/usermanagement/businessowners/BusinessNew/Newbusiness'
 
 function App() {
   return (
