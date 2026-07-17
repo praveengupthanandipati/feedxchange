@@ -25,6 +25,7 @@ function App() {
           <Route path="/business-owners" element={<Businessowners />} />
           <Route path="/business-owners/:id" element={<BusinessOwnerDetail />} />
           <Route path="/business-owners/new" element={<Newbusiness />} />
+          <Route path="/business-owners/edit/:id" element={<Newbusiness />} />
         </Route>
       </Routes>
     </Router>

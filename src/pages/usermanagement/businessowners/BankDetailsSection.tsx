@@ -5,55 +5,65 @@ import ConfirmDialog from "../../../components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
 import { accountTypeOptions, ifscLookup } from "./newBusiness.data";
 
-interface BankEntry {
+export interface BankEntry {
   id: string;
   accountType: string;
-  payeeName: string;
-  payeeAccountNumber: string;
+  accountHolderName: string;
+  accountNumber: string;
   ifscCode: string;
   bankName: string;
-  cityBranch: string;
+  branchName: string;
   ifscError: string;
 }
 
 let seq = 0;
-const nextId = () => `bank-${Date.now()}-${seq++}`;
+export const nextBankEntryId = () => `bank-${Date.now()}-${seq++}`;
 
 const emptyEntry = (): BankEntry => ({
-  id: nextId(),
+  id: nextBankEntryId(),
   accountType: "",
-  payeeName: "",
-  payeeAccountNumber: "",
+  accountHolderName: "",
+  accountNumber: "",
   ifscCode: "",
   bankName: "",
-  cityBranch: "",
+  branchName: "",
   ifscError: "",
 });
 
-const BankDetailsSection = () => {
-  const [entries, setEntries] = useState<BankEntry[]>([]);
-  const [primaryId, setPrimaryId] = useState<string | null>(null);
+interface BankDetailsSectionProps {
+  entries: BankEntry[];
+  onEntriesChange: (entries: BankEntry[]) => void;
+  primaryId: string | null;
+  onPrimaryIdChange: (id: string | null) => void;
+}
+
+const BankDetailsSection = ({
+  entries,
+  onEntriesChange,
+  primaryId,
+  onPrimaryIdChange,
+}: BankDetailsSectionProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const addEntry = () => {
     const entry = emptyEntry();
-    setEntries((prev) => [...prev, entry]);
-    if (entries.length === 0) setPrimaryId(entry.id);
+    onEntriesChange([...entries, entry]);
+    if (entries.length === 0) onPrimaryIdChange(entry.id);
   };
 
   const confirmRemoveEntry = () => {
-    setEntries((prev) => prev.filter((entry) => entry.id !== pendingDeleteId));
-    setPrimaryId((prev) => (prev === pendingDeleteId ? null : prev));
+    onEntriesChange(entries.filter((entry) => entry.id !== pendingDeleteId));
+    if (primaryId === pendingDeleteId) onPrimaryIdChange(null);
     setPendingDeleteId(null);
   };
 
   const updateEntry = (id: string, patch: Partial<BankEntry>) =>
-    setEntries((prev) => prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
+    onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
 
   const lookupIfsc = (id: string, ifscCode: string) => {
     const match = ifscLookup[ifscCode.trim().toUpperCase()];
     if (match) {
-      updateEntry(id, { bankName: match.bankName, cityBranch: match.branch, ifscError: "" });
+      updateEntry(id, { bankName: match.bankName, branchName: match.branch, ifscError: "" });
     } else {
       updateEntry(id, { ifscError: "IFSC code not found" });
     }
@@ -78,6 +88,7 @@ const BankDetailsSection = () => {
                       value={entry.accountType}
                       onChange={(value) => updateEntry(entry.id, { accountType: value })}
                       ariaLabel="Select Account Type"
+                      allowCustom
                     />
                   </div>
 
@@ -87,8 +98,10 @@ const BankDetailsSection = () => {
                       type="text"
                       className="form-field__control"
                       placeholder="Payee Name"
-                      value={entry.payeeName}
-                      onChange={(event) => updateEntry(entry.id, { payeeName: event.target.value })}
+                      value={entry.accountHolderName}
+                      onChange={(event) =>
+                        updateEntry(entry.id, { accountHolderName: event.target.value })
+                      }
                     />
                   </div>
 
@@ -99,9 +112,9 @@ const BankDetailsSection = () => {
                       inputMode="numeric"
                       className="form-field__control"
                       placeholder="Payee Account Number"
-                      value={entry.payeeAccountNumber}
+                      value={entry.accountNumber}
                       onChange={(event) =>
-                        updateEntry(entry.id, { payeeAccountNumber: event.target.value })
+                        updateEntry(entry.id, { accountNumber: event.target.value })
                       }
                     />
                   </div>
@@ -152,8 +165,8 @@ const BankDetailsSection = () => {
                       type="text"
                       className="form-field__control"
                       placeholder="Enter Branch Address"
-                      value={entry.cityBranch}
-                      onChange={(event) => updateEntry(entry.id, { cityBranch: event.target.value })}
+                      value={entry.branchName}
+                      onChange={(event) => updateEntry(entry.id, { branchName: event.target.value })}
                     />
                   </div>
 
@@ -173,7 +186,7 @@ const BankDetailsSection = () => {
                     type="radio"
                     name="primary-bank-account"
                     checked={primaryId === entry.id}
-                    onChange={() => setPrimaryId(entry.id)}
+                    onChange={() => onPrimaryIdChange(entry.id)}
                   />
                   Primary
                 </label>
