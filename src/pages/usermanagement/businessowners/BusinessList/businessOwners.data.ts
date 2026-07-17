@@ -14,7 +14,6 @@ export interface BusinessOwner {
 }
 
 export const businessTypeOptions = [
-  { value: "All", label: "All" },
   { value: "Fish Farm", label: "Fish Farm" },
   { value: "Layer Poultry", label: "Layer Poultry" },
 ];
@@ -50,10 +49,7 @@ export const indianStates = [
   "West Bengal",
 ];
 
-export const stateOptions = [
-  { value: "All", label: "All" },
-  ...indianStates.map((state) => ({ value: state, label: state })),
-];
+export const stateOptions = indianStates.map((state) => ({ value: state, label: state }));
 
 const COMPANY_NAMES = [
   "Sri Lakshmi Fish Farms",

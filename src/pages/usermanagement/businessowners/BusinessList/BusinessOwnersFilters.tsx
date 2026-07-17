@@ -27,6 +27,7 @@ const BusinessOwnersFilters = ({
         options={businessTypeOptions}
         value={businessType}
         onChange={onBusinessTypeChange}
+        placeholder="Business Type"
         ariaLabel="Filter by business type"
       />
 
@@ -34,7 +35,7 @@ const BusinessOwnersFilters = ({
         options={stateOptions}
         value={state}
         onChange={onStateChange}
-        placeholder="Select State"
+        placeholder="By State"
         ariaLabel="Filter by state"
       />
 

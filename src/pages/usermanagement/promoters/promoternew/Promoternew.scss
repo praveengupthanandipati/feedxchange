@@ -1,0 +1,47 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.new-promoter {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  // Leave room for the fixed action bar so it doesn't cover content.
+  padding-bottom: 5.5rem;
+
+  &__actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: v.$z-index-sticky;
+    padding: v.$spacing-3 v.$spacing-4;
+    background-color: v.$color-bg;
+    border-top: 1px solid v.$color-border;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  &__topbar {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__back {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    text-decoration: none;
+
+    &:hover {
+      color: v.$color-primary-dark;
+      text-decoration: underline;
+    }
+  }
+}

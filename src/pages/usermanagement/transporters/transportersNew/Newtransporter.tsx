@@ -3,45 +3,35 @@ import { Link } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../components/tooltip/InfoTooltip";
-import BrokerageChargesCard from "./BrokerageChargesCard";
-import CapacityRequirementsCard from "./CapacityRequirementsCard";
 import AdditionalContactsSection from "./AdditionalContactsSection";
 import AdditionalAddressSection from "./AdditionalAddressSection";
 import BankDetailsSection from "./BankDetailsSection";
 import DocumentsSection from "./DocumentsSection";
 import ProfileSettingsSection from "./ProfileSettingsSection";
 import {
-  lineOfBusinessOptions,
-  typeOfBusinessByLine,
-  subTypeByType,
+  typeOfTransporterOptions,
   groupOptions,
-  collectionAreaOptions,
-  areaOptions,
   establishmentYearOptions,
   cityOptions,
   districtOptions,
   stateOptions,
-} from "./newBusiness.data";
+} from "./newTransporter.data";
 import "../../../contracts/NewContract.scss";
-import "./Newbusiness.scss";
+import "../../businessowners/BusinessNew/Newbusiness.scss";
+import "./Newtransporter.scss";
 
-const TRACKED_FIELD_COUNT = 14;
+const TRACKED_FIELD_COUNT = 9;
 
-const Newbusiness = () => {
-  const [businessLegalName, setBusinessLegalName] = useState("");
+const Newtransporter = () => {
+  const [transporterLegalName, setTransporterLegalName] = useState("");
   const [tradingName, setTradingName] = useState("");
   const [establishmentYear, setEstablishmentYear] = useState("");
   const [panNumber, setPanNumber] = useState("");
   const [gstNumber, setGstNumber] = useState("");
-  const [lineOfBusiness, setLineOfBusiness] = useState("");
-  const [typeOfBusiness, setTypeOfBusiness] = useState("");
-  const [subTypeOfBusiness, setSubTypeOfBusiness] = useState("");
+  const [typeOfTransporter, setTypeOfTransporter] = useState("");
   const [group, setGroup] = useState("");
-  const [collectionArea, setCollectionArea] = useState("");
-  const [area, setArea] = useState("");
   const [referralCode, setReferralCode] = useState("");
-  const [referralName, setReferralName] = useState("");
-  const [aboutBusiness, setAboutBusiness] = useState("");
+  const [aboutTransporter, setAboutTransporter] = useState("");
 
   const [billingAddressLine1, setBillingAddressLine1] = useState("");
   const [billingAddressLine2, setBillingAddressLine2] = useState("");
@@ -58,84 +48,60 @@ const Newbusiness = () => {
   const [primaryMobileNumber, setPrimaryMobileNumber] = useState("");
   const [primaryAlternativeContact, setPrimaryAlternativeContact] = useState("");
 
-  const typeOfBusinessOptions = lineOfBusiness ? typeOfBusinessByLine[lineOfBusiness] ?? [] : [];
-  const subTypeOfBusinessOptions = typeOfBusiness ? subTypeByType[typeOfBusiness] ?? [] : [];
-
-  const handleLineOfBusinessChange = (value: string) => {
-    setLineOfBusiness(value);
-    setTypeOfBusiness("");
-    setSubTypeOfBusiness("");
-  };
-
-  const handleTypeOfBusinessChange = (value: string) => {
-    setTypeOfBusiness(value);
-    setSubTypeOfBusiness("");
-  };
-
   const profileCompletion = useMemo(() => {
     const values = [
-      businessLegalName,
+      transporterLegalName,
       tradingName,
       establishmentYear,
       panNumber,
       gstNumber,
-      lineOfBusiness,
-      typeOfBusiness,
-      subTypeOfBusiness,
+      typeOfTransporter,
       group,
-      collectionArea,
-      area,
       referralCode,
-      referralName,
-      aboutBusiness,
+      aboutTransporter,
     ];
     const filled = values.filter((value) => value.trim().length > 0).length;
     return Math.round((filled / TRACKED_FIELD_COUNT) * 100);
   }, [
-    businessLegalName,
+    transporterLegalName,
     tradingName,
     establishmentYear,
     panNumber,
     gstNumber,
-    lineOfBusiness,
-    typeOfBusiness,
-    subTypeOfBusiness,
+    typeOfTransporter,
     group,
-    collectionArea,
-    area,
     referralCode,
-    referralName,
-    aboutBusiness,
+    aboutTransporter,
   ]);
 
   return (
-    <div className="new-business">
-      <div className="new-business__topbar">
-        <div className="new-business__topbar-left">
-          <h1>New Business</h1>
-          <span className="new-business__completion">
+    <div className="new-transporter">
+      <div className="new-transporter__topbar">
+        <div className="new-transporter__topbar-left">
+          <h1>New Transporter</h1>
+          <span className="new-transporter__completion">
             Profile Completion: <strong>{profileCompletion}%</strong>
           </span>
         </div>
-        <Link to="/business-owners" className="new-business__back">
-          <FiArrowLeft aria-hidden /> Business Users
+        <Link to="/transporters" className="new-transporter__back">
+          <FiArrowLeft aria-hidden /> Transporters
         </Link>
       </div>
 
       <section className="new-contract__section">
-        <h2 className="new-contract__section-title">Business Profile</h2>
+        <h2 className="new-contract__section-title">Profile</h2>
         <div className="new-contract__grid">
           <div className="form-field">
-            <label className="form-field__label" htmlFor="businessLegalName">
-              Business Legal Name <span className="form-field__required">*</span>
+            <label className="form-field__label" htmlFor="transporterLegalName">
+              Transporter Legal Name <span className="form-field__required">*</span>
             </label>
             <input
-              id="businessLegalName"
+              id="transporterLegalName"
               type="text"
               className="form-field__control"
-              placeholder="Name as per PAN/GST"
-              value={businessLegalName}
-              onChange={(event) => setBusinessLegalName(event.target.value)}
+              placeholder="Name as per PAN / GST"
+              value={transporterLegalName}
+              onChange={(event) => setTransporterLegalName(event.target.value)}
             />
           </div>
 
@@ -159,7 +125,9 @@ const Newbusiness = () => {
               options={establishmentYearOptions}
               value={establishmentYear}
               onChange={setEstablishmentYear}
+              placeholder="Select or type year"
               ariaLabel="Establishment Year"
+              allowCustom
             />
           </div>
 
@@ -192,36 +160,12 @@ const Newbusiness = () => {
           </div>
 
           <div className="form-field">
-            <span className="form-field__label">Line of Business</span>
+            <span className="form-field__label">Type of Transporter</span>
             <SearchableSelect
-              options={lineOfBusinessOptions}
-              value={lineOfBusiness}
-              onChange={handleLineOfBusinessChange}
-              ariaLabel="Line of Business"
-            />
-          </div>
-
-          <div className="form-field">
-            <span className="form-field__label">Type of Business</span>
-            <SearchableSelect
-              options={typeOfBusinessOptions}
-              value={typeOfBusiness}
-              onChange={handleTypeOfBusinessChange}
-              placeholder={lineOfBusiness ? "Select..." : "Select Line of Business first"}
-              ariaLabel="Type of Business"
-              disabled={!lineOfBusiness}
-            />
-          </div>
-
-          <div className="form-field">
-            <span className="form-field__label">Sub Type of Business</span>
-            <SearchableSelect
-              options={subTypeOfBusinessOptions}
-              value={subTypeOfBusiness}
-              onChange={setSubTypeOfBusiness}
-              placeholder={typeOfBusiness ? "Select..." : "Select Type of Business first"}
-              ariaLabel="Sub Type of Business"
-              disabled={!typeOfBusiness}
+              options={typeOfTransporterOptions}
+              value={typeOfTransporter}
+              onChange={setTypeOfTransporter}
+              ariaLabel="Type of Transporter"
             />
           </div>
 
@@ -238,30 +182,6 @@ const Newbusiness = () => {
           </div>
 
           <div className="form-field">
-            <span className="form-field__label">Collection Area</span>
-            <SearchableSelect
-              options={collectionAreaOptions}
-              value={collectionArea}
-              onChange={setCollectionArea}
-              placeholder="Select or type..."
-              ariaLabel="Collection Area"
-              allowCustom
-            />
-          </div>
-
-          <div className="form-field">
-            <span className="form-field__label">Area</span>
-            <SearchableSelect
-              options={areaOptions}
-              value={area}
-              onChange={setArea}
-              placeholder="Select or type..."
-              ariaLabel="Area"
-              allowCustom
-            />
-          </div>
-
-          <div className="form-field">
             <label className="form-field__label" htmlFor="referralCode">
               Referral Code
             </label>
@@ -269,70 +189,51 @@ const Newbusiness = () => {
               id="referralCode"
               type="text"
               className="form-field__control"
-              placeholder="Enter Referred By"
+              placeholder="Enter Referral Code"
               value={referralCode}
               onChange={(event) => setReferralCode(event.target.value)}
             />
           </div>
 
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="referralName">
-              Referral Name
-            </label>
-            <input
-              id="referralName"
-              type="text"
-              className="form-field__control"
-              placeholder="Enter Referral Name"
-              value={referralName}
-              onChange={(event) => setReferralName(event.target.value)}
-            />
-          </div>
-
           <div className="form-field new-contract__grid--full mb-3">
-            <label className="form-field__label" htmlFor="aboutBusiness">
-              About Business
+            <label className="form-field__label" htmlFor="aboutTransporter">
+              Write About transporter:
             </label>
             <textarea
-              id="aboutBusiness"
+              id="aboutTransporter"
               className="form-field__control"
-              placeholder="Describe Your Business"
-              value={aboutBusiness}
-              onChange={(event) => setAboutBusiness(event.target.value)}
+              placeholder="Describe the Transporter here..."
+              value={aboutTransporter}
+              onChange={(event) => setAboutTransporter(event.target.value)}
             />
           </div>
-        </div>
-
-        <div className="new-contract__conditions">
-          <BrokerageChargesCard />
-          <CapacityRequirementsCard />
         </div>
       </section>
 
       <section className="new-contract__section">
-        <h2 className="new-contract__section-title">Contact &amp; Address</h2>
+        <h2 className="new-contract__section-title">Contact</h2>
         <div className="contact-address__subsections">
           <div className="new-contract__condition-card">
             <h3>Billing Communication Details</h3>
             <div className="new-contract__grid">
               <div className="form-field">
                 <label className="form-field__label">
-                  Billing Address Line 01 <span className="form-field__required">*</span>
+                  Address Line 01 <span className="form-field__required">*</span>
                 </label>
                 <input
                   type="text"
                   className="form-field__control"
-                  placeholder="Billing Address Line 01"
+                  placeholder="Address Line 01"
                   value={billingAddressLine1}
                   onChange={(event) => setBillingAddressLine1(event.target.value)}
                 />
               </div>
               <div className="form-field">
-                <label className="form-field__label">Billing Address Line 02</label>
+                <label className="form-field__label">Address Line 02</label>
                 <input
                   type="text"
                   className="form-field__control"
-                  placeholder="Billing Address Line 02"
+                  placeholder="Address Line 02"
                   value={billingAddressLine2}
                   onChange={(event) => setBillingAddressLine2(event.target.value)}
                 />
@@ -369,7 +270,9 @@ const Newbusiness = () => {
                   options={cityOptions}
                   value={billingCity}
                   onChange={setBillingCity}
+                  placeholder="Select or type..."
                   ariaLabel="City"
+                  allowCustom
                 />
               </div>
               <div className="form-field">
@@ -399,7 +302,7 @@ const Newbusiness = () => {
                 <input
                   type="email"
                   className="form-field__control"
-                  placeholder="Enter Valid Email"
+                  placeholder="Valid Email"
                   value={billingEmail}
                   onChange={(event) => setBillingEmail(event.target.value)}
                 />
@@ -410,7 +313,7 @@ const Newbusiness = () => {
                 <input
                   type="url"
                   className="form-field__control"
-                  placeholder="Valid Website URL"
+                  placeholder="Website URL"
                   value={websiteUrl}
                   onChange={(event) => setWebsiteUrl(event.target.value)}
                 />
@@ -460,7 +363,7 @@ const Newbusiness = () => {
                 <input
                   type="tel"
                   className="form-field__control"
-                  placeholder="Phone Number Optional"
+                  placeholder="10-digit Mobile Number (Optional)"
                   value={primaryAlternativeContact}
                   onChange={(event) => setPrimaryAlternativeContact(event.target.value)}
                 />
@@ -484,20 +387,20 @@ const Newbusiness = () => {
       </section>
 
       <section className="new-contract__section">
-        <h2 className="new-contract__section-title">Profile Settings</h2>
+        <h2 className="new-contract__section-title">Settings</h2>
         <ProfileSettingsSection />
       </section>
 
-      <div className="new-contract__actions new-business__actions">
-        <Link to="/business-owners" className="new-contract__cancel">
+      <div className="new-contract__actions new-transporter__actions">
+        <Link to="/transporters" className="new-contract__cancel">
           Cancel
         </Link>
         <button type="button" className="new-contract__submit">
-          Create Business
+          Create Transporter
         </button>
       </div>
     </div>
   );
 };
 
-export default Newbusiness;
+export default Newtransporter;

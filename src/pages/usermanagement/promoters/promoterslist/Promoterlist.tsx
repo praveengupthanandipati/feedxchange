@@ -3,15 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
-import BusinessOwnersFilters from "./BusinessOwnersFilters";
+import PromotersFilters from "./PromotersFilters";
 import Pagination from "./Pagination";
-import { buildBusinessOwnerColumns } from "./businessOwners.columns";
-import { businessOwners as initialBusinessOwners, type BusinessOwner } from "./businessOwners.data";
-import "./Businessowners.scss";
+import { buildPromoterColumns } from "./promoters.columns";
+import { promoters as initialPromoters, type Promoter } from "./promoters.data";
+import "./Promoters.scss";
 
 const PAGE_SIZE = 10;
 
-function getExportCellValue(row: BusinessOwner, column: TableColumn<BusinessOwner>): string {
+function getExportCellValue(row: Promoter, column: TableColumn<Promoter>): string {
   if (column.exportValue) return column.exportValue(row);
   const raw = (row as unknown as Record<string, unknown>)[column.key];
   return raw === undefined || raw === null ? "" : String(raw);
@@ -21,47 +21,53 @@ function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-const Businessowners = () => {
+const Promoterlist = () => {
   const navigate = useNavigate();
-  const [rows, setRows] = useState<BusinessOwner[]>(initialBusinessOwners);
+  const [rows, setRows] = useState<Promoter[]>(initialPromoters);
   const [keyword, setKeyword] = useState("");
-  const [businessType, setBusinessType] = useState("All");
   const [state, setState] = useState("All");
+  const [district, setDistrict] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const handleEdit = (_owner: BusinessOwner) => {
-    // TODO: open the edit-business-owner form once it exists.
+  const handleEdit = (_promoter: Promoter) => {
+    // TODO: open the edit-promoter form once it exists.
   };
 
-  const handleDelete = (owner: BusinessOwner) => {
-    setRows((prev) => prev.filter((row) => row.id !== owner.id));
+  const handleView = (_promoter: Promoter) => {
+    // TODO: open the promoter detail view once it exists.
+  };
+
+  const handleDelete = (promoter: Promoter) => {
+    setRows((prev) => prev.filter((row) => row.id !== promoter.id));
   };
 
   const columns = useMemo(
-    () => buildBusinessOwnerColumns({ onEdit: handleEdit, onDelete: handleDelete }),
+    () => buildPromoterColumns({ onEdit: handleEdit, onView: handleView, onDelete: handleDelete }),
     [],
   );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, businessType, state]);
+  }, [keyword, state, district]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
 
     return rows.filter((row) => {
-      if (businessType !== "All" && row.businessType !== businessType) return false;
       if (state !== "All" && row.state !== state) return false;
+      if (district !== "All" && row.district !== district) return false;
 
       if (q) {
-        const haystack = [row.companyName, row.location, row.mobile].join(" ").toLowerCase();
+        const haystack = [row.promoterName, row.referralCode, row.phone, row.email]
+          .join(" ")
+          .toLowerCase();
         if (!haystack.includes(q)) return false;
       }
 
       return true;
     });
-  }, [rows, keyword, businessType, state]);
+  }, [rows, keyword, state, district]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -69,12 +75,6 @@ const Businessowners = () => {
     (currentPageClamped - 1) * PAGE_SIZE,
     currentPageClamped * PAGE_SIZE,
   );
-
-  const handleClearFilters = () => {
-    setKeyword("");
-    setBusinessType("All");
-    setState("All");
-  };
 
   const handleExport = () => {
     const exportColumns = columns.filter((column) => column.key !== "actions");
@@ -93,7 +93,7 @@ const Businessowners = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "business-owners.xls";
+    link.download = "promoters.xls";
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -101,29 +101,29 @@ const Businessowners = () => {
   };
 
   return (
-    <div className="business-owners-page">
-      <div className="business-owners-card">
-        <div className="business-owners-card__header">
-          <h1>Business Owners</h1>
-          <div className="business-owners-card__actions">
+    <div className="promoters-page">
+      <div className="promoters-card">
+        <div className="promoters-card__header">
+          <h1>Promoters</h1>
+          <div className="promoters-card__actions">
             <button
               type="button"
-              className="business-owners-btn business-owners-btn--outline"
+              className="promoters-btn promoters-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
               {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
-              {filtersVisible ? "Hide Filters" : "Show Filters"}
+              {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
               type="button"
-              className="business-owners-btn business-owners-btn--warning"
+              className="promoters-btn promoters-btn--warning"
               onClick={handleExport}
             >
               <FiDownload aria-hidden /> Export
             </button>
             <button
               type="button"
-              className="business-owners-btn business-owners-btn--primary"
+              className="promoters-btn promoters-btn--primary"
               onClick={() => navigate("new")}
             >
               <FiPlus aria-hidden /> New
@@ -132,14 +132,13 @@ const Businessowners = () => {
         </div>
 
         {filtersVisible && (
-          <BusinessOwnersFilters
+          <PromotersFilters
             keyword={keyword}
             onKeywordChange={setKeyword}
-            businessType={businessType}
-            onBusinessTypeChange={setBusinessType}
             state={state}
             onStateChange={setState}
-            onClear={handleClearFilters}
+            district={district}
+            onDistrictChange={setDistrict}
           />
         )}
 
@@ -147,7 +146,7 @@ const Businessowners = () => {
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}
-          emptyMessage="No business owners match the current filters."
+          emptyMessage="No promoters match the current filters."
           minHeight
         />
 
@@ -163,4 +162,4 @@ const Businessowners = () => {
   );
 };
 
-export default Businessowners;
+export default Promoterlist;

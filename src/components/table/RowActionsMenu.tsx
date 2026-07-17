@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { FiMoreVertical, FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiMoreVertical, FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
 import "./RowActionsMenu.scss";
 
 interface RowActionsMenuProps {
   onEdit?: () => void;
+  onView?: () => void;
   onDelete?: () => void;
 }
 
-const RowActionsMenu = ({ onEdit, onDelete }: RowActionsMenuProps) => {
+const RowActionsMenu = ({ onEdit, onView, onDelete }: RowActionsMenuProps) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +55,18 @@ const RowActionsMenu = ({ onEdit, onDelete }: RowActionsMenuProps) => {
             >
               <FiEdit2 aria-hidden />
               Edit
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onView?.();
+              }}
+            >
+              <FiEye aria-hidden />
+              View
             </button>
           </li>
           <li>

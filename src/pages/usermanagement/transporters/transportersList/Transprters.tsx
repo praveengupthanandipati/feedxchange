@@ -3,15 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
-import BusinessOwnersFilters from "./BusinessOwnersFilters";
+import TransportersFilters from "./TransportersFilters";
 import Pagination from "./Pagination";
-import { buildBusinessOwnerColumns } from "./businessOwners.columns";
-import { businessOwners as initialBusinessOwners, type BusinessOwner } from "./businessOwners.data";
-import "./Businessowners.scss";
+import { buildTransporterColumns } from "./transporters.columns";
+import { transporters as initialTransporters, type Transporter } from "./transporters.data";
+import "./Transporters.scss";
 
 const PAGE_SIZE = 10;
 
-function getExportCellValue(row: BusinessOwner, column: TableColumn<BusinessOwner>): string {
+function getExportCellValue(row: Transporter, column: TableColumn<Transporter>): string {
   if (column.exportValue) return column.exportValue(row);
   const raw = (row as unknown as Record<string, unknown>)[column.key];
   return raw === undefined || raw === null ? "" : String(raw);
@@ -21,47 +21,59 @@ function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-const Businessowners = () => {
+const Transprters = () => {
   const navigate = useNavigate();
-  const [rows, setRows] = useState<BusinessOwner[]>(initialBusinessOwners);
+  const [rows, setRows] = useState<Transporter[]>(initialTransporters);
   const [keyword, setKeyword] = useState("");
-  const [businessType, setBusinessType] = useState("All");
+  const [transporterType, setTransporterType] = useState("All");
   const [state, setState] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const handleEdit = (_owner: BusinessOwner) => {
-    // TODO: open the edit-business-owner form once it exists.
+  const handleEdit = (_transporter: Transporter) => {
+    // TODO: open the edit-transporter form once it exists.
   };
 
-  const handleDelete = (owner: BusinessOwner) => {
-    setRows((prev) => prev.filter((row) => row.id !== owner.id));
+  const handleView = (transporter: Transporter) => {
+    navigate(`${transporter.id}`);
+  };
+
+  const handleDelete = (transporter: Transporter) => {
+    setRows((prev) => prev.filter((row) => row.id !== transporter.id));
   };
 
   const columns = useMemo(
-    () => buildBusinessOwnerColumns({ onEdit: handleEdit, onDelete: handleDelete }),
+    () => buildTransporterColumns({ onEdit: handleEdit, onView: handleView, onDelete: handleDelete }),
     [],
   );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, businessType, state]);
+  }, [keyword, transporterType, state]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
 
     return rows.filter((row) => {
-      if (businessType !== "All" && row.businessType !== businessType) return false;
+      if (transporterType !== "All" && row.transporterType !== transporterType) return false;
       if (state !== "All" && row.state !== state) return false;
 
       if (q) {
-        const haystack = [row.companyName, row.location, row.mobile].join(" ").toLowerCase();
+        const haystack = [
+          row.companyName,
+          row.transporterType,
+          row.location,
+          row.state,
+          row.mobile,
+        ]
+          .join(" ")
+          .toLowerCase();
         if (!haystack.includes(q)) return false;
       }
 
       return true;
     });
-  }, [rows, keyword, businessType, state]);
+  }, [rows, keyword, transporterType, state]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -69,12 +81,6 @@ const Businessowners = () => {
     (currentPageClamped - 1) * PAGE_SIZE,
     currentPageClamped * PAGE_SIZE,
   );
-
-  const handleClearFilters = () => {
-    setKeyword("");
-    setBusinessType("All");
-    setState("All");
-  };
 
   const handleExport = () => {
     const exportColumns = columns.filter((column) => column.key !== "actions");
@@ -93,7 +99,7 @@ const Businessowners = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "business-owners.xls";
+    link.download = "transporters.xls";
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -101,29 +107,29 @@ const Businessowners = () => {
   };
 
   return (
-    <div className="business-owners-page">
-      <div className="business-owners-card">
-        <div className="business-owners-card__header">
-          <h1>Business Owners</h1>
-          <div className="business-owners-card__actions">
+    <div className="transporters-page">
+      <div className="transporters-card">
+        <div className="transporters-card__header">
+          <h1>Transporters</h1>
+          <div className="transporters-card__actions">
             <button
               type="button"
-              className="business-owners-btn business-owners-btn--outline"
+              className="transporters-btn transporters-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
               {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
-              {filtersVisible ? "Hide Filters" : "Show Filters"}
+              {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
               type="button"
-              className="business-owners-btn business-owners-btn--warning"
+              className="transporters-btn transporters-btn--warning"
               onClick={handleExport}
             >
               <FiDownload aria-hidden /> Export
             </button>
             <button
               type="button"
-              className="business-owners-btn business-owners-btn--primary"
+              className="transporters-btn transporters-btn--primary"
               onClick={() => navigate("new")}
             >
               <FiPlus aria-hidden /> New
@@ -132,14 +138,13 @@ const Businessowners = () => {
         </div>
 
         {filtersVisible && (
-          <BusinessOwnersFilters
+          <TransportersFilters
             keyword={keyword}
             onKeywordChange={setKeyword}
-            businessType={businessType}
-            onBusinessTypeChange={setBusinessType}
+            transporterType={transporterType}
+            onTransporterTypeChange={setTransporterType}
             state={state}
             onStateChange={setState}
-            onClear={handleClearFilters}
           />
         )}
 
@@ -147,7 +152,7 @@ const Businessowners = () => {
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}
-          emptyMessage="No business owners match the current filters."
+          emptyMessage="No transporters match the current filters."
           minHeight
         />
 
@@ -163,4 +168,4 @@ const Businessowners = () => {
   );
 };
 
-export default Businessowners;
+export default Transprters;
