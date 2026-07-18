@@ -21,19 +21,19 @@ import {
   useAddBusinessProfileMutation,
   useUpdateBusinessProfileMutation,
   useGetBusinessProfileByIdQuery,
-} from "../../../store/businessProfilesApi";
-import "../../contracts/NewContract.scss";
+} from "../../../../store/businessProfilesApi";
+import "../../../contracts/NewContract.scss";
 import "./Newbusiness.scss";
 
 const TRACKED_FIELD_COUNT = 13;
+
+type SectionId = "profile" | "contact" | "bank" | "documents" | "settings";
 
 function getErrorMessage(err: unknown, isEditMode: boolean): string {
   // Full error (status, server message) is logged for debugging; the user only sees the plain fallback.
   console.error(`Failed to ${isEditMode ? "update" : "create"} business profile:`, err);
   return `Failed to ${isEditMode ? "update" : "create"} business profile.`;
 }
-
-type SectionId = "profile" | "contact" | "bank" | "documents" | "settings";
 
 const Newbusiness = () => {
   const navigate = useNavigate();

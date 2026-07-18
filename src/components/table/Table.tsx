@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiChevronUp, FiChevronDown } from "react-icons/fi";
+import { FiChevronUp, FiChevronDown, FiAlertCircle } from "react-icons/fi";
 import InfoTooltip from "../tooltip/InfoTooltip";
 import type { SortDirection, TableColumn } from "./table.types";
 import "./Table.scss";
@@ -13,6 +13,8 @@ interface TableProps<T> {
   onSelectRow?: (key: string) => void;
   onSelectAll?: (checked: boolean) => void;
   emptyMessage?: string;
+  /** When true, the table wrapper gets a min-height of 63vh instead of hugging its content. */
+  minHeight?: boolean;
 }
 
 function defaultSortValue<T>(row: T, key: string): string | number {
@@ -55,7 +57,8 @@ function Table<T>({
   selectedRowKeys = [],
   onSelectRow,
   onSelectAll,
-  emptyMessage = "No records found.",
+  emptyMessage = "Currently no records found.",
+  minHeight = false,
 }: TableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
@@ -98,7 +101,7 @@ function Table<T>({
   const someSelected = visibleKeys.some((key) => selectedSet.has(key));
 
   return (
-    <div className="table-wrapper">
+    <div className={`table-wrapper ${minHeight ? "table-wrapper--min-height" : ""}`}>
       <table className="table">
         <thead>
           <tr>
@@ -143,7 +146,10 @@ function Table<T>({
                 className="table__empty"
                 colSpan={columns.length + (selectable ? 1 : 0)}
               >
-                {emptyMessage}
+                <div className="table__empty-alert" role="status">
+                  <FiAlertCircle aria-hidden />
+                  {emptyMessage}
+                </div>
               </td>
             </tr>
           ) : (

@@ -1,54 +1,50 @@
 import { useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { FiTrash2 } from "react-icons/fi";
-import SearchableSelect from "../../../components/dropdown/SearchableSelect";
-import ConfirmDialog from "../../../components/dialog/ConfirmDialog";
+import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
 import {
   documentTypeOptions,
   MAX_DOCUMENT_FILE_SIZE_MB,
   ALLOWED_DOCUMENT_FILE_TYPES,
-} from "./newBusiness.data";
+} from "./newTransporter.data";
 
-export interface DocumentEntry {
+interface DocumentEntry {
   id: string;
-  documentTypeId: string;
+  documentType: string;
   documentNumber: string;
-  issuingAuthority: string;
+  issuingAuthorityName: string;
   issuedDate: string;
   fileName: string;
   fileError: string;
 }
 
 let seq = 0;
-export const nextDocumentId = () => `document-${Date.now()}-${seq++}`;
+const nextId = () => `document-${Date.now()}-${seq++}`;
 
 const emptyEntry = (): DocumentEntry => ({
-  id: nextDocumentId(),
-  documentTypeId: "",
+  id: nextId(),
+  documentType: "",
   documentNumber: "",
-  issuingAuthority: "",
+  issuingAuthorityName: "",
   issuedDate: "",
   fileName: "",
   fileError: "",
 });
 
-interface DocumentsSectionProps {
-  entries: DocumentEntry[];
-  onEntriesChange: (entries: DocumentEntry[]) => void;
-}
-
-const DocumentsSection = ({ entries, onEntriesChange }: DocumentsSectionProps) => {
+const DocumentsSection = () => {
+  const [entries, setEntries] = useState<DocumentEntry[]>([]);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const addEntry = () => onEntriesChange([...entries, emptyEntry()]);
+  const addEntry = () => setEntries((prev) => [...prev, emptyEntry()]);
   const confirmRemoveEntry = () => {
-    onEntriesChange(entries.filter((entry) => entry.id !== pendingDeleteId));
+    setEntries((prev) => prev.filter((entry) => entry.id !== pendingDeleteId));
     setPendingDeleteId(null);
   };
   const updateEntry = (id: string, patch: Partial<DocumentEntry>) =>
-    onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
+    setEntries((prev) => prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
 
   const handleFileChange = (id: string, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -88,8 +84,8 @@ const DocumentsSection = ({ entries, onEntriesChange }: DocumentsSectionProps) =
                     <span className="form-field__label">Select Document</span>
                     <SearchableSelect
                       options={documentTypeOptions}
-                      value={entry.documentTypeId}
-                      onChange={(value) => updateEntry(entry.id, { documentTypeId: value })}
+                      value={entry.documentType}
+                      onChange={(value) => updateEntry(entry.id, { documentType: value })}
                       placeholder="Select or type document type..."
                       ariaLabel="Select Document"
                       allowCustom
@@ -114,16 +110,16 @@ const DocumentsSection = ({ entries, onEntriesChange }: DocumentsSectionProps) =
                     <input
                       type="text"
                       className="form-field__control"
-                      placeholder="Ex: State Authority"
-                      value={entry.issuingAuthority}
+                      placeholder="Ex: Registration Authority"
+                      value={entry.issuingAuthorityName}
                       onChange={(event) =>
-                        updateEntry(entry.id, { issuingAuthority: event.target.value })
+                        updateEntry(entry.id, { issuingAuthorityName: event.target.value })
                       }
                     />
                   </div>
 
                   <div className="form-field">
-                    <label className="form-field__label">Date of Issue</label>
+                    <label className="form-field__label">Issued Date</label>
                     <input
                       type="date"
                       className="form-field__control"

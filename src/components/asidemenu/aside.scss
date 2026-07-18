@@ -11,11 +11,12 @@ $aside-item-height: 2.75rem;
   display: flex;
   flex-direction: column;
   width: $aside-width;
-  height: calc(100vh - #{v.$spacing-3 * 2});
+  height: 100vh;
   background-color: v.$color-navy-dark;
   color: rgba(v.$color-white, 0.85);
   transition: width v.$transition-base, transform v.$transition-base;
   overflow: hidden;
+  z-index: v.$z-index-modal;
 
   // Off-canvas drawer below `lg` — the expand/collapse rail only makes
   // sense once there's a persistent sidebar column to shrink.

@@ -1,0 +1,214 @@
+import { useState } from "react";
+import { FiSearch, FiTrash2 } from "react-icons/fi";
+import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
+import EmptyRowsState from "./EmptyRowsState";
+import { accountTypeOptions, ifscLookup } from "./newBusiness.data";
+
+export interface BankEntry {
+  id: string;
+  accountType: string;
+  accountHolderName: string;
+  accountNumber: string;
+  ifscCode: string;
+  bankName: string;
+  branchName: string;
+  ifscError: string;
+}
+
+let seq = 0;
+export const nextBankEntryId = () => `bank-${Date.now()}-${seq++}`;
+
+const emptyEntry = (): BankEntry => ({
+  id: nextBankEntryId(),
+  accountType: "",
+  accountHolderName: "",
+  accountNumber: "",
+  ifscCode: "",
+  bankName: "",
+  branchName: "",
+  ifscError: "",
+});
+
+interface BankDetailsSectionProps {
+  entries: BankEntry[];
+  onEntriesChange: (entries: BankEntry[]) => void;
+  primaryId: string | null;
+  onPrimaryIdChange: (id: string | null) => void;
+}
+
+const BankDetailsSection = ({
+  entries,
+  onEntriesChange,
+  primaryId,
+  onPrimaryIdChange,
+}: BankDetailsSectionProps) => {
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+  const addEntry = () => {
+    const entry = emptyEntry();
+    onEntriesChange([...entries, entry]);
+    if (entries.length === 0) onPrimaryIdChange(entry.id);
+  };
+
+  const confirmRemoveEntry = () => {
+    onEntriesChange(entries.filter((entry) => entry.id !== pendingDeleteId));
+    if (primaryId === pendingDeleteId) onPrimaryIdChange(null);
+    setPendingDeleteId(null);
+  };
+
+  const updateEntry = (id: string, patch: Partial<BankEntry>) =>
+    onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
+
+  const lookupIfsc = (id: string, ifscCode: string) => {
+    const match = ifscLookup[ifscCode.trim().toUpperCase()];
+    if (match) {
+      updateEntry(id, { bankName: match.bankName, branchName: match.branch, ifscError: "" });
+    } else {
+      updateEntry(id, { ifscError: "IFSC code not found" });
+    }
+  };
+
+  return (
+    <div>
+      <h3 className="form-subheading">Bank Account Details</h3>
+
+      {entries.length === 0 ? (
+        <EmptyRowsState onAdd={addEntry} message="No Data available" />
+      ) : (
+        <>
+          <div className="repeatable-entries">
+            {entries.map((entry) => (
+              <div className="repeatable-entry" key={entry.id}>
+                <div className="new-contract__grid">
+                  <div className="form-field">
+                    <span className="form-field__label">Select Account Type</span>
+                    <SearchableSelect
+                      options={accountTypeOptions}
+                      value={entry.accountType}
+                      onChange={(value) => updateEntry(entry.id, { accountType: value })}
+                      ariaLabel="Select Account Type"
+                      allowCustom
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-field__label">Payee Name</label>
+                    <input
+                      type="text"
+                      className="form-field__control"
+                      placeholder="Payee Name"
+                      value={entry.accountHolderName}
+                      onChange={(event) =>
+                        updateEntry(entry.id, { accountHolderName: event.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-field__label">Payee Account Number</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      className="form-field__control"
+                      placeholder="Payee Account Number"
+                      value={entry.accountNumber}
+                      onChange={(event) =>
+                        updateEntry(entry.id, { accountNumber: event.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-field__label">IFSC Code</label>
+                    <div className="form-field__with-action">
+                      <input
+                        type="text"
+                        className="form-field__control"
+                        value={entry.ifscCode}
+                        onChange={(event) =>
+                          updateEntry(entry.id, {
+                            ifscCode: event.target.value.toUpperCase(),
+                            ifscError: "",
+                          })
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="form-field__action"
+                        onClick={() => lookupIfsc(entry.id, entry.ifscCode)}
+                        aria-label="Look up IFSC code"
+                        title="Look up bank details for this IFSC code"
+                      >
+                        <FiSearch aria-hidden />
+                      </button>
+                    </div>
+                    {entry.ifscError && (
+                      <p className="form-field__error">{entry.ifscError}</p>
+                    )}
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-field__label">Bank Name</label>
+                    <input
+                      type="text"
+                      className="form-field__control"
+                      placeholder="Bank Name"
+                      value={entry.bankName}
+                      onChange={(event) => updateEntry(entry.id, { bankName: event.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-field__label">City / Branch</label>
+                    <input
+                      type="text"
+                      className="form-field__control"
+                      placeholder="Enter Branch Address"
+                      value={entry.branchName}
+                      onChange={(event) => updateEntry(entry.id, { branchName: event.target.value })}
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    className="repeatable-entry__delete repeatable-entry__delete--inline"
+                    onClick={() => setPendingDeleteId(entry.id)}
+                    aria-label="Remove bank account"
+                  >
+                    <FiTrash2 aria-hidden />
+                  </button>
+                </div>
+
+                <label className="repeatable-entry__radio">
+                  <span className="repeatable-entry__radio-label">Set As:</span>
+                  <input
+                    type="radio"
+                    name="primary-bank-account"
+                    checked={primaryId === entry.id}
+                    onChange={() => onPrimaryIdChange(entry.id)}
+                  />
+                  Primary
+                </label>
+              </div>
+            ))}
+          </div>
+
+          <button type="button" className="repeatable-entries__add" onClick={addEntry}>
+            + Add
+          </button>
+        </>
+      )}
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title="Remove this bank account?"
+        message="This will remove this bank account entry. This cannot be undone."
+        onConfirm={confirmRemoveEntry}
+        onCancel={() => setPendingDeleteId(null)}
+      />
+    </div>
+  );
+};
+
+export default BankDetailsSection;

@@ -6,9 +6,15 @@ import Dashboard from './pages/dashboard/Dashboard'
 import Contracts from './pages/contracts/Contracts'
 import ContractDetail from './pages/contracts/ContractDetail'
 import NewContract from './pages/contracts/NewContract'
-import Businessowners from './pages/usermanagement/businessowners/Businessowners'
-import BusinessOwnerDetail from './pages/usermanagement/businessowners/BusinessOwnerDetail'
-import Newbusiness from './pages/usermanagement/businessowners/Newbusiness'
+import Businessowners from './pages/usermanagement/businessowners/BusinessList/Businessowners'
+import BusinessOwnerDetail from './pages/usermanagement/businessowners/BusinessView/BusinessOwnerDetail'
+import Newbusiness from './pages/usermanagement/businessowners/BusinessNew/Newbusiness'
+import Transprters from './pages/usermanagement/transporters/transportersList/Transprters'
+import Newtransporter from './pages/usermanagement/transporters/transportersNew/Newtransporter'
+import Transportview from './pages/usermanagement/transporters/transportView/Transportview'
+import Promoterlist from './pages/usermanagement/promoters/promoterslist/Promoterlist'
+import Promoternew from './pages/usermanagement/promoters/promoternew/Promoternew'
+import Promoterview from './pages/usermanagement/promoters/promoterview/Promoterview'
 
 function App() {
   return (
@@ -25,6 +31,12 @@ function App() {
           <Route path="/business-owners" element={<Businessowners />} />
           <Route path="/business-owners/:id" element={<BusinessOwnerDetail />} />
           <Route path="/business-owners/new" element={<Newbusiness />} />
+          <Route path="/transporters" element={<Transprters />} />
+          <Route path="/transporters/new" element={<Newtransporter />} />
+          <Route path="/transporters/:id" element={<Transportview />} />
+          <Route path="/promoters" element={<Promoterlist />} />
+          <Route path="/promoters/new" element={<Promoternew />} />
+          <Route path="/promoters/:id" element={<Promoterview />} />
           <Route path="/business-owners/edit/:id" element={<Newbusiness />} />
         </Route>
       </Routes>

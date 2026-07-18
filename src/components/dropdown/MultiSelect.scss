@@ -1,0 +1,154 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.multi-select {
+  position: relative;
+  min-width: 10rem;
+  width: 100%;
+
+  &__trigger {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-medium);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    min-height: 2.5rem;
+    padding: v.$spacing-2 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    text-align: left;
+
+    > svg {
+      flex-shrink: 0;
+      color: v.$color-text-muted;
+      transition: transform v.$transition-fast;
+
+      &.is-open {
+        transform: rotate(180deg);
+      }
+    }
+
+    &:hover {
+      border-color: v.$color-primary;
+    }
+
+    &:disabled {
+      background-color: v.$color-gray-50;
+      color: v.$color-text-muted;
+      cursor: not-allowed;
+    }
+  }
+
+  &__placeholder {
+    color: v.$color-gray-400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+    flex: 1;
+  }
+
+  &__chip {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    padding: 0.15rem v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-navy, 0.08);
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    white-space: nowrap;
+  }
+
+  &__chip-remove {
+    @include m.flex-center;
+    color: v.$color-text-muted;
+    cursor: pointer;
+
+    &:hover {
+      color: v.$color-danger;
+    }
+  }
+
+  &__panel {
+    position: absolute;
+    top: calc(100% + #{v.$spacing-2});
+    left: 0;
+    width: 100%;
+    min-width: 14rem;
+    background-color: v.$color-bg;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    box-shadow: v.$shadow-lg;
+    z-index: v.$z-index-popover;
+    overflow: hidden;
+  }
+
+  &__search {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    color: v.$color-text-muted;
+
+    input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: v.$font-size-sm;
+      color: v.$color-text;
+    }
+  }
+
+  &__options {
+    list-style: none;
+    margin: 0;
+    padding: v.$spacing-2;
+    max-height: 14rem;
+    overflow-y: auto;
+
+    button {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      @include m.font-base(v.$font-weight-medium);
+      width: 100%;
+      padding: v.$spacing-2 v.$spacing-3;
+      border: none;
+      border-radius: v.$radius-md;
+      background: transparent;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color v.$transition-fast;
+
+      input[type="checkbox"] {
+        pointer-events: none;
+        accent-color: v.$color-primary;
+      }
+
+      &:hover {
+        background-color: v.$color-gray-100;
+      }
+
+      &.is-selected {
+        background-color: rgba(v.$color-orange, 0.1);
+        color: v.$color-orange-dark;
+        font-weight: v.$font-weight-semibold;
+      }
+    }
+  }
+
+  &__empty {
+    padding: v.$spacing-3;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+}

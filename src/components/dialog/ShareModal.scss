@@ -1,0 +1,167 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.share-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-backdrop;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-4;
+  overflow-y: auto;
+}
+
+.share-modal {
+  @include m.card(v.$spacing-6);
+  position: relative;
+  z-index: v.$z-index-modal;
+  width: 100%;
+  max-width: 32rem;
+  max-height: calc(100vh - #{v.$spacing-6});
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    padding-bottom: v.$spacing-4;
+    margin-bottom: v.$spacing-4;
+    border-bottom: 1px solid v.$color-border;
+
+    h2 {
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background: transparent;
+    color: v.$color-text-muted;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-5;
+    overflow-y: auto;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+  }
+
+  &__label {
+    @include m.font-base(v.$font-weight-semibold);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  &__required {
+    color: v.$color-danger;
+  }
+
+  &__fixed-recipient {
+    @include m.font-base(v.$font-weight-medium);
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg-muted;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+  }
+
+  &__textarea {
+    @include m.font-base(v.$font-weight-regular);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    min-height: 6rem;
+    padding: v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    resize: vertical;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+  }
+
+  &__channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+  }
+
+  &__channel {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    flex: 1 1 8rem;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast, border-color v.$transition-fast;
+
+    &--whatsapp {
+      border: 1px solid v.$color-success;
+      color: v.$color-success;
+
+      &.is-active {
+        background-color: v.$color-success;
+        color: v.$color-white;
+      }
+    }
+
+    &--sms {
+      border: 1px solid v.$color-primary;
+      color: v.$color-primary;
+
+      &.is-active {
+        background-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+
+    &--email {
+      border: 1px solid v.$color-info;
+      color: v.$color-info;
+
+      &.is-active {
+        background-color: v.$color-info;
+        color: v.$color-white;
+      }
+    }
+  }
+
+  &__footer {
+    @include m.flex(row, flex-end, center, v.$spacing-3);
+    flex-wrap: wrap;
+    padding-top: v.$spacing-5;
+    margin-top: v.$spacing-5;
+    border-top: 1px solid v.$color-border;
+  }
+}

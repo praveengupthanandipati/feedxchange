@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FiEye, FiEyeOff, FiDownload, FiPlus, FiSearch, FiX } from "react-icons/fi";
-import Table from "../../../components/table/Table";
-import type { TableColumn } from "../../../components/table/table.types";
-import RowActionsMenu from "../../../components/table/RowActionsMenu";
-import SearchableSelect from "../../../components/dropdown/SearchableSelect";
-import ConfirmDialog from "../../../components/dialog/ConfirmDialog";
+import Table from "../../../../components/table/Table";
+import type { TableColumn } from "../../../../components/table/table.types";
+import RowActionsMenu from "../../../../components/table/RowActionsMenu";
+import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import Pagination from "./Pagination";
 import "./Businessowners.scss";
 import {
   useGetBusinessProfileSummaryQuery,
   useDeleteBusinessProfileMutation,
   type BusinessOwner,
-} from "../../../store/businessProfilesApi";
+} from "../../../../store/businessProfilesApi";
 
 const PAGE_SIZE = 10;
 
