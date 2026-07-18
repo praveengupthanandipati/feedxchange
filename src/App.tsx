@@ -37,6 +37,7 @@ function App() {
           <Route path="/promoters" element={<Promoterlist />} />
           <Route path="/promoters/new" element={<Promoternew />} />
           <Route path="/promoters/:id" element={<Promoterview />} />
+          <Route path="/business-owners/edit/:id" element={<Newbusiness />} />
         </Route>
       </Routes>
     </Router>

@@ -10,43 +10,45 @@ import {
   ALLOWED_DOCUMENT_FILE_TYPES,
 } from "./newBusiness.data";
 
-interface DocumentEntry {
+export interface DocumentEntry {
   id: string;
-  documentType: string;
+  documentTypeId: string;
   documentNumber: string;
-  issuingAuthorityName: string;
-  dateOfIssue: string;
-  expiryDate: string;
+  issuingAuthority: string;
+  issuedDate: string;
   fileName: string;
   fileError: string;
 }
 
 let seq = 0;
-const nextId = () => `document-${Date.now()}-${seq++}`;
+export const nextDocumentId = () => `document-${Date.now()}-${seq++}`;
 
 const emptyEntry = (): DocumentEntry => ({
-  id: nextId(),
-  documentType: "",
+  id: nextDocumentId(),
+  documentTypeId: "",
   documentNumber: "",
-  issuingAuthorityName: "",
-  dateOfIssue: "",
-  expiryDate: "",
+  issuingAuthority: "",
+  issuedDate: "",
   fileName: "",
   fileError: "",
 });
 
-const DocumentsSection = () => {
-  const [entries, setEntries] = useState<DocumentEntry[]>([]);
+interface DocumentsSectionProps {
+  entries: DocumentEntry[];
+  onEntriesChange: (entries: DocumentEntry[]) => void;
+}
+
+const DocumentsSection = ({ entries, onEntriesChange }: DocumentsSectionProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const addEntry = () => setEntries((prev) => [...prev, emptyEntry()]);
+  const addEntry = () => onEntriesChange([...entries, emptyEntry()]);
   const confirmRemoveEntry = () => {
-    setEntries((prev) => prev.filter((entry) => entry.id !== pendingDeleteId));
+    onEntriesChange(entries.filter((entry) => entry.id !== pendingDeleteId));
     setPendingDeleteId(null);
   };
   const updateEntry = (id: string, patch: Partial<DocumentEntry>) =>
-    setEntries((prev) => prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
+    onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
 
   const handleFileChange = (id: string, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -86,8 +88,8 @@ const DocumentsSection = () => {
                     <span className="form-field__label">Select Document</span>
                     <SearchableSelect
                       options={documentTypeOptions}
-                      value={entry.documentType}
-                      onChange={(value) => updateEntry(entry.id, { documentType: value })}
+                      value={entry.documentTypeId}
+                      onChange={(value) => updateEntry(entry.id, { documentTypeId: value })}
                       placeholder="Select or type document type..."
                       ariaLabel="Select Document"
                       allowCustom
@@ -113,9 +115,9 @@ const DocumentsSection = () => {
                       type="text"
                       className="form-field__control"
                       placeholder="Ex: State Authority"
-                      value={entry.issuingAuthorityName}
+                      value={entry.issuingAuthority}
                       onChange={(event) =>
-                        updateEntry(entry.id, { issuingAuthorityName: event.target.value })
+                        updateEntry(entry.id, { issuingAuthority: event.target.value })
                       }
                     />
                   </div>
@@ -125,18 +127,8 @@ const DocumentsSection = () => {
                     <input
                       type="date"
                       className="form-field__control"
-                      value={entry.dateOfIssue}
-                      onChange={(event) => updateEntry(entry.id, { dateOfIssue: event.target.value })}
-                    />
-                  </div>
-
-                  <div className="form-field">
-                    <label className="form-field__label">Expiry Date</label>
-                    <input
-                      type="date"
-                      className="form-field__control"
-                      value={entry.expiryDate}
-                      onChange={(event) => updateEntry(entry.id, { expiryDate: event.target.value })}
+                      value={entry.issuedDate}
+                      onChange={(event) => updateEntry(entry.id, { issuedDate: event.target.value })}
                     />
                   </div>
 
