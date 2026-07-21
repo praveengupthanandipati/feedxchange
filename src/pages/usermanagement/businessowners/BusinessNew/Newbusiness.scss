@@ -62,35 +62,32 @@
 }
 
 // ============================================================
-// Accordion sections (1. Business Profile / 2. Contact & Address)
+// Plain card sections (1. Business Profile … 5. Profile Settings)
+// Scoped to .new-business so the shared .new-contract__section
+// styling used on the Contracts pages is left untouched.
 // ============================================================
-.accordion-section {
-  &__header {
-    @include m.flex(row, space-between, center);
-    width: 100%;
-    border: none;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-    text-align: left;
+.new-business .new-contract__section {
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow v.$transition-base;
 
-    .new-contract__section-title {
-      margin: 0;
-    }
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, v.$color-orange, v.$color-navy-light);
   }
 
-  &__chevron {
-    flex-shrink: 0;
-    color: v.$color-text-muted;
-    transition: transform v.$transition-fast;
+  &:hover {
+    box-shadow: v.$shadow-lg;
   }
 
-  &.is-open .accordion-section__chevron {
-    transform: rotate(180deg);
-  }
-
-  &__body {
-    margin-top: v.$spacing-5;
+  .new-contract__section-title {
+    padding-bottom: v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
   }
 }
 
