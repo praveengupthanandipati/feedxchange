@@ -45,6 +45,15 @@
     flex-wrap: wrap;
   }
 
+  &__card-title {
+    @include m.font-heading(v.$font-weight-semibold);
+    font-size: v.$font-size-lg;
+    color: v.$color-primary;
+    margin: 0 0 v.$spacing-5;
+    padding-bottom: v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+  }
+
   // ============================================================
   // Tabs
   // ============================================================

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
-import AccordionSection from "./AccordionSection";
 import BusinessProfile, {
   nextBrokerageRowId,
   nextCapacityRowId,
@@ -27,8 +26,6 @@ import "./Newbusiness.scss";
 
 const TRACKED_FIELD_COUNT = 13;
 
-type SectionId = "profile" | "contact" | "bank" | "documents" | "settings";
-
 function getErrorMessage(err: unknown, isEditMode: boolean): string {
   // Full error (status, server message) is logged for debugging; the user only sees the plain fallback.
   console.error(`Failed to ${isEditMode ? "update" : "create"} business profile:`, err);
@@ -43,9 +40,6 @@ const Newbusiness = () => {
   const [updateBusinessProfile] = useUpdateBusinessProfileMutation();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [openSection, setOpenSection] = useState<SectionId | null>("profile");
-  const toggleSection = (section: SectionId) =>
-    setOpenSection((prev) => (prev === section ? null : section));
 
   const [legalName, setLegalName] = useState("");
   const [tradingName, setTradingName] = useState("");
@@ -395,11 +389,8 @@ const Newbusiness = () => {
         <div className="new-business__loading">Loading business profile…</div>
       ) : (
         <>
-          <AccordionSection
-            title="1. Business Profile"
-            isOpen={openSection === "profile"}
-            onToggle={() => toggleSection("profile")}
-          >
+          <section className="new-contract__section">
+            <h2 className="new-contract__section-title">1. Business Profile</h2>
             <BusinessProfile
               legalName={legalName}
               onLegalNameChange={setLegalName}
@@ -436,13 +427,10 @@ const Newbusiness = () => {
               capacityRows={capacityRows}
               onCapacityRowsChange={setCapacityRows}
             />
-          </AccordionSection>
+          </section>
 
-          <AccordionSection
-            title="2. Contact & Address"
-            isOpen={openSection === "contact"}
-            onToggle={() => toggleSection("contact")}
-          >
+          <section className="new-contract__section">
+            <h2 className="new-contract__section-title">2. Contact &amp; Address</h2>
             <ContactsAddresses
               emailId={emailId}
               onEmailIdChange={setEmailId}
@@ -475,36 +463,27 @@ const Newbusiness = () => {
               addresses={addresses}
               onAddressesChange={setAddresses}
             />
-          </AccordionSection>
+          </section>
 
-          <AccordionSection
-            title="3. Bank Details"
-            isOpen={openSection === "bank"}
-            onToggle={() => toggleSection("bank")}
-          >
+          <section className="new-contract__section">
+            <h2 className="new-contract__section-title">3. Bank Details</h2>
             <BankDetailsSection
               entries={bankAccounts}
               onEntriesChange={setBankAccounts}
               primaryId={primaryBankId}
               onPrimaryIdChange={setPrimaryBankId}
             />
-          </AccordionSection>
+          </section>
 
-          <AccordionSection
-            title="4. Documents"
-            isOpen={openSection === "documents"}
-            onToggle={() => toggleSection("documents")}
-          >
+          <section className="new-contract__section">
+            <h2 className="new-contract__section-title">4. Documents</h2>
             <DocumentsSection entries={documents} onEntriesChange={setDocuments} />
-          </AccordionSection>
+          </section>
 
-          <AccordionSection
-            title="5. Profile Settings"
-            isOpen={openSection === "settings"}
-            onToggle={() => toggleSection("settings")}
-          >
+          <section className="new-contract__section">
+            <h2 className="new-contract__section-title">5. Profile Settings</h2>
             <ProfileSettingsSection />
-          </AccordionSection>
+          </section>
 
           {submitError && (
             <p className="new-contract__error" style={{ color: "#d92d20" }}>

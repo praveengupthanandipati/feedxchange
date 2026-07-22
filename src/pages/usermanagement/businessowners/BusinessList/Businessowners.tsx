@@ -367,6 +367,7 @@ const Businessowners = () => {
                 ? "Failed to load business owners."
                 : "No business owners match the current filters."
           }
+          minHeight
         />
 
         <Pagination

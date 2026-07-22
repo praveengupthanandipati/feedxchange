@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { FiArrowLeft, FiEdit3, FiShare2, FiUser, FiClipboard, FiCreditCard, FiLink } from "react-icons/fi";
-import type { IconType } from "react-icons";
+import { FiArrowLeft, FiEdit3, FiShare2 } from "react-icons/fi";
 import { businessOwners } from "../BusinessList/businessOwners.data";
 import ShareModal from "../../../../components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../components/dialog/ShareModal";
@@ -13,19 +12,9 @@ import LinkedBusinessTab from "./LinkedBusinessTab";
 import "../BusinessList/Businessowners.scss";
 import "./BusinessOwnerDetail.scss";
 
-type TabId = "overview" | "contacts" | "bank" | "linked";
-
-const TABS: { id: TabId; label: string; icon: IconType }[] = [
-  { id: "overview", label: "Overview", icon: FiUser },
-  { id: "contacts", label: "Contacts", icon: FiClipboard },
-  { id: "bank", label: "Bank Details & Docs", icon: FiCreditCard },
-  { id: "linked", label: "Linked Business", icon: FiLink },
-];
-
 const BusinessOwnerDetail = () => {
   const { id } = useParams<{ id: string }>();
   const owner = businessOwners.find((row) => row.id === id);
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [shareProfileOpen, setShareProfileOpen] = useState(false);
 
   const profile = useMemo(() => (owner ? getBusinessOwnerProfile(owner) : null), [owner]);
@@ -75,29 +64,27 @@ const BusinessOwnerDetail = () => {
             </button>
           </div>
         </div>
-
-        <nav className="business-owner-detail__tabs" aria-label="Business owner sections">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              className={`business-owner-detail__tab ${activeTab === tab.id ? "is-active" : ""}`}
-              onClick={() => setActiveTab(tab.id)}
-              aria-current={activeTab === tab.id}
-            >
-              <tab.icon aria-hidden />
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-
-        <div className="business-owner-detail__main">
-          {activeTab === "overview" && <OverviewTab profile={profile} />}
-          {activeTab === "contacts" && <ContactsTab profile={profile} />}
-          {activeTab === "bank" && <BankDetailsTab profile={profile} />}
-          {activeTab === "linked" && <LinkedBusinessTab ownerId={owner.id} />}
-        </div>
       </div>
+
+      <section className="business-owner-detail__card">
+        <h2 className="business-owner-detail__card-title">Overview</h2>
+        <OverviewTab profile={profile} />
+      </section>
+
+      <section className="business-owner-detail__card">
+        <h2 className="business-owner-detail__card-title">Contacts</h2>
+        <ContactsTab profile={profile} />
+      </section>
+
+      <section className="business-owner-detail__card">
+        <h2 className="business-owner-detail__card-title">Bank Details &amp; Docs</h2>
+        <BankDetailsTab profile={profile} />
+      </section>
+
+      <section className="business-owner-detail__card">
+        <h2 className="business-owner-detail__card-title">Linked Business</h2>
+        <LinkedBusinessTab ownerId={owner.id} />
+      </section>
 
       <ShareModal
         open={shareProfileOpen}
