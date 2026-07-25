@@ -60,15 +60,22 @@ export const asideNavSections: AsideNavSection[] = [
   },
   {
     id: "our-features",
-    title: "Our Features",
+    title: "Product Management",
     items: [
+      { id: "categories", label: "Categories", icon: FiMessageSquare, path: "/categories" },
       {
         id: "apps",
-        label: "Apps",
+        label: "Products",
         icon: FiGrid,
         children: [
-          { id: "apps-calendar", label: "Calendar", path: "/apps/calendar" },
-          { id: "apps-chat", label: "Chat", path: "/apps/chat" },
+          { id: "products-products", label: "Products", path: "/products" },
+          { id: "products-price-tracking", label: "Price Tracking", path: "/products/price-tracking" },
+          { id: "products-price-history", label: "Price History", path: "/products/price-history" },
+          {
+            id: "products-formula-calculations",
+            label: "Formula Calculations",
+            path: "/products/formula-calculations",
+          },
         ],
       },
       {
@@ -90,7 +97,7 @@ export const asideNavSections: AsideNavSection[] = [
         ],
       },
       { id: "notifications", label: "Notifications", icon: FiBell, path: "/notifications" },
-      { id: "messages", label: "Messages", icon: FiMessageSquare, path: "/messages" },
+      
     ],
   }, 
 ];

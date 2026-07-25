@@ -1,0 +1,199 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.categories-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+
+  @include m.respond-to(lg) {
+    grid-template-columns: minmax(280px, 22rem) minmax(0, 1fr);
+  }
+}
+
+// ============================================================
+// Add / Edit Category form
+// ============================================================
+.categories-form-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  min-width: 0;
+
+  &__title {
+    color: v.$color-primary;
+    font-size: v.$font-size-xl;
+    margin: 0;
+  }
+
+  &__actions {
+    @include m.flex(row, flex-end, center, v.$spacing-3);
+  }
+}
+
+.categories-upload {
+  @include m.flex(row, flex-start, center, v.$spacing-3);
+
+  &__preview {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg-muted;
+    color: v.$color-gray-400;
+    overflow: hidden;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__btn {
+    @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-navy);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+  }
+}
+
+.categories-btn {
+  @include m.flex-center;
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+
+  &--cancel {
+    background-color: rgba(v.$color-danger, 0.12);
+    color: v.$color-danger;
+
+    &:hover {
+      background-color: rgba(v.$color-danger, 0.2);
+    }
+  }
+
+  &--save {
+    background-color: v.$color-navy;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-navy-dark;
+    }
+  }
+}
+
+// ============================================================
+// Category table
+// ============================================================
+.categories-table-card {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  min-width: 0;
+}
+
+.categories {
+  &__link {
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: v.$color-primary;
+    font-weight: v.$font-weight-medium;
+    text-decoration: underline;
+    text-decoration-color: rgba(v.$color-primary, 0.4);
+    cursor: pointer;
+
+    &:hover {
+      color: v.$color-primary-dark;
+      text-decoration-color: currentColor;
+    }
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: v.$radius-pill;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+
+    &--active {
+      background-color: rgba(v.$color-success, 0.15);
+      color: v.$color-success;
+    }
+
+    &--inactive {
+      background-color: rgba(v.$color-gray-400, 0.2);
+      color: v.$color-gray-600;
+    }
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.categories-pagination {
+  @include m.flex(row, space-between, center);
+  flex-wrap: wrap;
+  gap: v.$spacing-3;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    display: flex;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2.25rem;
+      height: 2.25rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-gray-100;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}

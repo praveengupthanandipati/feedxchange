@@ -1,0 +1,285 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.product-new {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  // Leave room for the fixed action bar so it doesn't cover content.
+  padding-bottom: 5.5rem;
+
+  @include m.respond-to(md) {
+    padding-bottom: v.$spacing-6;
+  }
+
+  &__topbar {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__back {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    text-decoration: none;
+
+    &:hover {
+      color: v.$color-primary-dark;
+      text-decoration: underline;
+    }
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: v.$spacing-5;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(280px, 22rem) minmax(0, 1fr);
+    }
+  }
+}
+
+// ============================================================
+// Left — Product Primary Details
+// ============================================================
+.product-new-form-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  min-width: 0;
+
+  .form-subheading {
+    margin-top: v.$spacing-1;
+  }
+}
+
+.product-new-upload {
+  @include m.flex(row, flex-start, center, v.$spacing-3);
+
+  &__preview {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-bg-muted;
+    color: v.$color-gray-400;
+    overflow: hidden;
+
+    svg {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__btn {
+    @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-navy);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+  }
+}
+
+// ============================================================
+// Right — Nutritional Specifications / Value & Uses
+// ============================================================
+.product-new-specs-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  min-width: 0;
+}
+
+.product-new-specs-section {
+  min-width: 0;
+
+  .form-subheading {
+    margin-bottom: v.$spacing-3;
+  }
+}
+
+.nutrition-table {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  min-width: 0;
+
+  &__header {
+    display: none;
+    background-color: v.$color-navy;
+    border-radius: v.$radius-sm;
+
+    span {
+      @include m.font-base(v.$font-weight-semibold);
+      padding: v.$spacing-3;
+      color: v.$color-white;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    padding: v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+  }
+
+  &--specs {
+    .nutrition-table__header {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 6.5rem;
+    }
+
+    @include m.respond-to(sm) {
+      .nutrition-table__header {
+        display: grid;
+      }
+
+      .nutrition-table__row {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 6.5rem;
+        align-items: center;
+        border: none;
+        border-radius: 0;
+        padding: 0 v.$spacing-1;
+      }
+    }
+  }
+
+  &--values {
+    .nutrition-table__header {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) 6.5rem;
+    }
+
+    @include m.respond-to(sm) {
+      .nutrition-table__header {
+        display: grid;
+      }
+
+      .nutrition-table__row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) 6.5rem;
+        align-items: start;
+        border: none;
+        border-radius: 0;
+        padding: 0 v.$spacing-1;
+      }
+    }
+  }
+
+  &__checkbox {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    cursor: pointer;
+
+    @include m.respond-to(sm) {
+      justify-content: center;
+    }
+
+    input {
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: v.$color-primary;
+      cursor: pointer;
+    }
+  }
+
+  &__checkbox-label {
+    @include m.font-base(v.$font-weight-medium);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+
+    @include m.respond-to(sm) {
+      display: none;
+    }
+  }
+
+  &__row-actions {
+    display: flex;
+    gap: v.$spacing-2;
+    justify-self: start;
+
+    @include m.respond-to(sm) {
+      justify-self: center;
+    }
+  }
+
+  &__action-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    cursor: pointer;
+    transition: filter v.$transition-fast;
+
+    &:hover {
+      filter: brightness(0.92);
+    }
+
+    &--add {
+      background-color: v.$color-orange;
+      color: v.$color-navy-dark;
+    }
+
+    &--delete {
+      background-color: v.$color-danger;
+    }
+  }
+}
+
+// ============================================================
+// Action bar buttons (Cancel / Save Product)
+// ============================================================
+.product-new-btn {
+  @include m.flex-center;
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.75rem;
+  padding: 0 v.$spacing-5;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+
+  &--cancel {
+    background-color: rgba(v.$color-danger, 0.12);
+    color: v.$color-danger;
+
+    &:hover {
+      background-color: rgba(v.$color-danger, 0.2);
+    }
+  }
+
+  &--save {
+    background-color: v.$color-navy;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-navy-dark;
+    }
+  }
+}
