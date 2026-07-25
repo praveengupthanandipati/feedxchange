@@ -39,8 +39,8 @@ const Contracts = () => {
   const navigate = useNavigate();
   const [rows, setRows] = useState<Contract[]>(initialContracts);
   const [keyword, setKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [dateRangeFilter, setDateRangeFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [dateRangeFilter, setDateRangeFilter] = useState("Today");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -84,7 +84,7 @@ const Contracts = () => {
     const q = keyword.trim().toLowerCase();
 
     return rows.filter((row) => {
-      if (statusFilter !== "All" && row.status !== statusFilter) return false;
+      if (statusFilter && statusFilter !== "All" && row.status !== statusFilter) return false;
 
       if (q) {
         const haystack = [row.id, row.seller, row.buyer, row.product].join(" ").toLowerCase();
@@ -123,13 +123,16 @@ const Contracts = () => {
   const totalQuantityValue = rows.reduce((sum, row) => sum + row.qtyValue, 0);
 
   const dataShowingLabel =
-    [statusFilter !== "All" ? statusFilter : null, dateRangeFilter !== "All" ? dateRangeFilter : null]
+    [
+      statusFilter && statusFilter !== "All" ? statusFilter : null,
+      dateRangeFilter !== "All" ? dateRangeFilter : null,
+    ]
       .filter(Boolean)
       .join(" • ") || "All";
 
   const handleClearFilters = () => {
     setKeyword("");
-    setStatusFilter("All");
+    setStatusFilter("");
     setDateRangeFilter("All");
     setCustomFrom("");
     setCustomTo("");
@@ -223,14 +226,6 @@ const Contracts = () => {
               />
             </div>
 
-            <SearchableSelect
-              options={statusOptions}
-              value={statusFilter}
-              onChange={setStatusFilter}
-              placeholder="Select Status"
-              ariaLabel="Filter by status"
-            />
-
             {dateRangeFilter === "Custom Date Range" && (
               <div className="contracts-filters__date-range">
                 <input
@@ -248,6 +243,14 @@ const Contracts = () => {
                 />
               </div>
             )}
+
+            <SearchableSelect
+              options={statusOptions}
+              value={statusFilter}
+              onChange={setStatusFilter}
+              placeholder="Select Status"
+              ariaLabel="Filter by status"
+            />
 
             <button
               type="button"
@@ -270,6 +273,7 @@ const Contracts = () => {
           onSelectRow={handleToggleRow}
           onSelectAll={handleSelectAll}
           emptyMessage="No contracts match the current filters."
+          minHeight
         />
 
         <div className="contracts-pagination">

@@ -107,6 +107,18 @@ const ContractDetail = () => {
                         label="Delivery schedule"
                         value={contract.sellerConditions.deliverySchedule}
                       />
+                      {contract.sellerConditions.fromDate && (
+                        <DetailField label="From Date" value={contract.sellerConditions.fromDate} />
+                      )}
+                      {contract.sellerConditions.toDate && (
+                        <DetailField label="To Date" value={contract.sellerConditions.toDate} />
+                      )}
+                      {contract.sellerConditions.specificDays && (
+                        <DetailField
+                          label="Specific Days"
+                          value={contract.sellerConditions.specificDays}
+                        />
+                      )}
                       <DetailField
                         label="Quality Spec Source"
                         value={contract.sellerConditions.qualitySpecSource}
@@ -136,6 +148,18 @@ const ContractDetail = () => {
                         label="Delivery schedule"
                         value={contract.buyerConditions.deliverySchedule}
                       />
+                      {contract.buyerConditions.fromDate && (
+                        <DetailField label="From Date" value={contract.buyerConditions.fromDate} />
+                      )}
+                      {contract.buyerConditions.toDate && (
+                        <DetailField label="To Date" value={contract.buyerConditions.toDate} />
+                      )}
+                      {contract.buyerConditions.specificDays && (
+                        <DetailField
+                          label="Specific Days"
+                          value={contract.buyerConditions.specificDays}
+                        />
+                      )}
                       <DetailField
                         label="Quality Spec Source"
                         value={contract.buyerConditions.qualitySpecSource}
@@ -160,6 +184,42 @@ const ContractDetail = () => {
                 <h2 className="new-contract__section-title">3. Payments</h2>
                 <div className="new-contract__grid">
                   <DetailField label="Payment terms" value={contract.paymentTerms} />
+                  {contract.paymentBeforeDate && (
+                    <DetailField label="Payment Before Date" value={contract.paymentBeforeDate} />
+                  )}
+                  {contract.immediateAdvancePercent && (
+                    <DetailField
+                      label="Immediate Advance %"
+                      value={`${contract.immediateAdvancePercent}%`}
+                    />
+                  )}
+                  {contract.immediateAdvanceDate && (
+                    <DetailField
+                      label="Immediate Advance Date"
+                      value={contract.immediateAdvanceDate}
+                    />
+                  )}
+                  {contract.balanceAdvancePercent && (
+                    <DetailField
+                      label="Balance Advance %"
+                      value={`${contract.balanceAdvancePercent}%`}
+                    />
+                  )}
+                  {contract.balanceAdvanceDate && (
+                    <DetailField label="Balance Advance Date" value={contract.balanceAdvanceDate} />
+                  )}
+                  {contract.sellerPaymentDueDays && (
+                    <DetailField
+                      label="Seller Payment Due Days"
+                      value={contract.sellerPaymentDueDays}
+                    />
+                  )}
+                  {contract.buyerPaymentDueDays && (
+                    <DetailField
+                      label="Buyer Payment Due Days"
+                      value={contract.buyerPaymentDueDays}
+                    />
+                  )}
                   <DetailField label="Remarks" value={contract.paymentRemarks} full />
                 </div>
               </section>
