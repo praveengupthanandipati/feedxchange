@@ -371,8 +371,9 @@ const Newtransporter = () => {
             </div>
           </div>
 
-          <AdditionalContactsSection />
+        
           <AdditionalAddressSection />
+            <AdditionalContactsSection />
         </div>
       </section>
 

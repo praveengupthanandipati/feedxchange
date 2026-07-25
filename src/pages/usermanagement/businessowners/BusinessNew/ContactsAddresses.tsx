@@ -592,8 +592,8 @@ const ContactsAddresses = ({
         </div>
       </div>
 
-      <AdditionalContactsSection entries={contacts} onEntriesChange={onContactsChange} />
       <AdditionalAddressSection entries={addresses} onEntriesChange={onAddressesChange} />
+      <AdditionalContactsSection entries={contacts} onEntriesChange={onContactsChange} />
     </div>
   );
 };

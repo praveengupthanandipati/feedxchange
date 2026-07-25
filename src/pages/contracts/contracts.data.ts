@@ -12,6 +12,9 @@ export type ContractStatus = "Open" | "Pending" | "In-transit" | "Rejected";
 export interface ConditionInfo {
   commission: string;
   deliverySchedule: string;
+  fromDate: string;
+  toDate: string;
+  specificDays: string;
   qualitySpecSource: string;
   address: string;
   remarks: string;
@@ -41,6 +44,13 @@ export interface Contract {
   rateRemarks: string;
   deliveryType: string;
   paymentTerms: string;
+  paymentBeforeDate: string;
+  immediateAdvancePercent: string;
+  immediateAdvanceDate: string;
+  balanceAdvancePercent: string;
+  balanceAdvanceDate: string;
+  sellerPaymentDueDays: string;
+  buyerPaymentDueDays: string;
   paymentRemarks: string;
   iFreight: string;
   iFreightValue: number;
@@ -83,6 +93,26 @@ const PAYMENT_REMARKS = ["Payment against dispatch documents.", ""];
 const formatINR = (value: number) => `₹${value.toLocaleString("en-IN")}`;
 const formatDate = (date: Date) =>
   `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+const addDays = (date: Date, days: number) => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+};
+
+function buildConditionInfo(seed: number, date: Date): ConditionInfo {
+  const schedule = deliveryScheduleOptions[seed % deliveryScheduleOptions.length];
+
+  return {
+    commission: `${2 + (seed % 4)}%`,
+    deliverySchedule: schedule.label,
+    fromDate: schedule.value === "forward-contract" ? formatDate(addDays(date, 5)) : "",
+    toDate: schedule.value === "forward-contract" ? formatDate(addDays(date, 20)) : "",
+    specificDays: schedule.value === "specific-days" ? `${5 + (seed % 25)}` : "",
+    qualitySpecSource: qualitySpecSourceOptions[seed % qualitySpecSourceOptions.length].label,
+    address: addressOptions[seed % addressOptions.length].label,
+    remarks: RATE_REMARKS[(seed + 1) % RATE_REMARKS.length],
+  };
+}
 
 const ROW_COUNT = 25;
 
@@ -120,6 +150,10 @@ function buildContracts(): Contract[] {
 
     const indicativeFreightValue = 500 + ((i * 137) % 5000);
 
+    const paymentTermsLabel = PAYMENT_TERMS[i % PAYMENT_TERMS.length];
+    const immediateAdvancePercentValue =
+      paymentTermsLabel === "Forward Advance" ? 30 + (i % 40) : null;
+
     rows.push({
       id: `2026-${ROW_COUNT - i}`,
       date: formatDate(date),
@@ -143,25 +177,23 @@ function buildContracts(): Contract[] {
       indicativeFreight: formatINR(indicativeFreightValue),
       rateRemarks: RATE_REMARKS[i % RATE_REMARKS.length],
       deliveryType: DELIVERY_TYPES[i % DELIVERY_TYPES.length],
-      paymentTerms: PAYMENT_TERMS[i % PAYMENT_TERMS.length],
+      paymentTerms: paymentTermsLabel,
+      paymentBeforeDate: paymentTermsLabel === "100% Advance" ? formatDate(addDays(date, 10)) : "",
+      immediateAdvancePercent:
+        immediateAdvancePercentValue !== null ? `${immediateAdvancePercentValue}` : "",
+      immediateAdvanceDate:
+        paymentTermsLabel === "Forward Advance" ? formatDate(addDays(date, 3)) : "",
+      balanceAdvancePercent:
+        immediateAdvancePercentValue !== null ? `${100 - immediateAdvancePercentValue}` : "",
+      balanceAdvanceDate:
+        paymentTermsLabel === "Forward Advance" ? formatDate(addDays(date, 25)) : "",
+      sellerPaymentDueDays: paymentTermsLabel === "Credits" ? `${15 + (i % 30)}` : "",
+      buyerPaymentDueDays: paymentTermsLabel === "Credits" ? `${20 + ((i + 5) % 30)}` : "",
       paymentRemarks: PAYMENT_REMARKS[i % PAYMENT_REMARKS.length],
       iFreight: formatINR(iFreightValue),
       iFreightValue,
-      sellerConditions: {
-        commission: `${2 + (i % 4)}%`,
-        deliverySchedule: deliveryScheduleOptions[i % deliveryScheduleOptions.length].label,
-        qualitySpecSource: qualitySpecSourceOptions[i % qualitySpecSourceOptions.length].label,
-        address: addressOptions[i % addressOptions.length].label,
-        remarks: RATE_REMARKS[(i + 1) % RATE_REMARKS.length],
-      },
-      buyerConditions: {
-        commission: `${2 + ((i + 1) % 4)}%`,
-        deliverySchedule: deliveryScheduleOptions[(i + 1) % deliveryScheduleOptions.length].label,
-        qualitySpecSource:
-          qualitySpecSourceOptions[(i + 1) % qualitySpecSourceOptions.length].label,
-        address: addressOptions[(i + 1) % addressOptions.length].label,
-        remarks: RATE_REMARKS[(i + 2) % RATE_REMARKS.length],
-      },
+      sellerConditions: buildConditionInfo(i, date),
+      buyerConditions: buildConditionInfo(i + 1, date),
       approved: status === "Open" || status === "In-transit",
     });
   }

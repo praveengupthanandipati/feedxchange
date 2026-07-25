@@ -98,7 +98,9 @@ const AdditionalAddressSection = () => {
                   </div>
 
                   <div className="form-field">
-                    <label className="form-field__label">Pincode</label>
+                    <label className="form-field__label">
+                      Pincode <span className="form-field__required">*</span>
+                    </label>
                     <input
                       type="text"
                       inputMode="numeric"

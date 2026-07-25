@@ -53,6 +53,7 @@ const Newbusiness = () => {
   const [collectionArea, setCollectionArea] = useState("");
   const [area, setArea] = useState("");
   const [referredBy, setReferredBy] = useState("");
+  const [referralName, setReferralName] = useState("");
   const [aboutProfile, setAboutProfile] = useState("");
 
   const [emailId, setEmailId] = useState("");
@@ -108,6 +109,7 @@ const Newbusiness = () => {
     setCollectionArea(asString(profile.collectionArea));
     setArea(asString(profile.area));
     setReferredBy(asString(profile.referredBy));
+    setReferralName(asString(profile.referralName));
     setAboutProfile(asString(profile.aboutProfile));
     setEmailId(asString(profile.emailId));
     setWebsiteUrl(asString(profile.websiteUrl));
@@ -215,6 +217,7 @@ const Newbusiness = () => {
             documentNumber: asString(document.documentNumber),
             issuingAuthority: asString(document.issuingAuthority),
             issuedDate: asString(document.issuedDate).slice(0, 10),
+            expiryDate: asString(document.expiryDate).slice(0, 10),
             fileName: asString(document.fileName),
             fileError: "",
           }))
@@ -279,6 +282,7 @@ const Newbusiness = () => {
         collectionArea,
         area,
         referredBy,
+        referralName,
         aboutProfile,
         status: "Active",
         createdBy: currentUserId,
@@ -341,6 +345,7 @@ const Newbusiness = () => {
           fileName: document.fileName,
           issuingAuthority: document.issuingAuthority,
           issuedDate: document.issuedDate,
+          expiryDate: document.expiryDate,
         })),
         capacityRequirements: capacityRows.map((row) => ({
           productId: toNumber(row.productId),
@@ -416,6 +421,8 @@ const Newbusiness = () => {
               onAreaChange={setArea}
               referredBy={referredBy}
               onReferredByChange={setReferredBy}
+              referralName={referralName}
+              onReferralNameChange={setReferralName}
               aboutProfile={aboutProfile}
               onAboutProfileChange={setAboutProfile}
               buyBrokerageCharges={buyBrokerageCharges}

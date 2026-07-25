@@ -15,6 +15,10 @@ import Transportview from './pages/usermanagement/transporters/transportView/Tra
 import Promoterlist from './pages/usermanagement/promoters/promoterslist/Promoterlist'
 import Promoternew from './pages/usermanagement/promoters/promoternew/Promoternew'
 import Promoterview from './pages/usermanagement/promoters/promoterview/Promoterview'
+import Categories from './pages/product-management/categories/Categories'
+import Products from './pages/product-management/products/products-list/Products'
+import NewProduct from './pages/product-management/products/product-new/ProductNew'
+import Productview from './pages/product-management/products/product-view/Productview'
 
 function App() {
   return (
@@ -38,6 +42,10 @@ function App() {
           <Route path="/promoters/new" element={<Promoternew />} />
           <Route path="/promoters/:id" element={<Promoterview />} />
           <Route path="/business-owners/edit/:id" element={<Newbusiness />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/new" element={<NewProduct />} />
+          <Route path="/products/:id" element={<Productview />} />
         </Route>
       </Routes>
     </Router>
