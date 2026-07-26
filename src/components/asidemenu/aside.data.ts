@@ -1,6 +1,7 @@
 import {
   FiHome,
   FiFileText,
+  FiActivity,
   FiGrid,
   FiUser,
   FiSettings,
@@ -12,6 +13,9 @@ import {
   FiUsers,
   FiTag,
   FiUserPlus,
+  FiCheckSquare,
+  FiPackage,
+  FiSend,
 } from "react-icons/fi";
 import type { AsideNavSection } from "./aside.types";
 
@@ -19,10 +23,11 @@ import type { AsideNavSection } from "./aside.types";
 export const asideNavSections: AsideNavSection[] = [
   {
     id: "your-company",
-    title: "Your Company",
+    title: "FeedxChange",
     items: [
       { id: "dashboard", label: "Dashboard", icon: FiHome, path: "/dashboard" },
-      { id: "contract", label: "Contracts", icon: FiFileText, path: "/contracts" },      
+      { id: "contract", label: "Contracts", icon: FiFileText, path: "/contracts" },
+      { id: "contract-status", label: "Contract Status", icon: FiActivity, path: "/contract-status" },
       // {
       //   id: "task",
       //   label: "Task",
@@ -37,6 +42,64 @@ export const asideNavSections: AsideNavSection[] = [
     ],
   },
    {
+    id: "truck-management",
+    title: "Truck Management",
+    items: [
+      {
+        id: "pending-contracts",
+        label: "Pending Contracts",
+        icon: FiFileText,
+        path: "/truck-management/pending-contracts",
+      },
+      {
+        id: "bulk-freight-approval",
+        label: "Bulk Freight Approval",
+        icon: FiCheckSquare,
+        path: "/truck-management/bulk-freight-approval",
+      },
+      {
+        id: "pending-delivery-orders",
+        label: "Pending Delivery Orders",
+        icon: FiPackage,
+        path: "/truck-management/pending-delivery-orders",
+      },
+      {
+        id: "add-dispatch-by-user",
+        label: "Add Dispatch By User",
+        icon: FiUserPlus,
+        path: "/truck-management/add-dispatch-by-user",
+      },
+      {
+        id: "truck-transporters",
+        label: "Transporters",
+        icon: FiTruck,
+        children: [
+          {
+            id: "truck-transporters-freight-approval",
+            label: "Freight Approval",
+            path: "/truck-management/transporters/freight-approval",
+          },
+          {
+            id: "truck-transporters-dashboard",
+            label: "Transport Dashboard",
+            path: "/truck-management/transporters/transport-dashboard",
+          },
+          {
+            id: "truck-transporters-master",
+            label: "Truck Master",
+            path: "/truck-management/transporters/truck-master",
+          },
+        ],
+      },
+      {
+        id: "seller-dispatches-new",
+        label: "Seller Dispatches New",
+        icon: FiSend,
+        path: "/truck-management/seller-dispatches-new",
+      },
+    ],
+  },
+   {
     id: "user-management",
     title: "User Management",
     items: [
@@ -46,7 +109,7 @@ export const asideNavSections: AsideNavSection[] = [
         id: "promoters-dashboard",
         label: "Promoters Dashboard",
         icon: FiPieChart,
-        path: "/promoters-dashboard",
+        path: "/promoter-dashboard",
       },
       { id: "promoters", label: "Promoters", icon: FiUsers, path: "/promoters" },
       { id: "promocodes", label: "Promocodes", icon: FiTag, path: "/promocodes" },

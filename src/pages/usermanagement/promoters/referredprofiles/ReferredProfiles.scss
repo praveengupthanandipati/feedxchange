@@ -1,0 +1,74 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.referred-profiles-page {
+  padding-bottom: v.$spacing-6;
+}
+
+.referred-profiles-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      color: v.$color-primary;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__search {
+    width: 100%;
+    max-width: 22rem;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+
+    @include m.respond-below(sm) {
+      max-width: 100%;
+    }
+  }
+}
+
+.referred-profiles__status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: v.$radius-pill;
+  font-size: 0.7rem;
+  font-weight: v.$font-weight-semibold;
+
+  &--approved {
+    background-color: rgba(v.$color-success, 0.15);
+    color: v.$color-success;
+  }
+
+  &--pending {
+    background-color: rgba(v.$color-warning, 0.15);
+    color: v.$color-orange-dark;
+  }
+
+  &--rejected {
+    background-color: rgba(v.$color-danger, 0.12);
+    color: v.$color-danger;
+  }
+}

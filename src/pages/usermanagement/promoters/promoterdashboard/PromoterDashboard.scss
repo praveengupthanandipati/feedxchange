@@ -1,0 +1,197 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.promoter-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    flex-wrap: wrap;
+  }
+
+  &__summary {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: v.$spacing-5;
+    }
+  }
+
+  &__card {
+    @include m.card(v.$spacing-5);
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+  }
+
+  &__filters {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    flex-wrap: wrap;
+    padding: v.$spacing-4;
+    background-color: v.$color-bg-muted;
+    border-radius: v.$radius-md;
+
+    input {
+      flex: 1 1 12rem;
+      height: 2.5rem;
+      padding: 0 v.$spacing-3;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+
+      &::placeholder {
+        color: v.$color-gray-400;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-primary;
+        box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      }
+    }
+  }
+
+  &__apply,
+  &__reset {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+  }
+
+  &__apply {
+    border: none;
+    background-color: v.$color-navy;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-navy-dark;
+    }
+  }
+
+  &__reset {
+    border: 1px solid v.$color-orange;
+    background-color: v.$color-bg;
+    color: v.$color-orange-dark;
+
+    &:hover {
+      background-color: rgba(v.$color-orange, 0.08);
+    }
+  }
+}
+
+.promoter-summary {
+  @include m.flex(row, space-between, center);
+  padding: v.$spacing-4;
+  border-radius: v.$radius-lg;
+  color: v.$color-white;
+
+  @include m.respond-to(md) {
+    padding: v.$spacing-5 v.$spacing-6;
+  }
+
+  span {
+    @include m.font-heading(v.$font-weight-semibold);
+    font-size: v.$font-size-base;
+
+    @include m.respond-to(md) {
+      font-size: v.$font-size-lg;
+    }
+  }
+
+  strong {
+    @include m.font-heading(v.$font-weight-bold);
+    font-size: v.$font-size-xl;
+
+    @include m.respond-to(md) {
+      font-size: v.$font-size-2xl;
+    }
+  }
+
+  &--primary {
+    background: linear-gradient(135deg, v.$color-navy 0%, v.$color-navy-dark 100%);
+  }
+
+  &--info {
+    background: linear-gradient(135deg, v.$color-info 0%, #1f6fae 100%);
+  }
+
+  &--warning {
+    background: linear-gradient(135deg, v.$color-orange 0%, v.$color-orange-dark 100%);
+  }
+}
+
+.promoter-dashboard-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  color: v.$color-white;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+
+  &--info {
+    background-color: v.$color-info;
+
+    &:hover {
+      background-color: #1f6fae;
+    }
+  }
+
+  &--warning {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+}
+
+.promoter-dashboard__status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: v.$radius-pill;
+  font-size: 0.7rem;
+  font-weight: v.$font-weight-semibold;
+
+  &--paid {
+    background-color: rgba(v.$color-success, 0.15);
+    color: v.$color-success;
+  }
+
+  &--pending {
+    background-color: rgba(v.$color-warning, 0.15);
+    color: v.$color-orange-dark;
+  }
+}
