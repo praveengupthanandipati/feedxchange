@@ -1,0 +1,334 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.price-history-page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+}
+
+// ============================================================
+// Top filters
+// ============================================================
+.price-history-filters {
+  @include m.card(v.$spacing-5);
+  @include m.flex(row, space-between, center);
+  flex-wrap: wrap;
+  gap: v.$spacing-4;
+
+  h1 {
+    font-size: v.$font-size-xl;
+    margin: 0;
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+    align-items: center;
+
+    .searchable-select {
+      min-width: 14rem;
+    }
+  }
+
+  &__date {
+    @include m.font-base;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+  }
+
+  &__apply {
+    @include m.flex-center;
+    @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    font-size: v.$font-size-sm;
+  }
+
+  @include m.respond-below(sm) {
+    &__controls {
+      width: 100%;
+
+      .searchable-select,
+      &__date {
+        flex: 1 1 100%;
+      }
+    }
+  }
+}
+
+// ============================================================
+// Two-pane layout: sellers + main content
+// ============================================================
+.price-history-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-5;
+  align-items: start;
+
+  @include m.respond-to(lg) {
+    grid-template-columns: 18rem 1fr;
+  }
+}
+
+// ============================================================
+// Premium Sellers sidebar
+// ============================================================
+.price-history-sellers {
+  @include m.card(0);
+  overflow: hidden;
+  padding: 0;
+
+  &__header {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.font-heading(v.$font-weight-semibold);
+    padding: v.$spacing-4 v.$spacing-5;
+    background-color: v.$color-navy;
+    color: v.$color-white;
+    font-size: v.$font-size-base;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: v.$spacing-2;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+
+    @include m.respond-to(lg) {
+      max-height: 32rem;
+      overflow-y: scroll;
+    }
+  }
+
+  &__item {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    padding: v.$spacing-3;
+    border: none;
+    border-radius: v.$radius-md;
+    background-color: transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-bg-muted;
+    }
+
+    &.is-active {
+      background-color: rgba(v.$color-primary, 0.08);
+
+      .price-history-sellers__info strong {
+        color: v.$color-primary;
+      }
+    }
+  }
+
+  &__avatar {
+    @include m.flex-center;
+    @include m.font-heading(v.$font-weight-semibold);
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-navy;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+
+    strong {
+      @include m.font-base(v.$font-weight-semibold);
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    span {
+      @include m.flex(row, flex-start, center, 0.25rem);
+      color: v.$color-text-muted;
+      font-size: 0.75rem;
+
+      svg {
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+// ============================================================
+// Main content: stat cards + analytics
+// ============================================================
+.price-history-main {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  min-width: 0;
+}
+
+.price-history-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-4;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.price-history-stat {
+  @include m.card(v.$spacing-5);
+  @include m.flex(column, center, center, v.$spacing-2);
+  text-align: center;
+
+  &__icon {
+    @include m.flex-center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-navy;
+    color: v.$color-white;
+    font-size: 1.1rem;
+    margin-bottom: v.$spacing-1;
+  }
+
+  strong {
+    @include m.font-heading(v.$font-weight-bold);
+    font-size: v.$font-size-xl;
+    color: v.$color-text;
+
+    &.is-up {
+      color: v.$color-success;
+    }
+
+    &.is-down {
+      color: v.$color-danger;
+    }
+  }
+
+  span {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+}
+
+// ============================================================
+// Price Analytics card
+// ============================================================
+.price-history-analytics {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h2 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      font-size: v.$font-size-lg;
+      margin: 0;
+
+      svg {
+        color: v.$color-primary;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  &__seller {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-regular;
+  }
+
+  &__filter {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+
+    .searchable-select {
+      min-width: 9rem;
+    }
+  }
+
+  &__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-5;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    strong {
+      @include m.font-heading(v.$font-weight-bold);
+      color: v.$color-primary;
+      font-size: v.$font-size-lg;
+    }
+
+    span {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-4;
+
+    span {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__dot {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: v.$radius-pill;
+
+    &--original {
+      background-color: #1b3664;
+    }
+
+    &--offer {
+      background-color: #2e9e5b;
+    }
+
+    &--resale {
+      background-color: #faa41a;
+    }
+  }
+}

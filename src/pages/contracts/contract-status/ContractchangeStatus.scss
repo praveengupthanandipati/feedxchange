@@ -1,0 +1,288 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.contract-change-status {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+
+  // Leave room for the fixed mobile action bar so it doesn't cover content.
+  @include m.respond-below(md) {
+    padding-bottom: 5.5rem;
+  }
+
+  &__card {
+    @include m.card(v.$spacing-5);
+  }
+
+  &__title {
+    color: v.$color-primary;
+    font-size: v.$font-size-xl;
+    margin: 0 0 v.$spacing-4;
+    padding-bottom: v.$spacing-4;
+    border-bottom: 1px solid v.$color-border;
+  }
+
+  &__fields {
+    padding-bottom: v.$spacing-5;
+    margin-bottom: v.$spacing-5;
+    border-bottom: 1px solid v.$color-border;
+  }
+
+  &__input-group {
+    display: flex;
+    align-items: stretch;
+    gap: v.$spacing-2;
+
+    .form-field__control {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  &__search-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-navy);
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: none;
+    border-radius: v.$radius-md;
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+    font-size: v.$font-size-lg;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+  &__details {
+    padding: v.$spacing-4;
+    margin-bottom: v.$spacing-5;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+
+    @include m.respond-to(md) {
+      padding: v.$spacing-5;
+    }
+  }
+
+  &__details-header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+    margin-bottom: v.$spacing-5;
+
+    h2 {
+      color: v.$color-primary;
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+  }
+
+  &__placeholder {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__toggle-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-5;
+    padding: v.$spacing-4;
+    background-color: v.$color-bg-muted;
+    border-radius: v.$radius-md;
+
+    @include m.respond-to(sm) {
+      gap: v.$spacing-6;
+    }
+
+    .toggle-switch {
+      &.is-on .toggle-switch__label {
+        color: v.$color-primary;
+        font-weight: v.$font-weight-semibold;
+      }
+    }
+  }
+
+  // ============================================================
+  // Actions
+  // ============================================================
+  &__actions {
+    @include m.flex(row, flex-end, center, v.$spacing-3);
+
+    // Pin the primary actions to the bottom of the viewport on mobile,
+    // where scrolling past them to find "Change" is poor UX.
+    @include m.respond-below(md) {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: v.$z-index-sticky;
+      padding: v.$spacing-3 v.$spacing-4;
+      background-color: v.$color-bg;
+      border-top: 1px solid v.$color-border;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
+
+      .contract-change-status__cancel,
+      .contract-change-status__submit {
+        flex: 1;
+      }
+    }
+  }
+
+  &__cancel {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    height: 2.75rem;
+    padding: 0 v.$spacing-5;
+    border: 1px solid v.$color-orange;
+    border-radius: v.$radius-md;
+    color: v.$color-orange-dark;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: none;
+    background-color: v.$color-bg;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: rgba(v.$color-orange, 0.08);
+    }
+  }
+
+  &__submit {
+    @include m.flex-center;
+    @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2.75rem;
+    padding: 0 v.$spacing-6;
+    font-size: v.$font-size-sm;
+  }
+}
+
+// ============================================================
+// "Get Contracts" offcanvas drawer
+// ============================================================
+.get-contracts-drawer__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-backdrop;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity v.$transition-base, visibility v.$transition-base;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.get-contracts-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: v.$z-index-modal;
+  width: 75%;
+  max-width: 75%;
+  display: flex;
+  flex-direction: column;
+  background-color: v.$color-bg;
+  box-shadow: v.$shadow-lg;
+  transform: translateX(100%);
+  transition: transform v.$transition-base;
+
+  &.is-open {
+    transform: translateX(0);
+  }
+
+  @include m.respond-below(lg) {
+    width: 85%;
+    max-width: 85%;
+  }
+
+  @include m.respond-below(sm) {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-shrink: 0;
+    padding: v.$spacing-4 v.$spacing-5;
+    border-bottom: 1px solid v.$color-border;
+
+    h2 {
+      color: v.$color-primary;
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: transparent;
+    color: v.$color-text-muted;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-5;
+    padding: v.$spacing-5;
+  }
+
+  &__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__submit {
+    @include m.flex-center;
+    @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    align-self: flex-start;
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    font-size: v.$font-size-sm;
+  }
+
+  &__add-btn {
+    @include m.flex-center;
+    @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2rem;
+    padding: 0 v.$spacing-4;
+    font-size: v.$font-size-sm;
+    border: none;
+    border-radius: v.$radius-md;
+    cursor: pointer;
+  }
+}

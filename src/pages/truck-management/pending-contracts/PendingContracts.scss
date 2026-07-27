@@ -1,0 +1,612 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.pending-contracts-page {
+  padding-bottom: v.$spacing-6;
+
+  // Force scrollbar gutters to always render instead of relying on
+  // hover-to-reveal OS overlay scrollbars, so overflow is obvious.
+  .table-wrapper {
+    overflow-x: scroll;
+  }
+
+  .multi-select__options,
+  .searchable-select__options {
+    overflow-y: scroll;
+  }
+}
+
+.pending-contracts-card {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      color: v.$color-primary;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    flex-wrap: wrap;
+  }
+}
+
+.pending-contracts-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+
+  &--info {
+    background-color: v.$color-info;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: #1f6fae;
+    }
+  }
+
+  &--warning {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+}
+
+// ============================================================
+// Filters
+// ============================================================
+.pending-contracts-filters {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  overflow: visible;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    overflow: visible;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__date-range {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+
+    input {
+      @include m.font-base;
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+
+    span {
+      flex-shrink: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__search-row {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    flex-wrap: wrap;
+  }
+
+  &__search {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex: 1 1 18rem;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text-muted;
+
+    input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: v.$font-size-sm;
+      color: v.$color-text;
+
+      &::placeholder {
+        color: v.$color-gray-400;
+      }
+    }
+  }
+
+  &__clear {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-danger, 0.1);
+    color: v.$color-danger;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: rgba(v.$color-danger, 0.18);
+    }
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.pending-contracts-table {
+  &__id {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__id-badge {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-success;
+    color: v.$color-white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: #227a46;
+    }
+  }
+
+  &__id-text {
+    color: v.$color-primary;
+  }
+
+  &__name {
+    display: inline-flex;
+    align-items: center;
+    max-width: 11rem;
+  }
+
+  &__name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__qty--arranged {
+    color: v.$color-info;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__qty--pending {
+    color: v.$color-orange-dark;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__pay-type {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.pending-contracts-pagination {
+  @include m.flex(row, space-between, center);
+  flex-wrap: wrap;
+  gap: v.$spacing-3;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2.25rem;
+      height: 2.25rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-gray-100;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
+
+// ============================================================
+// Truck Tracking Details offcanvas drawer
+// ============================================================
+.truck-tracking-drawer__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-backdrop;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity v.$transition-base, visibility v.$transition-base;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.truck-tracking-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: v.$z-index-modal;
+  width: 50%;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+  background-color: v.$color-bg;
+  box-shadow: v.$shadow-lg;
+  transform: translateX(100%);
+  transition: transform v.$transition-base;
+
+  &.is-open {
+    transform: translateX(0);
+  }
+
+  @include m.respond-below(lg) {
+    width: 85%;
+    max-width: 85%;
+  }
+
+  @include m.respond-below(sm) {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-shrink: 0;
+    padding: v.$spacing-4 v.$spacing-5;
+    border-bottom: 1px solid v.$color-border;
+
+    h2 {
+      font-size: v.$font-size-lg;
+      margin: 0;
+
+      strong {
+        color: v.$color-primary;
+      }
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: transparent;
+    color: v.$color-text-muted;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+    padding: v.$spacing-5;
+  }
+
+  &__parties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-5;
+
+    p {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      margin: 0;
+
+      strong {
+        color: v.$color-text;
+      }
+
+      svg {
+        flex-shrink: 0;
+        color: v.$color-primary;
+      }
+    }
+  }
+
+  &__section-header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h3 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      color: v.$color-primary;
+      font-size: v.$font-size-base;
+      margin: 0;
+    }
+  }
+
+  &__add-btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    font-size: v.$font-size-sm;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: v.$spacing-3 v.$spacing-4;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+
+    span {
+      @include m.font-heading(v.$font-weight-semibold);
+      font-size: v.$font-size-sm;
+      opacity: 0.9;
+    }
+
+    strong {
+      @include m.font-heading(v.$font-weight-bold);
+      font-size: v.$font-size-lg;
+    }
+
+    &--total {
+      background: linear-gradient(135deg, v.$color-navy 0%, v.$color-navy-dark 100%);
+    }
+
+    &--success {
+      background: linear-gradient(135deg, v.$color-success 0%, #1d7a46 100%);
+    }
+
+    &--info {
+      background: linear-gradient(135deg, v.$color-info 0%, #1f6fae 100%);
+    }
+
+    &--danger {
+      background: linear-gradient(135deg, v.$color-danger 0%, #b8352b 100%);
+    }
+  }
+
+  &__empty {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__truck-list {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+  }
+
+  &__truck-card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+  }
+
+  &__truck-header {
+    @include m.flex(row, space-between, center);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    padding: v.$spacing-3 v.$spacing-4;
+    border: none;
+    background-color: v.$color-bg;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-bg-muted;
+    }
+  }
+
+  &__truck-title {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    min-width: 0;
+
+    svg {
+      flex-shrink: 0;
+      color: v.$color-primary;
+    }
+
+    strong {
+      color: v.$color-text;
+    }
+
+    span {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      white-space: nowrap;
+    }
+  }
+
+  &__truck-meta {
+    @include m.flex(row, flex-end, center, v.$spacing-3);
+    flex-shrink: 0;
+
+    > svg {
+      color: v.$color-text-muted;
+    }
+  }
+
+  &__share-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-navy;
+    color: v.$color-white;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-navy-dark;
+    }
+  }
+
+  &__status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+  }
+
+  &__truck-details {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+    padding: v.$spacing-4;
+    border-top: 1px solid v.$color-border;
+    background-color: v.$color-bg-muted;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 0;
+    }
+
+    span {
+      @include m.flex(row, flex-start, center, v.$spacing-1);
+      @include m.font-base(v.$font-weight-semibold);
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+
+      svg {
+        flex-shrink: 0;
+        color: v.$color-primary;
+      }
+    }
+
+    p {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      margin: 0;
+      word-break: break-word;
+    }
+  }
+
+  &__assignment-badge {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 0.2rem 0.6rem;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-orange, 0.15);
+    color: v.$color-orange-dark;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+  }
+}

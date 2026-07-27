@@ -1,0 +1,309 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.promocodes-page {
+  padding-bottom: v.$spacing-6;
+}
+
+.promocodes-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      color: v.$color-primary;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__search {
+    width: 100%;
+    max-width: 22rem;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+
+    @include m.respond-below(sm) {
+      max-width: 100%;
+    }
+  }
+}
+
+.promocodes-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  flex-shrink: 0;
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+
+  &--primary {
+    background-color: v.$color-navy;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-navy-dark;
+    }
+  }
+}
+
+// ============================================================
+// "Promo Code / URL" table cell
+// ============================================================
+.promocodes {
+  &__code-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  &__code {
+    @include m.font-base(v.$font-weight-semibold);
+    color: v.$color-text;
+  }
+
+  &__url {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-decoration: none;
+    word-break: break-all;
+
+    &:hover {
+      color: v.$color-primary;
+      text-decoration: underline;
+    }
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: v.$radius-pill;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+
+    &--active {
+      background-color: rgba(v.$color-success, 0.15);
+      color: v.$color-success;
+    }
+
+    &--inactive {
+      background-color: rgba(v.$color-gray-400, 0.2);
+      color: v.$color-gray-600;
+    }
+  }
+}
+
+// ============================================================
+// "New Promo Code" offcanvas drawer
+// ============================================================
+.promo-code-drawer__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-backdrop;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity v.$transition-base, visibility v.$transition-base;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.promo-code-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: v.$z-index-modal;
+  width: 28rem;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  background-color: v.$color-bg;
+  box-shadow: v.$shadow-lg;
+  transform: translateX(100%);
+  transition: transform v.$transition-base;
+
+  &.is-open {
+    transform: translateX(0);
+  }
+
+  @include m.respond-below(sm) {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-shrink: 0;
+    padding: v.$spacing-4 v.$spacing-5;
+    border-bottom: 1px solid v.$color-border;
+
+    h2 {
+      color: v.$color-primary;
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: transparent;
+    color: v.$color-text-muted;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-5;
+    padding: v.$spacing-5;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+  }
+
+  &__label {
+    @include m.font-base(v.$font-weight-semibold);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  &__required {
+    color: v.$color-danger;
+  }
+
+  &__input {
+    @include m.font-base;
+    height: 2.75rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    text-transform: uppercase;
+    transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+      text-transform: none;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+  }
+
+  &__hint {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__error {
+    background-color: rgba(v.$color-danger, 0.08);
+    color: v.$color-danger;
+    border-radius: v.$radius-md;
+    padding: v.$spacing-3 v.$spacing-4;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__preview {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+    word-break: break-all;
+
+    strong {
+      color: v.$color-text;
+    }
+  }
+
+  &__toggle-row {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+  }
+
+  &__footer {
+    @include m.flex(row, flex-end, center, v.$spacing-3);
+    flex-shrink: 0;
+    padding: v.$spacing-4 v.$spacing-5;
+    border-top: 1px solid v.$color-border;
+  }
+
+  &__cancel {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    border: 1px solid v.$color-orange;
+    border-radius: v.$radius-md;
+    color: v.$color-orange-dark;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    background-color: v.$color-bg;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: rgba(v.$color-orange, 0.08);
+    }
+  }
+
+  &__submit {
+    @include m.flex-center;
+    @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    font-size: v.$font-size-sm;
+  }
+}
