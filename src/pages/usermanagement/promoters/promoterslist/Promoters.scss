@@ -187,5 +187,10 @@
       background-color: rgba(v.$color-gray-400, 0.2);
       color: v.$color-gray-600;
     }
+
+    &--deleted {
+      background-color: rgba(v.$color-danger, 0.15);
+      color: v.$color-danger;
+    }
   }
 }

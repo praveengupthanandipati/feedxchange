@@ -8,12 +8,25 @@ import ContractDetail from './pages/contracts/ContractDetail'
 import NewContract from './pages/contracts/NewContract'
 import Businessowners from './pages/usermanagement/businessowners/BusinessList/Businessowners'
 import BusinessOwnerDetail from './pages/usermanagement/businessowners/BusinessView/BusinessOwnerDetail'
-import Newbusiness from './pages/usermanagement/businessowners/BusinessNew/Newbusiness'
+import BusinessOwnerWizardLayout from './pages/usermanagement/businessowners/BusinessNew/BusinessOwnerWizardLayout'
+import BusinessProfileStep from './pages/usermanagement/businessowners/BusinessNew/BusinessProfileStep'
+import ContactsAddressesStep from './pages/usermanagement/businessowners/BusinessNew/ContactsAddressesStep'
+import DocumentsStep from './pages/usermanagement/businessowners/BusinessNew/DocumentsStep'
+import BankDetailsStep from './pages/usermanagement/businessowners/BusinessNew/BankDetailsStep'
+import ProfileSettingsStep from './pages/usermanagement/businessowners/BusinessNew/ProfileSettingsStep'
 import Transprters from './pages/usermanagement/transporters/transportersList/Transprters'
-import Newtransporter from './pages/usermanagement/transporters/transportersNew/Newtransporter'
+import TransporterWizardLayout from './pages/usermanagement/transporters/transportersNew/TransporterWizardLayout'
+import TransporterProfileStep from './pages/usermanagement/transporters/transportersNew/TransporterProfileStep'
+import TransporterContactsAddressesStep from './pages/usermanagement/transporters/transportersNew/ContactsAddressesStep'
+import TransporterDocumentsStep from './pages/usermanagement/transporters/transportersNew/DocumentsStep'
+import TransporterBankDetailsStep from './pages/usermanagement/transporters/transportersNew/BankDetailsStep'
+import TransporterProfileSettingsStep from './pages/usermanagement/transporters/transportersNew/ProfileSettingsStep'
 import Transportview from './pages/usermanagement/transporters/transportView/Transportview'
 import Promoterlist from './pages/usermanagement/promoters/promoterslist/Promoterlist'
-import Promoternew from './pages/usermanagement/promoters/promoternew/Promoternew'
+import PromoterWizardLayout from './pages/usermanagement/promoters/promoternew/PromoterWizardLayout'
+import PromoterProfileStep from './pages/usermanagement/promoters/promoternew/PromoterProfileStep'
+import PromoterDocumentsStep from './pages/usermanagement/promoters/promoternew/DocumentsStep'
+import PromoterProfileSettingsStep from './pages/usermanagement/promoters/promoternew/ProfileSettingsStep'
 import Promoterview from './pages/usermanagement/promoters/promoterview/Promoterview'
 
 function App() {
@@ -30,14 +43,29 @@ function App() {
           <Route path="/contracts/new" element={<NewContract />} />
           <Route path="/business-owners" element={<Businessowners />} />
           <Route path="/business-owners/:id" element={<BusinessOwnerDetail />} />
-          <Route path="/business-owners/new" element={<Newbusiness />} />
+          <Route element={<BusinessOwnerWizardLayout />}>
+            <Route path="/business-owners/profile" element={<BusinessProfileStep />} />
+            <Route path="/business-owners/contacts" element={<ContactsAddressesStep />} />
+            <Route path="/business-owners/documents" element={<DocumentsStep />} />
+            <Route path="/business-owners/bank-details" element={<BankDetailsStep />} />
+            <Route path="/business-owners/profile-settings" element={<ProfileSettingsStep />} />
+          </Route>
           <Route path="/transporters" element={<Transprters />} />
-          <Route path="/transporters/new" element={<Newtransporter />} />
           <Route path="/transporters/:id" element={<Transportview />} />
+          <Route element={<TransporterWizardLayout />}>
+            <Route path="/transporters/profile" element={<TransporterProfileStep />} />
+            <Route path="/transporters/contacts" element={<TransporterContactsAddressesStep />} />
+            <Route path="/transporters/documents" element={<TransporterDocumentsStep />} />
+            <Route path="/transporters/bank-details" element={<TransporterBankDetailsStep />} />
+            <Route path="/transporters/profile-settings" element={<TransporterProfileSettingsStep />} />
+          </Route>
           <Route path="/promoters" element={<Promoterlist />} />
-          <Route path="/promoters/new" element={<Promoternew />} />
           <Route path="/promoters/:id" element={<Promoterview />} />
-          <Route path="/business-owners/edit/:id" element={<Newbusiness />} />
+          <Route element={<PromoterWizardLayout />}>
+            <Route path="/promoters/profile" element={<PromoterProfileStep />} />
+            <Route path="/promoters/documents" element={<PromoterDocumentsStep />} />
+            <Route path="/promoters/profile-settings" element={<PromoterProfileSettingsStep />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

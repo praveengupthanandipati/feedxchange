@@ -10,13 +10,26 @@ import {
   useGetBusinessTypesByLineQuery,
   useGetBusinessSubTypesQuery,
 } from "../../../../store/businessProfilesApi";
-import { groupOptions, collectionAreaOptions, areaOptions, establishmentYearOptions } from "./newBusiness.data";
+import { areaOptions, establishmentYearOptions } from "./newBusiness.data";
 
 export interface BrokerageRow {
   id: string;
   productId: string;
   buyCharge: string;
   sellCharge: string;
+  // Present only for rows loaded from an existing profile — tells the save
+  // step to call UpdateBusinessBuySellCharge instead of bundling this row
+  // into the next CreateBusinessBuySellCharge call. effectiveFrom/effectiveTo/
+  // isActive have no UI field yet, so they just round-trip whatever the
+  // backend already has for this row.
+  meta?: {
+    chargeId: number;
+    createdBy: number;
+    createdOn: string;
+    effectiveFrom: string;
+    effectiveTo: string;
+    isActive: boolean;
+  };
 }
 
 let brokerageRowSeq = 0;
@@ -192,6 +205,11 @@ export interface CapacityRow {
   productId: string;
   tonsPerDay: string;
   tonsPerMonth: string;
+  // GetBusinessCapacityRequirement doesn't return a row id, so hydrated rows
+  // never carry `meta` today — every save re-creates via
+  // CreateBusinessCapacityRequirement rather than updating in place. Wire
+  // this up for real once the backend's GET response includes an id.
+  meta?: { capacityRequirementId: number; createdBy: number; createdOn: string };
 }
 
 let capacityRowSeq = 0;
@@ -310,12 +328,10 @@ interface BusinessProfileProps {
   onBusinessTypeIdChange: (value: string) => void;
   businessSubTypeId: string;
   onBusinessSubTypeIdChange: (value: string) => void;
-  groupName: string;
-  onGroupNameChange: (value: string) => void;
-  collectionArea: string;
-  onCollectionAreaChange: (value: string) => void;
   area: string;
   onAreaChange: (value: string) => void;
+  collectionArea: string;
+  onCollectionAreaChange: (value: string) => void;
   referredBy: string;
   onReferredByChange: (value: string) => void;
   aboutProfile: string;
@@ -347,12 +363,10 @@ const BusinessProfile = ({
   onBusinessTypeIdChange,
   businessSubTypeId,
   onBusinessSubTypeIdChange,
-  groupName,
-  onGroupNameChange,
-  collectionArea,
-  onCollectionAreaChange,
   area,
   onAreaChange,
+  collectionArea,
+  onCollectionAreaChange,
   referredBy,
   onReferredByChange,
   aboutProfile,
@@ -515,30 +529,6 @@ const BusinessProfile = ({
         </div>
 
         <div className="form-field">
-          <span className="form-field__label">Group</span>
-          <SearchableSelect
-            options={groupOptions}
-            value={groupName}
-            onChange={onGroupNameChange}
-            placeholder="Select or type..."
-            ariaLabel="Group"
-            allowCustom
-          />
-        </div>
-
-        <div className="form-field">
-          <span className="form-field__label">Collection Area</span>
-          <SearchableSelect
-            options={collectionAreaOptions}
-            value={collectionArea}
-            onChange={onCollectionAreaChange}
-            placeholder="Select or type..."
-            ariaLabel="Collection Area"
-            allowCustom
-          />
-        </div>
-
-        <div className="form-field">
           <span className="form-field__label">Area</span>
           <SearchableSelect
             options={areaOptions}
@@ -547,6 +537,20 @@ const BusinessProfile = ({
             placeholder="Select or type..."
             ariaLabel="Area"
             allowCustom
+          />
+        </div>
+
+        <div className="form-field">
+          <label className="form-field__label" htmlFor="collectionArea">
+            Collection Area
+          </label>
+          <input
+            id="collectionArea"
+            type="text"
+            className="form-field__control"
+            placeholder="Enter Collection Area"
+            value={collectionArea}
+            onChange={(event) => onCollectionAreaChange(event.target.value)}
           />
         </div>
 

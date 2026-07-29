@@ -12,9 +12,17 @@ import {
   useGetBusinessProfileSummaryQuery,
   useDeleteBusinessProfileMutation,
   type BusinessOwner,
+  type BusinessOwnerStatus,
 } from "../../../../store/businessProfilesApi";
 
 const PAGE_SIZE = 10;
+const DEFAULT_STATUS_FILTER: BusinessOwnerStatus = "Active";
+const statusFilterOptions = [
+  { value: "All", label: "All" },
+  { value: "Active", label: "Active" },
+  { value: "Inactive", label: "Inactive" },
+  { value: "Deleted", label: "Deleted" },
+];
 
 export const indianStates = [
   "Andhra Pradesh",
@@ -59,11 +67,12 @@ const StatusBadge = ({ status }: { status: BusinessOwner["status"] }) => (
 );
 
 interface ColumnHandlers {
+  onView: (owner: BusinessOwner) => void;
   onEdit: (owner: BusinessOwner) => void;
   onDelete: (owner: BusinessOwner) => void;
 }
 
-function buildBusinessOwnerColumns({ onEdit, onDelete }: ColumnHandlers): TableColumn<BusinessOwner>[] {
+function buildBusinessOwnerColumns({ onView, onEdit, onDelete }: ColumnHandlers): TableColumn<BusinessOwner>[] {
   return [
     {
       key: "legalName",
@@ -75,11 +84,6 @@ function buildBusinessOwnerColumns({ onEdit, onDelete }: ColumnHandlers): TableC
         </Link>
       ),
       exportValue: (row) => row.legalName,
-    },
-    {
-      key: "actions",
-      header: "",
-      render: (row) => <RowActionsMenu onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />,
     },
     {
       key: "status",
@@ -114,6 +118,19 @@ function buildBusinessOwnerColumns({ onEdit, onDelete }: ColumnHandlers): TableC
       header: "State",
       sortable: true,
     },
+    {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu
+          variant="inline"
+          onView={() => onView(row)}
+          onEdit={() => onEdit(row)}
+          onDelete={() => onDelete(row)}
+        />
+      ),
+    },
   ];
 }
 
@@ -125,6 +142,8 @@ interface FilterOption {
 interface BusinessOwnersFiltersProps {
   keyword: string;
   onKeywordChange: (value: string) => void;
+  status: string;
+  onStatusChange: (value: string) => void;
   businessType: string;
   onBusinessTypeChange: (value: string) => void;
   businessTypeOptions: FilterOption[];
@@ -137,6 +156,8 @@ interface BusinessOwnersFiltersProps {
 const BusinessOwnersFilters = ({
   keyword,
   onKeywordChange,
+  status,
+  onStatusChange,
   businessType,
   onBusinessTypeChange,
   businessTypeOptions,
@@ -147,6 +168,14 @@ const BusinessOwnersFilters = ({
 }: BusinessOwnersFiltersProps) => {
   return (
     <div className="business-owners-filters">
+      <SearchableSelect
+        options={statusFilterOptions}
+        value={status}
+        onChange={onStatusChange}
+        placeholder="Select Status"
+        ariaLabel="Filter by status"
+      />
+
       <SearchableSelect
         options={businessTypeOptions}
         value={businessType}
@@ -204,6 +233,7 @@ const Businessowners = () => {
   const [deleteBusinessProfile] = useDeleteBusinessProfileMutation();
   const rows = useMemo(() => data ?? [], [data]);
   const [keyword, setKeyword] = useState("");
+  const [status, setStatus] = useState<string>(DEFAULT_STATUS_FILTER);
   const [businessType, setBusinessType] = useState("All");
   const [location, setLocation] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -211,8 +241,12 @@ const Businessowners = () => {
   const [pendingDeleteOwner, setPendingDeleteOwner] = useState<BusinessOwner | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  const handleView = (owner: BusinessOwner) => {
+    navigate(`/business-owners/${owner.profileId}`);
+  };
+
   const handleEdit = (owner: BusinessOwner) => {
-    navigate(`edit/${owner.profileId}`);
+    navigate(`/business-owners/profile?id=${owner.profileId}`);
   };
 
   const handleDelete = (owner: BusinessOwner) => {
@@ -238,7 +272,7 @@ const Businessowners = () => {
   };
 
   const columns = useMemo(
-    () => buildBusinessOwnerColumns({ onEdit: handleEdit, onDelete: handleDelete }),
+    () => buildBusinessOwnerColumns({ onView: handleView, onEdit: handleEdit, onDelete: handleDelete }),
     [],
   );
 
@@ -254,12 +288,13 @@ const Businessowners = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, businessType, location]);
+  }, [keyword, status, businessType, location]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
 
     return rows.filter((row) => {
+      if (status !== "All" && row.status !== status) return false;
       if (businessType !== "All" && row.businessTypeName !== businessType) return false;
       if (location !== "All" && row.location !== location) return false;
 
@@ -272,7 +307,7 @@ const Businessowners = () => {
 
       return true;
     });
-  }, [rows, keyword, businessType, location]);
+  }, [rows, keyword, status, businessType, location]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -283,6 +318,7 @@ const Businessowners = () => {
 
   const handleClearFilters = () => {
     setKeyword("");
+    setStatus(DEFAULT_STATUS_FILTER);
     setBusinessType("All");
     setLocation("All");
   };
@@ -335,7 +371,7 @@ const Businessowners = () => {
             <button
               type="button"
               className="business-owners-btn business-owners-btn--primary"
-              onClick={() => navigate("new")}
+              onClick={() => navigate("/business-owners/profile")}
             >
               <FiPlus aria-hidden /> New
             </button>
@@ -346,6 +382,8 @@ const Businessowners = () => {
           <BusinessOwnersFilters
             keyword={keyword}
             onKeywordChange={setKeyword}
+            status={status}
+            onStatusChange={setStatus}
             businessType={businessType}
             onBusinessTypeChange={setBusinessType}
             businessTypeOptions={businessTypeOptions}

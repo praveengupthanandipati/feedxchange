@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { FiMail } from "react-icons/fi";
 import ShareModal from "../../../../components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../components/dialog/ShareModal";
 import type { TransporterProfile } from "./transporterDetail.data";
+import {
+  useGetAllTransporterLinesQuery,
+  useGetTransporterTypesByLineQuery,
+} from "../../../../store/transportersApi";
 
 interface OverviewTabProps {
   profile: TransporterProfile;
@@ -27,6 +31,24 @@ const OverviewTab = ({ profile }: OverviewTabProps) => {
 
   const handleSendMessage = (_payload: ShareModalPayload) => undefined;
 
+  const { data: transporterLines } = useGetAllTransporterLinesQuery();
+  const lineOfTransporter = useMemo(
+    () =>
+      transporterLines?.find((line) => String(line.transporterLineId) === profile.transporterLineId)
+        ?.transporterLineName ?? "",
+    [transporterLines, profile.transporterLineId],
+  );
+
+  const { data: transporterTypes } = useGetTransporterTypesByLineQuery(profile.transporterLineId, {
+    skip: !profile.transporterLineId,
+  });
+  const typeOfTransporter = useMemo(
+    () =>
+      transporterTypes?.find((type) => String(type.transporterTypeId) === profile.transporterTypeId)
+        ?.transporterTypeName ?? "",
+    [transporterTypes, profile.transporterTypeId],
+  );
+
   return (
     <div className="business-owner-detail__tab-panel">
       <section className="business-owner-detail__section">
@@ -48,6 +70,16 @@ const OverviewTab = ({ profile }: OverviewTabProps) => {
               <a href={`tel:${profile.mobile}`} className="business-owners__link">
                 {profile.mobile}
               </a>
+            }
+          />
+          <DetailField
+            label="Alternative Contact"
+            value={
+              profile.alternativeContact ? (
+                <a href={`tel:${profile.alternativeContact}`} className="business-owners__link">
+                  {profile.alternativeContact}
+                </a>
+              ) : undefined
             }
           />
           <DetailField
@@ -94,7 +126,8 @@ const OverviewTab = ({ profile }: OverviewTabProps) => {
           <DetailField label="Year of Establishment" value={profile.yearOfEstablishment} />
           <DetailField label="PAN Number" value={profile.panNumber} />
           <DetailField label="GST Number" value={profile.gstNumber} />
-          <DetailField label="Type of Transporter" value={profile.typeOfTransporter} />
+          <DetailField label="Line of Transporter" value={lineOfTransporter} />
+          <DetailField label="Type of Transporter" value={typeOfTransporter} />
           <DetailField label="Group" value={profile.group} />
           <DetailField label="Referral By" value={profile.referralBy} />
           <DetailField label="Google Map Location" value={profile.googleMapLocation} />

@@ -10,7 +10,7 @@ import {
   ALLOWED_DOCUMENT_FILE_TYPES,
 } from "./newTransporter.data";
 
-interface DocumentEntry {
+export interface DocumentEntry {
   id: string;
   documentType: string;
   documentNumber: string;
@@ -18,13 +18,29 @@ interface DocumentEntry {
   issuedDate: string;
   fileName: string;
   fileError: string;
+  // The picked File, held only until save — cleared once uploaded. Absent
+  // for hydrated rows whose file wasn't replaced, in which case the save
+  // step reuses meta.filePath/fileSize/contentType instead of re-uploading.
+  file?: File;
+  // Present only for rows loaded from an existing profile — tells the save
+  // step to call UpdateProfileDocument instead of bundling this row into the
+  // next CreateProfileDocument call.
+  meta?: {
+    documentId: number;
+    createdBy: number;
+    createdOn: string;
+    filePath: string;
+    fileSize: number;
+    contentType: string;
+    uploadDate: string;
+  };
 }
 
 let seq = 0;
-const nextId = () => `document-${Date.now()}-${seq++}`;
+export const nextDocumentId = () => `document-${Date.now()}-${seq++}`;
 
 const emptyEntry = (): DocumentEntry => ({
-  id: nextId(),
+  id: nextDocumentId(),
   documentType: "",
   documentNumber: "",
   issuingAuthorityName: "",
@@ -33,39 +49,43 @@ const emptyEntry = (): DocumentEntry => ({
   fileError: "",
 });
 
-const DocumentsSection = () => {
-  const [entries, setEntries] = useState<DocumentEntry[]>([]);
+interface DocumentsSectionProps {
+  entries: DocumentEntry[];
+  onEntriesChange: (entries: DocumentEntry[]) => void;
+}
+
+const DocumentsSection = ({ entries, onEntriesChange }: DocumentsSectionProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const addEntry = () => setEntries((prev) => [...prev, emptyEntry()]);
+  const addEntry = () => onEntriesChange([...entries, emptyEntry()]);
   const confirmRemoveEntry = () => {
-    setEntries((prev) => prev.filter((entry) => entry.id !== pendingDeleteId));
+    onEntriesChange(entries.filter((entry) => entry.id !== pendingDeleteId));
     setPendingDeleteId(null);
   };
   const updateEntry = (id: string, patch: Partial<DocumentEntry>) =>
-    setEntries((prev) => prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
+    onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
 
   const handleFileChange = (id: string, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
-      updateEntry(id, { fileName: "", fileError: "" });
+      updateEntry(id, { fileName: "", fileError: "", file: undefined });
       return;
     }
 
     if (!ALLOWED_DOCUMENT_FILE_TYPES.includes(file.type)) {
-      updateEntry(id, { fileName: "", fileError: "Unsupported file format." });
+      updateEntry(id, { fileName: "", fileError: "Unsupported file format.", file: undefined });
       event.target.value = "";
       return;
     }
 
     if (file.size > MAX_DOCUMENT_FILE_SIZE_MB * 1024 * 1024) {
-      updateEntry(id, { fileName: "", fileError: `File must be under ${MAX_DOCUMENT_FILE_SIZE_MB}MB.` });
+      updateEntry(id, { fileName: "", fileError: `File must be under ${MAX_DOCUMENT_FILE_SIZE_MB}MB.`, file: undefined });
       event.target.value = "";
       return;
     }
 
-    updateEntry(id, { fileName: file.name, fileError: "" });
+    updateEntry(id, { fileName: file.name, fileError: "", file });
   };
 
   return (
