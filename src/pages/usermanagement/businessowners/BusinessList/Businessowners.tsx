@@ -55,9 +55,9 @@ export const indianStates = [
   "West Bengal",
 ];
 
-export function buildFilterOptions(values: string[]) {
+export function buildFilterOptions(values: string[], allLabel = "All") {
   const unique = Array.from(new Set(values.filter(Boolean))).sort();
-  return [{ value: "All", label: "All" }, ...unique.map((value) => ({ value, label: value }))];
+  return [{ value: "All", label: allLabel }, ...unique.map((value) => ({ value, label: value }))];
 }
 
 const StatusBadge = ({ status }: { status: BusinessOwner["status"] }) => (
@@ -277,12 +277,12 @@ const Businessowners = () => {
   );
 
   const businessTypeOptions = useMemo(
-    () => buildFilterOptions(rows.map((row) => row.businessTypeName)),
+    () => buildFilterOptions(rows.map((row) => row.businessTypeName), "Business Type"),
     [rows],
   );
 
   const locationOptions = useMemo(
-    () => buildFilterOptions(rows.map((row) => row.location)),
+    () => buildFilterOptions(rows.map((row) => row.location), "By State"),
     [rows],
   );
 

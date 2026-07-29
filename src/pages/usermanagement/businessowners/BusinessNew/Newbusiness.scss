@@ -116,7 +116,6 @@
 // ============================================================
 .new-business .new-contract__section {
   position: relative;
-  overflow: hidden;
   transition: box-shadow v.$transition-base;
 
   &::before {
@@ -126,6 +125,7 @@
     left: 0;
     right: 0;
     height: 3px;
+    border-radius: v.$radius-lg v.$radius-lg 0 0;
     background: linear-gradient(90deg, v.$color-orange, v.$color-navy-light);
   }
 

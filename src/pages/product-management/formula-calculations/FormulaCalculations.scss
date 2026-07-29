@@ -1,0 +1,58 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.formula-calculations-page {
+  @include m.flex(row, center, center);
+  min-height: 60vh;
+  padding: v.$spacing-4;
+}
+
+.formula-calculations-card {
+  @include m.card(v.$spacing-6);
+  @include m.flex(column, center, center, v.$spacing-3);
+  max-width: 26rem;
+  width: 100%;
+  text-align: center;
+
+  &__icon {
+    @include m.flex-center;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-orange, 0.12);
+    color: v.$color-orange;
+    font-size: 1.75rem;
+  }
+
+  h1 {
+    color: v.$color-primary;
+    font-size: v.$font-size-xl;
+    margin: 0;
+  }
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__back {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    margin-top: v.$spacing-3;
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    border-radius: v.$radius-md;
+    background-color: v.$color-navy;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: none;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-navy-dark;
+    }
+  }
+}

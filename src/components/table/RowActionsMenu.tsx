@@ -81,43 +81,49 @@ const RowActionsMenu = ({ onEdit, onView, onDelete, variant = "menu" }: RowActio
 
       {open && (
         <ul className="row-actions__menu">
-          <li>
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                onEdit?.();
-              }}
-            >
-              <FiEdit2 aria-hidden />
-              Edit
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                onView?.();
-              }}
-            >
-              <FiEye aria-hidden />
-              View
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              className="row-actions__item--danger"
-              onClick={() => {
-                setOpen(false);
-                onDelete?.();
-              }}
-            >
-              <FiTrash2 aria-hidden />
-              Delete
-            </button>
-          </li>
+          {onEdit && (
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  onEdit();
+                }}
+              >
+                <FiEdit2 aria-hidden />
+                Edit
+              </button>
+            </li>
+          )}
+          {onView && (
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  onView();
+                }}
+              >
+                <FiEye aria-hidden />
+                View
+              </button>
+            </li>
+          )}
+          {onDelete && (
+            <li>
+              <button
+                type="button"
+                className="row-actions__item--danger"
+                onClick={() => {
+                  setOpen(false);
+                  onDelete();
+                }}
+              >
+                <FiTrash2 aria-hidden />
+                Delete
+              </button>
+            </li>
+          )}
         </ul>
       )}
     </div>

@@ -334,6 +334,8 @@ interface BusinessProfileProps {
   onCollectionAreaChange: (value: string) => void;
   referredBy: string;
   onReferredByChange: (value: string) => void;
+  referralName: string;
+  onReferralNameChange: (value: string) => void;
   aboutProfile: string;
   onAboutProfileChange: (value: string) => void;
   buyBrokerageCharges: string;
@@ -369,6 +371,8 @@ const BusinessProfile = ({
   onCollectionAreaChange,
   referredBy,
   onReferredByChange,
+  referralName,
+  onReferralNameChange,
   aboutProfile,
   onAboutProfileChange,
   buyBrokerageCharges,
@@ -556,15 +560,29 @@ const BusinessProfile = ({
 
         <div className="form-field">
           <label className="form-field__label" htmlFor="referredBy">
-            Referred By
+           Referral Code
           </label>
           <input
             id="referredBy"
             type="text"
             className="form-field__control"
-            placeholder="Enter Referred By"
+            placeholder="Enter Referral Code"
             value={referredBy}
             onChange={(event) => onReferredByChange(event.target.value)}
+          />
+        </div>
+
+        <div className="form-field">
+          <label className="form-field__label" htmlFor="referralName">
+            Referral Name
+          </label>
+          <input
+            id="referralName"
+            type="text"
+            className="form-field__control"
+            placeholder="Enter Referral Name"
+            value={referralName}
+            onChange={(event) => onReferralNameChange(event.target.value)}
           />
         </div>
 

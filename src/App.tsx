@@ -28,6 +28,18 @@ import PromoterProfileStep from './pages/usermanagement/promoters/promoternew/Pr
 import PromoterDocumentsStep from './pages/usermanagement/promoters/promoternew/DocumentsStep'
 import PromoterProfileSettingsStep from './pages/usermanagement/promoters/promoternew/ProfileSettingsStep'
 import Promoterview from './pages/usermanagement/promoters/promoterview/Promoterview'
+import Categories from './pages/product-management/categories/Categories'
+import Products from './pages/product-management/products/products-list/Products'
+import NewProduct from './pages/product-management/products/product-new/ProductNew'
+import Productview from './pages/product-management/products/product-view/Productview'
+import ContractchangeStatus from './pages/contracts/contract-status/ContractchangeStatus'
+import PromoterDashboard from './pages/usermanagement/promoters/promoterdashboard/PromoterDashboard'
+import Promocodes from './pages/usermanagement/promoters/promocodes/Promocodes'
+import ReferredProfiles from './pages/usermanagement/promoters/referredprofiles/ReferredProfiles'
+import ProductPriceTracking from './pages/product-management/price-tracking/ProductPriceTracking'
+import PriceHistory from './pages/product-management/price-history/ProductPrieHistory'
+import FormulaCalculations from './pages/product-management/formula-calculations/FormulaCalculations'
+import PendingContracts from './pages/truck-management/pending-contracts/PendingContracts'
 
 function App() {
   return (
@@ -66,6 +78,18 @@ function App() {
             <Route path="/promoters/documents" element={<PromoterDocumentsStep />} />
             <Route path="/promoters/profile-settings" element={<PromoterProfileSettingsStep />} />
           </Route>
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/new" element={<NewProduct />} />
+          <Route path="/products/:id" element={<Productview />} />
+          <Route path="/contract-status" element={<ContractchangeStatus />} />
+          <Route path="/promoter-dashboard" element={<PromoterDashboard />} />
+          <Route path="/promocodes" element={<Promocodes />} />
+          <Route path="/referred-profiles" element={<ReferredProfiles />} />
+          <Route path="/products/price-tracking" element={<ProductPriceTracking />} />
+          <Route path="/products/price-history" element={<PriceHistory />} />
+          <Route path="/products/formula-calculations" element={<FormulaCalculations />} />
+          <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
         </Route>
       </Routes>
     </Router>

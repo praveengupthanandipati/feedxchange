@@ -44,10 +44,9 @@ export const gstDetailsOptions = [
 ];
 
 export const deliveryScheduleOptions = [
-  { value: "immediate", label: "Immediate" },
-  { value: "7d", label: "Within 7 Days" },
-  { value: "15d", label: "Within 15 Days" },
-  { value: "30d", label: "Within 30 Days" },
+  { value: "ready-loading", label: "Ready Loading" },
+  { value: "forward-contract", label: "Forward Contract" },
+  { value: "specific-days", label: "Specific Days" },
 ];
 
 export const qualitySpecSourceOptions = [

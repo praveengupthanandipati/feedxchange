@@ -22,6 +22,9 @@ import "./NewContract.scss";
 interface ConditionState {
   commission: string;
   deliverySchedule: string;
+  fromDate: string;
+  toDate: string;
+  specificDays: string;
   qualitySpecSource: string;
   address: string;
   remarks: string;
@@ -29,7 +32,10 @@ interface ConditionState {
 
 const emptyCondition: ConditionState = {
   commission: "5",
-  deliverySchedule: "",
+  deliverySchedule: "ready-loading",
+  fromDate: "",
+  toDate: "",
+  specificDays: "",
   qualitySpecSource: "",
   address: "",
   remarks: "",
@@ -49,13 +55,25 @@ const REQUIRED_FIELD_LABELS: Record<string, string> = {
   gstDetails: "GST details",
   sellerCommission: "Seller Commission",
   sellerDeliverySchedule: "Seller Delivery schedule",
+  sellerFromDate: "Seller From Date",
+  sellerToDate: "Seller To Date",
+  sellerSpecificDays: "Seller Specific Days",
   sellerQualitySpecSource: "Seller Quality Spec Source",
   sellerAddress: "Seller Loading Address At",
   buyerCommission: "Buyer Commission",
   buyerDeliverySchedule: "Buyer Delivery schedule",
+  buyerFromDate: "Buyer From Date",
+  buyerToDate: "Buyer To Date",
+  buyerSpecificDays: "Buyer Specific Days",
   buyerQualitySpecSource: "Buyer Quality Spec Source",
   buyerAddress: "Buyer Delivery Address At",
   paymentTerms: "Payment terms",
+  paymentBeforeDate: "Payment Before Date",
+  immediateAdvancePercent: "Immediate Advance %",
+  immediateAdvanceDate: "Immediate Advance Date",
+  balanceAdvanceDate: "Balance Advance Date",
+  sellerPaymentDueDays: "Seller Payment Due Days",
+  buyerPaymentDueDays: "Buyer Payment Due Days",
 };
 
 const NewContract = () => {
@@ -81,6 +99,12 @@ const NewContract = () => {
   const [buyerConditions, setBuyerConditions] = useState<ConditionState>(emptyCondition);
 
   const [paymentTerms, setPaymentTerms] = useState("");
+  const [paymentBeforeDate, setPaymentBeforeDate] = useState("");
+  const [immediateAdvancePercent, setImmediateAdvancePercent] = useState("");
+  const [immediateAdvanceDate, setImmediateAdvanceDate] = useState("");
+  const [balanceAdvanceDate, setBalanceAdvanceDate] = useState("");
+  const [sellerPaymentDueDays, setSellerPaymentDueDays] = useState("");
+  const [buyerPaymentDueDays, setBuyerPaymentDueDays] = useState("");
   const [paymentRemarks, setPaymentRemarks] = useState("");
 
   const [approved, setApproved] = useState(false);
@@ -89,6 +113,10 @@ const NewContract = () => {
   const baseRate = parseFloat(contractRate) || 0;
   const gstAmount = Math.round(baseRate * ((parseFloat(gstPercent) || 0) / 100) * 100) / 100;
   const netRate = Math.round((baseRate + gstAmount) * 100) / 100;
+
+  const balanceAdvancePercent = immediateAdvancePercent
+    ? Math.max(0, 100 - (parseFloat(immediateAdvancePercent) || 0))
+    : "";
 
   const sellerLabel = sellerOptions.find((option) => option.value === sellerId)?.label;
   const buyerLabel = buyerOptions.find((option) => option.value === buyerId)?.label;
@@ -112,13 +140,32 @@ const NewContract = () => {
       gstDetails,
       sellerCommission: sellerConditions.commission,
       sellerDeliverySchedule: sellerConditions.deliverySchedule,
+      sellerFromDate:
+        sellerConditions.deliverySchedule === "forward-contract" ? sellerConditions.fromDate : "skip",
+      sellerToDate:
+        sellerConditions.deliverySchedule === "forward-contract" ? sellerConditions.toDate : "skip",
+      sellerSpecificDays:
+        sellerConditions.deliverySchedule === "specific-days" ? sellerConditions.specificDays : "skip",
       sellerQualitySpecSource: sellerConditions.qualitySpecSource,
       sellerAddress: sellerConditions.address,
       buyerCommission: buyerConditions.commission,
       buyerDeliverySchedule: buyerConditions.deliverySchedule,
+      buyerFromDate:
+        buyerConditions.deliverySchedule === "forward-contract" ? buyerConditions.fromDate : "skip",
+      buyerToDate:
+        buyerConditions.deliverySchedule === "forward-contract" ? buyerConditions.toDate : "skip",
+      buyerSpecificDays:
+        buyerConditions.deliverySchedule === "specific-days" ? buyerConditions.specificDays : "skip",
       buyerQualitySpecSource: buyerConditions.qualitySpecSource,
       buyerAddress: buyerConditions.address,
       paymentTerms,
+      paymentBeforeDate: paymentTerms === "100-advance" ? paymentBeforeDate : "skip",
+      immediateAdvancePercent:
+        paymentTerms === "forward-advance" ? immediateAdvancePercent : "skip",
+      immediateAdvanceDate: paymentTerms === "forward-advance" ? immediateAdvanceDate : "skip",
+      balanceAdvanceDate: paymentTerms === "forward-advance" ? balanceAdvanceDate : "skip",
+      sellerPaymentDueDays: paymentTerms === "credits" ? sellerPaymentDueDays : "skip",
+      buyerPaymentDueDays: paymentTerms === "credits" ? buyerPaymentDueDays : "skip",
     }),
     [
       contractDate,
@@ -135,6 +182,12 @@ const NewContract = () => {
       sellerConditions,
       buyerConditions,
       paymentTerms,
+      paymentBeforeDate,
+      immediateAdvancePercent,
+      immediateAdvanceDate,
+      balanceAdvanceDate,
+      sellerPaymentDueDays,
+      buyerPaymentDueDays,
     ],
   );
 
@@ -479,6 +532,58 @@ const NewContract = () => {
                 />
               </div>
 
+              {sellerConditions.deliverySchedule === "forward-contract" && (
+                <>
+                  <div className="form-field">
+                    <label className="form-field__label" htmlFor="sellerFromDate">
+                      From Date <span className="form-field__required">*</span>
+                    </label>
+                    <input
+                      id="sellerFromDate"
+                      type="date"
+                      className="form-field__control"
+                      value={sellerConditions.fromDate}
+                      onChange={(event) =>
+                        handleSellerConditionChange({ fromDate: event.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label className="form-field__label" htmlFor="sellerToDate">
+                      To Date <span className="form-field__required">*</span>
+                    </label>
+                    <input
+                      id="sellerToDate"
+                      type="date"
+                      className="form-field__control"
+                      value={sellerConditions.toDate}
+                      onChange={(event) =>
+                        handleSellerConditionChange({ toDate: event.target.value })
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
+              {sellerConditions.deliverySchedule === "specific-days" && (
+                <div className="form-field">
+                  <label className="form-field__label" htmlFor="sellerSpecificDays">
+                    Specific Days <span className="form-field__required">*</span>
+                  </label>
+                  <input
+                    id="sellerSpecificDays"
+                    type="number"
+                    min="0"
+                    className="form-field__control"
+                    placeholder="Enter number of days"
+                    value={sellerConditions.specificDays}
+                    onChange={(event) =>
+                      handleSellerConditionChange({ specificDays: event.target.value })
+                    }
+                  />
+                </div>
+              )}
+
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">
                   Quality Spec Source <span className="form-field__required">*</span>
@@ -552,6 +657,58 @@ const NewContract = () => {
                 />
               </div>
 
+              {buyerConditions.deliverySchedule === "forward-contract" && (
+                <>
+                  <div className="form-field">
+                    <label className="form-field__label" htmlFor="buyerFromDate">
+                      From Date <span className="form-field__required">*</span>
+                    </label>
+                    <input
+                      id="buyerFromDate"
+                      type="date"
+                      className="form-field__control"
+                      value={buyerConditions.fromDate}
+                      onChange={(event) =>
+                        handleBuyerConditionChange({ fromDate: event.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label className="form-field__label" htmlFor="buyerToDate">
+                      To Date <span className="form-field__required">*</span>
+                    </label>
+                    <input
+                      id="buyerToDate"
+                      type="date"
+                      className="form-field__control"
+                      value={buyerConditions.toDate}
+                      onChange={(event) =>
+                        handleBuyerConditionChange({ toDate: event.target.value })
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
+              {buyerConditions.deliverySchedule === "specific-days" && (
+                <div className="form-field">
+                  <label className="form-field__label" htmlFor="buyerSpecificDays">
+                    Specific Days <span className="form-field__required">*</span>
+                  </label>
+                  <input
+                    id="buyerSpecificDays"
+                    type="number"
+                    min="0"
+                    className="form-field__control"
+                    placeholder="Enter number of days"
+                    value={buyerConditions.specificDays}
+                    onChange={(event) =>
+                      handleBuyerConditionChange({ specificDays: event.target.value })
+                    }
+                  />
+                </div>
+              )}
+
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">
                   Quality Spec Source <span className="form-field__required">*</span>
@@ -611,6 +768,115 @@ const NewContract = () => {
               ariaLabel="Payment terms"
             />
           </div>
+
+          {paymentTerms === "100-advance" && (
+            <div className="form-field">
+              <label className="form-field__label" htmlFor="paymentBeforeDate">
+                Payment Before Date <span className="form-field__required">*</span>
+              </label>
+              <input
+                id="paymentBeforeDate"
+                type="date"
+                className="form-field__control"
+                value={paymentBeforeDate}
+                onChange={(event) => setPaymentBeforeDate(event.target.value)}
+              />
+            </div>
+          )}
+
+          {paymentTerms === "forward-advance" && (
+            <>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="immediateAdvancePercent">
+                  Immediate Advance % <span className="form-field__required">*</span>
+                </label>
+                <input
+                  id="immediateAdvancePercent"
+                  type="number"
+                  min="0"
+                  max="100"
+                  className="form-field__control"
+                  placeholder="Enter Immediate Advance %"
+                  value={immediateAdvancePercent}
+                  onChange={(event) => setImmediateAdvancePercent(event.target.value)}
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="immediateAdvanceDate">
+                  Immediate Advance Date <span className="form-field__required">*</span>
+                </label>
+                <input
+                  id="immediateAdvanceDate"
+                  type="date"
+                  className="form-field__control"
+                  value={immediateAdvanceDate}
+                  onChange={(event) => setImmediateAdvanceDate(event.target.value)}
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="balanceAdvancePercent">
+                  Balance Advance %
+                </label>
+                <input
+                  id="balanceAdvancePercent"
+                  type="text"
+                  className="form-field__control"
+                  value={balanceAdvancePercent}
+                  disabled
+                  readOnly
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="balanceAdvanceDate">
+                  Balance Advance Date <span className="form-field__required">*</span>
+                </label>
+                <input
+                  id="balanceAdvanceDate"
+                  type="date"
+                  className="form-field__control"
+                  value={balanceAdvanceDate}
+                  onChange={(event) => setBalanceAdvanceDate(event.target.value)}
+                />
+              </div>
+            </>
+          )}
+
+          {paymentTerms === "credits" && (
+            <>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="sellerPaymentDueDays">
+                  Seller Payment Due Days <span className="form-field__required">*</span>
+                </label>
+                <input
+                  id="sellerPaymentDueDays"
+                  type="number"
+                  min="0"
+                  className="form-field__control"
+                  placeholder="Enter number of days"
+                  value={sellerPaymentDueDays}
+                  onChange={(event) => setSellerPaymentDueDays(event.target.value)}
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="buyerPaymentDueDays">
+                  Buyer Payment Due Days <span className="form-field__required">*</span>
+                </label>
+                <input
+                  id="buyerPaymentDueDays"
+                  type="number"
+                  min="0"
+                  className="form-field__control"
+                  placeholder="Enter number of days"
+                  value={buyerPaymentDueDays}
+                  onChange={(event) => setBuyerPaymentDueDays(event.target.value)}
+                />
+              </div>
+            </>
+          )}
 
           <div className="form-field new-contract__grid--full">
             <label className="form-field__label" htmlFor="paymentRemarks">

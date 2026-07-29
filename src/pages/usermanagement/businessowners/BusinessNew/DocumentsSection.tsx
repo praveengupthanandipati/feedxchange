@@ -16,6 +16,7 @@ export interface DocumentEntry {
   documentNumber: string;
   issuingAuthority: string;
   issuedDate: string;
+  expiryDate: string;
   fileName: string;
   fileError: string;
   // The picked File, held only until save — cleared once uploaded. Absent
@@ -45,6 +46,7 @@ const emptyEntry = (): DocumentEntry => ({
   documentNumber: "",
   issuingAuthority: "",
   issuedDate: "",
+  expiryDate: "",
   fileName: "",
   fileError: "",
 });
@@ -145,6 +147,16 @@ const DocumentsSection = ({ entries, onEntriesChange }: DocumentsSectionProps) =
                       className="form-field__control"
                       value={entry.issuedDate}
                       onChange={(event) => updateEntry(entry.id, { issuedDate: event.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-field__label">Expiry Date</label>
+                    <input
+                      type="date"
+                      className="form-field__control"
+                      value={entry.expiryDate}
+                      onChange={(event) => updateEntry(entry.id, { expiryDate: event.target.value })}
                     />
                   </div>
 

@@ -73,6 +73,7 @@ export interface DocumentPayload {
   fileName: string;
   issuingAuthority: string;
   issuedDate: string;
+  expiryDate: string;
 }
 
 export interface CapacityRequirementPayload {
@@ -102,6 +103,7 @@ export interface AddBusinessProfilePayload {
   collectionArea: string;
   area: string;
   referredBy: string;
+  referralName: string;
   aboutProfile: string;
   status: string;
   createdBy: number;
