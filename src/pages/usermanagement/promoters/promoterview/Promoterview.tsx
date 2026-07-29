@@ -1,14 +1,14 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiEdit3, FiShare2, FiMail, FiDownload } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
 import ShareModal from "../../../../components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../components/dialog/ShareModal";
-import { promoters } from "../promoterslist/promoters.data";
-import { getPromoterProfile, toRecipientOptions } from "./promoterDetail.data";
-import type { DocumentRow } from "./promoterDetail.data";
+import { useGetPromoterProfileByIdQuery } from "../../../../store/promotersApi";
+import { mapPromoterProfileDetail, toRecipientOptions } from "./promoterDetail.data";
+import type { DocumentRow, RegionRow } from "./promoterDetail.data";
 import "../promoterslist/Promoters.scss";
 import "../../businessowners/BusinessList/Businessowners.scss";
 import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
@@ -27,15 +27,27 @@ const DetailField = ({ label, value }: DetailFieldProps) => (
 
 const Promoterview = () => {
   const { id } = useParams<{ id: string }>();
-  const promoter = promoters.find((row) => row.id === id);
+  const navigate = useNavigate();
   const [shareProfileOpen, setShareProfileOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
 
-  const profile = useMemo(() => (promoter ? getPromoterProfile(promoter) : null), [promoter]);
-  const recipientOptions = useMemo(() => (promoter ? toRecipientOptions(promoter) : []), [promoter]);
+  const {
+    data: rawProfile,
+    isFetching,
+    isError,
+  } = useGetPromoterProfileByIdQuery(id ?? "", { skip: !id });
+
+  const profile = useMemo(() => (rawProfile ? mapPromoterProfileDetail(rawProfile) : null), [rawProfile]);
+  const recipientOptions = useMemo(() => (profile ? toRecipientOptions(profile) : []), [profile]);
 
   const handleShareProfile = (_payload: ShareModalPayload) => undefined;
   const handleSendMessage = (_payload: ShareModalPayload) => undefined;
+
+  const regionColumns: TableColumn<RegionRow>[] = [
+    { key: "stateName", header: "State" },
+    { key: "districtName", header: "District" },
+    { key: "cityName", header: "City" },
+  ];
 
   const documentColumns: TableColumn<DocumentRow>[] = [
     { key: "sno", header: "S.No", width: "4rem" },
@@ -61,7 +73,20 @@ const Promoterview = () => {
     },
   ];
 
-  if (!promoter || !profile) {
+  if (isFetching) {
+    return (
+      <div className="business-owner-detail">
+        <Link to="/promoters" className="business-owner-detail__back">
+          <FiArrowLeft aria-hidden /> Back to Promoters
+        </Link>
+        <div className="business-owner-detail__card">
+          <p>Loading promoter profile…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !profile) {
     return (
       <div className="business-owner-detail">
         <Link to="/promoters" className="business-owner-detail__back">
@@ -83,13 +108,17 @@ const Promoterview = () => {
       <div className="business-owner-detail__card">
         <div className="business-owner-detail__header">
           <div>
-            <h1>{promoter.promoterName}</h1>
-            <span className={`promoters__status promoters__status--${promoter.status.toLowerCase()}`}>
-              {promoter.status}
+            <h1>{profile.promoterName}</h1>
+            <span className={`promoters__status promoters__status--${profile.status.toLowerCase()}`}>
+              {profile.status}
             </span>
           </div>
           <div className="business-owner-detail__header-actions">
-            <button type="button" className="promoters-btn promoters-btn--outline">
+            <button
+              type="button"
+              className="promoters-btn promoters-btn--outline"
+              onClick={() => navigate(`/promoters/profile?id=${id}`)}
+            >
               <FiEdit3 aria-hidden /> Edit
             </button>
             <button type="button" className="promoters-btn promoters-btn--primary" onClick={() => setShareProfileOpen(true)}>
@@ -116,16 +145,16 @@ const Promoterview = () => {
                 <DetailField
                   label="Mobile"
                   value={
-                    <a href={`tel:${promoter.phone}`} className="promoters__link">
-                      {promoter.phone}
+                    <a href={`tel:${profile.mobileNumber}`} className="promoters__link">
+                      {profile.mobileNumber}
                     </a>
                   }
                 />
                 <DetailField
                   label="Email"
                   value={
-                    <a href={`mailto:${promoter.email}`} className="promoters__link">
-                      {promoter.email}
+                    <a href={`mailto:${profile.emailId}`} className="promoters__link">
+                      {profile.emailId}
                     </a>
                   }
                 />
@@ -136,11 +165,13 @@ const Promoterview = () => {
             </section>
 
             <section className="business-owner-detail__section">
-              <h2 className="business-owner-detail__section-title">Association/Region:</h2>
-              <div className="business-owner-detail__grid">
-                <DetailField label="Associated Products" value={profile.associatedProducts} />
-                <DetailField label="Geographic Region of Operation" value={profile.region} />
-              </div>
+              <h2 className="business-owner-detail__section-title">Regions of Operation</h2>
+              <Table
+                columns={regionColumns}
+                data={profile.regions}
+                rowKey={(row) => row.id}
+                emptyMessage="No regions on file."
+              />
             </section>
 
             <section className="business-owner-detail__section">
@@ -149,6 +180,7 @@ const Promoterview = () => {
                 <DetailField label="Commission Structure" value={profile.commissionStructure} />
                 <DetailField label="Commission Rate/Value" value={profile.commissionRateValue} />
                 <DetailField label="Payment Frequency" value={profile.paymentFrequency} />
+                <DetailField label="Total Referrals" value={profile.totalReferrals} />
                 <DetailField label="Remarks" value={profile.remarks} />
               </div>
             </section>
@@ -181,7 +213,7 @@ const Promoterview = () => {
         title="Send Message"
         onClose={() => setMessageOpen(false)}
         onSend={handleSendMessage}
-        fixedRecipientLabel={promoter.promoterName}
+        fixedRecipientLabel={profile.promoterName}
         messagePlaceholder="Enter your message"
         confirmLabel="Send Message"
       />

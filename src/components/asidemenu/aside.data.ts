@@ -103,15 +103,49 @@ export const asideNavSections: AsideNavSection[] = [
     id: "user-management",
     title: "User Management",
     items: [
-      { id: "business-owners", label: "Business Owners", icon: FiBriefcase, path: "/business-owners" },
-      { id: "transporters", label: "Transporters", icon: FiTruck, path: "/transporters" },
+      {
+        id: "business-owners",
+        label: "Business Owners",
+        icon: FiBriefcase,
+        path: "/business-owners",
+        children: [
+          { id: "business-owners-profile", label: "Business Profile", path: "/business-owners/profile" },
+          { id: "business-owners-contacts", label: "Contacts & Addresses", path: "/business-owners/contacts" },
+          { id: "business-owners-documents", label: "Documents", path: "/business-owners/documents" },
+          { id: "business-owners-bank-details", label: "Bank Details", path: "/business-owners/bank-details" },
+          { id: "business-owners-profile-settings", label: "Profile Settings", path: "/business-owners/profile-settings" },
+        ],
+      },
+      {
+        id: "transporters",
+        label: "Transporters",
+        icon: FiTruck,
+        path: "/transporters",
+        children: [
+          { id: "transporters-profile", label: "Transporter Profile", path: "/transporters/profile" },
+          { id: "transporters-contacts", label: "Contacts & Addresses", path: "/transporters/contacts" },
+          { id: "transporters-documents", label: "Documents", path: "/transporters/documents" },
+          { id: "transporters-bank-details", label: "Bank Details", path: "/transporters/bank-details" },
+          { id: "transporters-profile-settings", label: "Profile Settings", path: "/transporters/profile-settings" },
+        ],
+      },
       {
         id: "promoters-dashboard",
         label: "Promoters Dashboard",
         icon: FiPieChart,
         path: "/promoter-dashboard",
       },
-      { id: "promoters", label: "Promoters", icon: FiUsers, path: "/promoters" },
+      {
+        id: "promoters",
+        label: "Promoters",
+        icon: FiUsers,
+        path: "/promoters",
+        children: [
+          { id: "promoters-profile", label: "Promoter Profile", path: "/promoters/profile" },
+          { id: "promoters-documents", label: "Documents", path: "/promoters/documents" },
+          { id: "promoters-profile-settings", label: "Profile Settings", path: "/promoters/profile-settings" },
+        ],
+      },
       { id: "promocodes", label: "Promocodes", icon: FiTag, path: "/promocodes" },
       {
         id: "referred-profiles",

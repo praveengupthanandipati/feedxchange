@@ -1,72 +1,86 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../components/tooltip/InfoTooltip";
-import DocumentsSection from "./DocumentsSection";
-import ProfileSettingsSection from "./ProfileSettingsSection";
 import {
   cityOptions,
   districtOptions,
   stateOptions,
   productOptions,
-  regionOptions,
   commissionStructureOptions,
   paymentFrequencyOptions,
-  generatePromoterCode,
 } from "./promoterNew.data";
-import "../../../contracts/NewContract.scss";
-import "../../businessowners/BusinessNew/Newbusiness.scss";
-import "./Promoternew.scss";
+import RegionSection from "./RegionSection";
+import { fetchLocationFromPincode } from "../../../../utils/pincodeLookup";
+import { usePromoterWizard } from "./PromoterWizardContext";
+import { useGetPromoterProfileByIdQuery } from "../../../../store/promotersApi";
+import { useSavePromoterProfileStep } from "./useSavePromoterProfileStep";
+import { hydrateDraftFromPromoterProfile } from "./promoterWizard.utils";
 
-const Promoternew = () => {
-  const [promoterCode] = useState(() => generatePromoterCode());
-  const [promoterName, setPromoterName] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [emailAddress, setEmailAddress] = useState("");
-  const [designation, setDesignation] = useState("");
-  const [addressLine1, setAddressLine1] = useState("");
-  const [addressLine2, setAddressLine2] = useState("");
-  const [landmark, setLandmark] = useState("");
-  const [pinCode, setPinCode] = useState("");
-  const [city, setCity] = useState("");
-  const [district, setDistrict] = useState("");
-  const [state, setState] = useState("");
+const PromoterProfileStep = () => {
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("id");
+  const { draft, updateDraft, profileId, setProfileId } = usePromoterWizard();
+  const { submitting, submitError, handleSaveAndContinue } = useSavePromoterProfileStep(
+    "/promoters/documents",
+  );
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const [associatedProducts, setAssociatedProducts] = useState("");
-  const [region, setRegion] = useState("");
+  // Editing an existing promoter lands here with ?id=<profileId> — load it
+  // once so the later steps unlock pre-filled instead of blank.
+  const {
+    data: existingProfile,
+    isFetching: loadingExistingProfile,
+    isError: existingProfileLoadError,
+  } = useGetPromoterProfileByIdQuery(editId ?? "", { skip: !editId || Boolean(profileId) });
 
-  const [commissionStructure, setCommissionStructure] = useState("");
-  const [commissionRateValue, setCommissionRateValue] = useState("");
-  const [paymentFrequency, setPaymentFrequency] = useState("");
+  useEffect(() => {
+    if (existingProfile && !profileId && editId) {
+      updateDraft(hydrateDraftFromPromoterProfile(existingProfile));
+      setProfileId(Number(editId));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [existingProfile, editId]);
 
-  const [termsAndConditions, setTermsAndConditions] = useState("");
-  const [remarks, setRemarks] = useState("");
+  if (editId && !profileId && loadingExistingProfile) {
+    return <div className="new-business__loading">Loading promoter profile…</div>;
+  }
+
+  
+  const handleSubmit = () => {
+    if (!draft.promoterName.trim()) {
+      setValidationError("Promoter Name is required.");
+      return;
+    }
+    setValidationError(null);
+    handleSaveAndContinue();
+  };
+
+  const handlePinCodeChange = (value: string) => {
+    updateDraft({ pinCode: value });
+    fetchLocationFromPincode(value).then((location) => {
+      if (location) {
+        updateDraft({ city: location.city, district: location.district, state: location.state });
+      }
+    });
+  };
 
   return (
-    <div className="new-promoter">
-      <div className="new-promoter__topbar">
-        <h1>New Promoter</h1>
-        <Link to="/promoters" className="new-promoter__back">
-          <FiArrowLeft aria-hidden /> Promoters
-        </Link>
-      </div>
-
+    <>
       <section className="new-contract__section">
-        <h2 className="new-contract__section-title">Basic Information:</h2>
+        <h2 className="new-contract__section-title">1. Basic Information</h2>
+        {!editId && (
+          <p className="new-business__step-hint">
+            Promoter Profile is mandatory — save it to unlock Documents and Profile Settings.
+          </p>
+        )}
         <div className="new-contract__grid">
           <div className="form-field">
             <span className="form-field__label">
               Promoter Code
               <InfoTooltip text="Auto-generated unique code used to track this promoter's referrals." />
             </span>
-            <input
-              type="text"
-              className="form-field__control"
-              value={promoterCode}
-              onChange={() => undefined}
-            />
+            <input type="text" className="form-field__control" value={draft.promoterCode} readOnly />
           </div>
 
           <div className="form-field">
@@ -78,8 +92,8 @@ const Promoternew = () => {
               type="text"
               className="form-field__control"
               placeholder="Promoter Name"
-              value={promoterName}
-              onChange={(event) => setPromoterName(event.target.value)}
+              value={draft.promoterName}
+              onChange={(event) => updateDraft({ promoterName: event.target.value })}
             />
           </div>
 
@@ -92,8 +106,8 @@ const Promoternew = () => {
               type="text"
               className="form-field__control"
               placeholder="Company Name"
-              value={companyName}
-              onChange={(event) => setCompanyName(event.target.value)}
+              value={draft.companyName}
+              onChange={(event) => updateDraft({ companyName: event.target.value })}
             />
           </div>
 
@@ -106,8 +120,8 @@ const Promoternew = () => {
               type="tel"
               className="form-field__control"
               placeholder="Mobile Number"
-              value={mobileNumber}
-              onChange={(event) => setMobileNumber(event.target.value)}
+              value={draft.mobileNumber}
+              onChange={(event) => updateDraft({ mobileNumber: event.target.value })}
             />
           </div>
 
@@ -120,8 +134,8 @@ const Promoternew = () => {
               type="email"
               className="form-field__control"
               placeholder="Email"
-              value={emailAddress}
-              onChange={(event) => setEmailAddress(event.target.value)}
+              value={draft.emailAddress}
+              onChange={(event) => updateDraft({ emailAddress: event.target.value })}
             />
           </div>
 
@@ -134,8 +148,8 @@ const Promoternew = () => {
               type="text"
               className="form-field__control"
               placeholder="Designation"
-              value={designation}
-              onChange={(event) => setDesignation(event.target.value)}
+              value={draft.designation}
+              onChange={(event) => updateDraft({ designation: event.target.value })}
             />
           </div>
 
@@ -148,8 +162,8 @@ const Promoternew = () => {
               type="text"
               className="form-field__control"
               placeholder="Address Line 1"
-              value={addressLine1}
-              onChange={(event) => setAddressLine1(event.target.value)}
+              value={draft.addressLine1}
+              onChange={(event) => updateDraft({ addressLine1: event.target.value })}
             />
           </div>
 
@@ -162,8 +176,8 @@ const Promoternew = () => {
               type="text"
               className="form-field__control"
               placeholder="Address Line 2"
-              value={addressLine2}
-              onChange={(event) => setAddressLine2(event.target.value)}
+              value={draft.addressLine2}
+              onChange={(event) => updateDraft({ addressLine2: event.target.value })}
             />
           </div>
 
@@ -176,8 +190,8 @@ const Promoternew = () => {
               type="text"
               className="form-field__control"
               placeholder="Landmark Ex: Near Bus Stop"
-              value={landmark}
-              onChange={(event) => setLandmark(event.target.value)}
+              value={draft.landmark}
+              onChange={(event) => updateDraft({ landmark: event.target.value })}
             />
           </div>
 
@@ -191,8 +205,8 @@ const Promoternew = () => {
               inputMode="numeric"
               className="form-field__control"
               placeholder="Postal Code"
-              value={pinCode}
-              onChange={(event) => setPinCode(event.target.value)}
+              value={draft.pinCode}
+              onChange={(event) => handlePinCodeChange(event.target.value)}
             />
           </div>
 
@@ -202,8 +216,8 @@ const Promoternew = () => {
             </span>
             <SearchableSelect
               options={cityOptions}
-              value={city}
-              onChange={setCity}
+              value={draft.city}
+              onChange={(value) => updateDraft({ city: value })}
               placeholder="City"
               ariaLabel="City"
               allowCustom
@@ -216,8 +230,8 @@ const Promoternew = () => {
             </span>
             <SearchableSelect
               options={districtOptions}
-              value={district}
-              onChange={setDistrict}
+              value={draft.district}
+              onChange={(value) => updateDraft({ district: value })}
               placeholder="District"
               ariaLabel="District"
               allowCustom
@@ -230,8 +244,8 @@ const Promoternew = () => {
             </span>
             <SearchableSelect
               options={stateOptions}
-              value={state}
-              onChange={setState}
+              value={draft.state}
+              onChange={(value) => updateDraft({ state: value })}
               placeholder="State"
               ariaLabel="State"
               allowCustom
@@ -241,43 +255,36 @@ const Promoternew = () => {
       </section>
 
       <section className="new-contract__section">
-        <h2 className="new-contract__section-title">Association/Region</h2>
+        <h2 className="new-contract__section-title">2. Association/Region</h2>
         <div className="new-contract__grid">
           <div className="form-field">
             <span className="form-field__label">Associated Products</span>
             <SearchableSelect
               options={productOptions}
-              value={associatedProducts}
-              onChange={setAssociatedProducts}
+              value={draft.associatedProducts}
+              onChange={(value) => updateDraft({ associatedProducts: value })}
               placeholder="Products"
               ariaLabel="Associated Products"
               allowCustom
             />
           </div>
-
-          <div className="form-field">
-            <span className="form-field__label">Geographic Region of Operation</span>
-            <SearchableSelect
-              options={regionOptions}
-              value={region}
-              onChange={setRegion}
-              placeholder="Regions"
-              ariaLabel="Geographic Region of Operation"
-              allowCustom
-            />
-          </div>
         </div>
+
+        <RegionSection
+          entries={draft.regions}
+          onEntriesChange={(entries) => updateDraft({ regions: entries })}
+        />
       </section>
 
       <section className="new-contract__section">
-        <h2 className="new-contract__section-title">Commission &amp; Payment Details:</h2>
+        <h2 className="new-contract__section-title">3. Commission &amp; Payment Details</h2>
         <div className="new-contract__grid">
           <div className="form-field">
             <span className="form-field__label">Commission Structure</span>
             <SearchableSelect
               options={commissionStructureOptions}
-              value={commissionStructure}
-              onChange={setCommissionStructure}
+              value={draft.commissionStructure}
+              onChange={(value) => updateDraft({ commissionStructure: value })}
               placeholder="Structure"
               ariaLabel="Commission Structure"
               allowCustom
@@ -293,8 +300,8 @@ const Promoternew = () => {
               type="text"
               className="form-field__control"
               placeholder="e.g. 5% or Rs. 1000"
-              value={commissionRateValue}
-              onChange={(event) => setCommissionRateValue(event.target.value)}
+              value={draft.commissionRateValue}
+              onChange={(event) => updateDraft({ commissionRateValue: event.target.value })}
             />
           </div>
 
@@ -302,8 +309,8 @@ const Promoternew = () => {
             <span className="form-field__label">Payment Frequency</span>
             <SearchableSelect
               options={paymentFrequencyOptions}
-              value={paymentFrequency}
-              onChange={setPaymentFrequency}
+              value={draft.paymentFrequency}
+              onChange={(value) => updateDraft({ paymentFrequency: value })}
               placeholder="Frequency"
               ariaLabel="Payment Frequency"
               allowCustom
@@ -321,8 +328,8 @@ const Promoternew = () => {
             id="termsAndConditions"
             className="form-field__control"
             placeholder="Write Terms & Conditions"
-            value={termsAndConditions}
-            onChange={(event) => setTermsAndConditions(event.target.value)}
+            value={draft.termsAndConditions}
+            onChange={(event) => updateDraft({ termsAndConditions: event.target.value })}
           />
         </div>
       </section>
@@ -336,30 +343,42 @@ const Promoternew = () => {
             id="remarks"
             className="form-field__control"
             placeholder="Write Remarks"
-            value={remarks}
-            onChange={(event) => setRemarks(event.target.value)}
+            value={draft.remarks}
+            onChange={(event) => updateDraft({ remarks: event.target.value })}
           />
         </div>
       </section>
 
-      <section className="new-contract__section">
-        <DocumentsSection />
-      </section>
+      {existingProfileLoadError && (
+        <p className="new-contract__error" style={{ color: "#d92d20" }}>
+          Failed to load promoter profile.
+        </p>
+      )}
 
-      <section className="new-contract__section">
-        <ProfileSettingsSection />
-      </section>
+      {validationError && (
+        <p className="new-contract__error" style={{ color: "#d92d20" }}>
+          {validationError}
+        </p>
+      )}
 
-      <div className="new-contract__actions new-promoter__actions">
-        <Link to="/promoters" className="new-contract__cancel">
-          Cancel
-        </Link>
-        <button type="button" className="new-contract__submit">
-          Create Promoter
+      {submitError && (
+        <p className="new-contract__error" style={{ color: "#d92d20" }}>
+          {submitError}
+        </p>
+      )}
+
+      <div className="new-contract__actions">
+        <button
+          type="button"
+          className="new-contract__submit"
+          onClick={handleSubmit}
+          disabled={submitting}
+        >
+          {submitting ? "Saving…" : profileId ? "Save & Continue" : "Save & Unlock Next Steps"}
         </button>
       </div>
-    </div>
+    </>
   );
 };
 
-export default Promoternew;
+export default PromoterProfileStep;

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import type { TableColumn } from "../../../../components/table/table.types";
 import RowActionsMenu from "../../../../components/table/RowActionsMenu";
-import type { Transporter } from "./transporters.data";
+import type { Transporter } from "../../../../store/transportersApi";
 
 const StatusBadge = ({ status }: { status: Transporter["status"] }) => (
   <span className={`transporters__status transporters__status--${status.toLowerCase()}`}>
@@ -22,26 +22,15 @@ export function buildTransporterColumns({
 }: ColumnHandlers): TableColumn<Transporter>[] {
   return [
     {
-      key: "companyName",
-      header: "Company Name",
+      key: "legalName",
+      header: "Transporter Name",
       sortable: true,
       render: (row) => (
-        <Link to={`/transporters/${row.id}`} className="transporters__link">
-          {row.companyName}
+        <Link to={`/transporters/${row.profileId}`} className="transporters__link">
+          {row.legalName}
         </Link>
       ),
-      exportValue: (row) => row.companyName,
-    },
-    {
-      key: "actions",
-      header: "",
-      render: (row) => (
-        <RowActionsMenu
-          onEdit={() => onEdit(row)}
-          onView={() => onView(row)}
-          onDelete={() => onDelete(row)}
-        />
-      ),
+      exportValue: (row) => row.legalName,
     },
     {
       key: "status",
@@ -51,17 +40,9 @@ export function buildTransporterColumns({
       exportValue: (row) => row.status,
     },
     {
-      key: "transporterType",
+      key: "transporterTypeName",
       header: "Transporter Type",
       sortable: true,
-    },
-    {
-      key: "truckCount",
-      header: "No. of Trucks",
-      sortable: true,
-      align: "center",
-      sortValue: (row) => row.truckCount,
-      exportValue: (row) => String(row.truckCount),
     },
     {
       key: "location",
@@ -69,20 +50,33 @@ export function buildTransporterColumns({
       sortable: true,
     },
     {
-      key: "mobile",
+      key: "mobileNumber",
       header: "Mobile Number",
       sortable: true,
       render: (row) => (
-        <a href={`tel:${row.mobile}`} className="transporters__link">
-          {row.mobile}
+        <a href={`tel:${row.mobileNumber}`} className="transporters__link">
+          {row.mobileNumber}
         </a>
       ),
-      exportValue: (row) => row.mobile,
+      exportValue: (row) => row.mobileNumber,
     },
     {
-      key: "state",
+      key: "stateName",
       header: "State",
       sortable: true,
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu
+          variant="inline"
+          onView={() => onView(row)}
+          onEdit={() => onEdit(row)}
+          onDelete={() => onDelete(row)}
+        />
+      ),
     },
   ];
 }
