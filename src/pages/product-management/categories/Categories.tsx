@@ -1,22 +1,30 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
-import { FiImage, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiImage, FiChevronLeft, FiChevronRight,FiEdit2, FiTrash2 } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
-import RowActionsMenu from "../../../components/table/RowActionsMenu";
+//import RowActionsMenu from "../../../components/table/RowActionsMenu";
 import type { TableColumn } from "../../../components/table/table.types";
 import {
-  categories as initialCategories,
-  statusOptions,
-  nextCategoryId,
-  MAX_CATEGORY_IMAGE_SIZE_MB,
-  ALLOWED_CATEGORY_IMAGE_TYPES,
-  type Category,
-} from "./categories.data";
+  useGetAllActiveCategoriesQuery,
+  useAddCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+} from "../../../store/categoryApi";
+import type { Category } from "../../../store/categoryApi";
 import "../../contracts/NewContract.scss";
 import "./Categories.scss";
+import RowActionsMenu from "../../../components/table/RowActionsMenu";
 
 const PAGE_SIZE = 10;
+const ALLOWED_CATEGORY_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const MAX_CATEGORY_IMAGE_SIZE_MB = 2;
+
+
+const statusOptions = [
+  { value: "Active", label: "Active" },
+  { value: "Inactive", label: "Inactive" },
+];
 
 interface FormErrors {
   categoryName?: string;
@@ -29,16 +37,39 @@ const StatusBadge = ({ status }: { status: Category["status"] }) => (
 );
 
 const Categories = () => {
-  const [rows, setRows] = useState<Category[]>(initialCategories);
+  const {
+  data: apiCategories = [],
+  isLoading,
+  error,
+} = useGetAllActiveCategoriesQuery();
+
+// Add
+    const [addCategory] = useAddCategoryMutation();
+
+    // Update
+    const [updateCategory] = useUpdateCategoryMutation();
+
+    // Delete
+    const [deleteCategory] = useDeleteCategoryMutation();
+
+  const [rows, setRows] = useState<Category[]>([]);
+
+  useEffect(() => {
+  if (apiCategories.length > 0) {
+    setRows(apiCategories);
+  }
+}, [apiCategories]);
   const [currentPage, setCurrentPage] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [categoryName, setCategoryName] = useState("");
+  //const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
   const [seoName, setSeoName] = useState("");
   const [status, setStatus] = useState("Active");
   const [description, setDescription] = useState("");
   const [imagePreview, setImagePreview] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
   const [imageError, setImageError] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -49,32 +80,38 @@ const Categories = () => {
     setStatus("Active");
     setDescription("");
     setImagePreview("");
+    setSelectedImage(undefined)
     setImageError("");
     setErrors({});
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-    if (!ALLOWED_CATEGORY_IMAGE_TYPES.includes(file.type)) {
-      setImageError("Unsupported file format.");
-      event.target.value = "";
-      return;
-    }
+  if (!ALLOWED_CATEGORY_IMAGE_TYPES.includes(file.type)) {
+    setImageError("Unsupported file format.");
+    event.target.value = "";
+    return;
+  }
 
-    if (file.size > MAX_CATEGORY_IMAGE_SIZE_MB * 1024 * 1024) {
-      setImageError(`Image must be under ${MAX_CATEGORY_IMAGE_SIZE_MB}MB.`);
-      event.target.value = "";
-      return;
-    }
+  if (file.size > MAX_CATEGORY_IMAGE_SIZE_MB * 1024 * 1024) {
+    setImageError(`Image must be under ${MAX_CATEGORY_IMAGE_SIZE_MB}MB.`);
+    event.target.value = "";
+    return;
+  }
 
-    setImageError("");
-    const reader = new FileReader();
-    reader.onload = () => setImagePreview(String(reader.result ?? ""));
-    reader.readAsDataURL(file);
-  };
+  setImageError("");
+
+  // Save the actual file for the API
+  setSelectedImage(file);
+
+  // Show preview in the UI
+  const reader = new FileReader();
+  reader.onload = () => setImagePreview(String(reader.result ?? ""));
+  reader.readAsDataURL(file);
+};
 
   const handleEdit = (row: Category) => {
     setEditingId(row.id);
@@ -83,16 +120,25 @@ const Categories = () => {
     setStatus(row.status);
     setDescription(row.description);
     setImagePreview(row.imageUrl);
+     // user hasn't selected a new image yet
+     setSelectedImage(undefined);
     setImageError("");
     setErrors({});
   };
 
-  const handleDelete = (row: Category) => {
-    setRows((prev) => prev.filter((item) => item.id !== row.id));
-    if (editingId === row.id) resetForm();
-  };
+  const handleDelete = async (row: Category) => {
+  try {
+    await deleteCategory({
+      categoryId: Number(row.id),
+      actionPerformedBy: 1,
+    }).unwrap();
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    
     const trimmedName = categoryName.trim();
     const trimmedSeoName = seoName.trim();
 
@@ -104,45 +150,68 @@ const Categories = () => {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
+     if (!editingId && !selectedImage) {
+  setImageError("Please select an image.");
+  return;
+}
     if (editingId) {
-      setRows((prev) =>
-        prev.map((row) =>
-          row.id === editingId
-            ? {
-                ...row,
-                categoryName: trimmedName,
-                seoName: trimmedSeoName,
-                status: status as Category["status"],
-                description,
-                imageUrl: imagePreview,
-              }
-            : row,
-        ),
-      );
-    } else {
-      const priority = rows.length ? Math.max(...rows.map((row) => row.priority)) + 1 : 1;
-      setRows((prev) => [
-        ...prev,
-        {
-          id: nextCategoryId(),
-          categoryName: trimmedName,
-          seoName: trimmedSeoName,
-          status: status as Category["status"],
-          priority,
-          description,
-          imageUrl: imagePreview,
-        },
-      ]);
-    }
+      if (!selectedImage) {
+    setImageError("Please upload an image.");
+    return;
+  }
+  try {
+    const existingCategory = rows.find((row) => row.id === editingId);
+
+    if (!existingCategory) return;
+
+    await updateCategory({
+      Id: Number(editingId),
+      Name: trimmedName,
+      SEOName: trimmedSeoName,
+      Description: description,
+      Priority: existingCategory.priority,
+      IsActive: status === "Active",
+      IsDeleted: false,
+      CreatedAt: new Date().toISOString(),
+      CreatedBy: 1,
+      UpdatedAt: new Date().toISOString(),
+      UpdatedBy: 1,
+      Image: selectedImage,
+    }).unwrap();
 
     resetForm();
-  };
+  } catch (err) {
+    console.error("Failed to update category:", err);
+  }
+} else {
+  try {
+    const priority =
+      rows.length > 0
+        ? Math.max(...rows.map((row) => row.priority)) + 1
+        : 1;
 
+    await addCategory({
+      Name: trimmedName,
+      SEOName: trimmedSeoName,
+      Description: description,
+      Priority: priority,
+      IsActive: status === "Active",
+      ActionPerfomedBy: 1,
+      Image: selectedImage!,
+    }).unwrap();
+
+    resetForm();
+  } catch (err) {
+    console.error("Failed to add category:", err);
+  }
+}
+};
   const columns = useMemo<TableColumn<Category>[]>(
     () => [
       {
         key: "categoryName",
         header: "Category Name",
+        width: "45%",
         render: (row) => (
           <button type="button" className="categories__link" onClick={() => handleEdit(row)}>
             {row.categoryName}
@@ -151,25 +220,33 @@ const Categories = () => {
         exportValue: (row) => row.categoryName,
       },
       {
-        key: "actions",
-        header: "Actions",
-        render: (row) => (
-          <RowActionsMenu onEdit={() => handleEdit(row)} onDelete={() => handleDelete(row)} />
-        ),
-      },
-      {
         key: "status",
         header: "Status",
+         width: "20%",
         render: (row) => <StatusBadge status={row.status} />,
         exportValue: (row) => row.status,
       },
       {
         key: "priority",
         header: "Priority",
+        width: "15%",
         sortable: true,
         sortValue: (row) => row.priority,
         exportValue: (row) => String(row.priority),
       },
+      {
+  key: "actions",
+  header: "",
+  align: "center",
+  width: "90px",
+  render: (row) => (
+    <RowActionsMenu
+      variant="inline"
+      onEdit={() => handleEdit(row)}
+      onDelete={() => handleDelete(row)}
+    />
+  ),
+},
     ],
     [rows],
   );
@@ -183,6 +260,13 @@ const Categories = () => {
   const startResult = rows.length === 0 ? 0 : (currentPageClamped - 1) * PAGE_SIZE + 1;
   const endResult = Math.min(currentPageClamped * PAGE_SIZE, rows.length);
 
+  if (isLoading) {
+  return <div>Loading categories...</div>;
+}
+
+if (error) {
+  return <div>Failed to load categories.</div>;
+}
   return (
     <div className="categories-page">
       <div className="categories-form-card">
@@ -324,5 +408,4 @@ const Categories = () => {
     </div>
   );
 };
-
 export default Categories;

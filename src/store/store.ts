@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { businessProfilesApi } from "./businessProfilesApi";
 import { transportersApi } from "./transportersApi";
 import { promotersApi } from "./promotersApi";
+import {categoryApi} from "./categoryApi";
 import { userProfilesCommonApi } from "./userProfilesCommonApi";
 import { authApi } from "./authApi";
 
@@ -10,6 +11,7 @@ export const store = configureStore({
     [businessProfilesApi.reducerPath]: businessProfilesApi.reducer,
     [transportersApi.reducerPath]: transportersApi.reducer,
     [promotersApi.reducerPath]: promotersApi.reducer,
+    [categoryApi.reducerPath]: categoryApi.reducer,
     [userProfilesCommonApi.reducerPath]: userProfilesCommonApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
   },
@@ -20,6 +22,7 @@ export const store = configureStore({
       promotersApi.middleware,
       userProfilesCommonApi.middleware,
       authApi.middleware,
+      categoryApi.middleware
     ),
 });
 

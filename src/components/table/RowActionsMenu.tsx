@@ -33,38 +33,46 @@ const RowActionsMenu = ({ onEdit, onView, onDelete, variant = "menu" }: RowActio
   }, [open]);
 
   if (variant === "inline") {
-    return (
-      <div className="row-actions row-actions--inline">
+  return (
+    <div className="row-actions row-actions--inline">
+      {onView && (
         <button
           type="button"
           className="row-actions__icon-btn"
-          onClick={() => onView?.()}
+          onClick={onView}
           aria-label="View"
           title="View"
         >
           <FiEye aria-hidden />
         </button>
+      )}
+
+      {onEdit && (
         <button
           type="button"
           className="row-actions__icon-btn"
-          onClick={() => onEdit?.()}
+          onClick={onEdit}
           aria-label="Edit"
           title="Edit"
         >
           <FiEdit2 aria-hidden />
         </button>
+      )}
+
+      {onDelete && (
         <button
           type="button"
           className="row-actions__icon-btn row-actions__icon-btn--danger"
-          onClick={() => onDelete?.()}
+          onClick={onDelete}
           aria-label="Delete"
           title="Delete"
         >
           <FiTrash2 aria-hidden />
         </button>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
+}
 
   return (
     <div className="row-actions" ref={menuRef}>

@@ -2,23 +2,22 @@
 @use "../../assets/styles/mixins" as m;
 
 .table-wrapper {
+   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  // border-radius: v.$radius-lg;
+  overflow-y: auto;
   border: 1px solid v.$color-border;
-  scrollbar-width: thin;
-
-  &--min-height {
-    min-height: 65vh;
-  }
+  max-height: 600px;
+ }
+.table-scroll {
+   max-height: 500px; // adjust as needed
+  overflow-x: hidden;
 }
 
 .table {
-  width: 100%;
-  min-width: 1200px;
-  border-collapse: separate;
+ width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
   border-spacing: 0;
-  font-size: v.$font-size-sm;
 
   th {
     @include m.font-heading(v.$font-weight-semibold);

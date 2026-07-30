@@ -102,6 +102,7 @@ function Table<T>({
 
   return (
     <div className={`table-wrapper ${minHeight ? "table-wrapper--min-height" : ""}`}>
+      {/* <div className="table-scroll"> */}
       <table className="table">
         <thead>
           <tr>
@@ -181,7 +182,8 @@ function Table<T>({
           )}
         </tbody>
       </table>
-    </div>
+      </div>
+    // </div>
   );
 }
 
