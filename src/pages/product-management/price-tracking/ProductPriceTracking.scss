@@ -461,7 +461,8 @@
 
   &__body {
     flex: 1;
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
     display: flex;
     flex-direction: column;
     gap: v.$spacing-4;
@@ -522,7 +523,8 @@
     flex-direction: column;
     gap: v.$spacing-1;
     max-height: 16rem;
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
     padding: v.$spacing-2;
     border: 1px solid v.$color-border;
     border-radius: v.$radius-md;

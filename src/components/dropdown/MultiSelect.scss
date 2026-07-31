@@ -112,7 +112,8 @@
     margin: 0;
     padding: v.$spacing-2;
     max-height: 14rem;
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
 
     button {
       @include m.flex(row, flex-start, center, v.$spacing-2);

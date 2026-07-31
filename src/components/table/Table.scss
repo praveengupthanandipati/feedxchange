@@ -2,7 +2,11 @@
 @use "../../assets/styles/mixins" as m;
 
 .table-wrapper {
-  overflow-x: auto;
+  // scroll (not auto) so the horizontal scrollbar gutter always renders
+  // instead of relying on a hover-to-reveal OS overlay scrollbar. Vertical
+  // overflow is handled by the page itself, so it stays visible (not clipped).
+  overflow-x: scroll;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   // border-radius: v.$radius-lg;
   border: 1px solid v.$color-border;
