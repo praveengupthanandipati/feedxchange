@@ -3,13 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
+import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import TransportersFilters from "./TransportersFilters";
 import Pagination from "./Pagination";
 import { buildTransporterColumns } from "./transporters.columns";
-import { transporters as initialTransporters, type Transporter } from "./transporters.data";
+import { buildFilterOptions } from "../../businessowners/BusinessList/Businessowners";
+import {
+  useGetTransporterProfileSummaryQuery,
+  useDeleteTransporterProfileMutation,
+  type Transporter,
+  type TransporterProfileStatus,
+} from "../../../../store/transportersApi";
 import "./Transporters.scss";
 
 const PAGE_SIZE = 10;
+const DEFAULT_STATUS_FILTER: TransporterProfileStatus = "Active";
 
 function getExportCellValue(row: Transporter, column: TableColumn<Transporter>): string {
   if (column.exportValue) return column.exportValue(row);
@@ -23,23 +31,48 @@ function escapeHtml(value: string) {
 
 const Transprters = () => {
   const navigate = useNavigate();
-  const [rows, setRows] = useState<Transporter[]>(initialTransporters);
+  const { data, isLoading, error } = useGetTransporterProfileSummaryQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [deleteTransporterProfile] = useDeleteTransporterProfileMutation();
+  const rows = useMemo(() => data ?? [], [data]);
   const [keyword, setKeyword] = useState("");
+  const [status, setStatus] = useState<string>(DEFAULT_STATUS_FILTER);
   const [transporterType, setTransporterType] = useState("All");
   const [state, setState] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pendingDeleteRow, setPendingDeleteRow] = useState<Transporter | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const handleEdit = (_transporter: Transporter) => {
-    // TODO: open the edit-transporter form once it exists.
+  const handleEdit = (transporter: Transporter) => {
+    navigate(`/transporters/profile?id=${transporter.profileId}`);
   };
 
   const handleView = (transporter: Transporter) => {
-    navigate(`${transporter.id}`);
+    navigate(`${transporter.profileId}`);
   };
 
   const handleDelete = (transporter: Transporter) => {
-    setRows((prev) => prev.filter((row) => row.id !== transporter.id));
+    setDeleteError(null);
+    setPendingDeleteRow(transporter);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteRow) return;
+
+    const modifiedBy = Number(localStorage.getItem("userId")) || 0;
+
+    try {
+      await deleteTransporterProfile({
+        profileId: pendingDeleteRow.profileId,
+        modifiedOn: new Date().toISOString(),
+        modifiedBy,
+      }).unwrap();
+      setPendingDeleteRow(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete transporter.");
+    }
   };
 
   const columns = useMemo(
@@ -47,24 +80,32 @@ const Transprters = () => {
     [],
   );
 
+  const transporterTypeOptions = useMemo(
+    () => buildFilterOptions(rows.map((row) => row.transporterTypeName)),
+    [rows],
+  );
+
+  const stateOptions = useMemo(() => buildFilterOptions(rows.map((row) => row.stateName)), [rows]);
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, transporterType, state]);
+  }, [keyword, status, transporterType, state]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
 
     return rows.filter((row) => {
-      if (transporterType !== "All" && row.transporterType !== transporterType) return false;
-      if (state !== "All" && row.state !== state) return false;
+      if (status !== "All" && row.status !== status) return false;
+      if (transporterType !== "All" && row.transporterTypeName !== transporterType) return false;
+      if (state !== "All" && row.stateName !== state) return false;
 
       if (q) {
         const haystack = [
-          row.companyName,
-          row.transporterType,
+          row.legalName,
+          row.transporterTypeName,
           row.location,
-          row.state,
-          row.mobile,
+          row.stateName,
+          row.mobileNumber,
         ]
           .join(" ")
           .toLowerCase();
@@ -73,7 +114,7 @@ const Transprters = () => {
 
       return true;
     });
-  }, [rows, keyword, transporterType, state]);
+  }, [rows, keyword, status, transporterType, state]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -130,7 +171,7 @@ const Transprters = () => {
             <button
               type="button"
               className="transporters-btn transporters-btn--primary"
-              onClick={() => navigate("new")}
+              onClick={() => navigate("/transporters/profile")}
             >
               <FiPlus aria-hidden /> New
             </button>
@@ -141,18 +182,28 @@ const Transprters = () => {
           <TransportersFilters
             keyword={keyword}
             onKeywordChange={setKeyword}
+            status={status}
+            onStatusChange={setStatus}
             transporterType={transporterType}
             onTransporterTypeChange={setTransporterType}
+            transporterTypeOptions={transporterTypeOptions}
             state={state}
             onStateChange={setState}
+            stateOptions={stateOptions}
           />
         )}
 
         <Table
           columns={columns}
           data={pagedRows}
-          rowKey={(row) => row.id}
-          emptyMessage="No transporters match the current filters."
+          rowKey={(row) => String(row.profileId)}
+          emptyMessage={
+            isLoading
+              ? "Loading transporters…"
+              : error
+                ? "Failed to load transporters."
+                : "No transporters match the current filters."
+          }
           minHeight
         />
 
@@ -164,6 +215,17 @@ const Transprters = () => {
           onPageChange={setCurrentPage}
         />
       </div>
+
+      <ConfirmDialog
+        open={pendingDeleteRow !== null}
+        title="Remove this transporter?"
+        message={
+          deleteError ||
+          `This will permanently delete "${pendingDeleteRow?.legalName}". This cannot be undone.`
+        }
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteRow(null)}
+      />
     </div>
   );
 };

@@ -6,9 +6,11 @@ interface RowActionsMenuProps {
   onEdit?: () => void;
   onView?: () => void;
   onDelete?: () => void;
+  /** "inline" shows View/Edit/Delete as icon buttons revealed on row hover, instead of the "..." dropdown. */
+  variant?: "menu" | "inline";
 }
 
-const RowActionsMenu = ({ onEdit, onView, onDelete }: RowActionsMenuProps) => {
+const RowActionsMenu = ({ onEdit, onView, onDelete, variant = "menu" }: RowActionsMenuProps) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -29,6 +31,48 @@ const RowActionsMenu = ({ onEdit, onView, onDelete }: RowActionsMenuProps) => {
       document.removeEventListener("keydown", handleEscape);
     };
   }, [open]);
+
+  if (variant === "inline") {
+  return (
+    <div className="row-actions row-actions--inline">
+      {onView && (
+        <button
+          type="button"
+          className="row-actions__icon-btn"
+          onClick={onView}
+          aria-label="View"
+          title="View"
+        >
+          <FiEye aria-hidden />
+        </button>
+      )}
+
+      {onEdit && (
+        <button
+          type="button"
+          className="row-actions__icon-btn"
+          onClick={onEdit}
+          aria-label="Edit"
+          title="Edit"
+        >
+          <FiEdit2 aria-hidden />
+        </button>
+      )}
+
+      {onDelete && (
+        <button
+          type="button"
+          className="row-actions__icon-btn row-actions__icon-btn--danger"
+          onClick={onDelete}
+          aria-label="Delete"
+          title="Delete"
+        >
+          <FiTrash2 aria-hidden />
+        </button>
+      )}
+    </div>
+  );
+}
 
   return (
     <div className="row-actions" ref={menuRef}>

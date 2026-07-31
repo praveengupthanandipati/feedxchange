@@ -14,6 +14,10 @@ export interface BankEntry {
   bankName: string;
   branchName: string;
   ifscError: string;
+  // Present only for rows loaded from an existing profile — tells the save
+  // step to call UpdateProfileBankAccount instead of bundling this row into
+  // the next CreateProfileBankAccount call.
+  meta?: { bankAccountId: number; createdBy: number; createdOn: string };
 }
 
 let seq = 0;

@@ -3,13 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
+import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import PromotersFilters from "./PromotersFilters";
 import Pagination from "./Pagination";
 import { buildPromoterColumns } from "./promoters.columns";
-import { promoters as initialPromoters, type Promoter } from "./promoters.data";
+import { buildFilterOptions } from "../../businessowners/BusinessList/Businessowners";
+import {
+  useGetPromoterProfileSummaryQuery,
+  useDeletePromoterProfileMutation,
+  type Promoter,
+  type PromoterProfileStatus,
+} from "../../../../store/promotersApi";
 import "./Promoters.scss";
 
 const PAGE_SIZE = 10;
+const DEFAULT_STATUS_FILTER: PromoterProfileStatus = "Active";
 
 function getExportCellValue(row: Promoter, column: TableColumn<Promoter>): string {
   if (column.exportValue) return column.exportValue(row);
@@ -23,23 +31,48 @@ function escapeHtml(value: string) {
 
 const Promoterlist = () => {
   const navigate = useNavigate();
-  const [rows, setRows] = useState<Promoter[]>(initialPromoters);
+  const { data, isLoading, error } = useGetPromoterProfileSummaryQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [deletePromoterProfile] = useDeletePromoterProfileMutation();
+  const rows = useMemo(() => data ?? [], [data]);
   const [keyword, setKeyword] = useState("");
-  const [state, setState] = useState("All");
-  const [district, setDistrict] = useState("All");
+  const [status, setStatus] = useState<string>(DEFAULT_STATUS_FILTER);
+  const [commissionStructure, setCommissionStructure] = useState("All");
+  const [paymentFrequency, setPaymentFrequency] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pendingDeleteRow, setPendingDeleteRow] = useState<Promoter | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const handleEdit = (_promoter: Promoter) => {
-    // TODO: open the edit-promoter form once it exists.
+  const handleEdit = (promoter: Promoter) => {
+    navigate(`/promoters/profile?id=${promoter.profileId}`);
   };
 
-  const handleView = (_promoter: Promoter) => {
-    // TODO: open the promoter detail view once it exists.
+  const handleView = (promoter: Promoter) => {
+    navigate(`/promoters/${promoter.profileId}`);
   };
 
   const handleDelete = (promoter: Promoter) => {
-    setRows((prev) => prev.filter((row) => row.id !== promoter.id));
+    setDeleteError(null);
+    setPendingDeleteRow(promoter);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteRow) return;
+
+    const modifiedBy = Number(localStorage.getItem("userId")) || 0;
+
+    try {
+      await deletePromoterProfile({
+        profileId: pendingDeleteRow.profileId,
+        modifiedOn: new Date().toISOString(),
+        modifiedBy,
+      }).unwrap();
+      setPendingDeleteRow(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete promoter.");
+    }
   };
 
   const columns = useMemo(
@@ -47,19 +80,29 @@ const Promoterlist = () => {
     [],
   );
 
+  const commissionStructureOptions = useMemo(
+    () => buildFilterOptions(rows.map((row) => row.commissionStructure)),
+    [rows],
+  );
+  const paymentFrequencyOptions = useMemo(
+    () => buildFilterOptions(rows.map((row) => row.paymentFrequency)),
+    [rows],
+  );
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, state, district]);
+  }, [keyword, status, commissionStructure, paymentFrequency]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
 
     return rows.filter((row) => {
-      if (state !== "All" && row.state !== state) return false;
-      if (district !== "All" && row.district !== district) return false;
+      if (status !== "All" && row.status !== status) return false;
+      if (commissionStructure !== "All" && row.commissionStructure !== commissionStructure) return false;
+      if (paymentFrequency !== "All" && row.paymentFrequency !== paymentFrequency) return false;
 
       if (q) {
-        const haystack = [row.promoterName, row.referralCode, row.phone, row.email]
+        const haystack = [row.legalName, row.tradingName, row.companyName, row.mobileNumber, row.emailId]
           .join(" ")
           .toLowerCase();
         if (!haystack.includes(q)) return false;
@@ -67,7 +110,7 @@ const Promoterlist = () => {
 
       return true;
     });
-  }, [rows, keyword, state, district]);
+  }, [rows, keyword, status, commissionStructure, paymentFrequency]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -124,7 +167,7 @@ const Promoterlist = () => {
             <button
               type="button"
               className="promoters-btn promoters-btn--primary"
-              onClick={() => navigate("new")}
+              onClick={() => navigate("/promoters/profile")}
             >
               <FiPlus aria-hidden /> New
             </button>
@@ -135,18 +178,28 @@ const Promoterlist = () => {
           <PromotersFilters
             keyword={keyword}
             onKeywordChange={setKeyword}
-            state={state}
-            onStateChange={setState}
-            district={district}
-            onDistrictChange={setDistrict}
+            status={status}
+            onStatusChange={setStatus}
+            commissionStructure={commissionStructure}
+            onCommissionStructureChange={setCommissionStructure}
+            commissionStructureOptions={commissionStructureOptions}
+            paymentFrequency={paymentFrequency}
+            onPaymentFrequencyChange={setPaymentFrequency}
+            paymentFrequencyOptions={paymentFrequencyOptions}
           />
         )}
 
         <Table
           columns={columns}
           data={pagedRows}
-          rowKey={(row) => row.id}
-          emptyMessage="No promoters match the current filters."
+          rowKey={(row) => String(row.profileId)}
+          emptyMessage={
+            isLoading
+              ? "Loading promoters…"
+              : error
+                ? "Failed to load promoters."
+                : "No promoters match the current filters."
+          }
           minHeight
         />
 
@@ -158,6 +211,17 @@ const Promoterlist = () => {
           onPageChange={setCurrentPage}
         />
       </div>
+
+      <ConfirmDialog
+        open={pendingDeleteRow !== null}
+        title="Remove this promoter?"
+        message={
+          deleteError ||
+          `This will permanently delete "${pendingDeleteRow?.legalName}". This cannot be undone.`
+        }
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteRow(null)}
+      />
     </div>
   );
 };

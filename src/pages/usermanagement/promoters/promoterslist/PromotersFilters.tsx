@@ -1,40 +1,67 @@
 import { FiSearch } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
-import { stateOptions, districtOptions } from "./promoters.data";
+
+interface FilterOption {
+  value: string;
+  label: string;
+}
+
+export const statusFilterOptions: FilterOption[] = [
+  { value: "All", label: "All" },
+  { value: "Active", label: "Active" },
+  { value: "Inactive", label: "Inactive" },
+  { value: "Deleted", label: "Deleted" },
+];
 
 interface PromotersFiltersProps {
   keyword: string;
   onKeywordChange: (value: string) => void;
-  state: string;
-  onStateChange: (value: string) => void;
-  district: string;
-  onDistrictChange: (value: string) => void;
+  status: string;
+  onStatusChange: (value: string) => void;
+  commissionStructure: string;
+  onCommissionStructureChange: (value: string) => void;
+  commissionStructureOptions: FilterOption[];
+  paymentFrequency: string;
+  onPaymentFrequencyChange: (value: string) => void;
+  paymentFrequencyOptions: FilterOption[];
 }
 
 const PromotersFilters = ({
   keyword,
   onKeywordChange,
-  state,
-  onStateChange,
-  district,
-  onDistrictChange,
+  status,
+  onStatusChange,
+  commissionStructure,
+  onCommissionStructureChange,
+  commissionStructureOptions,
+  paymentFrequency,
+  onPaymentFrequencyChange,
+  paymentFrequencyOptions,
 }: PromotersFiltersProps) => {
   return (
     <div className="promoters-filters">
       <SearchableSelect
-        options={stateOptions}
-        value={state}
-        onChange={onStateChange}
-        placeholder="Search by State"
-        ariaLabel="Filter by state"
+        options={statusFilterOptions}
+        value={status}
+        onChange={onStatusChange}
+        placeholder="Select Status"
+        ariaLabel="Filter by status"
       />
 
       <SearchableSelect
-        options={districtOptions}
-        value={district}
-        onChange={onDistrictChange}
-        placeholder="Search by District"
-        ariaLabel="Filter by district"
+        options={commissionStructureOptions}
+        value={commissionStructure}
+        onChange={onCommissionStructureChange}
+        placeholder="Filter by Commission Structure"
+        ariaLabel="Filter by commission structure"
+      />
+
+      <SearchableSelect
+        options={paymentFrequencyOptions}
+        value={paymentFrequency}
+        onChange={onPaymentFrequencyChange}
+        placeholder="Filter by Payment Frequency"
+        ariaLabel="Filter by payment frequency"
       />
 
       <div className="promoters-filters__search">
@@ -43,7 +70,7 @@ const PromotersFilters = ({
           type="text"
           value={keyword}
           onChange={(event) => onKeywordChange(event.target.value)}
-          placeholder="Search by name, referral code, phone, email"
+          placeholder="Search by name, company, phone, email"
         />
       </div>
     </div>

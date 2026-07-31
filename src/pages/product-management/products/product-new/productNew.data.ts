@@ -1,10 +1,3 @@
-import { categories } from "../../categories/categories.data";
-
-export const categoryOptions = categories.map((category) => ({
-  value: category.categoryName,
-  label: category.categoryName,
-}));
-
 export const statusOptions = [
   { value: "Active", label: "Active" },
   { value: "Inactive", label: "Inactive" },

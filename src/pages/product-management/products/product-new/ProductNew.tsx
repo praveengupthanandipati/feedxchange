@@ -5,7 +5,6 @@ import { FiUser, FiArrowLeft, FiPlus, FiTrash2 } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import {
-  categoryOptions,
   statusOptions,
   weightClauseOptions,
   nutritionalParameterOptions,

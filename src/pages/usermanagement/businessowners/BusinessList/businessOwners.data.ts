@@ -1,7 +1,7 @@
 // TODO: replace with real data once the business owners API is wired up.
 
 export type BusinessType = "Fish Farm" | "Layer Poultry";
-export type BusinessOwnerStatus = "Active" | "Inactive" | "Blocked";
+export type BusinessOwnerStatus = "Active" | "Inactive" | "Deleted";
 
 export interface BusinessOwner {
   id: string;
@@ -51,22 +51,28 @@ export const indianStates = [
 
 export const stateOptions = indianStates.map((state) => ({ value: state, label: state }));
 
-const COMPANY_NAMES = [
-  "Sri Lakshmi Fish Farms",
-  "Vijaya Layer Poultry Farm",
-  "Krishna Aqua Ventures",
-  "Godavari Poultry Estates",
-  "Sai Balaji Fisheries",
-  "Rayalaseema Layer Farms",
-  "Konaseema Aqua Farms",
-  "Nellore Fish Breeders",
-  "Anantapur Poultry Co-op",
-  "Guntur Layer Growers",
-  "Krishnaveni Fisheries",
-  "Eluru Aqua Exports",
-  "Kakinada Poultry Farms",
-  "Chittoor Layer Estates",
-  "Tirupati Aqua Traders",
+const relationShipType = [
+  "Branch",
+  "Subsidiary",
+  "Franchise",
+  "Dealer",
+  "Transporter",
+  "Promoter",
+  "Distributor",
+  "Supplier",
+  "Manufacturer",
+  "Retailer",
+  "Wholesaler",
+  "Importer",
+  "Exporter",
+  "Trader",
+  "Contractor",
+  "Consultant",
+  "Agency",
+  "Cooperative",
+  "Association",
+  "Partnership",
+  "Proprietorship"
 ];
 
 const LOCATIONS = [
@@ -82,7 +88,7 @@ const LOCATIONS = [
   "Anantapur",
 ];
 
-const STATUSES: BusinessOwnerStatus[] = ["Active", "Inactive", "Blocked"];
+const STATUSES: BusinessOwnerStatus[] = ["Active", "Inactive", "Deleted"];
 const BUSINESS_TYPES: BusinessType[] = ["Fish Farm", "Layer Poultry"];
 
 const ROW_COUNT = 22;
@@ -98,7 +104,7 @@ function buildBusinessOwners(): BusinessOwner[] {
 
     rows.push({
       id: `bo-${1000 + i}`,
-      companyName: COMPANY_NAMES[i % COMPANY_NAMES.length],
+      companyName: relationShipType[i % relationShipType.length],
       status: STATUSES[i % STATUSES.length],
       businessType: BUSINESS_TYPES[i % BUSINESS_TYPES.length],
       location: LOCATIONS[i % LOCATIONS.length],

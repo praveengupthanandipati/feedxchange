@@ -5,7 +5,7 @@ import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
 import { accountTypeOptions, ifscLookup } from "./newTransporter.data";
 
-interface BankEntry {
+export interface BankEntry {
   id: string;
   accountType: string;
   payeeName: string;
@@ -14,13 +14,17 @@ interface BankEntry {
   bankName: string;
   cityBranch: string;
   ifscError: string;
+  // Present only for rows loaded from an existing profile — tells the save
+  // step to call UpdateProfileBankAccount instead of bundling this row into
+  // the next CreateProfileBankAccount call.
+  meta?: { bankAccountId: number; createdBy: number; createdOn: string };
 }
 
 let seq = 0;
-const nextId = () => `bank-${Date.now()}-${seq++}`;
+export const nextBankEntryId = () => `bank-${Date.now()}-${seq++}`;
 
 const emptyEntry = (): BankEntry => ({
-  id: nextId(),
+  id: nextBankEntryId(),
   accountType: "",
   payeeName: "",
   payeeAccountNumber: "",
@@ -30,25 +34,35 @@ const emptyEntry = (): BankEntry => ({
   ifscError: "",
 });
 
-const BankDetailsSection = () => {
-  const [entries, setEntries] = useState<BankEntry[]>([]);
-  const [primaryId, setPrimaryId] = useState<string | null>(null);
+interface BankDetailsSectionProps {
+  entries: BankEntry[];
+  onEntriesChange: (entries: BankEntry[]) => void;
+  primaryId: string | null;
+  onPrimaryIdChange: (id: string | null) => void;
+}
+
+const BankDetailsSection = ({
+  entries,
+  onEntriesChange,
+  primaryId,
+  onPrimaryIdChange,
+}: BankDetailsSectionProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const addEntry = () => {
     const entry = emptyEntry();
-    setEntries((prev) => [...prev, entry]);
-    if (entries.length === 0) setPrimaryId(entry.id);
+    onEntriesChange([...entries, entry]);
+    if (entries.length === 0) onPrimaryIdChange(entry.id);
   };
 
   const confirmRemoveEntry = () => {
-    setEntries((prev) => prev.filter((entry) => entry.id !== pendingDeleteId));
-    setPrimaryId((prev) => (prev === pendingDeleteId ? null : prev));
+    onEntriesChange(entries.filter((entry) => entry.id !== pendingDeleteId));
+    if (primaryId === pendingDeleteId) onPrimaryIdChange(null);
     setPendingDeleteId(null);
   };
 
   const updateEntry = (id: string, patch: Partial<BankEntry>) =>
-    setEntries((prev) => prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
+    onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
 
   const lookupIfsc = (id: string, ifscCode: string) => {
     const match = ifscLookup[ifscCode.trim().toUpperCase()];
@@ -173,7 +187,7 @@ const BankDetailsSection = () => {
                     type="radio"
                     name="primary-bank-account"
                     checked={primaryId === entry.id}
-                    onChange={() => setPrimaryId(entry.id)}
+                    onChange={() => onPrimaryIdChange(entry.id)}
                   />
                   Primary
                 </label>

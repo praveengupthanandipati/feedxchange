@@ -8,10 +8,6 @@ import {
   FiCheck,
   FiChevronLeft,
   FiChevronRight,
-  FiHome,
-  FiUser,
-  FiMapPin,
-  FiTruck,
 } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import MultiSelect from "../../../components/dropdown/MultiSelect";
@@ -119,116 +115,6 @@ const FreightActionModal = ({ variant, open, rows, onClose, onConfirm }: Freight
   );
 };
 
-interface ContractDetailsDrawerProps {
-  open: boolean;
-  row: BulkFreightRow | null;
-  onClose: () => void;
-}
-
-const ContractDetailsDrawer = ({ open, row, onClose }: ContractDetailsDrawerProps) => {
-  useEffect(() => {
-    if (!open) return;
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [open, onClose]);
-
-  return createPortal(
-    <>
-      <div className={`contract-details-drawer__backdrop ${open ? "is-open" : ""}`} onClick={onClose} />
-      <div
-        className={`contract-details-drawer ${open ? "is-open" : ""}`}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="contract-details-drawer-title"
-      >
-        {row && (
-          <>
-            <div className="contract-details-drawer__header">
-              <h2 id="contract-details-drawer-title">
-                Contract Number: <strong>{row.contractNumber}</strong>
-              </h2>
-              <button
-                type="button"
-                className="contract-details-drawer__close"
-                onClick={onClose}
-                aria-label="Close"
-              >
-                <FiX aria-hidden />
-              </button>
-            </div>
-
-            <div className="contract-details-drawer__body">
-              <div className="contract-details-drawer__parties">
-                <p>
-                  <FiHome aria-hidden /> Seller: <strong>{row.seller}</strong>
-                </p>
-                <p>
-                  <FiUser aria-hidden /> Buyer: <strong>{row.buyer}</strong>
-                </p>
-              </div>
-
-              <div className="contract-details-drawer__stats">
-                <div className="contract-details-drawer__stat">
-                  <span>Qty (MT)</span>
-                  <strong>
-                    {row.qtyOriginal && (
-                      <span className="contract-details-drawer__stat-original">{row.qtyOriginal}</span>
-                    )}
-                    {row.qtyCurrent}
-                  </strong>
-                </div>
-                <div className="contract-details-drawer__stat">
-                  <span>Freight</span>
-                  <strong>
-                    {row.freightOriginal && (
-                      <span className="contract-details-drawer__stat-original">{row.freightOriginal}</span>
-                    )}
-                    {row.freightCurrent}
-                  </strong>
-                </div>
-              </div>
-
-              <div className="contract-details-drawer__section">
-                <h3>
-                  <FiTruck aria-hidden /> Transporter
-                </h3>
-                <p>{row.transporter}</p>
-              </div>
-
-              <div className="contract-details-drawer__section">
-                <h3>
-                  <FiMapPin aria-hidden /> Loading Address
-                </h3>
-                <p>{row.loadingAddress}</p>
-              </div>
-
-              <div className="contract-details-drawer__section">
-                <h3>
-                  <FiMapPin aria-hidden /> Delivery Address
-                </h3>
-                <p>{row.deliveryAddress}</p>
-              </div>
-
-              <div className="contract-details-drawer__meta">
-                <span>
-                  Assigned Date: <strong>{row.assignedDate}</strong>
-                </span>
-                <span>
-                  Assigned By: <strong>{row.assignedBy}</strong>
-                </span>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </>,
-    document.body,
-  );
-};
-
 function getExportCellValue(row: BulkFreightRow, column: TableColumn<BulkFreightRow>): string {
   if (column.exportValue) return column.exportValue(row);
   const raw = (row as unknown as Record<string, unknown>)[column.key];
@@ -246,23 +132,13 @@ const BulkFreightApproval = () => {
   const [dateTo, setDateTo] = useState("");
   const [contractFilter, setContractFilter] = useState("");
   const [assignedFilter, setAssignedFilter] = useState("");
-  const [filtersVisible, setFiltersVisible] = useState(true);
+  const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [rows, setRows] = useState(bulkFreightRows);
   const [actionModal, setActionModal] = useState<ActionVariant | null>(null);
-  const [detailsRow, setDetailsRow] = useState<BulkFreightRow | null>(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
 
-  const handleOpenDetails = (row: BulkFreightRow) => {
-    setDetailsRow(row);
-    setDetailsOpen(true);
-  };
-
-  const bulkFreightColumns = useMemo(
-    () => buildBulkFreightColumns({ onOpenDetails: handleOpenDetails }),
-    [],
-  );
+  const bulkFreightColumns = useMemo(() => buildBulkFreightColumns(), []);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -514,8 +390,6 @@ const BulkFreightApproval = () => {
         onClose={() => setActionModal(null)}
         onConfirm={(comments) => actionModal && handleConfirmAction(actionModal, comments)}
       />
-
-      <ContractDetailsDrawer open={detailsOpen} row={detailsRow} onClose={() => setDetailsOpen(false)} />
     </div>
   );
 };

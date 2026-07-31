@@ -24,13 +24,6 @@ export const districtOptions = [
 
 export const stateOptions = indianStates.map((state) => ({ value: state, label: state }));
 
-export const regionOptions = [
-  { value: "north-zone", label: "North Zone" },
-  { value: "south-zone", label: "South Zone" },
-  { value: "east-zone", label: "East Zone" },
-  { value: "west-zone", label: "West Zone" },
-];
-
 export const commissionStructureOptions = [
   { value: "percentage-of-sale", label: "Percentage of Sale" },
   { value: "flat-fee", label: "Flat Fee" },
@@ -48,11 +41,13 @@ export const paymentFrequencyOptions = [
 // ============================================================
 // Documents
 // ============================================================
+// value is the real documentTypeId (as a string, for SearchableSelect) —
+// confirmed against the backend: 1 = PAN.
 export const documentTypeOptions = [
-  { value: "pan-card", label: "PAN Card" },
-  { value: "aadhaar-card", label: "Aadhaar Card" },
-  { value: "gst-certificate", label: "GST Certificate" },
-  { value: "address-proof", label: "Address Proof" },
+  { value: "1", label: "PAN Card" },
+  { value: "2", label: "Aadhaar Card" },
+  { value: "3", label: "GST Certificate" },
+  { value: "4", label: "Address Proof" },
 ];
 
 export const MAX_DOCUMENT_FILE_SIZE_MB = 5;

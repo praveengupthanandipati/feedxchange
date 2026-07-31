@@ -10,13 +10,7 @@ const TruncatedText = ({ value }: { value: string }) => (
   </span>
 );
 
-interface ColumnHandlers {
-  onOpenDetails: (row: BulkFreightRow) => void;
-}
-
-export function buildBulkFreightColumns({
-  onOpenDetails,
-}: ColumnHandlers): TableColumn<BulkFreightRow>[] {
+export function buildBulkFreightColumns(): TableColumn<BulkFreightRow>[] {
   return [
     {
       key: "contractNumber",
@@ -24,15 +18,10 @@ export function buildBulkFreightColumns({
       sortable: true,
       render: (row) => (
         <span className="bulk-freight-table__contract">
-          <button
-            type="button"
-            className="bulk-freight-table__contract-badge"
-            onClick={() => onOpenDetails(row)}
-            aria-label={`View details for contract ${row.contractNumber}`}
-            title="View Contract Details"
-          >
+          {/* TODO: wire up the Assign link once the destination route is ready. */}
+          <span className="bulk-freight-table__contract-badge">
             <FiExternalLink aria-hidden />
-          </button>
+          </span>
           <span className="bulk-freight-table__contract-text">{row.contractNumber}</span>
         </span>
       ),

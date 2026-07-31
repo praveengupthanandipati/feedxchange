@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
+import { fetchLocationFromPincode } from "../../../../utils/pincodeLookup";
 import {
   contactTypeOptions,
   designationOptions,
@@ -184,6 +185,10 @@ export interface AddressEntry {
   district: string;
   stateName: string;
   googleLocationUrl: string;
+  // Present only for rows loaded from an existing profile — tells the save
+  // step to call UpdateProfileAddress instead of bundling this row into the
+  // next CreateProfileAddress call.
+  meta?: { addressId: number; createdBy: number; createdOn: string };
 }
 
 let addressSeq = 0;
@@ -208,6 +213,11 @@ interface AdditionalAddressSectionProps {
 
 const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddressSectionProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  // Read in updateEntry so the pincode lookup's async callback (which can
+  // resolve after further edits/re-renders) always patches the latest
+  // entries instead of the stale array closed over when it started.
+  const entriesRef = useRef(entries);
+  entriesRef.current = entries;
 
   const addEntry = () => onEntriesChange([...entries, emptyAddressEntry()]);
   const confirmRemoveEntry = () => {
@@ -215,7 +225,14 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
     setPendingDeleteId(null);
   };
   const updateEntry = (id: string, patch: Partial<AddressEntry>) =>
-    onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
+    onEntriesChange(entriesRef.current.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
+
+  const handlePincodeChange = (id: string, value: string) => {
+    updateEntry(id, { pincode: value });
+    fetchLocationFromPincode(value).then((location) => {
+      if (location) updateEntry(id, { city: location.city, district: location.district, stateName: location.state });
+    });
+  };
 
   return (
     <div>
@@ -280,7 +297,7 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
                       className="form-field__control"
                       placeholder="Ex: 502325"
                       value={entry.pincode}
-                      onChange={(event) => updateEntry(entry.id, { pincode: event.target.value })}
+                      onChange={(event) => handlePincodeChange(entry.id, event.target.value)}
                     />
                   </div>
 
@@ -431,6 +448,17 @@ const ContactsAddresses = ({
   addresses,
   onAddressesChange,
 }: ContactsAddressesProps) => {
+  const handleBillingPincodeChange = (value: string) => {
+    onPincodeChange(value);
+    fetchLocationFromPincode(value).then((location) => {
+      if (location) {
+        onCityChange(location.city);
+        onDistrictChange(location.district);
+        onStateNameChange(location.state);
+      }
+    });
+  };
+
   return (
     <div className="contact-address__subsections">
       <div className="new-contract__condition-card">
@@ -478,7 +506,7 @@ const ContactsAddresses = ({
               className="form-field__control"
               placeholder="Enter Valid Pincode"
               value={pincode}
-              onChange={(event) => onPincodeChange(event.target.value)}
+              onChange={(event) => handleBillingPincodeChange(event.target.value)}
             />
           </div>
 

@@ -1,7 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_URL } from "../api/api";
+import type {
+  ProfileAddressDetail,
+  ProfileContactDetail,
+  ProfileBankAccountDetail,
+  ProfileDocumentDetail,
+} from "./userProfilesCommonApi";
 
-export type BusinessOwnerStatus = "Active" | "Inactive" | "Blocked";
+export type BusinessOwnerStatus = "Active" | "Inactive" | "Deleted";
 
 export interface BusinessOwner {
   profileId: number;
@@ -127,6 +133,187 @@ export interface DeleteBusinessProfilePayload {
   modifiedBy: number;
 }
 
+export interface CreateBusinessCollectionAreaEntry {
+  profileId: number;
+  collectionAreaId: number;
+}
+
+export interface UpdateBusinessCollectionAreaPayload {
+  id: number;
+  profileId: number;
+  collectionAreaId: number;
+}
+
+export interface CreateBusinessCapacityRequirementEntry {
+  profileId: number;
+  productId: number;
+  tonsPerDay: number;
+  tonsPerMonth: number;
+  createdBy: number;
+}
+
+export interface UpdateBusinessCapacityRequirementPayload {
+  capacityRequirementId: number;
+  profileId: number;
+  productId: number;
+  tonsPerDay: number;
+  tonsPerMonth: number;
+  createdBy: number;
+  createdOn: string;
+  modifiedBy: number;
+  modifiedOn: string;
+}
+
+export interface CreateBusinessBuySellChargeEntry {
+  profileId: number;
+  productId: number;
+  buyCharge: number;
+  sellCharge: number;
+  effectiveFrom: string;
+  effectiveTo: string;
+  isActive: boolean;
+  createdBy: number;
+}
+
+export interface UpdateBusinessBuySellChargePayload {
+  chargeId: number;
+  profileId: number;
+  productId: number;
+  buyCharge: number;
+  sellCharge: number;
+  effectiveFrom: string;
+  effectiveTo: string;
+  isActive: boolean;
+  createdBy: number;
+  createdOn: string;
+  modifiedBy: number;
+  modifiedOn: string;
+}
+
+export interface BusinessProfileDetailInfo {
+  businessProfileId: number;
+  profileId: number;
+  businessUnitTypeId: number;
+  businessUnitTypeName: string;
+  businessLineId: number;
+  businessLineName: string;
+  businessTypeId: number;
+  businessTypeName: string;
+  businessSubTypeId: number;
+  businessSubTypeName: string;
+  buyBrokerageCharges: number;
+  sellBrokerageCharges: number;
+  annualTurnover: number;
+  monthlyTurnover: number;
+  employeeCount: number;
+  isVerified: boolean;
+  verifiedBy: number;
+  verifiedByName: string;
+  verifiedOn: string;
+}
+
+
+
+export interface BusinessProfileCategoryDetail {
+  id: number;
+  profileId: number;
+  categoryId: number;
+  categoryName: string;
+}
+
+export interface BusinessProfileCollectionAreaDetail {
+  profileId: number;
+  collectionAreaId: number;
+  collectionAreaName: string;
+}
+
+export interface BusinessProfileProductDetail {
+  businessProductId: number;
+  profileId: number;
+  productId: number;
+  productName: string;
+  isBuyer: boolean;
+  isSeller: boolean;
+  isManufacturer: boolean;
+  createdBy: number;
+  createdByName: string;
+  createdOn: string;
+  modifiedBy: number;
+  modifiedByName: string;
+  modifiedOn: string;
+}
+
+export interface BusinessProfileCapacityRequirementDetail {
+  profileId: number;
+  productId: number;
+  productName: string;
+  tonsPerDay: number;
+  tonsPerMonth: number;
+  createdBy: number;
+  createdByName: string;
+  createdOn: string;
+  modifiedBy: number;
+  modifiedByName: string;
+  modifiedOn: string;
+}
+
+export interface BusinessProfileBuySellChargeDetail {
+  chargeId: number;
+  profileId: number;
+  productId: number;
+  productName: string;
+  buyCharge: number;
+  sellCharge: number;
+  effectiveFrom: string;
+  effectiveTo: string;
+  isActive: boolean;
+  createdBy: number;
+  createdByName: string;
+  createdOn: string;
+  modifiedBy: number;
+  modifiedByName: string;
+  modifiedOn: string;
+}
+
+export interface BusinessProfileDetail {
+  profileId: number;
+  profileTypeId: number;
+  profilePictureUrl: string;
+  firstName: string;
+  lastName: string;
+  legalName: string;
+  tradingName: string;
+  yearOfEstablishment: string;
+  panNumber: string;
+  gstNumber: string;
+  emailId: string;
+  mobileNumber: string;
+  alternativeContactNumber: string;
+  websiteUrl: string;
+  groupName: string;
+  collectionArea: string;
+  area: string;
+  referredBy: string;
+  aboutProfile: string;
+  status: string;
+  createdBy: number;
+  createdByName: string;
+  createdOn: string;
+  modifiedBy: number;
+  modifiedByName: string;
+  modifiedOn: string;
+  businessProfileDetails: BusinessProfileDetailInfo;
+  categories: BusinessProfileCategoryDetail[];
+  collectionAreas: BusinessProfileCollectionAreaDetail[];
+  products: BusinessProfileProductDetail[];
+  capacityRequirements: BusinessProfileCapacityRequirementDetail[];
+  buySellCharges: BusinessProfileBuySellChargeDetail[];
+  addresses: ProfileAddressDetail[];
+  contacts: ProfileContactDetail[];
+  bankAccounts: ProfileBankAccountDetail[];
+  documents: ProfileDocumentDetail[];
+}
+
 export interface BusinessLineApiItem {
   businessLineId: number;
   businessLineName: string;
@@ -168,12 +355,83 @@ export const businessProfilesApi = createApi({
       transformResponse: unwrapArray<BusinessOwner>,
       providesTags: ["BusinessProfile"],
     }),
-    getBusinessProfileById: builder.query<Record<string, unknown> | null, string>({
+    getBusinessProfileById: builder.query<BusinessProfileDetail | null, string>({
       query: (profileId) => `/api/BusinessProfiles/GetBusinessProfileById/${profileId}`,
-      transformResponse: unwrapObject<Record<string, unknown>>,
+      transformResponse: unwrapObject<BusinessProfileDetail>,
       providesTags: ["BusinessProfile"],
     }),
-    addBusinessProfile: builder.mutation<void, AddBusinessProfilePayload>({
+    getBusinessCollectionArea: builder.query<BusinessProfileCollectionAreaDetail[], string>({
+      query: (profileId) => `/api/BusinessProfiles/GetBusinessCollectionArea/${profileId}`,
+      transformResponse: unwrapArray<BusinessProfileCollectionAreaDetail>,
+      providesTags: ["BusinessProfile"],
+    }),
+    
+    createBusinessCollectionArea: builder.mutation<void, CreateBusinessCollectionAreaEntry[]>({
+      query: (body) => ({
+        url: "/api/BusinessProfiles/CreateBusinessCollectionArea",
+        method: "POST",
+        body,
+        responseHandler: "text",
+      }),
+      invalidatesTags: ["BusinessProfile"],
+    }),
+    // Also not called yet, same reason as createBusinessCollectionArea above.
+    updateBusinessCollectionArea: builder.mutation<void, UpdateBusinessCollectionAreaPayload>({
+      query: (body) => ({
+        url: "/api/BusinessProfiles/UpdateBusinessCollectionArea",
+        method: "POST",
+        body,
+        responseHandler: "text",
+      }),
+      invalidatesTags: ["BusinessProfile"],
+    }),
+    createBusinessCapacityRequirement: builder.mutation<void, CreateBusinessCapacityRequirementEntry[]>({
+      query: (body) => ({
+        url: "/api/BusinessProfiles/CreateBusinessCapacityRequirement",
+        method: "POST",
+        body,
+        responseHandler: "text",
+      }),
+      invalidatesTags: ["BusinessProfile"],
+    }),
+    getBusinessCapacityRequirement: builder.query<BusinessProfileCapacityRequirementDetail[], string>({
+      query: (profileId) => `/api/BusinessProfiles/GetBusinessCapacityRequirement/${profileId}`,
+      transformResponse: unwrapArray<BusinessProfileCapacityRequirementDetail>,
+      providesTags: ["BusinessProfile"],
+    }),
+    updateBusinessCapacityRequirement: builder.mutation<void, UpdateBusinessCapacityRequirementPayload>({
+      query: (body) => ({
+        url: "/api/BusinessProfiles/UpdateBusinessCapacityRequirement",
+        method: "POST",
+        body,
+        responseHandler: "text",
+      }),
+      invalidatesTags: ["BusinessProfile"],
+    }),
+    createBusinessBuySellCharge: builder.mutation<void, CreateBusinessBuySellChargeEntry[]>({
+      query: (body) => ({
+        url: "/api/BusinessProfiles/CreateBusinessBuySellCharge",
+        method: "POST",
+        body,
+        responseHandler: "text",
+      }),
+      invalidatesTags: ["BusinessProfile"],
+    }),
+    getBusinessBuySellCharge: builder.query<BusinessProfileBuySellChargeDetail[], string>({
+      query: (profileId) => `/api/BusinessProfiles/GetBusinessBuySellCharge/${profileId}`,
+      transformResponse: unwrapArray<BusinessProfileBuySellChargeDetail>,
+      providesTags: ["BusinessProfile"],
+    }),
+    updateBusinessBuySellCharge: builder.mutation<void, UpdateBusinessBuySellChargePayload>({
+      query: (body) => ({
+        url: "/api/BusinessProfiles/UpdateBusinessBuySellCharge",
+        method: "POST",
+        body,
+        responseHandler: "text",
+      }),
+      invalidatesTags: ["BusinessProfile"],
+    }),
+    addBusinessProfile: builder.mutation<string, AddBusinessProfilePayload>({
       query: (body) => ({
         url: "/api/BusinessProfiles/AddBusinessProfile",
         method: "POST",
@@ -218,6 +476,15 @@ export const businessProfilesApi = createApi({
 export const {
   useGetBusinessProfileSummaryQuery,
   useGetBusinessProfileByIdQuery,
+  useGetBusinessCollectionAreaQuery,
+  useCreateBusinessCollectionAreaMutation,
+  useUpdateBusinessCollectionAreaMutation,
+  useCreateBusinessCapacityRequirementMutation,
+  useGetBusinessCapacityRequirementQuery,
+  useUpdateBusinessCapacityRequirementMutation,
+  useCreateBusinessBuySellChargeMutation,
+  useGetBusinessBuySellChargeQuery,
+  useUpdateBusinessBuySellChargeMutation,
   useAddBusinessProfileMutation,
   useUpdateBusinessProfileMutation,
   useDeleteBusinessProfileMutation,

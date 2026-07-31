@@ -2,13 +2,6 @@
 
 import { indianStates } from "../../businessowners/BusinessList/businessOwners.data";
 
-export const typeOfTransporterOptions = [
-  { value: "mini-transporter", label: "Mini Transporter" },
-  { value: "light-transporter", label: "Light Transporter" },
-  { value: "heavy-transporter", label: "Heavy Transporter" },
-  { value: "container-transporter", label: "Container Transporter" },
-];
-
 export const groupOptions = [
   { value: "north-zone", label: "North Zone" },
   { value: "south-zone", label: "South Zone" },
@@ -81,12 +74,14 @@ export const ifscLookup: Record<string, { bankName: string; branch: string }> = 
 // ============================================================
 // 4. Documents
 // ============================================================
+// value is the real documentTypeId (as a string, for SearchableSelect) —
+// confirmed against the backend: 1 = PAN.
 export const documentTypeOptions = [
-  { value: "pan-card", label: "PAN Card" },
-  { value: "aadhaar-card", label: "Aadhaar Card" },
-  { value: "gst-certificate", label: "GST Certificate" },
-  { value: "transport-license", label: "Transport License" },
-  { value: "vehicle-permit", label: "Vehicle Permit" },
+  { value: "1", label: "PAN Card" },
+  { value: "2", label: "Aadhaar Card" },
+  { value: "3", label: "GST Certificate" },
+  { value: "4", label: "Transport License" },
+  { value: "5", label: "Vehicle Permit" },
 ];
 
 export const MAX_DOCUMENT_FILE_SIZE_MB = 5;
