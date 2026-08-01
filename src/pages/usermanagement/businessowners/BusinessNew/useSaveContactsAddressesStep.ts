@@ -15,11 +15,6 @@ function getErrorMessage(err: unknown): string {
   return "Failed to save contacts & addresses.";
 }
 
-// Contacts still ride the whole-profile update (no dedicated contact
-// endpoint yet). Addresses persist through their own userProfilesCommonApi
-// endpoints: rows with a `meta` (loaded from an existing profile, or from an
-// earlier save this session) go through UpdateProfileAddress; the rest are
-// bundled into one CreateProfileAddress call.
 export const useSaveContactsAddressesStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId } = useBusinessOwnerWizard();

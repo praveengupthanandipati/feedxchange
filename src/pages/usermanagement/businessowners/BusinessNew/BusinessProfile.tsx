@@ -1,15 +1,14 @@
-import { useMemo, useState } from "react";
-import { FiPlus, FiTrash2 } from "react-icons/fi";
+import { useMemo } from "react";
+import { FiPlus } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../components/tooltip/InfoTooltip";
-import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
-import { productOptions } from "../../../contracts/newContract.data";
 import {
   useGetAllBusinessLinesQuery,
   useGetBusinessTypesByLineQuery,
   useGetBusinessSubTypesQuery,
 } from "../../../../store/businessProfilesApi";
+import { useGetProductsQuery } from "../../../../store/productsApi";
 import { areaOptions, establishmentYearOptions } from "./newBusiness.data";
 
 export interface BrokerageRow {
@@ -35,6 +34,11 @@ export interface BrokerageRow {
 let brokerageRowSeq = 0;
 export const nextBrokerageRowId = () => `brokerage-${Date.now()}-${brokerageRowSeq++}`;
 
+interface ProductOption {
+  value: string;
+  label: string;
+}
+
 interface BrokerageChargesCardProps {
   buyBrokerageCharges: string;
   onBuyBrokerageChargesChange: (value: string) => void;
@@ -42,6 +46,7 @@ interface BrokerageChargesCardProps {
   onSellBrokerageChargesChange: (value: string) => void;
   rows: BrokerageRow[];
   onRowsChange: (rows: BrokerageRow[]) => void;
+  productOptions: ProductOption[];
 }
 
 const BrokerageChargesCard = ({
@@ -51,9 +56,8 @@ const BrokerageChargesCard = ({
   onSellBrokerageChargesChange,
   rows,
   onRowsChange,
+  productOptions,
 }: BrokerageChargesCardProps) => {
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-
   const addRow = () => {
     onRowsChange([
       ...rows,
@@ -74,11 +78,6 @@ const BrokerageChargesCard = ({
   const handleSellBrokerageChange = (value: string) => {
     onSellBrokerageChargesChange(value);
     onRowsChange(rows.map((row) => ({ ...row, sellCharge: value })));
-  };
-
-  const confirmRemoveRow = () => {
-    onRowsChange(rows.filter((row) => row.id !== pendingDeleteId));
-    setPendingDeleteId(null);
   };
 
   const updateRow = (id: string, patch: Partial<BrokerageRow>) => {
@@ -128,7 +127,7 @@ const BrokerageChargesCard = ({
             <span>Product</span>
             <span>Buy Charges</span>
             <span>Sell Charges</span>
-            <span>Actions</span>
+            <span>Add</span>
           </div>
           {rows.map((row, index) => {
             const usedProducts = rows
@@ -145,7 +144,6 @@ const BrokerageChargesCard = ({
                   value={row.productId}
                   onChange={(value) => updateRow(row.id, { productId: value })}
                   ariaLabel="Product"
-                  allowCustom
                 />
                 <input
                   type="number"
@@ -164,14 +162,6 @@ const BrokerageChargesCard = ({
                   onChange={(event) => updateRow(row.id, { sellCharge: event.target.value })}
                 />
                 <div className="repeatable-rows__actions">
-                  <button
-                    type="button"
-                    className="repeatable-rows__delete"
-                    onClick={() => setPendingDeleteId(row.id)}
-                    aria-label="Remove row"
-                  >
-                    <FiTrash2 aria-hidden />
-                  </button>
                   {index === rows.length - 1 && (
                     <button
                       type="button"
@@ -188,14 +178,6 @@ const BrokerageChargesCard = ({
           })}
         </div>
       )}
-
-      <ConfirmDialog
-        open={pendingDeleteId !== null}
-        title="Remove this row?"
-        message="This will remove the brokerage charges for this product. This cannot be undone."
-        onConfirm={confirmRemoveRow}
-        onCancel={() => setPendingDeleteId(null)}
-      />
     </div>
   );
 };
@@ -205,10 +187,6 @@ export interface CapacityRow {
   productId: string;
   tonsPerDay: string;
   tonsPerMonth: string;
-  // GetBusinessCapacityRequirement doesn't return a row id, so hydrated rows
-  // never carry `meta` today — every save re-creates via
-  // CreateBusinessCapacityRequirement rather than updating in place. Wire
-  // this up for real once the backend's GET response includes an id.
   meta?: { capacityRequirementId: number; createdBy: number; createdOn: string };
 }
 
@@ -218,18 +196,12 @@ export const nextCapacityRowId = () => `capacity-${Date.now()}-${capacityRowSeq+
 interface CapacityRequirementsCardProps {
   rows: CapacityRow[];
   onRowsChange: (rows: CapacityRow[]) => void;
+  productOptions: ProductOption[];
 }
 
-const CapacityRequirementsCard = ({ rows, onRowsChange }: CapacityRequirementsCardProps) => {
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-
+const CapacityRequirementsCard = ({ rows, onRowsChange, productOptions }: CapacityRequirementsCardProps) => {
   const addRow = () => {
     onRowsChange([...rows, { id: nextCapacityRowId(), productId: "", tonsPerDay: "", tonsPerMonth: "" }]);
-  };
-
-  const confirmRemoveRow = () => {
-    onRowsChange(rows.filter((row) => row.id !== pendingDeleteId));
-    setPendingDeleteId(null);
   };
 
   const updateRow = (id: string, patch: Partial<CapacityRow>) => {
@@ -248,7 +220,7 @@ const CapacityRequirementsCard = ({ rows, onRowsChange }: CapacityRequirementsCa
             <span>Product</span>
             <span>TPD</span>
             <span>TPM</span>
-            <span>Actions</span>
+            <span>Add</span>
           </div>
           {rows.map((row, index) => (
             <div className="repeatable-rows__row" key={row.id}>
@@ -257,7 +229,6 @@ const CapacityRequirementsCard = ({ rows, onRowsChange }: CapacityRequirementsCa
                 value={row.productId}
                 onChange={(value) => updateRow(row.id, { productId: value })}
                 ariaLabel="Product"
-                allowCustom
               />
               <input
                 type="number"
@@ -276,14 +247,6 @@ const CapacityRequirementsCard = ({ rows, onRowsChange }: CapacityRequirementsCa
                 onChange={(event) => updateRow(row.id, { tonsPerMonth: event.target.value })}
               />
               <div className="repeatable-rows__actions">
-                <button
-                  type="button"
-                  className="repeatable-rows__delete"
-                  onClick={() => setPendingDeleteId(row.id)}
-                  aria-label="Remove row"
-                >
-                  <FiTrash2 aria-hidden />
-                </button>
                 {index === rows.length - 1 && (
                   <button
                     type="button"
@@ -299,14 +262,6 @@ const CapacityRequirementsCard = ({ rows, onRowsChange }: CapacityRequirementsCa
           ))}
         </div>
       )}
-
-      <ConfirmDialog
-        open={pendingDeleteId !== null}
-        title="Remove this row?"
-        message="This will remove the capacity requirement for this product. This cannot be undone."
-        onConfirm={confirmRemoveRow}
-        onCancel={() => setPendingDeleteId(null)}
-      />
     </div>
   );
 };
@@ -384,6 +339,16 @@ const BusinessProfile = ({
   capacityRows,
   onCapacityRowsChange,
 }: BusinessProfileProps) => {
+  const { data: products } = useGetProductsQuery();
+  const productOptions = useMemo(
+    () =>
+      (products ?? []).map((product) => ({
+        value: String(product.id),
+        label: product.name ?? "",
+      })),
+    [products],
+  );
+
   const { data: businessLines } = useGetAllBusinessLinesQuery();
   const businessLineOptions = useMemo(
     () =>
@@ -608,8 +573,13 @@ const BusinessProfile = ({
           onSellBrokerageChargesChange={onSellBrokerageChargesChange}
           rows={brokerageRows}
           onRowsChange={onBrokerageRowsChange}
+          productOptions={productOptions}
         />
-        <CapacityRequirementsCard rows={capacityRows} onRowsChange={onCapacityRowsChange} />
+        <CapacityRequirementsCard
+          rows={capacityRows}
+          onRowsChange={onCapacityRowsChange}
+          productOptions={productOptions}
+        />
       </div>
     </>
   );

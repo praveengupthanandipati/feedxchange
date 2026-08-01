@@ -6,7 +6,9 @@ import {
   type CreateProfileBankAccountEntry,
   type UpdateProfileBankAccountPayload,
 } from "../../../../store/userProfilesCommonApi";
+import { useUpdateBusinessProfileMutation } from "../../../../store/businessProfilesApi";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
+import { buildBusinessProfilePayload } from "./businessOwnerWizard.utils";
 
 function getErrorMessage(err: unknown): string {
   console.error("Failed to save bank details:", err);
@@ -15,10 +17,13 @@ function getErrorMessage(err: unknown): string {
 
 // Rows with a `meta` (loaded from an existing profile) go through
 // UpdateProfileBankAccount; the rest are bundled into one
-// CreateProfileBankAccount call.
+// CreateProfileBankAccount call. Also re-syncs the core profile record on
+// this same profileId, same as every other step, so the profile stays
+// current no matter which step the user last saved from.
 export const useSaveBankDetailsStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId } = useBusinessOwnerWizard();
+  const [updateBusinessProfile] = useUpdateBusinessProfileMutation();
   const [createProfileBankAccount] = useCreateProfileBankAccountMutation();
   const [updateProfileBankAccount] = useUpdateProfileBankAccountMutation();
   const [submitting, setSubmitting] = useState(false);
@@ -31,6 +36,12 @@ export const useSaveBankDetailsStep = (nextPath: string) => {
     try {
       const currentUserId = Number(localStorage.getItem("userId")) || 0;
       const now = new Date().toISOString();
+
+      await updateBusinessProfile({
+        ...buildBusinessProfilePayload(draft, currentUserId),
+        profileId,
+        modifiedBy: currentUserId,
+      }).unwrap();
 
       const newEntries: CreateProfileBankAccountEntry[] = [];
       const updates: UpdateProfileBankAccountPayload[] = [];

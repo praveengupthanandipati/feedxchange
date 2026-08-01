@@ -7,6 +7,7 @@ import {
   useGetBusinessTypesByLineQuery,
   useGetBusinessSubTypesQuery,
 } from "../../../../store/businessProfilesApi";
+import { useGetProductsQuery } from "../../../../store/productsApi";
 import ShareModal from "../../../../components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../components/dialog/ShareModal";
 import { mapBusinessProfileDetail, toRecipientOptions } from "./businessOwnerDetail.data";
@@ -38,10 +39,6 @@ const BusinessOwnerDetail = () => {
     isError,
   } = useGetBusinessProfileByIdQuery(id ?? "", { skip: !id });
 
-  // businessProfileDetails.businessLineName/businessTypeName/
-  // businessSubTypeName from GetBusinessProfileById aren't reliable — same as
-  // the Edit wizard, resolve the display names by looking the ids up against
-  // the cascading master-data endpoints instead of trusting those fields.
   const details = rawProfile?.businessProfileDetails;
   const businessLineId = details ? String(details.businessLineId) : "";
   const businessTypeId = details ? String(details.businessTypeId) : "";
@@ -49,6 +46,7 @@ const BusinessOwnerDetail = () => {
   const { data: businessLines } = useGetAllBusinessLinesQuery();
   const { data: businessTypes } = useGetBusinessTypesByLineQuery(businessLineId, { skip: !businessLineId });
   const { data: businessSubTypes } = useGetBusinessSubTypesQuery(businessTypeId, { skip: !businessTypeId });
+  const { data: products } = useGetProductsQuery();
 
   const profile = useMemo(() => {
     if (!rawProfile) return null;
@@ -59,13 +57,25 @@ const BusinessOwnerDetail = () => {
       (subType) => subType.businessSubTypeId === details?.businessSubTypeId,
     )?.businessSubTypeName;
 
+    // productName can come back null from the backend join — fall back to
+    // the live product list so the row still shows a name instead of blank.
+    const productNameById = new Map((products ?? []).map((product) => [product.id, product.name ?? ""]));
+
     return {
       ...mapped,
       lineOfBusiness: lineName ?? mapped.lineOfBusiness,
       businessType: typeName ?? mapped.businessType,
       subTypeOfBusiness: subTypeName ?? mapped.subTypeOfBusiness,
+      brokerageCharges: mapped.brokerageCharges.map((charge) => ({
+        ...charge,
+        product: charge.product || productNameById.get(charge.productId) || "",
+      })),
+      capacity: mapped.capacity.map((req) => ({
+        ...req,
+        product: req.product || productNameById.get(req.productId) || "",
+      })),
     };
-  }, [rawProfile, details, businessLines, businessTypes, businessSubTypes]);
+  }, [rawProfile, details, businessLines, businessTypes, businessSubTypes, products]);
   const recipientOptions = useMemo(() => (profile ? toRecipientOptions(profile) : []), [profile]);
 
   const handleShareProfile = (_payload: ShareModalPayload) => undefined;

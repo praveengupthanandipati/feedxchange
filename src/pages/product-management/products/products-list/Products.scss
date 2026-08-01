@@ -101,6 +101,24 @@
       }
     }
   }
+
+  &__clear {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-danger, 0.1);
+    color: v.$color-danger;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: rgba(v.$color-danger, 0.18);
+    }
+  }
 }
 
 .products-list-pagination {
@@ -181,6 +199,11 @@
     &--inactive {
       background-color: rgba(v.$color-gray-400, 0.2);
       color: v.$color-gray-600;
+    }
+
+    &--deleted {
+      background-color: rgba(v.$color-danger, 0.15);
+      color: v.$color-danger;
     }
   }
 }

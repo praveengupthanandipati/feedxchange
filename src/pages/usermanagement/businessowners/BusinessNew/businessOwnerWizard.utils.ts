@@ -134,6 +134,13 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
       productId: String(req.productId),
       tonsPerDay: String(req.tonsPerDay),
       tonsPerMonth: String(req.tonsPerMonth),
+      meta: req.capacityRequirementId
+        ? {
+            capacityRequirementId: req.capacityRequirementId,
+            createdBy: req.createdBy,
+            createdOn: req.createdOn,
+          }
+        : undefined,
     })),
     billingAddressLine1: primaryAddress?.addressLine1 ?? "",
     billingAddressLine2: primaryAddress?.addressLine2 ?? "",

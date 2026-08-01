@@ -8,7 +8,9 @@ import {
   type CreateProfileDocumentEntry,
   type UpdateProfileDocumentPayload,
 } from "../../../../store/userProfilesCommonApi";
+import { useUpdatePromoterProfileMutation } from "../../../../store/promotersApi";
 import { usePromoterWizard } from "./PromoterWizardContext";
+import { buildPromoterProfilePayload } from "./promoterWizard.utils";
 import { documentTypeOptions } from "./promoterNew.data";
 
 function getErrorMessage(err: unknown): string {
@@ -16,12 +18,11 @@ function getErrorMessage(err: unknown): string {
   return "Failed to save documents.";
 }
 
-// Rows with a `meta` (loaded from an existing profile) go through
-// UpdateProfileDocument; the rest are bundled into one CreateProfileDocument
-// call.
+
 export const useSaveDocumentsStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId } = usePromoterWizard();
+  const [updatePromoterProfile] = useUpdatePromoterProfileMutation();
   const [createProfileDocument] = useCreateProfileDocumentMutation();
   const [updateProfileDocument] = useUpdateProfileDocumentMutation();
   const resolveFileFields = useDocumentFileFieldsResolver();
@@ -35,6 +36,12 @@ export const useSaveDocumentsStep = (nextPath: string) => {
     try {
       const currentUserId = Number(localStorage.getItem("userId")) || 0;
       const now = new Date().toISOString();
+
+      await updatePromoterProfile({
+        ...buildPromoterProfilePayload(draft, currentUserId),
+        profileId,
+        modifiedBy: currentUserId,
+      }).unwrap();
 
       const newEntries: CreateProfileDocumentEntry[] = [];
       const updates: UpdateProfileDocumentPayload[] = [];
