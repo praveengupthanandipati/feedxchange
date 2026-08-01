@@ -20,14 +20,6 @@ function getErrorMessage(err: unknown): string {
   return "Failed to save business profile.";
 }
 
-// Used only by the Business Profile step (where capacity rows and buy/sell
-// charges are actually edited) — ProfileSettingsStep still uses the plain
-// useSaveBusinessProfileStep, since re-running these saves from there on
-// every "Finish" click would duplicate capacity rows (GetBusinessCapacity
-// Requirement doesn't return a row id, so hydrated rows never carry `meta`
-// and every save re-creates via CreateBusinessCapacityRequirement rather
-// than updating in place — buy/sell charges don't have this problem since
-// GetBusinessBuySellCharge does return a chargeId).
 export const useSaveBusinessProfileMainStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId, setProfileId } = useBusinessOwnerWizard();

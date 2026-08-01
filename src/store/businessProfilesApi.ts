@@ -244,6 +244,7 @@ export interface BusinessProfileProductDetail {
 }
 
 export interface BusinessProfileCapacityRequirementDetail {
+  capacityRequirementId: number;
   profileId: number;
   productId: number;
   productName: string;

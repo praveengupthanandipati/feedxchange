@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../components/tooltip/InfoTooltip";
@@ -6,7 +6,6 @@ import {
   cityOptions,
   districtOptions,
   stateOptions,
-  productOptions,
   commissionStructureOptions,
   paymentFrequencyOptions,
 } from "./promoterNew.data";
@@ -14,6 +13,7 @@ import RegionSection from "./RegionSection";
 import { fetchLocationFromPincode } from "../../../../utils/pincodeLookup";
 import { usePromoterWizard } from "./PromoterWizardContext";
 import { useGetPromoterProfileByIdQuery } from "../../../../store/promotersApi";
+import { useGetProductsQuery } from "../../../../store/productsApi";
 import { useSavePromoterProfileStep } from "./useSavePromoterProfileStep";
 import { hydrateDraftFromPromoterProfile } from "./promoterWizard.utils";
 
@@ -26,8 +26,17 @@ const PromoterProfileStep = () => {
   );
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Editing an existing promoter lands here with ?id=<profileId> — load it
-  // once so the later steps unlock pre-filled instead of blank.
+  const { data: products } = useGetProductsQuery();
+  const productOptions = useMemo(
+    () =>
+      (products ?? []).map((product) => ({
+        value: String(product.id),
+        label: product.name ?? "",
+      })),
+    [products],
+  );
+
+
   const {
     data: existingProfile,
     isFetching: loadingExistingProfile,

@@ -8,7 +8,9 @@ import {
   type CreateProfileDocumentEntry,
   type UpdateProfileDocumentPayload,
 } from "../../../../store/userProfilesCommonApi";
+import { useUpdateTransporterProfileMutation } from "../../../../store/transportersApi";
 import { useTransporterWizard } from "./TransporterWizardContext";
+import { buildTransporterProfilePayload } from "./transporterWizard.utils";
 import { documentTypeOptions } from "./newTransporter.data";
 
 function getErrorMessage(err: unknown): string {
@@ -19,6 +21,7 @@ function getErrorMessage(err: unknown): string {
 export const useSaveDocumentsStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId } = useTransporterWizard();
+  const [updateTransporterProfile] = useUpdateTransporterProfileMutation();
   const [createProfileDocument] = useCreateProfileDocumentMutation();
   const [updateProfileDocument] = useUpdateProfileDocumentMutation();
   const resolveFileFields = useDocumentFileFieldsResolver();
@@ -32,6 +35,12 @@ export const useSaveDocumentsStep = (nextPath: string) => {
     try {
       const currentUserId = Number(localStorage.getItem("userId")) || 0;
       const now = new Date().toISOString();
+
+      await updateTransporterProfile({
+        ...buildTransporterProfilePayload(draft, currentUserId),
+        profileId,
+        modifiedBy: currentUserId,
+      }).unwrap();
 
       const newEntries: CreateProfileDocumentEntry[] = [];
       const updates: UpdateProfileDocumentPayload[] = [];

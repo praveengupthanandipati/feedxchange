@@ -14,8 +14,7 @@ const BusinessProfileStep = () => {
     "/business-owners/contacts",
   );
 
-  // Editing an existing business owner lands here with ?id=<profileId> — load
-  // it once so every step below unlocks pre-filled instead of blank.
+ 
   const {
     data: existingProfile,
     isFetching: loadingExistingProfile,
@@ -27,7 +26,6 @@ const BusinessProfileStep = () => {
       updateDraft(hydrateDraftFromProfile(existingProfile));
       setProfileId(Number(editId));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingProfile]);
 
   if (editId && !profileId && loadingExistingProfile) {
@@ -76,8 +74,9 @@ const BusinessProfileStep = () => {
           brokerageRows={draft.brokerageRows}
           onBrokerageRowsChange={(rows) => updateDraft({ brokerageRows: rows })}
           capacityRows={draft.capacityRows}
-          onCapacityRowsChange={(rows) => updateDraft({ capacityRows: rows })}
-        />
+          onCapacityRowsChange={(rows) => updateDraft({ capacityRows: rows })} referralName={""} onReferralNameChange={function (value: string): void {
+            throw new Error("Function not implemented.");
+          } }        />
       </section>
 
       {existingProfileLoadError && (

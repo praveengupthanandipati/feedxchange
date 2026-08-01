@@ -111,6 +111,7 @@ export const useSavePromoterProfileStep = (nextPath: string) => {
           });
         } else {
           newRegions.push({
+            profileId: currentProfileId!,
             stateName: region.stateName,
             districtName: region.districtName,
             cityName: region.cityName,

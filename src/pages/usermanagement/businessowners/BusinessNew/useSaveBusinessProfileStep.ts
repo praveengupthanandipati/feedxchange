@@ -12,9 +12,6 @@ function getErrorMessage(err: unknown): string {
   return "Failed to save business profile.";
 }
 
-// Shared by every wizard step so they all persist the same way: create the
-// profile on the first save, then update that same record on every step
-// after. Used until the backend adds per-section endpoints.
 export const useSaveBusinessProfileStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId, setProfileId } = useBusinessOwnerWizard();

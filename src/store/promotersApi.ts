@@ -105,6 +105,7 @@ export interface PromoterBusinessMapping {
 }
 
 export interface CreatePromoterRegionEntry {
+  profileId: number;
   stateName: string;
   districtName: string;
   cityName: string;

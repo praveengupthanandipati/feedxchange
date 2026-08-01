@@ -8,7 +8,9 @@ import {
   type CreateProfileDocumentEntry,
   type UpdateProfileDocumentPayload,
 } from "../../../../store/userProfilesCommonApi";
+import { useUpdateBusinessProfileMutation } from "../../../../store/businessProfilesApi";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
+import { buildBusinessProfilePayload } from "./businessOwnerWizard.utils";
 import { documentTypeOptions } from "./newBusiness.data";
 
 function getErrorMessage(err: unknown): string {
@@ -19,6 +21,7 @@ function getErrorMessage(err: unknown): string {
 export const useSaveDocumentsStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId } = useBusinessOwnerWizard();
+  const [updateBusinessProfile] = useUpdateBusinessProfileMutation();
   const [createProfileDocument] = useCreateProfileDocumentMutation();
   const [updateProfileDocument] = useUpdateProfileDocumentMutation();
   const resolveFileFields = useDocumentFileFieldsResolver();
@@ -32,6 +35,12 @@ export const useSaveDocumentsStep = (nextPath: string) => {
     try {
       const currentUserId = Number(localStorage.getItem("userId")) || 0;
       const now = new Date().toISOString();
+
+      await updateBusinessProfile({
+        ...buildBusinessProfilePayload(draft, currentUserId),
+        profileId,
+        modifiedBy: currentUserId,
+      }).unwrap();
 
       const newEntries: CreateProfileDocumentEntry[] = [];
       const updates: UpdateProfileDocumentPayload[] = [];

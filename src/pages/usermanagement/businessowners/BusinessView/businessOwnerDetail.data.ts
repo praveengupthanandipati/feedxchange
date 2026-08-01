@@ -2,12 +2,14 @@ import type { SearchableSelectOption } from "../../../../components/dropdown/Sea
 import type { BusinessProfileDetail } from "../../../../store/businessProfilesApi";
 
 export interface BrokerageChargeRow {
+  productId: number;
   product: string;
   buyCharge: number;
   sellCharge: number;
 }
 
 export interface CapacityRow {
+  productId: number;
   product: string;
   tpd: number;
   tpm: number;
@@ -113,11 +115,13 @@ export function mapBusinessProfileDetail(profile: BusinessProfileDetail): Busine
     gstNumber: profile.gstNumber ?? "",
     businessDescription: profile.aboutProfile ?? "",
     brokerageCharges: (profile.buySellCharges ?? []).map((charge) => ({
+      productId: charge.productId,
       product: charge.productName,
       buyCharge: charge.buyCharge,
       sellCharge: charge.sellCharge,
     })),
     capacity: (profile.capacityRequirements ?? []).map((req) => ({
+      productId: req.productId,
       product: req.productName,
       tpd: req.tonsPerDay,
       tpm: req.tonsPerMonth,

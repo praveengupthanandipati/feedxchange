@@ -416,7 +416,7 @@
 
     @include m.respond-to(sm) {
       display: grid;
-      grid-template-columns: repeat(3, 1fr) auto;
+      grid-template-columns: 2fr 1fr 1fr auto;
       gap: v.$spacing-3;
       padding: 0 v.$spacing-1;
 
