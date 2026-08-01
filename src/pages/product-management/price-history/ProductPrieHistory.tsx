@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Area,
   CartesianGrid,
@@ -32,8 +33,14 @@ const SERIES_LABELS: Record<string, string> = {
 const formatINR = (value: number) => `₹${value.toLocaleString("en-IN")}`;
 
 const ProductPrieHistory = () => {
-  const [selectedProduct, setSelectedProduct] = useState(productOptions[2].value);
-  const [appliedProduct, setAppliedProduct] = useState(productOptions[2].value);
+  const [searchParams] = useSearchParams();
+  const productParam = searchParams.get("product");
+  const initialProduct = productOptions.some((option) => option.value === productParam)
+    ? (productParam as string)
+    : productOptions[2].value;
+
+  const [selectedProduct, setSelectedProduct] = useState(initialProduct);
+  const [appliedProduct, setAppliedProduct] = useState(initialProduct);
   const [dateValue, setDateValue] = useState(todayISO());
   const [selectedSellerId, setSelectedSellerId] = useState(sellers[0].id);
   const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>("Daywise");

@@ -1,0 +1,480 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.bulk-freight-approval-page {
+  padding-bottom: v.$spacing-6;
+}
+
+.bulk-freight-approval-card {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      color: v.$color-primary;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    flex-wrap: wrap;
+  }
+}
+
+.bulk-freight-approval-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+
+  &--info {
+    background-color: v.$color-info;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: #1f6fae;
+    }
+  }
+
+  &--warning {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+}
+
+// ============================================================
+// Filters
+// ============================================================
+.bulk-freight-approval-filters {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  overflow: visible;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    overflow: visible;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__date-range {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    height: 2.5rem;
+    min-width: 0;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+
+    input {
+      @include m.font-base;
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+
+    span {
+      flex-shrink: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__clear-row {
+    @include m.flex(row, flex-end, center);
+  }
+
+  &__clear {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-danger, 0.1);
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: rgba(v.$color-danger, 0.18);
+    }
+  }
+}
+
+// ============================================================
+// Bulk actions
+// ============================================================
+.bulk-freight-approval-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-3;
+}
+
+.bulk-freight-approval-action {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-5;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast, opacity v.$transition-fast;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--approve {
+    background-color: v.$color-success;
+    color: v.$color-white;
+
+    &:hover:not(:disabled) {
+      background-color: #227a46;
+    }
+  }
+
+  &--reject {
+    background-color: v.$color-danger;
+    color: v.$color-white;
+
+    &:hover:not(:disabled) {
+      background-color: #b8352b;
+    }
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.bulk-freight-table {
+  &__contract {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__contract-badge {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-info;
+    color: v.$color-white;
+    font-size: 0.85rem;
+  }
+
+  &__contract-text {
+    color: v.$color-primary;
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: v.$radius-pill;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+
+    &--updated {
+      background-color: v.$color-orange;
+      color: v.$color-navy-dark;
+    }
+
+    &--accepted {
+      background-color: v.$color-success;
+      color: v.$color-white;
+    }
+
+    &--rejected {
+      background-color: v.$color-danger;
+      color: v.$color-white;
+    }
+  }
+
+  &__change {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+  }
+
+  &__change-original {
+    color: v.$color-text-muted;
+    text-decoration: line-through;
+  }
+
+  &__change-current {
+    color: v.$color-info;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__truncated {
+    display: inline-flex;
+    align-items: center;
+    max-width: 11rem;
+  }
+
+  &__truncated-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.bulk-freight-approval-pagination {
+  @include m.flex(row, space-between, center);
+  flex-wrap: wrap;
+  gap: v.$spacing-3;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2.25rem;
+      height: 2.25rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-gray-100;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
+
+// ============================================================
+// Approve / Reject modal
+// ============================================================
+.freight-action-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-backdrop;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-4;
+  overflow-y: auto;
+}
+
+.freight-action-modal {
+  @include m.card(v.$spacing-6);
+  position: relative;
+  z-index: v.$z-index-modal;
+  width: 100%;
+  max-width: 28rem;
+  max-height: calc(100vh - #{v.$spacing-6});
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    padding-bottom: v.$spacing-4;
+    margin-bottom: v.$spacing-4;
+    border-bottom: 1px solid v.$color-border;
+
+    h2 {
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background: transparent;
+    color: v.$color-text-muted;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  &__notice {
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__list {
+    margin: 0;
+    padding-left: v.$spacing-5;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+
+    li {
+      margin-bottom: v.$spacing-1;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+  }
+
+  &__label {
+    @include m.font-base(v.$font-weight-semibold);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  &__textarea {
+    @include m.font-base(v.$font-weight-regular);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    min-height: 6rem;
+    padding: v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    resize: vertical;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+  }
+
+  &__footer {
+    @include m.flex(row, flex-end, center, v.$spacing-3);
+    flex-wrap: wrap;
+    padding-top: v.$spacing-5;
+    margin-top: v.$spacing-5;
+    border-top: 1px solid v.$color-border;
+
+    @include m.respond-below(sm) {
+      flex-direction: column-reverse;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  &__cancel,
+  &__confirm {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+  }
+
+  &__cancel {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+  &__confirm {
+    &--approve {
+      background-color: v.$color-success;
+      color: v.$color-white;
+
+      &:hover {
+        background-color: #227a46;
+      }
+    }
+
+    &--reject {
+      background-color: v.$color-danger;
+      color: v.$color-white;
+
+      &:hover {
+        background-color: #b8352b;
+      }
+    }
+  }
+}

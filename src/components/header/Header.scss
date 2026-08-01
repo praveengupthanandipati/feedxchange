@@ -129,7 +129,8 @@
     margin: 0;
     padding: 0;
     max-height: 22rem;
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
   }
 
   &__notification {

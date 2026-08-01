@@ -271,7 +271,7 @@ const ProductPriceTracking = () => {
   const navigate = useNavigate();
   const [rows, setRows] = useState<PriceTrackingRow[]>(initialRows);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [filtersVisible, setFiltersVisible] = useState(true);
+  const [filtersVisible, setFiltersVisible] = useState(false);
   const [pageError, setPageError] = useState("");
   const [saveToastVisible, setSaveToastVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -303,8 +303,8 @@ const ProductPriceTracking = () => {
     );
   };
 
-  const handleView = (_row: PriceTrackingRow) => {
-    navigate("/products");
+  const handleView = (row: PriceTrackingRow) => {
+    navigate(`/products/price-history?product=${encodeURIComponent(row.productName)}`);
   };
 
   const columns = useMemo(

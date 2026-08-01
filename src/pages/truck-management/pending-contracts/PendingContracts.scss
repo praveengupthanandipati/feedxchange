@@ -3,17 +3,6 @@
 
 .pending-contracts-page {
   padding-bottom: v.$spacing-6;
-
-  // Force scrollbar gutters to always render instead of relying on
-  // hover-to-reveal OS overlay scrollbars, so overflow is obvious.
-  .table-wrapper {
-    overflow-x: scroll;
-  }
-
-  .multi-select__options,
-  .searchable-select__options {
-    overflow-y: scroll;
-  }
 }
 
 .pending-contracts-card {
@@ -100,6 +89,7 @@
   &__date-range {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     height: 2.5rem;
+    min-width: 0;
     padding: 0 v.$spacing-3;
     border: 1px solid v.$color-border;
     border-radius: v.$radius-md;
@@ -373,7 +363,8 @@
 
   &__body {
     flex: 1;
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
     display: flex;
     flex-direction: column;
     gap: v.$spacing-4;
@@ -489,8 +480,9 @@
   }
 
   &__truck-header {
-    @include m.flex(row, space-between, center);
+    @include m.flex(row, space-between, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
+    flex-wrap: wrap;
     width: 100%;
     padding: v.$spacing-3 v.$spacing-4;
     border: none;
@@ -506,6 +498,7 @@
 
   &__truck-title {
     @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
     min-width: 0;
 
     svg {
@@ -520,13 +513,13 @@
     span {
       color: v.$color-text-muted;
       font-size: v.$font-size-sm;
-      white-space: nowrap;
     }
   }
 
   &__truck-meta {
     @include m.flex(row, flex-end, center, v.$spacing-3);
     flex-shrink: 0;
+    flex-wrap: wrap;
 
     > svg {
       color: v.$color-text-muted;

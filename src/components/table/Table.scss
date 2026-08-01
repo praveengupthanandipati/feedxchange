@@ -2,22 +2,26 @@
 @use "../../assets/styles/mixins" as m;
 
 .table-wrapper {
-   width: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
+  // scroll (not auto) so the horizontal scrollbar gutter always renders
+  // instead of relying on a hover-to-reveal OS overlay scrollbar. Vertical
+  // overflow is handled by the page itself, so it stays visible (not clipped).
+  overflow-x: scroll;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid v.$color-border;
-  max-height: 600px;
- }
-.table-scroll {
-   max-height: 500px; // adjust as needed
-  overflow-x: hidden;
+  scrollbar-width: thin;
+
+  &--min-height {
+    min-height: 65vh;
+  }
 }
 
 .table {
- width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
+  width: 100%;
+  min-width: 1200px;
+  border-collapse: separate;
   border-spacing: 0;
+  font-size: v.$font-size-sm;
 
   th {
     @include m.font-heading(v.$font-weight-semibold);
