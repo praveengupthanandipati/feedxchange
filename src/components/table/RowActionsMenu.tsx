@@ -8,9 +8,17 @@ interface RowActionsMenuProps {
   onDelete?: () => void;
   /** "inline" shows View/Edit/Delete as icon buttons revealed on row hover, instead of the "..." dropdown. */
   variant?: "menu" | "inline";
+  /** Which edge the dropdown opens from. Default "right" (grows left) suits an Actions column placed last; use "left" (grows right) when Actions is the first column, so the menu doesn't overhang the table's left edge. */
+  menuAlign?: "left" | "right";
 }
 
-const RowActionsMenu = ({ onEdit, onView, onDelete, variant = "menu" }: RowActionsMenuProps) => {
+const RowActionsMenu = ({
+  onEdit,
+  onView,
+  onDelete,
+  variant = "menu",
+  menuAlign = "right",
+}: RowActionsMenuProps) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -88,7 +96,7 @@ const RowActionsMenu = ({ onEdit, onView, onDelete, variant = "menu" }: RowActio
       </button>
 
       {open && (
-        <ul className="row-actions__menu">
+        <ul className={`row-actions__menu ${menuAlign === "left" ? "row-actions__menu--align-left" : ""}`}>
           {onEdit && (
             <li>
               <button

@@ -193,6 +193,7 @@
 
   &__contract-badge {
     @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
     width: 1.75rem;
     height: 1.75rem;
@@ -200,6 +201,13 @@
     background-color: v.$color-info;
     color: v.$color-white;
     font-size: 0.85rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: #1f6fae;
+    }
   }
 
   &__contract-text {

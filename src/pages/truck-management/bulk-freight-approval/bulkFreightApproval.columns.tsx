@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { FiExternalLink } from "react-icons/fi";
 import type { TableColumn } from "../../../components/table/table.types";
 import InfoTooltip from "../../../components/tooltip/InfoTooltip";
@@ -18,10 +19,14 @@ export function buildBulkFreightColumns(): TableColumn<BulkFreightRow>[] {
       sortable: true,
       render: (row) => (
         <span className="bulk-freight-table__contract">
-          {/* TODO: wire up the Assign link once the destination route is ready. */}
-          <span className="bulk-freight-table__contract-badge">
+          <Link
+            to={`/truck-management/assign-transports?contract=${encodeURIComponent(row.contractNumber)}`}
+            className="bulk-freight-table__contract-badge"
+            aria-label={`Assign transport for contract ${row.contractNumber}`}
+            title="Assign Transport"
+          >
             <FiExternalLink aria-hidden />
-          </span>
+          </Link>
           <span className="bulk-freight-table__contract-text">{row.contractNumber}</span>
         </span>
       ),
