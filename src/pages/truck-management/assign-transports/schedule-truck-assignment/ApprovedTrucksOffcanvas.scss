@@ -1,0 +1,315 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+// ============================================================
+// All Approved Trucks offcanvas (75% viewport)
+// ============================================================
+.approved-trucks-offcanvas__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-backdrop;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity v.$transition-base, visibility v.$transition-base;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.approved-trucks-offcanvas {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: v.$z-index-modal;
+  width: 75%;
+  max-width: 75%;
+  display: flex;
+  flex-direction: column;
+  background-color: v.$color-bg;
+  box-shadow: v.$shadow-lg;
+  transform: translateX(100%);
+  transition: transform v.$transition-base;
+
+  &.is-open {
+    transform: translateX(0);
+  }
+
+  @include m.respond-below(lg) {
+    width: 90%;
+    max-width: 90%;
+  }
+
+  @include m.respond-below(sm) {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-shrink: 0;
+    padding: v.$spacing-4 v.$spacing-5;
+    border-bottom: 1px solid v.$color-border;
+
+    h2 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      color: v.$color-primary;
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: transparent;
+    color: v.$color-text-muted;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+    padding: v.$spacing-5;
+  }
+
+  // Stat cards
+  // Sized with auto-fit (not viewport breakpoints): this panel is always a
+  // fraction of the viewport width, so columns must respond to the panel's
+  // own rendered width, not the window's.
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: v.$spacing-3;
+  }
+
+  &__stat {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    padding: v.$spacing-3 v.$spacing-4;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    min-width: 0;
+
+    &--navy {
+      background: linear-gradient(135deg, v.$color-navy 0%, v.$color-navy-dark 100%);
+    }
+
+    &--success {
+      background: linear-gradient(135deg, v.$color-success 0%, #1d7a46 100%);
+    }
+
+    &--info {
+      background: linear-gradient(135deg, v.$color-info 0%, #1f6fae 100%);
+    }
+
+    &--warning {
+      background: linear-gradient(135deg, v.$color-orange 0%, v.$color-orange-dark 100%);
+    }
+
+    &--danger {
+      background: linear-gradient(135deg, v.$color-danger 0%, #b8352b 100%);
+    }
+  }
+
+  &__stat-icon {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-white, 0.2);
+    font-size: 1rem;
+  }
+
+  &__stat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+
+    span {
+      @include m.font-heading(v.$font-weight-semibold);
+      font-size: 0.7rem;
+      opacity: 0.9;
+    }
+
+    strong {
+      @include m.font-heading(v.$font-weight-bold);
+      @include m.clamp-lines(2);
+      font-size: v.$font-size-sm;
+      white-space: normal;
+      word-break: break-word;
+    }
+  }
+
+  // Search
+  &__search {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    padding: 0 v.$spacing-3;
+    height: 2.5rem;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text-muted;
+    flex-shrink: 0;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    input {
+      @include m.font-base;
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+
+      &::placeholder {
+        color: v.$color-gray-400;
+      }
+    }
+  }
+
+  // Table
+  &__table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid v.$color-border;
+    scrollbar-width: thin;
+
+    // overflow-x: auto forces overflow-y to compute as auto too (per the
+    // CSS overflow spec), which would otherwise clip the row actions
+    // dropdown menu when it opens on the last row.
+    min-height: 400px;
+  }
+
+  &__table {
+    width: 100%;
+    min-width: 50rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: v.$font-size-sm;
+
+    th {
+      @include m.font-heading(v.$font-weight-semibold);
+      padding: v.$spacing-3 v.$spacing-4;
+      background-color: v.$color-navy;
+      color: v.$color-white;
+      font-size: v.$font-size-sm;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: v.$spacing-3 v.$spacing-4;
+      color: v.$color-text;
+      white-space: nowrap;
+      border-top: 1px solid v.$color-border;
+    }
+
+    tbody tr {
+      transition: background-color v.$transition-fast;
+
+      &:hover {
+        background-color: v.$color-bg-muted;
+      }
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    white-space: normal;
+    color: v.$color-text-muted;
+  }
+
+  &__track-link {
+    @include m.flex(row, center, center, v.$spacing-1);
+    @include m.focus-ring(v.$color-orange);
+    display: inline-flex;
+    padding: 0.2rem v.$spacing-3;
+    border: 1px solid v.$color-info;
+    border-radius: v.$radius-pill;
+    color: v.$color-info;
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-info;
+      color: v.$color-white;
+    }
+  }
+
+  // Pagination
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+
+    p {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      margin: 0;
+    }
+  }
+
+  &__pagination-controls {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-bg-muted;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}

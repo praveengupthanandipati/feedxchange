@@ -42,6 +42,7 @@ interface TruckTrackingDrawerProps {
 }
 
 const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) => {
+  const navigate = useNavigate();
   const [expandedTrucks, setExpandedTrucks] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -68,9 +69,9 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
     });
   };
 
-  const handleExpandAll = () => {
+  const handleAddViewTrucks = () => {
     if (!row) return;
-    setExpandedTrucks(new Set(row.trucks.map((truck) => truck.truckNumber)));
+    navigate(`/truck-management/assign-transports?contract=${encodeURIComponent(row.id)}`);
   };
 
   const handleShare = (truck: TruckAssignment) => {
@@ -121,7 +122,7 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
                 <button
                   type="button"
                   className="truck-tracking-drawer__add-btn"
-                  onClick={handleExpandAll}
+                  onClick={handleAddViewTrucks}
                 >
                   <FiPlus aria-hidden /> Add / View Trucks
                 </button>

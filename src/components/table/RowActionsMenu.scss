@@ -28,6 +28,11 @@
     top: calc(100% + #{v.$spacing-1});
     right: 0;
     min-width: 140px;
+
+    &--align-left {
+      right: auto;
+      left: 0;
+    }
     list-style: none;
     margin: 0;
     padding: v.$spacing-2;

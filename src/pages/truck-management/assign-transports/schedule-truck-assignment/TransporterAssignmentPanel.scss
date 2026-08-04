@@ -1,0 +1,197 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+// ============================================================
+// Inline "Add / View Transporters" expanded row panel
+// ============================================================
+.transporter-assignment-panel {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  padding: v.$spacing-4;
+  background-color: v.$color-bg-muted;
+  border-top: 3px solid v.$color-orange;
+
+  @include m.respond-to(md) {
+    padding: v.$spacing-5;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    h3 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      @include m.font-heading(v.$font-weight-semibold);
+      color: v.$color-primary;
+      font-size: v.$font-size-base;
+      margin: 0;
+    }
+  }
+
+  &__header-actions {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, opacity v.$transition-fast;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--save {
+      background-color: v.$color-primary;
+      color: v.$color-white;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-primary-dark;
+      }
+    }
+
+    &--send {
+      background-color: v.$color-success;
+      color: v.$color-white;
+
+      &:hover:not(:disabled) {
+        background-color: #227a46;
+      }
+    }
+  }
+
+  &__table {
+    // Nested table already provides its own horizontal scroll for small viewports.
+    min-width: 0;
+
+    // The wrapper's overflow-x: scroll forces overflow-y to compute as auto
+    // (per the CSS overflow spec, an axis can't stay "visible" while its
+    // sibling axis isn't), which clips the transporter-name dropdown panel
+    // when the table is too short. A fixed floor gives it room to open
+    // without being cut off.
+    .table-wrapper {
+      min-height: 400px;
+    }
+
+    // Extra breathing room between columns, and true vertical centering for
+    // every cell — table cells default to vertical-align: baseline unless
+    // set explicitly, which left the checkbox column sitting high next to
+    // the taller input/select controls in the other columns.
+    th,
+    td {
+      padding: v.$spacing-3 v.$spacing-5;
+      vertical-align: middle;
+    }
+
+    .table__select-col {
+      vertical-align: middle;
+    }
+  }
+
+  &__footer {
+    @include m.flex(row, flex-end, center);
+  }
+
+  &__approved-link {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    padding: v.$spacing-2 0;
+    border: none;
+    background: transparent;
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: v.$color-primary-dark;
+    }
+  }
+}
+
+// ============================================================
+// Editable transporter table cells (rendered via Table's column.render)
+// ============================================================
+.transporter-assignment-table {
+  // Explicit positioning context for the Transporter Name cell so its
+  // dropdown panel (position: absolute) anchors to the cell, not some
+  // ancestor. Every row shares this class, so the raised z-index only
+  // applies while a cell's dropdown is actually open (:focus-within) —
+  // giving every row a static z-index would just make later rows paint
+  // over an earlier row's open panel, tie-broken by DOM order.
+  &__name-cell {
+    position: relative;
+    min-width: 10rem;
+
+    .searchable-select:focus-within {
+      position: relative;
+      z-index: 2;
+    }
+  }
+
+  &__control {
+    @include m.font-base;
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    min-width: 8rem;
+    height: 2.25rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+
+    &--narrow {
+      min-width: 5rem;
+    }
+  }
+
+  &__row-actions {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+  }
+
+  &__icon-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 1.85rem;
+    height: 1.85rem;
+    flex-shrink: 0;
+    border: none;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: filter v.$transition-fast;
+
+    &:hover {
+      filter: brightness(0.92);
+    }
+
+    &--add {
+      background-color: v.$color-success;
+    }
+  }
+}

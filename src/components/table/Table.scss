@@ -114,6 +114,17 @@
     &.is-selected {
       background-color: rgba(v.$color-orange, 0.06);
     }
+
+    &.table__expanded-row {
+      &:hover {
+        background-color: transparent;
+      }
+
+      td {
+        padding: 0;
+        white-space: normal;
+      }
+    }
   }
 
   td {
