@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLazyGetAllContractsForExcelQuery,useGetAllContractsByFiltersQuery } from "../../../store/pendingContractApi";
 import {
   FiEye,
   FiEyeOff,
@@ -24,7 +25,6 @@ import Table from "../../../components/table/Table";
 import type { TableColumn } from "../../../components/table/table.types";
 import { buildPendingContractColumns } from "./pendingContracts.columns";
 import {
-  pendingContracts,
   sellerOptions,
   buyerOptions,
   deliveryScheduleOptions,
@@ -270,6 +270,13 @@ function escapeHtml(value: string) {
 }
 
 const PendingContracts = () => {
+  const {data,isLoading,error,} = useGetAllContractsByFiltersQuery({
+  Status: "pending",
+  SearchText: "",
+});
+
+  const [downloadExcel] = useLazyGetAllContractsForExcelQuery();
+
   const [sellerFilter, setSellerFilter] = useState<string[]>([]);
   const [buyerFilter, setBuyerFilter] = useState<string[]>([]);
   const [dateFrom, setDateFrom] = useState("");
@@ -280,6 +287,26 @@ const PendingContracts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [truckDrawerOpen, setTruckDrawerOpen] = useState(false);
   const [truckDrawerRow, setTruckDrawerRow] = useState<PendingContractRow | null>(null);
+
+  useEffect(() => {
+  console.log(data);
+}, [data]);
+
+  const handleDownloadExcel = async () => {
+    try {
+      const result = await downloadExcel().unwrap();
+      const url = window.URL.createObjectURL(result);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "Contracts.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Excel Download Failed", err);
+    }
+  };
 
   const handleOpenTruckDetails = (row: PendingContractRow) => {
     setTruckDrawerRow(row);
@@ -296,24 +323,63 @@ const PendingContracts = () => {
   }, [sellerFilter, buyerFilter, dateFrom, dateTo, scheduleFilter, keyword]);
 
   const filteredRows = useMemo(() => {
-    const q = keyword.trim().toLowerCase();
+  const q = keyword.trim().toLowerCase();
 
-    return pendingContracts.filter((row) => {
-      if (sellerFilter.length > 0 && !sellerFilter.includes(row.seller)) return false;
-      if (buyerFilter.length > 0 && !buyerFilter.includes(row.buyer)) return false;
-      if (scheduleFilter !== "All" && row.deliverySchedule !== scheduleFilter) return false;
+  const contracts = data ?? [];
 
-      if (dateFrom && row.dateValue < new Date(dateFrom).getTime()) return false;
-      if (dateTo && row.dateValue > new Date(dateTo).getTime() + 24 * 60 * 60 * 1000 - 1) return false;
+  return contracts.filter((row: PendingContractRow) => {
+    if (sellerFilter.length > 0 && !sellerFilter.includes(row.seller))
+      return false;
 
-      if (q) {
-        const haystack = [row.id, row.seller, row.buyer, row.product].join(" ").toLowerCase();
-        if (!haystack.includes(q)) return false;
-      }
+    if (buyerFilter.length > 0 && !buyerFilter.includes(row.buyer))
+      return false;
 
-      return true;
-    });
-  }, [sellerFilter, buyerFilter, scheduleFilter, dateFrom, dateTo, keyword]);
+    if (
+      scheduleFilter !== "All" &&
+      row.deliverySchedule !== scheduleFilter
+    )
+      return false;
+
+    if (
+      dateFrom &&
+      row.dateValue < new Date(dateFrom).getTime()
+    )
+      return false;
+
+    if (
+      dateTo &&
+      row.dateValue >
+        new Date(dateTo).getTime() +
+          24 * 60 * 60 * 1000 -
+          1
+    )
+      return false;
+
+    if (q) {
+      const haystack = [
+        row.id,
+        row.seller,
+        row.buyer,
+        row.product,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      if (!haystack.includes(q))
+        return false;
+    }
+
+    return true;
+  });
+}, [
+  data,
+  sellerFilter,
+  buyerFilter,
+  scheduleFilter,
+  dateFrom,
+  dateTo,
+  keyword,
+]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -331,12 +397,12 @@ const PendingContracts = () => {
     setKeyword("");
   };
 
-  const handleExport = () => {
+  const handleExportToExcel = () => {
     const headerRow = pendingContractColumns
       .map((column) => `<th>${escapeHtml(column.header)}</th>`)
       .join("");
     const bodyRows = filteredRows
-      .map((row) => {
+      .map((row ) => {
         const cells = pendingContractColumns
           .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
           .join("");
@@ -373,7 +439,7 @@ const PendingContracts = () => {
             <button
               type="button"
               className="pending-contracts-btn pending-contracts-btn--warning"
-              onClick={handleExport}
+              onClick={handleDownloadExcel}
             >
               <FiDownload aria-hidden /> Export
             </button>
