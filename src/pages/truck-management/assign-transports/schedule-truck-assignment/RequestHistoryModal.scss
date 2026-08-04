@@ -1,0 +1,139 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.request-history-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-backdrop;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-4;
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity v.$transition-base, visibility v.$transition-base;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.request-history-modal {
+  @include m.card(v.$spacing-6);
+  position: relative;
+  z-index: v.$z-index-modal;
+  width: 100%;
+  // "lg" modal size, matching Bootstrap's .modal-lg (800px).
+  max-width: 50rem;
+  max-height: calc(100vh - #{v.$spacing-6});
+  display: flex;
+  flex-direction: column;
+  transform: translateY(-1rem) scale(0.97);
+  opacity: 0;
+  transition: transform v.$transition-base, opacity v.$transition-base;
+
+  &.is-open {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    padding-bottom: v.$spacing-4;
+    margin-bottom: v.$spacing-4;
+    border-bottom: 1px solid v.$color-border;
+
+    h2 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      color: v.$color-primary;
+      font-size: v.$font-size-lg;
+      margin: 0;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-base;
+      }
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background: transparent;
+    color: v.$color-text-muted;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+    }
+  }
+
+  &__body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  &__table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+  }
+
+  &__table {
+    width: 100%;
+    min-width: 32rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: v.$font-size-sm;
+
+    th {
+      @include m.font-heading(v.$font-weight-semibold);
+      padding: v.$spacing-3 v.$spacing-4;
+      background-color: v.$color-navy;
+      color: v.$color-white;
+      font-size: v.$font-size-sm;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: v.$spacing-3 v.$spacing-4;
+      color: v.$color-text;
+      white-space: nowrap;
+      border-top: 1px solid v.$color-border;
+    }
+  }
+
+  &__amount {
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: v.$radius-pill;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+
+    &--agreed {
+      background-color: v.$color-success;
+      color: v.$color-white;
+    }
+
+    &--rejected {
+      background-color: v.$color-danger;
+      color: v.$color-white;
+    }
+  }
+}

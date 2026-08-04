@@ -109,8 +109,6 @@ const ScheduleRequestDrawer = ({
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
 
-  if (!open) return null;
-
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
@@ -171,9 +169,9 @@ const ScheduleRequestDrawer = ({
 
   return createPortal(
     <>
-      <div className="schedule-request-drawer__backdrop is-open" onClick={onClose} />
+      <div className={`schedule-request-drawer__backdrop ${open ? "is-open" : ""}`} onClick={onClose} />
       <div
-        className="schedule-request-drawer is-open"
+        className={`schedule-request-drawer ${open ? "is-open" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="schedule-request-drawer-title"

@@ -1,11 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { FiMoreVertical, FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
+import type { IconType } from "react-icons";
 import "./RowActionsMenu.scss";
+
+export interface RowAction {
+  key: string;
+  label: string;
+  icon: IconType;
+  onClick: () => void;
+  danger?: boolean;
+}
 
 interface RowActionsMenuProps {
   onEdit?: () => void;
   onView?: () => void;
   onDelete?: () => void;
+  /** Arbitrary menu items, for tables whose actions don't fit the Edit/View/Delete shape. Takes over the dropdown's contents; onEdit/onView/onDelete are ignored when this is set. */
+  actions?: RowAction[];
   /** "inline" shows View/Edit/Delete as icon buttons revealed on row hover, instead of the "..." dropdown. */
   variant?: "menu" | "inline";
   /** Which edge the dropdown opens from. Default "right" (grows left) suits an Actions column placed last; use "left" (grows right) when Actions is the first column, so the menu doesn't overhang the table's left edge. */
@@ -16,6 +27,7 @@ const RowActionsMenu = ({
   onEdit,
   onView,
   onDelete,
+  actions,
   variant = "menu",
   menuAlign = "right",
 }: RowActionsMenuProps) => {
@@ -97,48 +109,68 @@ const RowActionsMenu = ({
 
       {open && (
         <ul className={`row-actions__menu ${menuAlign === "left" ? "row-actions__menu--align-left" : ""}`}>
-          {onEdit && (
-            <li>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  onEdit();
-                }}
-              >
-                <FiEdit2 aria-hidden />
-                Edit
-              </button>
-            </li>
-          )}
-          {onView && (
-            <li>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  onView();
-                }}
-              >
-                <FiEye aria-hidden />
-                View
-              </button>
-            </li>
-          )}
-          {onDelete && (
-            <li>
-              <button
-                type="button"
-                className="row-actions__item--danger"
-                onClick={() => {
-                  setOpen(false);
-                  onDelete();
-                }}
-              >
-                <FiTrash2 aria-hidden />
-                Delete
-              </button>
-            </li>
+          {actions ? (
+            actions.map((action) => (
+              <li key={action.key}>
+                <button
+                  type="button"
+                  className={action.danger ? "row-actions__item--danger" : ""}
+                  onClick={() => {
+                    setOpen(false);
+                    action.onClick();
+                  }}
+                >
+                  <action.icon aria-hidden />
+                  {action.label}
+                </button>
+              </li>
+            ))
+          ) : (
+            <>
+              {onEdit && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      onEdit();
+                    }}
+                  >
+                    <FiEdit2 aria-hidden />
+                    Edit
+                  </button>
+                </li>
+              )}
+              {onView && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      onView();
+                    }}
+                  >
+                    <FiEye aria-hidden />
+                    View
+                  </button>
+                </li>
+              )}
+              {onDelete && (
+                <li>
+                  <button
+                    type="button"
+                    className="row-actions__item--danger"
+                    onClick={() => {
+                      setOpen(false);
+                      onDelete();
+                    }}
+                  >
+                    <FiTrash2 aria-hidden />
+                    Delete
+                  </button>
+                </li>
+              )}
+            </>
           )}
         </ul>
       )}

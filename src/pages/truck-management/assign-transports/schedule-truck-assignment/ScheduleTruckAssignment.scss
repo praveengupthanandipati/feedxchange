@@ -94,6 +94,15 @@
     &:hover {
       background-color: v.$color-primary-dark;
     }
+
+    &.is-active {
+      background-color: v.$color-orange;
+      color: v.$color-navy-dark;
+
+      &:hover {
+        background-color: v.$color-orange-dark;
+      }
+    }
   }
 
   &__update-btn {

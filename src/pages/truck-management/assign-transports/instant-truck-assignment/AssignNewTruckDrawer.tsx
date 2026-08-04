@@ -111,8 +111,6 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
 
-  if (!open) return null;
-
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
@@ -189,9 +187,9 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
 
   return createPortal(
     <>
-      <div className="assign-truck-drawer__backdrop is-open" onClick={onClose} />
+      <div className={`assign-truck-drawer__backdrop ${open ? "is-open" : ""}`} onClick={onClose} />
       <div
-        className="assign-truck-drawer is-open"
+        className={`assign-truck-drawer ${open ? "is-open" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="assign-truck-drawer-title"

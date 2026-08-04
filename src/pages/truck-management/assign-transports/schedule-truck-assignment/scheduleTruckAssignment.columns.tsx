@@ -1,4 +1,4 @@
-import { FiEdit2, FiCheckCircle, FiXCircle, FiTruck } from "react-icons/fi";
+import { FiEdit2, FiCheckCircle, FiXCircle, FiTruck, FiChevronUp } from "react-icons/fi";
 import RowActionsMenu from "../../../../components/table/RowActionsMenu";
 import type { TableColumn } from "../../../../components/table/table.types";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
@@ -6,11 +6,15 @@ import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 interface ColumnHandlers {
   onEdit: (row: ScheduleTruckRow) => void;
   onDelete: (row: ScheduleTruckRow) => void;
+  expandedRowId: string | null;
+  onToggleTrucks: (row: ScheduleTruckRow) => void;
 }
 
 export function buildScheduleTruckColumns({
   onEdit,
   onDelete,
+  expandedRowId,
+  onToggleTrucks,
 }: ColumnHandlers): TableColumn<ScheduleTruckRow>[] {
   return [
     {
@@ -46,12 +50,20 @@ export function buildScheduleTruckColumns({
     {
       key: "trucks",
       header: "Trucks",
-      // TODO: wire up once per-schedule truck tracking is ready.
-      render: () => (
-        <button type="button" className="schedule-truck-table__trucks-btn" title="Add / View Trucks">
-          <FiTruck aria-hidden /> Add/View
-        </button>
-      ),
+      render: (row) => {
+        const isExpanded = expandedRowId === row.id;
+        return (
+          <button
+            type="button"
+            className={`schedule-truck-table__trucks-btn ${isExpanded ? "is-active" : ""}`}
+            title={isExpanded ? "Hide Trucks" : "Add / View Trucks"}
+            onClick={() => onToggleTrucks(row)}
+          >
+            {isExpanded ? <FiChevronUp aria-hidden /> : <FiTruck aria-hidden />}
+            {isExpanded ? "Hide" : "Add/View"}
+          </button>
+        );
+      },
       exportValue: (row) => String(row.trucksAssigned),
     },
     {

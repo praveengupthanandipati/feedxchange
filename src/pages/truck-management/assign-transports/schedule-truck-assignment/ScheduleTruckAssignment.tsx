@@ -5,6 +5,7 @@ import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import { buildScheduleTruckColumns } from "./scheduleTruckAssignment.columns";
 import { scheduleTruckRows as seedRows, type ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 import ScheduleRequestDrawer from "./ScheduleRequestDrawer";
+import TransporterAssignmentPanel from "./TransporterAssignmentPanel";
 import "./ScheduleTruckAssignment.scss";
 
 const ScheduleTruckAssignment = () => {
@@ -12,6 +13,11 @@ const ScheduleTruckAssignment = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<ScheduleTruckRow | null>(null);
   const [rowPendingDelete, setRowPendingDelete] = useState<ScheduleTruckRow | null>(null);
+  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+
+  const handleToggleTrucks = (row: ScheduleTruckRow) => {
+    setExpandedRowId((prev) => (prev === row.id ? null : row.id));
+  };
 
   const handleOpenNew = () => {
     setEditingRow(null);
@@ -40,8 +46,10 @@ const ScheduleTruckAssignment = () => {
       buildScheduleTruckColumns({
         onEdit: handleOpenEdit,
         onDelete: (row) => setRowPendingDelete(row),
+        expandedRowId,
+        onToggleTrucks: handleToggleTrucks,
       }),
-    [],
+    [expandedRowId],
   );
 
   return (
@@ -62,6 +70,8 @@ const ScheduleTruckAssignment = () => {
         data={rows}
         rowKey={(row) => row.id}
         emptyMessage="No scheduled truck requests yet for this contract."
+        expandedRowKey={expandedRowId}
+        renderExpandedRow={(row) => <TransporterAssignmentPanel scheduleRow={row} />}
       />
 
       <ScheduleRequestDrawer
