@@ -41,6 +41,7 @@ import PriceHistory from './pages/product-management/price-history/ProductPrieHi
 import FormulaCalculations from './pages/product-management/formula-calculations/FormulaCalculations'
 import PendingContracts from './pages/truck-management/pending-contracts/PendingContracts'
 import BulkFreightApproval from './pages/truck-management/bulk-freight-approval/BulkFreightApproval'
+import Assigntransports from './pages/truck-management/assign-transports/Assigntransports'
 
 function App() {
   return (
@@ -92,6 +93,7 @@ function App() {
           <Route path="/products/formula-calculations" element={<FormulaCalculations />} />
           <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
           <Route path="/truck-management/bulk-freight-approval" element={<BulkFreightApproval />} />
+          <Route path="/truck-management/assign-transports" element={<Assigntransports />} />
         </Route>
       </Routes>
     </Router>

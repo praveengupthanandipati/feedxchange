@@ -136,3 +136,7 @@ $z-index-modal-backdrop: 1040;
 $z-index-modal: 1050;
 $z-index-popover: 1060;
 $z-index-tooltip: 1070;
+// Confirmation dialogs must always win over any other overlay — including
+// another modal or an offcanvas panel — since they can be triggered from
+// inside one (e.g. deleting a row from within an already-open drawer).
+$z-index-modal-top: 1080;

@@ -1,0 +1,240 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.assign-transports-page {
+  padding-bottom: v.$spacing-6;
+}
+
+.assign-transports-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      color: v.$color-text;
+      font-size: v.$font-size-lg;
+      font-weight: v.$font-weight-semibold;
+      margin: 0;
+    }
+  }
+
+  &__contract-no {
+    color: v.$color-primary;
+  }
+
+  &__back {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    text-decoration: none;
+
+    &:hover {
+      color: v.$color-primary-dark;
+      text-decoration: underline;
+    }
+  }
+}
+
+// ============================================================
+// Stat cards
+// ============================================================
+.assign-transports-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include m.respond-to(lg) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  &__card {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    padding: v.$spacing-3 v.$spacing-4;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+
+    &--navy {
+      background: linear-gradient(135deg, v.$color-navy 0%, v.$color-navy-dark 100%);
+    }
+
+    &--success {
+      background: linear-gradient(135deg, v.$color-success 0%, #1d7a46 100%);
+    }
+
+    &--info {
+      background: linear-gradient(135deg, v.$color-info 0%, #1f6fae 100%);
+    }
+
+    &--warning {
+      background: linear-gradient(135deg, v.$color-orange 0%, v.$color-orange-dark 100%);
+    }
+
+    &--danger {
+      background: linear-gradient(135deg, v.$color-danger 0%, #b8352b 100%);
+    }
+  }
+
+  &__icon {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-white, 0.2);
+    font-size: 1.1rem;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  &__label {
+    @include m.font-heading(v.$font-weight-semibold);
+    font-size: v.$font-size-sm;
+    opacity: 0.9;
+  }
+
+  &__body strong {
+    @include m.font-heading(v.$font-weight-bold);
+    font-size: v.$font-size-lg;
+  }
+}
+
+// ============================================================
+// Contract details
+// ============================================================
+.assign-transports-details {
+  padding: v.$spacing-4;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg-muted;
+
+  @include m.respond-to(md) {
+    padding: v.$spacing-5;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+    margin-bottom: v.$spacing-4;
+
+    h2 {
+      color: v.$color-primary;
+      font-size: v.$font-size-base;
+      margin: 0;
+    }
+  }
+
+  &__toggle {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    cursor: pointer;
+
+    &:hover {
+      color: v.$color-primary-dark;
+      text-decoration: underline;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+
+    &--full {
+      grid-column: 1 / -1;
+    }
+
+    span {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+
+    strong {
+      @include m.font-heading(v.$font-weight-semibold);
+      color: v.$color-text;
+      word-break: break-word;
+    }
+  }
+}
+
+// ============================================================
+// Tabs
+// ============================================================
+.assign-transports-tabs-section {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__title {
+    color: v.$color-primary;
+    font-size: v.$font-size-base;
+    margin: 0;
+  }
+}
+
+.assign-transports-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  overflow: hidden;
+
+  &__tab {
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    flex: 1 1 12rem;
+    height: 2.75rem;
+    border: none;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover:not(.is-active) {
+      background-color: v.$color-gray-50;
+    }
+
+    &.is-active {
+      background-color: v.$color-navy;
+      color: v.$color-white;
+    }
+  }
+}

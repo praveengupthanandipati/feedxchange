@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { FiChevronUp, FiChevronDown, FiAlertCircle } from "react-icons/fi";
 import InfoTooltip from "../tooltip/InfoTooltip";
 import type { SortDirection, TableColumn } from "./table.types";
@@ -15,6 +16,10 @@ interface TableProps<T> {
   emptyMessage?: string;
   /** When true, the table wrapper gets a min-height of 63vh instead of hugging its content. */
   minHeight?: boolean;
+  /** Key of the row currently showing its expanded detail panel. */
+  expandedRowKey?: string | null;
+  /** Renders a full-width panel in a row inserted directly below the row matching `expandedRowKey`. */
+  renderExpandedRow?: (row: T) => ReactNode;
 }
 
 function defaultSortValue<T>(row: T, key: string): string | number {
@@ -59,6 +64,8 @@ function Table<T>({
   onSelectAll,
   emptyMessage = "Currently no records found.",
   minHeight = false,
+  expandedRowKey = null,
+  renderExpandedRow,
 }: TableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
@@ -157,26 +164,36 @@ function Table<T>({
             sortedData.map((row) => {
               const key = rowKey(row);
               const isSelected = selectedSet.has(key);
+              const isExpanded = Boolean(renderExpandedRow) && expandedRowKey === key;
               return (
-                <tr key={key} className={isSelected ? "is-selected" : ""}>
-                  {selectable && (
-                    <td className="table__select-col">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => onSelectRow?.(key)}
-                        aria-label={`Select row ${key}`}
-                      />
-                    </td>
+                <Fragment key={key}>
+                  <tr className={isSelected ? "is-selected" : ""}>
+                    {selectable && (
+                      <td className="table__select-col">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => onSelectRow?.(key)}
+                          aria-label={`Select row ${key}`}
+                        />
+                      </td>
+                    )}
+                    {columns.map((column) => (
+                      <td key={column.key} style={{ textAlign: column.align }}>
+                        {column.render
+                          ? column.render(row)
+                          : String((row as Record<string, unknown>)[column.key] ?? "")}
+                      </td>
+                    ))}
+                  </tr>
+                  {isExpanded && (
+                    <tr className="table__expanded-row">
+                      <td colSpan={columns.length + (selectable ? 1 : 0)}>
+                        {renderExpandedRow!(row)}
+                      </td>
+                    </tr>
                   )}
-                  {columns.map((column) => (
-                    <td key={column.key} style={{ textAlign: column.align }}>
-                      {column.render
-                        ? column.render(row)
-                        : String((row as Record<string, unknown>)[column.key] ?? "")}
-                    </td>
-                  ))}
-                </tr>
+                </Fragment>
               );
             })
           )}

@@ -4,7 +4,7 @@
 .confirm-dialog__backdrop {
   position: fixed;
   inset: 0;
-  z-index: v.$z-index-modal-backdrop;
+  z-index: v.$z-index-modal-top;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -15,7 +15,7 @@
 .confirm-dialog {
   @include m.card(v.$spacing-6);
   position: relative;
-  z-index: v.$z-index-modal;
+  z-index: v.$z-index-modal-top;
   width: 100%;
   max-width: 24rem;
   text-align: center;
