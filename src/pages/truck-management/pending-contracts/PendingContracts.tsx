@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
+  
+  useGetAllContractsByFiltersQuery,
+  useLazyGetAllContractsForExcelQuery,
+ 
+} from "../../../store/pendingContractApi";
+import {
   FiEye,
   FiEyeOff,
   FiDownload,
@@ -42,7 +48,6 @@ interface TruckTrackingDrawerProps {
 }
 
 const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) => {
-  const navigate = useNavigate();
   const [expandedTrucks, setExpandedTrucks] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -69,9 +74,9 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
     });
   };
 
-  const handleAddViewTrucks = () => {
+  const handleExpandAll = () => {
     if (!row) return;
-    navigate(`/truck-management/assign-transports?contract=${encodeURIComponent(row.id)}`);
+    setExpandedTrucks(new Set(row.trucks.map((truck) => truck.truckNumber)));
   };
 
   const handleShare = (truck: TruckAssignment) => {
@@ -122,7 +127,7 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
                 <button
                   type="button"
                   className="truck-tracking-drawer__add-btn"
-                  onClick={handleAddViewTrucks}
+                  onClick={handleExpandAll}
                 >
                   <FiPlus aria-hidden /> Add / View Trucks
                 </button>
@@ -271,16 +276,56 @@ function escapeHtml(value: string) {
 }
 
 const PendingContracts = () => {
+
+
+  const [downloadExcel] = useLazyGetAllContractsForExcelQuery();
+
   const [sellerFilter, setSellerFilter] = useState<string[]>([]);
   const [buyerFilter, setBuyerFilter] = useState<string[]>([]);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [scheduleFilter, setScheduleFilter] = useState("All");
+  const [scheduleFilter, setScheduleFilter] = useState("Pending");
   const [keyword, setKeyword] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [truckDrawerOpen, setTruckDrawerOpen] = useState(false);
   const [truckDrawerRow, setTruckDrawerRow] = useState<PendingContractRow | null>(null);
+
+  const searchKeyword = keyword.trim();
+
+  // Single source of truth for the filters query — backend only accepts
+  // Status and SearchText (confirmed via Swagger). Fires whenever there's
+  // a search keyword; skipped when the search box is empty.
+  const {
+    data: filteredContracts,
+    isLoading, 
+    error,
+  } = useGetAllContractsByFiltersQuery(
+    {
+      Status: scheduleFilter,
+      SearchText: keyword.trim(),
+    });
+
+  useEffect(() => {
+   
+  }, [filteredContracts, isLoading, error]);
+
+  const handleDownloadExcel = async () => {
+    try {
+      const result = await downloadExcel().unwrap();
+      const url = window.URL.createObjectURL(result);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "Contracts.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Excel Download Failed", err);
+    }
+  };
+
 
   const handleOpenTruckDetails = (row: PendingContractRow) => {
     setTruckDrawerRow(row);
@@ -332,7 +377,7 @@ const PendingContracts = () => {
     setKeyword("");
   };
 
-  const handleExport = () => {
+  const handleExportToExcel = () => {
     const headerRow = pendingContractColumns
       .map((column) => `<th>${escapeHtml(column.header)}</th>`)
       .join("");
@@ -374,7 +419,7 @@ const PendingContracts = () => {
             <button
               type="button"
               className="pending-contracts-btn pending-contracts-btn--warning"
-              onClick={handleExport}
+              onClick={handleDownloadExcel}
             >
               <FiDownload aria-hidden /> Export
             </button>
