@@ -42,6 +42,12 @@ import FormulaCalculations from './pages/product-management/formula-calculations
 import PendingContracts from './pages/truck-management/pending-contracts/PendingContracts'
 import BulkFreightApproval from './pages/truck-management/bulk-freight-approval/BulkFreightApproval'
 import Assigntransports from './pages/truck-management/assign-transports/Assigntransports'
+import DriversList from './pages/transporters/drivers/drivers-list/DriversList'
+import DriverNew from './pages/transporters/drivers/driver-create/NewDriver'
+import DriverView from './pages/transporters/drivers/driver-view/DriverView'
+import TrucksList from './pages/transporters/truck-master/trucks-list/TrucksList'
+import TruckNew from './pages/transporters/truck-master/truck-new/TruckNew'
+import TrucksView from './pages/transporters/truck-master/truck-view/TruckView'
 
 function App() {
   return (
@@ -94,6 +100,12 @@ function App() {
           <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
           <Route path="/truck-management/bulk-freight-approval" element={<BulkFreightApproval />} />
           <Route path="/truck-management/assign-transports" element={<Assigntransports />} />
+          <Route path="/truck-management/transporters/driver-master" element={<DriversList />} />
+          <Route path="/truck-management/transporters/driver-master/new" element={<DriverNew />} />
+          <Route path="/truck-management/transporters/driver-master/:id" element={<DriverView />} />
+          <Route path="/truck-management/transporters/truck-master" element={<TrucksList />} />
+          <Route path="/truck-management/transporters/truck-master/new" element={<TruckNew />} />
+          <Route path="/truck-management/transporters/truck-master/:id" element={<TrucksView />} />
         </Route>
       </Routes>
     </Router>

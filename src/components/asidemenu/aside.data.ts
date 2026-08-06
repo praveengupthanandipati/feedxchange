@@ -89,6 +89,11 @@ export const asideNavSections: AsideNavSection[] = [
             label: "Truck Master",
             path: "/truck-management/transporters/truck-master",
           },
+           {
+            id: "driver-master",
+            label: "Drivers Master",
+            path: "/truck-management/transporters/driver-master",
+          },
         ],
       },
       {
