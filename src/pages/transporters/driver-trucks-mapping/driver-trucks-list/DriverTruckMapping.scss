@@ -1,0 +1,160 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.driver-truck-mapping-page {
+  padding-bottom: v.$spacing-6;
+}
+
+.driver-truck-mapping-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    flex-wrap: wrap;
+  }
+}
+
+.driver-truck-mapping-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+
+  &--outline {
+    background-color: v.$color-white;
+    color: v.$color-primary;
+    border: 1px solid v.$color-border;
+
+    &:hover {
+      background-color: v.$color-gray-50;
+    }
+  }
+
+  &--warning {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+  &--primary {
+    background-color: v.$color-navy;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-navy-dark;
+    }
+  }
+}
+
+// ============================================================
+// Filters
+// ============================================================
+.driver-truck-mapping-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+  padding: v.$spacing-4;
+  background-color: v.$color-bg-muted;
+  border-radius: v.$radius-md;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.driver-truck-mapping {
+  &__link {
+    border: none;
+    background: none;
+    padding: 0;
+    color: v.$color-primary;
+    text-decoration: underline;
+    text-decoration-color: rgba(v.$color-primary, 0.4);
+    font-weight: v.$font-weight-medium;
+    font-size: inherit;
+    cursor: pointer;
+
+    &:hover {
+      color: v.$color-primary-dark;
+      text-decoration-color: currentColor;
+    }
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.driver-truck-mapping-pagination {
+  @include m.flex(row, space-between, center);
+  flex-wrap: wrap;
+  gap: v.$spacing-3;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2.25rem;
+      height: 2.25rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-gray-100;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
