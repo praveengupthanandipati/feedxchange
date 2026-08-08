@@ -1,0 +1,73 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.complete-trip-modal {
+  max-width: 26rem;
+  text-align: left;
+
+  &__icon {
+    background-color: rgba(v.$color-success, 0.12);
+    color: v.$color-success;
+  }
+
+  &__field {
+    text-align: left;
+    margin-bottom: v.$spacing-4;
+
+    label {
+      display: block;
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-medium;
+      margin-bottom: v.$spacing-2;
+    }
+
+    .form-field__control {
+      @include m.font-base;
+      width: 100%;
+      height: 2.5rem;
+      padding: 0 v.$spacing-3;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      font-size: v.$font-size-sm;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-primary;
+        box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      }
+    }
+  }
+
+  &__confirm {
+    background-color: v.$color-success;
+
+    &:hover {
+      background-color: darken(v.$color-success, 8%);
+    }
+  }
+
+  &__error {
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    margin: 0 0 v.$spacing-4;
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    position: absolute;
+    top: v.$spacing-4;
+    right: v.$spacing-4;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background: transparent;
+    color: v.$color-text-muted;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+  }
+}

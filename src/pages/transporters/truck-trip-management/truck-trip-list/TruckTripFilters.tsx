@@ -12,12 +12,12 @@ interface TruckTripFiltersProps {
   driverName: string;
   onDriverNameChange: (value: string) => void;
   driverOptions: FilterOption[];
-  sellerName: string;
-  onSellerNameChange: (value: string) => void;
-  sellerOptions: FilterOption[];
-  buyerName: string;
-  onBuyerNameChange: (value: string) => void;
-  buyerOptions: FilterOption[];
+  businessProfileName: string;
+  onBusinessProfileNameChange: (value: string) => void;
+  businessProfileOptions: FilterOption[];
+  tripStatus: string;
+  onTripStatusChange: (value: string) => void;
+  tripStatusOptions: FilterOption[];
 }
 
 const TruckTripFilters = ({
@@ -27,12 +27,12 @@ const TruckTripFilters = ({
   driverName,
   onDriverNameChange,
   driverOptions,
-  sellerName,
-  onSellerNameChange,
-  sellerOptions,
-  buyerName,
-  onBuyerNameChange,
-  buyerOptions,
+  businessProfileName,
+  onBusinessProfileNameChange,
+  businessProfileOptions,
+  tripStatus,
+  onTripStatusChange,
+  tripStatusOptions,
 }: TruckTripFiltersProps) => {
   return (
     <div className="truck-trip-filters">
@@ -53,19 +53,19 @@ const TruckTripFilters = ({
       />
 
       <SearchableSelect
-        options={sellerOptions}
-        value={sellerName}
-        onChange={onSellerNameChange}
-        placeholder="Search by Seller"
-        ariaLabel="Search by seller"
+        options={businessProfileOptions}
+        value={businessProfileName}
+        onChange={onBusinessProfileNameChange}
+        placeholder="Search by Business Profile"
+        ariaLabel="Search by business profile"
       />
 
       <SearchableSelect
-        options={buyerOptions}
-        value={buyerName}
-        onChange={onBuyerNameChange}
-        placeholder="Search by Buyer"
-        ariaLabel="Search by buyer"
+        options={tripStatusOptions}
+        value={tripStatus}
+        onChange={onTripStatusChange}
+        placeholder="Filter by Status"
+        ariaLabel="Filter by trip status"
       />
     </div>
   );

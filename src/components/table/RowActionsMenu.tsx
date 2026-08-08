@@ -21,6 +21,10 @@ interface RowActionsMenuProps {
   variant?: "menu" | "inline";
   /** Which edge the dropdown opens from. Default "right" (grows left) suits an Actions column placed last; use "left" (grows right) when Actions is the first column, so the menu doesn't overhang the table's left edge. */
   menuAlign?: "left" | "right";
+  /** Overrides the trash icon for onDelete — for tables where the action isn't a literal delete (e.g. "release"). */
+  deleteIcon?: IconType;
+  /** Overrides the "Delete" label/tooltip for onDelete. */
+  deleteLabel?: string;
 }
 
 const RowActionsMenu = ({
@@ -30,6 +34,8 @@ const RowActionsMenu = ({
   actions,
   variant = "menu",
   menuAlign = "right",
+  deleteIcon: DeleteIcon = FiTrash2,
+  deleteLabel = "Delete",
 }: RowActionsMenuProps) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -84,10 +90,10 @@ const RowActionsMenu = ({
           type="button"
           className="row-actions__icon-btn row-actions__icon-btn--danger"
           onClick={onDelete}
-          aria-label="Delete"
-          title="Delete"
+          aria-label={deleteLabel}
+          title={deleteLabel}
         >
-          <FiTrash2 aria-hidden />
+          <DeleteIcon aria-hidden />
         </button>
       )}
     </div>
@@ -165,8 +171,8 @@ const RowActionsMenu = ({
                       onDelete();
                     }}
                   >
-                    <FiTrash2 aria-hidden />
-                    Delete
+                    <DeleteIcon aria-hidden />
+                    {deleteLabel}
                   </button>
                 </li>
               )}

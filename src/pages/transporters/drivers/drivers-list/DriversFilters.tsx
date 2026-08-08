@@ -12,12 +12,6 @@ interface DriversFiltersProps {
   experienceYears: string;
   onExperienceYearsChange: (value: string) => void;
   experienceYearsOptions: FilterOption[];
-  state: string;
-  onStateChange: (value: string) => void;
-  stateOptions: FilterOption[];
-  transporter: string;
-  onTransporterChange: (value: string) => void;
-  transporterOptions: FilterOption[];
 }
 
 const DriversFilters = ({
@@ -26,12 +20,6 @@ const DriversFilters = ({
   experienceYears,
   onExperienceYearsChange,
   experienceYearsOptions,
-  state,
-  onStateChange,
-  stateOptions,
-  transporter,
-  onTransporterChange,
-  transporterOptions,
 }: DriversFiltersProps) => {
   return (
     <div className="drivers-filters">
@@ -41,22 +29,6 @@ const DriversFilters = ({
         onChange={onExperienceYearsChange}
         placeholder="Filter by Experience"
         ariaLabel="Filter by experience years"
-      />
-
-      <SearchableSelect
-        options={stateOptions}
-        value={state}
-        onChange={onStateChange}
-        placeholder="Filter by State"
-        ariaLabel="Filter by state"
-      />
-
-      <SearchableSelect
-        options={transporterOptions}
-        value={transporter}
-        onChange={onTransporterChange}
-        placeholder="Filter by Transporter"
-        ariaLabel="Filter by transporter"
       />
 
       <div className="drivers-filters__search">

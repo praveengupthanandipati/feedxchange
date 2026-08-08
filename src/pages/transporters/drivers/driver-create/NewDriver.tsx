@@ -1,7 +1,12 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import {
+  useGetDriverByIdQuery,
+  useAddDriverMutation,
+  useUpdateDriverMutation,
+} from "../../../../store/driversApi";
 import {
   bloodGroupOptions,
   licenseTypeOptions,
@@ -10,9 +15,16 @@ import {
   PAN_NUMBER_REGEX,
   MIN_DRIVER_AGE,
   calculateAge,
-  type NewDriverPayload,
 } from "./driverNew.data";
 import "../../../contracts/NewContract.scss";
+
+function toDateInputValue(isoValue: string): string {
+  const date = new Date(isoValue);
+  if (Number.isNaN(date.getTime())) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
 
 interface FormErrors {
   driverName?: string;
@@ -33,6 +45,13 @@ interface FormErrors {
 
 const NewDriver = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("id");
+  const isEditMode = Boolean(editId);
+
+  const { data: editingDriver } = useGetDriverByIdQuery(editId ?? "", { skip: !editId });
+  const [addDriver] = useAddDriverMutation();
+  const [updateDriver] = useUpdateDriverMutation();
 
   const [driverName, setDriverName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
@@ -52,6 +71,24 @@ const NewDriver = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!editingDriver) return;
+    setDriverName(editingDriver.driverName);
+    setMobileNumber(editingDriver.mobileNumber);
+    setDateOfBirth(toDateInputValue(editingDriver.dateOfBirth));
+    setBloodGroup(editingDriver.bloodGroup);
+    setExperienceYears(String(editingDriver.experienceYears));
+    setAddress(editingDriver.address);
+    setLicenseType(editingDriver.licenseType);
+    setLicenseNumber(editingDriver.licenseNumber);
+    setLicenseIssuedDate(toDateInputValue(editingDriver.licenseIssuedDate));
+    setLicenseExpiryDate(toDateInputValue(editingDriver.licenseExpiryDate));
+    setEmergencyContactName(editingDriver.emergencyContactName);
+    setEmergencyContactNumber(editingDriver.emergencyContactNumber);
+    setAadharNumber(editingDriver.aadharNumber);
+    setPanNumber(editingDriver.panNumber);
+  }, [editingDriver]);
 
   const handleSave = async () => {
     const trimmedName = driverName.trim();
@@ -109,7 +146,7 @@ const NewDriver = () => {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    const payload: NewDriverPayload = {
+    const driverDetails = {
       driverName: trimmedName,
       mobileNumber,
       licenseNumber: trimmedLicenseNumber,
@@ -131,8 +168,11 @@ const NewDriver = () => {
     setSubmitError(null);
 
     try {
-      // TODO: call the real createDriver mutation once the backend exposes one.
-      await Promise.resolve(payload);
+      if (isEditMode && editingDriver) {
+        await updateDriver({ driverId: editingDriver.driverId, updateDriver: driverDetails }).unwrap();
+      } else {
+        await addDriver(driverDetails).unwrap();
+      }
       navigate("/truck-management/transporters/driver-master");
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Failed to save driver.");
@@ -144,7 +184,7 @@ const NewDriver = () => {
   return (
     <div className="new-contract">
       <div className="new-contract__topbar">
-        <h1>New Driver</h1>
+        <h1>{isEditMode ? "Edit Driver" : "New Driver"}</h1>
         <Link to="/truck-management/transporters/driver-master" className="new-contract__back">
           <FiArrowLeft aria-hidden /> Drivers List
         </Link>
@@ -400,7 +440,7 @@ const NewDriver = () => {
           Cancel
         </Link>
         <button type="button" className="new-contract__submit" onClick={handleSave} disabled={submitting}>
-          {submitting ? "Saving…" : "Save Driver"}
+          {submitting ? "Saving…" : isEditMode ? "Save Changes" : "Save Driver"}
         </button>
       </div>
     </div>

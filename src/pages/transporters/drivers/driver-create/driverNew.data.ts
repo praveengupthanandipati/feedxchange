@@ -29,21 +29,3 @@ export function calculateAge(dateOfBirthIso: string): number {
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age -= 1;
   return age;
 }
-
-export interface NewDriverPayload {
-  driverName: string;
-  mobileNumber: string;
-  licenseNumber: string;
-  licenseExpiryDate: string;
-  dateOfBirth: string;
-  address: string;
-  licenseType: string;
-  licenseIssuedDate: string;
-  emergencyContactName: string;
-  emergencyContactNumber: string;
-  bloodGroup: string;
-  experienceYears: number;
-  aadharNumber: string;
-  panNumber: string;
-  actionPerformedBy: number;
-}

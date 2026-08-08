@@ -1,19 +1,28 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import { useGetBusinessProfileSummaryQuery } from "../../../../store/businessProfilesApi";
-import { MOCK_TRUCKS } from "../../truck-master/trucks-list/trucks.mock";
-import { MOCK_DRIVERS } from "../../drivers/drivers-list/drivers.mock";
+import { useGetAllActiveTruckDetailsQuery } from "../../../../store/trucksApi";
+import { useGetAllActiveDriversQuery } from "../../../../store/driversApi";
+import { useGetProductsQuery } from "../../../../store/productsApi";
 import {
-  productTypeOptions,
-  MIN_LATITUDE,
-  MAX_LATITUDE,
-  MIN_LONGITUDE,
-  MAX_LONGITUDE,
-  type NewTruckTripPayload,
-} from "./truckNewTrip.data";
+  useGetTripByIdQuery,
+  useAddTripMutation,
+  useUpdateTripMutation,
+} from "../../../../store/truckTripApi";
+import { MIN_LATITUDE, MAX_LATITUDE, MIN_LONGITUDE, MAX_LONGITUDE } from "./truckNewTrip.data";
 import "../../../contracts/NewContract.scss";
+
+function toDateTimeInputValue(isoValue: string): string {
+  const date = new Date(isoValue);
+  if (Number.isNaN(date.getTime())) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}T${hours}:${minutes}`;
+}
 
 interface FormErrors {
   truckId?: string;
@@ -46,17 +55,30 @@ function isValidLongitude(value: string): boolean {
 
 const TruckNewTrip = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("id");
+  const isEditMode = Boolean(editId);
 
-  // TODO: replace with a real trucksApi/driversApi (RTK Query) once the
-  // backend exposes GetAllTrucks / GetAllDrivers summary endpoints.
-  const truckOptions = MOCK_TRUCKS.map((truck) => ({
-    value: String(truck.profileId),
+  const { data: editingTrip } = useGetTripByIdQuery(editId ?? "", { skip: !editId });
+  const [addTrip] = useAddTripMutation();
+  const [updateTrip] = useUpdateTripMutation();
+
+  const { data: trucks = [] } = useGetAllActiveTruckDetailsQuery();
+  const truckOptions = trucks.map((truck) => ({
+    value: String(truck.truckId),
     label: `${truck.truckNumber} (${truck.registrationNumber})`,
   }));
-  const driverOptions = MOCK_DRIVERS.map((driver) => ({
+
+  const { data: drivers = [] } = useGetAllActiveDriversQuery();
+  const driverOptions = drivers.map((driver) => ({
     value: String(driver.driverId),
     label: `${driver.driverName} — ${driver.mobileNumber}`,
   }));
+
+  const { data: products = [] } = useGetProductsQuery();
+  const productTypeOptions = Array.from(new Set(products.map((product) => product.name).filter(Boolean))).map(
+    (name) => ({ value: name as string, label: name as string }),
+  );
 
   const { data: businessProfiles = [] } = useGetBusinessProfileSummaryQuery();
   const businessProfileOptions = businessProfiles.map((profile) => ({
@@ -85,6 +107,27 @@ const TruckNewTrip = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!editingTrip) return;
+    setTruckId(String(editingTrip.truckId));
+    setDriverId(String(editingTrip.driverId));
+    setBusinessProfileId(String(editingTrip.businessProfileId));
+    setFromAddress(editingTrip.fromAddress);
+    setToAddress(editingTrip.toAddress);
+    setFromLatitude(String(editingTrip.fromLatitude));
+    setFromLongitude(String(editingTrip.fromLongitude));
+    setToLatitude(String(editingTrip.toLatitude));
+    setToLongitude(String(editingTrip.toLongitude));
+    setDistanceInKM(String(editingTrip.distanceInKM));
+    setEstimatedDuration(String(editingTrip.estimatedDuration));
+    setProductType(editingTrip.productType);
+    setWeight(String(editingTrip.weight));
+    setStartDate(toDateTimeInputValue(editingTrip.startDate));
+    setExpectedEndDate(toDateTimeInputValue(editingTrip.expectedEndDate));
+    setFreightAmount(String(editingTrip.freightAmount));
+    setRemarks(editingTrip.remarks);
+  }, [editingTrip]);
 
   const handleSave = async () => {
     const trimmedFromAddress = fromAddress.trim();
@@ -138,7 +181,7 @@ const TruckNewTrip = () => {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    const payload: NewTruckTripPayload = {
+    const tripDetails = {
       truckId: Number(truckId),
       driverId: Number(driverId),
       businessProfileId: Number(businessProfileId),
@@ -163,8 +206,11 @@ const TruckNewTrip = () => {
     setSubmitError(null);
 
     try {
-      // TODO: call the real createTruckTrip mutation once the backend exposes one.
-      await Promise.resolve(payload);
+      if (isEditMode && editingTrip) {
+        await updateTrip({ tripId: editingTrip.tripId, updateTrip: tripDetails }).unwrap();
+      } else {
+        await addTrip(tripDetails).unwrap();
+      }
       navigate("/truck-management/transporters/truck-trips");
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Failed to save truck trip.");
@@ -176,7 +222,7 @@ const TruckNewTrip = () => {
   return (
     <div className="new-contract">
       <div className="new-contract__topbar">
-        <h1>New Truck Trip</h1>
+        <h1>{isEditMode ? "Edit Truck Trip" : "New Truck Trip"}</h1>
         <Link to="/truck-management/transporters/truck-trips" className="new-contract__back">
           <FiArrowLeft aria-hidden /> Truck Trips List
         </Link>
@@ -475,7 +521,7 @@ const TruckNewTrip = () => {
           Cancel
         </Link>
         <button type="button" className="new-contract__submit" onClick={handleSave} disabled={submitting}>
-          {submitting ? "Saving…" : "Save Trip"}
+          {submitting ? "Saving…" : isEditMode ? "Save Changes" : "Save Trip"}
         </button>
       </div>
     </div>
