@@ -7,6 +7,10 @@ import {pendingContractApi} from "./pendingContractApi";
 import {productsApi} from "./productsApi";
 import { userProfilesCommonApi } from "./userProfilesCommonApi";
 import { authApi } from "./authApi";
+import { trucksApi } from "./trucksApi";
+import { driversApi } from "./driversApi";
+import { truckTripApi } from "./truckTripApi";
+import { driverTruckMappingApi } from "./driverTruckMappingApi";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +22,10 @@ export const store = configureStore({
     [productsApi.reducerPath]: productsApi.reducer,
     [userProfilesCommonApi.reducerPath]: userProfilesCommonApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
+    [trucksApi.reducerPath]: trucksApi.reducer,
+    [driversApi.reducerPath]: driversApi.reducer,
+    [truckTripApi.reducerPath]: truckTripApi.reducer,
+    [driverTruckMappingApi.reducerPath]: driverTruckMappingApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -29,6 +37,10 @@ export const store = configureStore({
       categoryApi.middleware,
       productsApi.middleware,
       pendingContractApi.middleware,
+      trucksApi.middleware,
+      driversApi.middleware,
+      truckTripApi.middleware,
+      driverTruckMappingApi.middleware,
     ),
 });
 

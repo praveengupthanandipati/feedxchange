@@ -1,8 +1,7 @@
-import { useMemo } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiEdit3 } from "react-icons/fi";
-import { MOCK_TRUCKS } from "../trucks-list/trucks.mock";
+import { useGetTruckDetailsByIdQuery } from "../../../../store/trucksApi";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
 import "../trucks-list/Trucks.scss";
 
@@ -22,17 +21,27 @@ const TruckView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // TODO: replace with a real useGetTruckByIdQuery once the backend exposes one; see trucks.mock.ts.
-  const truck = useMemo(() => MOCK_TRUCKS.find((row) => String(row.profileId) === id), [id]);
+  const { data: truck, isLoading, error } = useGetTruckDetailsByIdQuery(id ?? "", { skip: !id });
 
   if (!truck) {
+    const errorDetail =
+      error && "status" in error
+        ? `${error.status} ${typeof error.data === "string" ? error.data : JSON.stringify(error.data)}`
+        : null;
+
     return (
       <div className="business-owner-detail">
         <Link to="/truck-management/transporters/truck-master" className="business-owner-detail__back">
           <FiArrowLeft aria-hidden /> Back to Trucks List
         </Link>
         <div className="business-owner-detail__card">
-          <p>No truck found for id "{id}".</p>
+          <p>
+            {isLoading
+              ? "Loading truck…"
+              : errorDetail
+                ? `Failed to load truck "${id}": ${errorDetail}`
+                : `No truck found for id "${id}".`}
+          </p>
         </div>
       </div>
     );
@@ -53,10 +62,7 @@ const TruckView = () => {
             <button
               type="button"
               className="trucks-btn trucks-btn--outline"
-              onClick={() =>
-                // TODO: point at the real edit route once the Truck edit page is built.
-                navigate(`/truck-management/transporters/truck-master/edit/${truck.profileId}`)
-              }
+              onClick={() => navigate(`/truck-management/transporters/truck-master/new?id=${truck.truckId}`)}
             >
               <FiEdit3 aria-hidden /> Edit
             </button>
@@ -70,6 +76,8 @@ const TruckView = () => {
               <DetailField label="Truck Number" value={truck.truckNumber} />
               <DetailField label="Registration Number" value={truck.registrationNumber} />
               <DetailField label="Truck Type" value={truck.truckType} />
+              <DetailField label="Transporter" value={truck.profileLegalName} />
+              <DetailField label="Status" value={truck.status} />
             </div>
           </section>
 

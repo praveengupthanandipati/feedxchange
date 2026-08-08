@@ -42,6 +42,34 @@
     margin: 0 0 v.$spacing-5;
   }
 
+  &__reason {
+    text-align: left;
+    margin: 0 0 v.$spacing-5;
+
+    label {
+      display: block;
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-medium;
+      margin-bottom: v.$spacing-2;
+    }
+
+    textarea {
+      @include m.font-base;
+      width: 100%;
+      padding: v.$spacing-2 v.$spacing-3;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      font-size: v.$font-size-sm;
+      resize: vertical;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-primary;
+        box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      }
+    }
+  }
+
   &__actions {
     @include m.flex(row, center, center, v.$spacing-3);
   }
@@ -58,6 +86,11 @@
     font-weight: v.$font-weight-semibold;
     cursor: pointer;
     transition: background-color v.$transition-fast;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 
   &__cancel {

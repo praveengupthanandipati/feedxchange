@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import type { TableColumn } from "../../../../components/table/table.types";
 import RowActionsMenu from "../../../../components/table/RowActionsMenu";
-import type { Driver } from "./drivers.types";
+import type { Driver } from "../../../../store/driversApi";
 
 function formatDisplayDate(value: string): string {
   const date = new Date(value);
@@ -13,10 +13,11 @@ function formatDisplayDate(value: string): string {
 
 interface ColumnHandlers {
   onEdit: (driver: Driver) => void;
+  onView: (driver: Driver) => void;
   onDelete: (driver: Driver) => void;
 }
 
-export function buildDriverColumns({ onEdit, onDelete }: ColumnHandlers): TableColumn<Driver>[] {
+export function buildDriverColumns({ onEdit, onView, onDelete }: ColumnHandlers): TableColumn<Driver>[] {
   return [
     {
       key: "driverName",
@@ -28,14 +29,6 @@ export function buildDriverColumns({ onEdit, onDelete }: ColumnHandlers): TableC
         </Link>
       ),
       exportValue: (row) => row.driverName,
-    },
-    {
-      key: "actions",
-      header: "",
-      align: "center",
-      render: (row) => (
-        <RowActionsMenu menuAlign="left" onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
-      ),
     },
     {
       key: "mobileNumber",
@@ -78,6 +71,19 @@ export function buildDriverColumns({ onEdit, onDelete }: ColumnHandlers): TableC
       key: "aadharNumber",
       header: "Aadhar Number",
       sortable: true,
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu
+          variant="inline"
+          onView={() => onView(row)}
+          onEdit={() => onEdit(row)}
+          onDelete={() => onDelete(row)}
+        />
+      ),
     },
   ];
 }

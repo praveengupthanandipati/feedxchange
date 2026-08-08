@@ -1,7 +1,7 @@
 import type { TableColumn } from "../../../../components/table/table.types";
 import RowActionsMenu from "../../../../components/table/RowActionsMenu";
 import InfoTooltip from "../../../../components/tooltip/InfoTooltip";
-import type { TruckTrip } from "./truckTrip.types";
+import type { TruckTrip } from "../../../../store/truckTripApi";
 
 const TruncatedAddress = ({ value }: { value: string }) => (
   <span className="truck-trip-table__address">
@@ -25,28 +25,14 @@ function formatDisplayDateTime(value: string): string {
 interface ColumnHandlers {
   onView: (row: TruckTrip) => void;
   onEdit: (row: TruckTrip) => void;
-  onDelete: (row: TruckTrip) => void;
 }
 
-export function buildTruckTripColumns({ onView, onEdit, onDelete }: ColumnHandlers): TableColumn<TruckTrip>[] {
+export function buildTruckTripColumns({ onView, onEdit }: ColumnHandlers): TableColumn<TruckTrip>[] {
   return [
     {
       key: "truckNumber",
       header: "Truck Number",
       sortable: true,
-    },
-    {
-      key: "actions",
-      header: "",
-      align: "center",
-      render: (row) => (
-        <RowActionsMenu
-          menuAlign="left"
-          onView={() => onView(row)}
-          onEdit={() => onEdit(row)}
-          onDelete={() => onDelete(row)}
-        />
-      ),
     },
     {
       key: "driverName",
@@ -85,6 +71,19 @@ export function buildTruckTripColumns({ onView, onEdit, onDelete }: ColumnHandle
       sortValue: (row) => row.expectedEndDate,
       render: (row) => formatDisplayDateTime(row.expectedEndDate),
       exportValue: (row) => formatDisplayDateTime(row.expectedEndDate),
+    },
+    {
+      key: "tripStatus",
+      header: "Status",
+      sortable: true,
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu variant="inline" onView={() => onView(row)} onEdit={() => onEdit(row)} />
+      ),
     },
   ];
 }

@@ -7,8 +7,11 @@ import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import DriversFilters from "./DriversFilters";
 import Pagination from "./Pagination";
 import { buildDriverColumns } from "./drivers.columns";
-import { MOCK_DRIVERS } from "./drivers.mock";
-import type { Driver } from "./drivers.types";
+import {
+  useGetAllActiveDriversQuery,
+  useDeleteDriverMutation,
+  type Driver,
+} from "../../../../store/driversApi";
 import "./Drivers.scss";
 
 const PAGE_SIZE = 10;
@@ -16,11 +19,6 @@ const PAGE_SIZE = 10;
 interface FilterOption {
   value: string;
   label: string;
-}
-
-function buildStringOptions(values: string[], allLabel: string): FilterOption[] {
-  const unique = Array.from(new Set(values.filter(Boolean))).sort();
-  return [{ value: "All", label: allLabel }, ...unique.map((value) => ({ value, label: value }))];
 }
 
 function buildExperienceOptions(values: number[], allLabel: string): FilterOption[] {
@@ -43,35 +41,50 @@ function escapeHtml(value: string) {
 
 const DriversList = () => {
   const navigate = useNavigate();
-  // TODO: replace with a real driversApi (RTK Query) once the backend exposes
-  // a GetAllDrivers summary endpoint; see drivers.mock.ts.
-  const [rows, setRows] = useState<Driver[]>(MOCK_DRIVERS);
+  const { data, isLoading, error } = useGetAllActiveDriversQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [deleteDriver] = useDeleteDriverMutation();
+  const rows = useMemo(() => data ?? [], [data]);
+
   const [keyword, setKeyword] = useState("");
   const [experienceYears, setExperienceYears] = useState("All");
-  const [state, setState] = useState("All");
-  const [transporter, setTransporter] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Driver | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleEdit = (driver: Driver) => {
-    // TODO: point at the real edit route once the Driver edit page is built.
-    navigate(`/truck-management/transporters/driver-master/edit/${driver.driverId}`);
+    navigate(`/truck-management/transporters/driver-master/new?id=${driver.driverId}`);
+  };
+
+  const handleView = (driver: Driver) => {
+    navigate(`/truck-management/transporters/driver-master/${driver.driverId}`);
   };
 
   const handleDelete = (driver: Driver) => {
+    setDeleteError(null);
     setPendingDeleteRow(driver);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!pendingDeleteRow) return;
-    // TODO: call the real delete mutation once the backend exposes one.
-    setRows((prev) => prev.filter((row) => row.driverId !== pendingDeleteRow.driverId));
-    setPendingDeleteRow(null);
+
+    const actionPerformedBy = Number(localStorage.getItem("userId")) || 0;
+
+    try {
+      await deleteDriver({
+        driverId: pendingDeleteRow.driverId,
+        actionPerformedBy,
+      }).unwrap();
+      setPendingDeleteRow(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete driver.");
+    }
   };
 
   const columns = useMemo(
-    () => buildDriverColumns({ onEdit: handleEdit, onDelete: handleDelete }),
+    () => buildDriverColumns({ onEdit: handleEdit, onView: handleView, onDelete: handleDelete }),
     [],
   );
 
@@ -79,37 +92,25 @@ const DriversList = () => {
     () => buildExperienceOptions(rows.map((row) => row.experienceYears), "Filter by Experience"),
     [rows],
   );
-  const stateOptions = useMemo(
-    () => buildStringOptions(rows.map((row) => row.stateName), "Filter by State"),
-    [rows],
-  );
-  const transporterOptions = useMemo(
-    () => buildStringOptions(rows.map((row) => row.transporterName), "Filter by Transporter"),
-    [rows],
-  );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, experienceYears, state, transporter]);
+  }, [keyword, experienceYears]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
 
     return rows.filter((row) => {
       if (experienceYears !== "All" && String(row.experienceYears) !== experienceYears) return false;
-      if (state !== "All" && row.stateName !== state) return false;
-      if (transporter !== "All" && row.transporterName !== transporter) return false;
 
       if (q) {
-        const haystack = [row.driverName, row.mobileNumber, row.licenseNumber, row.stateName, row.transporterName]
-          .join(" ")
-          .toLowerCase();
+        const haystack = [row.driverName, row.mobileNumber, row.licenseNumber].join(" ").toLowerCase();
         if (!haystack.includes(q)) return false;
       }
 
       return true;
     });
-  }, [rows, keyword, experienceYears, state, transporter]);
+  }, [rows, keyword, experienceYears]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -176,12 +177,6 @@ const DriversList = () => {
             experienceYears={experienceYears}
             onExperienceYearsChange={setExperienceYears}
             experienceYearsOptions={experienceYearsOptions}
-            state={state}
-            onStateChange={setState}
-            stateOptions={stateOptions}
-            transporter={transporter}
-            onTransporterChange={setTransporter}
-            transporterOptions={transporterOptions}
           />
         )}
 
@@ -189,7 +184,13 @@ const DriversList = () => {
           columns={columns}
           data={pagedRows}
           rowKey={(row) => String(row.driverId)}
-          emptyMessage="No drivers match the current filters."
+          emptyMessage={
+            isLoading
+              ? "Loading drivers…"
+              : error
+                ? "Failed to load drivers."
+                : "No drivers match the current filters."
+          }
           minHeight
         />
 
@@ -205,7 +206,10 @@ const DriversList = () => {
       <ConfirmDialog
         open={pendingDeleteRow !== null}
         title="Remove this driver?"
-        message={`This will permanently delete "${pendingDeleteRow?.driverName}". This cannot be undone.`}
+        message={
+          deleteError ||
+          `This will permanently delete "${pendingDeleteRow?.driverName}". This cannot be undone.`
+        }
         onConfirm={confirmDelete}
         onCancel={() => setPendingDeleteRow(null)}
       />

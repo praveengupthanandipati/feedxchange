@@ -7,8 +7,11 @@ import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import TrucksFilters from "./TrucksFilters";
 import Pagination from "./Pagination";
 import { buildTruckColumns } from "./trucks.columns";
-import { MOCK_TRUCKS } from "./trucks.mock";
-import type { Truck } from "./trucks.types";
+import {
+  useGetAllActiveTruckDetailsQuery,
+  useDeleteTruckDetailsMutation,
+  type Truck,
+} from "../../../../store/trucksApi";
 import "./Trucks.scss";
 
 const PAGE_SIZE = 10;
@@ -43,9 +46,11 @@ function escapeHtml(value: string) {
 
 const TrucksList = () => {
   const navigate = useNavigate();
-  // TODO: replace with a real trucksApi (RTK Query) once the backend exposes
-  // a GetAllTrucks summary endpoint; see trucks.mock.ts.
-  const [rows, setRows] = useState<Truck[]>(MOCK_TRUCKS);
+  const { data, isLoading, error } = useGetAllActiveTruckDetailsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [deleteTruckDetails] = useDeleteTruckDetailsMutation();
+  const rows = useMemo(() => data ?? [], [data]);
 
   const [truckNumber, setTruckNumber] = useState("");
   const [registrationNumber, setRegistrationNumber] = useState("");
@@ -59,25 +64,39 @@ const TrucksList = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Truck | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleEdit = (truck: Truck) => {
-    // TODO: point at the real edit route once the Truck edit page is built.
-    navigate(`/truck-management/transporters/truck-master/edit/${truck.profileId}`);
+    navigate(`/truck-management/transporters/truck-master/new?id=${truck.truckId}`);
+  };
+
+  const handleView = (truck: Truck) => {
+    navigate(`/truck-management/transporters/truck-master/${truck.truckId}`);
   };
 
   const handleDelete = (truck: Truck) => {
+    setDeleteError(null);
     setPendingDeleteRow(truck);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!pendingDeleteRow) return;
-    // TODO: call the real delete mutation once the backend exposes one.
-    setRows((prev) => prev.filter((row) => row.profileId !== pendingDeleteRow.profileId));
-    setPendingDeleteRow(null);
+
+    const actionPerformedBy = Number(localStorage.getItem("userId")) || 0;
+
+    try {
+      await deleteTruckDetails({
+        truckId: pendingDeleteRow.truckId,
+        actionPerformedBy,
+      }).unwrap();
+      setPendingDeleteRow(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete truck.");
+    }
   };
 
   const columns = useMemo(
-    () => buildTruckColumns({ onEdit: handleEdit, onDelete: handleDelete }),
+    () => buildTruckColumns({ onEdit: handleEdit, onView: handleView, onDelete: handleDelete }),
     [],
   );
 
@@ -224,8 +243,14 @@ const TrucksList = () => {
         <Table
           columns={columns}
           data={pagedRows}
-          rowKey={(row) => String(row.profileId)}
-          emptyMessage="No trucks match the current filters."
+          rowKey={(row) => String(row.truckId)}
+          emptyMessage={
+            isLoading
+              ? "Loading trucks…"
+              : error
+                ? "Failed to load trucks."
+                : "No trucks match the current filters."
+          }
           minHeight
         />
 
@@ -241,7 +266,10 @@ const TrucksList = () => {
       <ConfirmDialog
         open={pendingDeleteRow !== null}
         title="Remove this truck?"
-        message={`This will permanently delete "${pendingDeleteRow?.truckNumber}". This cannot be undone.`}
+        message={
+          deleteError ||
+          `This will permanently delete "${pendingDeleteRow?.truckNumber}". This cannot be undone.`
+        }
         onConfirm={confirmDelete}
         onCancel={() => setPendingDeleteRow(null)}
       />

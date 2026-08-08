@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiEdit3, FiSend } from "react-icons/fi";
-import { MOCK_DRIVERS } from "../drivers-list/drivers.mock";
+import { useGetDriverByIdQuery } from "../../../../store/driversApi";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
 import "../drivers-list/Drivers.scss";
 
@@ -32,8 +32,7 @@ const DriverView = () => {
   const [message, setMessage] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // TODO: replace with a real useGetDriverByIdQuery once the backend exposes one; see drivers.mock.ts.
-  const driver = useMemo(() => MOCK_DRIVERS.find((row) => String(row.driverId) === id), [id]);
+  const { data: driver, isLoading } = useGetDriverByIdQuery(id ?? "", { skip: !id });
 
   useEffect(() => {
     const el = modalRef.current;
@@ -54,7 +53,7 @@ const DriverView = () => {
           <FiArrowLeft aria-hidden /> Back to Drivers List
         </Link>
         <div className="business-owner-detail__card">
-          <p>No driver found for id "{id}".</p>
+          <p>{isLoading ? "Loading driver…" : `No driver found for id "${id}".`}</p>
         </div>
       </div>
     );
@@ -77,8 +76,7 @@ const DriverView = () => {
               type="button"
               className="drivers-btn drivers-btn--outline"
               onClick={() =>
-                // TODO: point at the real edit route once the Driver edit page is built.
-                navigate(`/truck-management/transporters/driver-master/edit/${driver.driverId}`)
+                navigate(`/truck-management/transporters/driver-master/new?id=${driver.driverId}`)
               }
             >
               <FiEdit3 aria-hidden /> Edit
@@ -110,8 +108,7 @@ const DriverView = () => {
               <DetailField label="Date of Birth" value={formatDisplayDate(driver.dateOfBirth)} />
               <DetailField label="Blood Group" value={driver.bloodGroup} />
               <DetailField label="Experience" value={`${driver.experienceYears} yrs`} />
-              <DetailField label="State" value={driver.stateName} />
-              <DetailField label="Transporter" value={driver.transporterName} />
+              <DetailField label="Status" value={driver.status} />
               <DetailField label="Address" value={driver.address} />
             </div>
           </section>

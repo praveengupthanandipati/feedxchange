@@ -1,6 +1,11 @@
+import { FiUnlock } from "react-icons/fi";
 import type { TableColumn } from "../../../../components/table/table.types";
 import RowActionsMenu from "../../../../components/table/RowActionsMenu";
-import type { DriverTruckMapping } from "./driverTruckMapping.types";
+import type { DriverTruckMapping } from "../../../../store/driverTruckMappingApi";
+
+export interface DriverTruckMappingRow extends DriverTruckMapping {
+  driverPhone: string;
+}
 
 function formatDisplayDate(value: string): string {
   const date = new Date(value);
@@ -11,16 +16,14 @@ function formatDisplayDate(value: string): string {
 }
 
 interface ColumnHandlers {
-  onView: (row: DriverTruckMapping) => void;
-  onEdit: (row: DriverTruckMapping) => void;
-  onDelete: (row: DriverTruckMapping) => void;
+  onView: (row: DriverTruckMappingRow) => void;
+  onDelete: (row: DriverTruckMappingRow) => void;
 }
 
 export function buildDriverTruckMappingColumns({
   onView,
-  onEdit,
   onDelete,
-}: ColumnHandlers): TableColumn<DriverTruckMapping>[] {
+}: ColumnHandlers): TableColumn<DriverTruckMappingRow>[] {
   return [
     {
       key: "truckNumber",
@@ -32,14 +35,6 @@ export function buildDriverTruckMappingColumns({
         </button>
       ),
       exportValue: (row) => row.truckNumber,
-    },
-    {
-      key: "actions",
-      header: "",
-      align: "center",
-      render: (row) => (
-        <RowActionsMenu menuAlign="left" onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
-      ),
     },
     {
       key: "driverName",
@@ -69,6 +64,25 @@ export function buildDriverTruckMappingColumns({
       sortValue: (row) => row.assignedFrom,
       render: (row) => formatDisplayDate(row.assignedFrom),
       exportValue: (row) => formatDisplayDate(row.assignedFrom),
+    },
+    {
+      key: "status",
+      header: "Status",
+      sortable: true,
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu
+          variant="inline"
+          onView={() => onView(row)}
+          onDelete={() => onDelete(row)}
+          deleteIcon={FiUnlock}
+          deleteLabel="Release"
+        />
+      ),
     },
   ];
 }

@@ -2,16 +2,9 @@ import { useEffect, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { FiX, FiTruck } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
-import type {
-  DriverOption,
-  DriverTruckMapping,
-  DriverTruckMappingFormValues,
-  TruckOption,
-} from "./driverTruckMapping.types";
+import type { DriverTruckMapping } from "../../../../store/driverTruckMappingApi";
+import type { DriverOption, DriverTruckMappingFormValues, TruckOption } from "./driverTruckMapping.types";
 import "./DriverTruckMappingOffcanvas.scss";
-
-// TODO: replace with the signed-in user's id once auth context exposes one.
-const CURRENT_USER_ID = 1;
 
 function toDateInputValue(value: string): string {
   const date = new Date(value);
@@ -21,10 +14,11 @@ function toDateInputValue(value: string): string {
 
 interface DriverTruckMappingOffcanvasProps {
   open: boolean;
-  mode: "create" | "edit";
+  mode: "create" | "view";
   initialValues: DriverTruckMapping | null;
   truckOptions: TruckOption[];
   driverOptions: DriverOption[];
+  actionPerformedBy: number;
   onClose: () => void;
   onSave: (values: DriverTruckMappingFormValues) => void;
 }
@@ -35,9 +29,11 @@ const DriverTruckMappingOffcanvas = ({
   initialValues,
   truckOptions,
   driverOptions,
+  actionPerformedBy,
   onClose,
   onSave,
 }: DriverTruckMappingOffcanvasProps) => {
+  const readOnly = mode === "view";
   const [truckId, setTruckId] = useState("");
   const [driverId, setDriverId] = useState("");
   const [assignedFrom, setAssignedFrom] = useState("");
@@ -93,7 +89,7 @@ const DriverTruckMappingOffcanvas = ({
       assignedFrom: new Date(assignedFrom).toISOString(),
       assignmentReason: assignmentReason.trim(),
       isPrimary,
-      actionPerformedBy: CURRENT_USER_ID,
+      actionPerformedBy,
     });
   };
 
@@ -111,7 +107,7 @@ const DriverTruckMappingOffcanvas = ({
       >
         <div className="driver-truck-mapping-offcanvas__header">
           <h2 id="driver-truck-mapping-offcanvas-title">
-            <FiTruck aria-hidden /> {mode === "create" ? "Create Map" : "Edit Mapping"}
+            <FiTruck aria-hidden /> {mode === "create" ? "Create Map" : "Mapping Details"}
           </h2>
           <button
             type="button"
@@ -133,6 +129,7 @@ const DriverTruckMappingOffcanvas = ({
                 onChange={setTruckId}
                 placeholder="Select Truck"
                 ariaLabel="Select truck"
+                disabled={readOnly}
               />
             </div>
 
@@ -144,6 +141,7 @@ const DriverTruckMappingOffcanvas = ({
                 onChange={setDriverId}
                 placeholder="Select Driver"
                 ariaLabel="Select driver"
+                disabled={readOnly}
               />
             </div>
 
@@ -155,6 +153,7 @@ const DriverTruckMappingOffcanvas = ({
                 value={assignedFrom}
                 onChange={(event) => setAssignedFrom(event.target.value)}
                 required
+                disabled={readOnly}
               />
             </div>
 
@@ -166,6 +165,7 @@ const DriverTruckMappingOffcanvas = ({
                 value={assignmentReason}
                 onChange={(event) => setAssignmentReason(event.target.value)}
                 placeholder="Reason for this assignment"
+                disabled={readOnly}
               />
             </div>
 
@@ -174,6 +174,7 @@ const DriverTruckMappingOffcanvas = ({
                 type="checkbox"
                 checked={isPrimary}
                 onChange={(event) => setIsPrimary(event.target.checked)}
+                disabled={readOnly}
               />
               Mark as primary driver for this truck
             </label>
@@ -181,11 +182,13 @@ const DriverTruckMappingOffcanvas = ({
 
           <div className="driver-truck-mapping-offcanvas__actions">
             <button type="button" className="driver-truck-mapping-offcanvas__cancel" onClick={onClose}>
-              Cancel
+              {readOnly ? "Close" : "Cancel"}
             </button>
-            <button type="submit" className="driver-truck-mapping-offcanvas__submit" disabled={!isValid}>
-              {mode === "create" ? "Create Map" : "Save Changes"}
-            </button>
+            {!readOnly && (
+              <button type="submit" className="driver-truck-mapping-offcanvas__submit" disabled={!isValid}>
+                Create Map
+              </button>
+            )}
           </div>
         </form>
       </div>

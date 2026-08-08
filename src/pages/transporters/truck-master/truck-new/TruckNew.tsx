@@ -1,7 +1,13 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import {
+  useGetTruckDetailsByIdQuery,
+  useAddTruckDetailsMutation,
+  useUpdateTruckDetailsMutation,
+} from "../../../../store/trucksApi";
+import { useGetTransporterProfileSummaryQuery } from "../../../../store/transportersApi";
 import {
   truckTypeOptions,
   makeOptions,
@@ -11,13 +17,13 @@ import {
   REGISTRATION_NUMBER_REGEX,
   MIN_MANUFACTURE_YEAR,
   normalizeRegistrationNumber,
-  type NewTruckPayload,
 } from "./truckNew.data";
 import "../../../contracts/NewContract.scss";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
 interface FormErrors {
+  transporterProfileId?: string;
   truckNumber?: string;
   registrationNumber?: string;
   truckType?: string;
@@ -32,7 +38,25 @@ interface FormErrors {
 
 const TruckNew = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("id");
+  const isEditMode = Boolean(editId);
 
+  const { data: editingTruck } = useGetTruckDetailsByIdQuery(editId ?? "", { skip: !editId });
+  const [addTruckDetails] = useAddTruckDetailsMutation();
+  const [updateTruckDetails] = useUpdateTruckDetailsMutation();
+
+  const { data: transporters } = useGetTransporterProfileSummaryQuery();
+  const transporterOptions = useMemo(
+    () =>
+      (transporters ?? []).map((transporter) => ({
+        value: String(transporter.profileId),
+        label: transporter.legalName,
+      })),
+    [transporters],
+  );
+
+  const [transporterProfileId, setTransporterProfileId] = useState("");
   const [truckNumber, setTruckNumber] = useState("");
   const [registrationNumber, setRegistrationNumber] = useState("");
   const [truckType, setTruckType] = useState("");
@@ -48,12 +72,29 @@ const TruckNew = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!editingTruck) return;
+    setTransporterProfileId(String(editingTruck.profileId));
+    setTruckNumber(editingTruck.truckNumber);
+    setRegistrationNumber(editingTruck.registrationNumber);
+    setTruckType(editingTruck.truckType);
+    setMake(editingTruck.make);
+    setModel(editingTruck.model);
+    setManufactureYear(String(editingTruck.manufactureYear));
+    setCapacity(String(editingTruck.capacity));
+    setCapacityUnit(editingTruck.capacityUnit);
+    setFuelType(editingTruck.fuelType);
+    setOwnershipType(editingTruck.ownershipType);
+  }, [editingTruck]);
+
   const handleSave = async () => {
     const trimmedTruckNumber = truckNumber.trim();
     const trimmedModel = model.trim();
     const normalizedRegistrationNumber = normalizeRegistrationNumber(registrationNumber);
 
     const nextErrors: FormErrors = {};
+
+    if (!transporterProfileId) nextErrors.transporterProfileId = "Transporter is required.";
 
     if (!trimmedTruckNumber) nextErrors.truckNumber = "Truck Number is required.";
     else if (trimmedTruckNumber.length < 2) nextErrors.truckNumber = "Truck Number must be at least 2 characters.";
@@ -84,7 +125,8 @@ const TruckNew = () => {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    const payload: NewTruckPayload = {
+    const truckDetails = {
+      profileId: Number(transporterProfileId),
       truckNumber: trimmedTruckNumber,
       registrationNumber: normalizedRegistrationNumber,
       truckType,
@@ -102,8 +144,11 @@ const TruckNew = () => {
     setSubmitError(null);
 
     try {
-      // TODO: call the real createTruck mutation once the backend exposes one.
-      await Promise.resolve(payload);
+      if (isEditMode && editingTruck) {
+        await updateTruckDetails({ truckId: editingTruck.truckId, updateTruckDetails: truckDetails }).unwrap();
+      } else {
+        await addTruckDetails(truckDetails).unwrap();
+      }
       navigate("/truck-management/transporters/truck-master");
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Failed to save truck.");
@@ -115,7 +160,7 @@ const TruckNew = () => {
   return (
     <div className="new-contract">
       <div className="new-contract__topbar">
-        <h1>New Truck</h1>
+        <h1>{isEditMode ? "Edit Truck" : "New Truck"}</h1>
         <Link to="/truck-management/transporters/truck-master" className="new-contract__back">
           <FiArrowLeft aria-hidden /> Trucks List
         </Link>
@@ -130,6 +175,22 @@ const TruckNew = () => {
       <section className="new-contract__section">
         <h2 className="new-contract__section-title">1. Truck Identification</h2>
         <div className="new-contract__grid">
+          <div className="form-field">
+            <span className="form-field__label">
+              Transporter <span className="form-field__required">*</span>
+            </span>
+            <SearchableSelect
+              options={transporterOptions}
+              value={transporterProfileId}
+              onChange={setTransporterProfileId}
+              placeholder="Select Transporter"
+              ariaLabel="Transporter"
+            />
+            {errors.transporterProfileId && (
+              <p className="form-field__error">{errors.transporterProfileId}</p>
+            )}
+          </div>
+
           <div className="form-field">
             <label className="form-field__label" htmlFor="truckNumber">
               Truck Number <span className="form-field__required">*</span>
@@ -296,7 +357,7 @@ const TruckNew = () => {
           Cancel
         </Link>
         <button type="button" className="new-contract__submit" onClick={handleSave} disabled={submitting}>
-          {submitting ? "Saving…" : "Save Truck"}
+          {submitting ? "Saving…" : isEditMode ? "Save Changes" : "Save Truck"}
         </button>
       </div>
     </div>

@@ -11,6 +11,12 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  /** When set, renders a textarea for capturing a reason before confirming. */
+  reasonLabel?: string;
+  reasonValue?: string;
+  onReasonChange?: (value: string) => void;
+  /** Disables the confirm button — e.g. while the reason is still empty. */
+  confirmDisabled?: boolean;
 }
 
 const ConfirmDialog = ({
@@ -21,6 +27,10 @@ const ConfirmDialog = ({
   cancelLabel = "Cancel",
   onConfirm,
   onCancel,
+  reasonLabel,
+  reasonValue,
+  onReasonChange,
+  confirmDisabled = false,
 }: ConfirmDialogProps) => {
   useEffect(() => {
     if (!open) return;
@@ -50,11 +60,27 @@ const ConfirmDialog = ({
           {title}
         </h2>
         <p className="confirm-dialog__message">{message}</p>
+        {reasonLabel && onReasonChange && (
+          <div className="confirm-dialog__reason">
+            <label htmlFor="confirm-dialog-reason">{reasonLabel}</label>
+            <textarea
+              id="confirm-dialog-reason"
+              rows={3}
+              value={reasonValue ?? ""}
+              onChange={(event) => onReasonChange(event.target.value)}
+            />
+          </div>
+        )}
         <div className="confirm-dialog__actions">
           <button type="button" className="confirm-dialog__cancel" onClick={onCancel}>
             {cancelLabel}
           </button>
-          <button type="button" className="confirm-dialog__confirm" onClick={onConfirm}>
+          <button
+            type="button"
+            className="confirm-dialog__confirm"
+            onClick={onConfirm}
+            disabled={confirmDisabled}
+          >
             {confirmLabel}
           </button>
         </div>

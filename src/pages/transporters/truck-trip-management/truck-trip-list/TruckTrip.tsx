@@ -3,12 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
-import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import TruckTripFilters from "./TruckTripFilters";
 import Pagination from "./Pagination";
 import { buildTruckTripColumns } from "./truckTrip.columns";
-import { MOCK_TRUCK_TRIPS } from "./truckTrip.mock";
-import type { TruckTrip } from "./truckTrip.types";
+import { useGetAllTripsQuery, type TruckTrip } from "../../../../store/truckTripApi";
 import "./TruckTrip.scss";
 
 const PAGE_SIZE = 10;
@@ -35,39 +33,31 @@ function escapeHtml(value: string) {
 
 const TruckTripPage = () => {
   const navigate = useNavigate();
-  // TODO: replace with a real truckTripApi (RTK Query) once the backend
-  // exposes GetAllTruckTrips / trucks / drivers / business profiles endpoints.
-  const [rows, setRows] = useState<TruckTrip[]>(MOCK_TRUCK_TRIPS);
+  const { data, isLoading, error } = useGetAllTripsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [rows, setRows] = useState<TruckTrip[]>([]);
   const [truckFilter, setTruckFilter] = useState("All");
   const [driverFilter, setDriverFilter] = useState("All");
-  const [sellerFilter, setSellerFilter] = useState("All");
-  const [buyerFilter, setBuyerFilter] = useState("All");
+  const [businessProfileFilter, setBusinessProfileFilter] = useState("All");
+  const [tripStatusFilter, setTripStatusFilter] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pendingDeleteRow, setPendingDeleteRow] = useState<TruckTrip | null>(null);
+
+  useEffect(() => {
+    if (data) setRows(data);
+  }, [data]);
 
   const handleView = (row: TruckTrip) => {
     navigate(`/truck-management/transporters/truck-trips/${row.tripId}`);
   };
 
   const handleEdit = (row: TruckTrip) => {
-    // TODO: point at the real edit route once the Truck Trip edit page is built.
-    navigate(`/truck-management/transporters/truck-trips/edit/${row.tripId}`);
-  };
-
-  const handleDelete = (row: TruckTrip) => {
-    setPendingDeleteRow(row);
-  };
-
-  const confirmDelete = () => {
-    if (!pendingDeleteRow) return;
-    // TODO: call the real delete mutation once the backend exposes one.
-    setRows((prev) => prev.filter((row) => row.tripId !== pendingDeleteRow.tripId));
-    setPendingDeleteRow(null);
+    navigate(`/truck-management/transporters/truck-trips/new?id=${row.tripId}`);
   };
 
   const columns = useMemo(
-    () => buildTruckTripColumns({ onView: handleView, onEdit: handleEdit, onDelete: handleDelete }),
+    () => buildTruckTripColumns({ onView: handleView, onEdit: handleEdit }),
     [],
   );
 
@@ -79,28 +69,28 @@ const TruckTripPage = () => {
     () => buildStringOptions(rows.map((row) => row.driverName), "Search by Driver"),
     [rows],
   );
-  const sellerFilterOptions = useMemo(
-    () => buildStringOptions(rows.map((row) => row.sellerName), "Search by Seller"),
+  const businessProfileFilterOptions = useMemo(
+    () => buildStringOptions(rows.map((row) => row.businessProfileName), "Search by Business Profile"),
     [rows],
   );
-  const buyerFilterOptions = useMemo(
-    () => buildStringOptions(rows.map((row) => row.buyerName), "Search by Buyer"),
+  const tripStatusFilterOptions = useMemo(
+    () => buildStringOptions(rows.map((row) => row.tripStatus), "Filter by Status"),
     [rows],
   );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [truckFilter, driverFilter, sellerFilter, buyerFilter]);
+  }, [truckFilter, driverFilter, businessProfileFilter, tripStatusFilter]);
 
   const filteredRows = useMemo(() => {
     return rows.filter((row) => {
       if (truckFilter !== "All" && row.truckNumber !== truckFilter) return false;
       if (driverFilter !== "All" && row.driverName !== driverFilter) return false;
-      if (sellerFilter !== "All" && row.sellerName !== sellerFilter) return false;
-      if (buyerFilter !== "All" && row.buyerName !== buyerFilter) return false;
+      if (businessProfileFilter !== "All" && row.businessProfileName !== businessProfileFilter) return false;
+      if (tripStatusFilter !== "All" && row.tripStatus !== tripStatusFilter) return false;
       return true;
     });
-  }, [rows, truckFilter, driverFilter, sellerFilter, buyerFilter]);
+  }, [rows, truckFilter, driverFilter, businessProfileFilter, tripStatusFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -168,12 +158,12 @@ const TruckTripPage = () => {
             driverName={driverFilter}
             onDriverNameChange={setDriverFilter}
             driverOptions={driverFilterOptions}
-            sellerName={sellerFilter}
-            onSellerNameChange={setSellerFilter}
-            sellerOptions={sellerFilterOptions}
-            buyerName={buyerFilter}
-            onBuyerNameChange={setBuyerFilter}
-            buyerOptions={buyerFilterOptions}
+            businessProfileName={businessProfileFilter}
+            onBusinessProfileNameChange={setBusinessProfileFilter}
+            businessProfileOptions={businessProfileFilterOptions}
+            tripStatus={tripStatusFilter}
+            onTripStatusChange={setTripStatusFilter}
+            tripStatusOptions={tripStatusFilterOptions}
           />
         )}
 
@@ -181,7 +171,13 @@ const TruckTripPage = () => {
           columns={columns}
           data={pagedRows}
           rowKey={(row) => String(row.tripId)}
-          emptyMessage="No truck trips match the current filters."
+          emptyMessage={
+            isLoading
+              ? "Loading truck trips…"
+              : error
+                ? "Failed to load truck trips."
+                : "No truck trips match the current filters."
+          }
           minHeight
         />
 
@@ -193,14 +189,6 @@ const TruckTripPage = () => {
           onPageChange={setCurrentPage}
         />
       </div>
-
-      <ConfirmDialog
-        open={pendingDeleteRow !== null}
-        title="Remove this trip?"
-        message={`This will permanently delete the trip for "${pendingDeleteRow?.truckNumber}" from "${pendingDeleteRow?.fromAddress}" to "${pendingDeleteRow?.toAddress}". This cannot be undone.`}
-        onConfirm={confirmDelete}
-        onCancel={() => setPendingDeleteRow(null)}
-      />
     </div>
   );
 };
