@@ -42,6 +42,16 @@ import FormulaCalculations from './pages/product-management/formula-calculations
 import PendingContracts from './pages/truck-management/pending-contracts/PendingContracts'
 import BulkFreightApproval from './pages/truck-management/bulk-freight-approval/BulkFreightApproval'
 import Assigntransports from './pages/truck-management/assign-transports/Assigntransports'
+import DriversList from './pages/transporters/drivers/drivers-list/DriversList'
+import DriverNew from './pages/transporters/drivers/driver-create/NewDriver'
+import DriverView from './pages/transporters/drivers/driver-view/DriverView'
+import TrucksList from './pages/transporters/truck-master/trucks-list/TrucksList'
+import TruckNew from './pages/transporters/truck-master/truck-new/TruckNew'
+import TrucksView from './pages/transporters/truck-master/truck-view/TruckView'
+import DriverTruckMapping from './pages/transporters/driver-trucks-mapping/driver-trucks-list/DriverTruckMapping'
+import TruckTrips from './pages/transporters/truck-trip-management/truck-trip-list/TruckTrip'
+import TruckTripNew from './pages/transporters/truck-trip-management/truck-new-trip/TruckNewTrip'
+import TruckTripView from './pages/transporters/truck-trip-management/truck-trip-view/TruckTripView'
 
 function App() {
   return (
@@ -94,6 +104,16 @@ function App() {
           <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
           <Route path="/truck-management/bulk-freight-approval" element={<BulkFreightApproval />} />
           <Route path="/truck-management/assign-transports" element={<Assigntransports />} />
+          <Route path="/truck-management/transporters/driver-master" element={<DriversList />} />
+          <Route path="/truck-management/transporters/driver-master/new" element={<DriverNew />} />
+          <Route path="/truck-management/transporters/driver-master/:id" element={<DriverView />} />
+          <Route path="/truck-management/transporters/truck-master" element={<TrucksList />} />
+          <Route path="/truck-management/transporters/truck-master/new" element={<TruckNew />} />
+          <Route path="/truck-management/transporters/truck-master/:id" element={<TrucksView />} />
+          <Route path="/truck-management/transporters/driver-truck-mapping" element={<DriverTruckMapping />} />
+          <Route path="/truck-management/transporters/truck-trips" element={<TruckTrips />} />
+          <Route path="/truck-management/transporters/truck-trips/new" element={<TruckTripNew />} />
+          <Route path="/truck-management/transporters/truck-trips/:id" element={<TruckTripView />} />
         </Route>
       </Routes>
     </Router>

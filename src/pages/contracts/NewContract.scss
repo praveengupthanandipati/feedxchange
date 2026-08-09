@@ -281,6 +281,12 @@
     color: v.$color-danger;
   }
 
+  &__error {
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
   &__control {
     @include m.font-base;
     height: 2.75rem;
