@@ -1,6 +1,6 @@
 // TODO: replace with real reference data once seller/buyer/product masters are wired up.
 
-export const sellerOptions = [
+/*export const sellerOptions = [
   { value: "chatrai-lakshmi", label: "Chatrai - Lakshmi Poultry" },
   { value: "mudinepalli-purnima", label: "Mudinepalli - Purnima Feeds" },
   { value: "chilakaluripet-eswar", label: "Chilakaluripet - Eswar Traders" },
@@ -15,7 +15,7 @@ export const productOptions = [
   { value: "rapeseed-doc", label: "Rapeseed DOC" },
   { value: "rice-ddgs", label: "Rice DDGS" },
   { value: "soya-doc", label: "Soya DOC" },
-];
+];*/
 
 export const quantityMeasureOptions = [
   { value: "mt", label: "Metric Tons" },

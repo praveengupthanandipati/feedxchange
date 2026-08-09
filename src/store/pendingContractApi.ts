@@ -1,10 +1,33 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_URL } from "../api/api";
 
-export interface GetAllContractsResponse {
-  totalContracts: number;
-  totalQuantity: number;
-  contracts: any[];
+export interface PendingContractApiResponse {
+  contractId: number;
+  contractNumber: string;
+  contractDate: string;
+  sellerId: number | null;
+  sellerName: string | null;
+  buyerId: number | null;
+  buyerName: string | null;
+  productId: number | null;
+  productName: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedBy: string | null;
+  updatedAt: string | null;
+
+  basicDetails: {
+    contractRate: number;
+    quantity: number;
+    quantityMeasure: string;
+    minQuantity: number;
+    maxQuantity: number;
+    deliverySchedule: string;
+    deliveryType: string;
+    deliveryFromDate: string | null;
+    deliveryToDate: string | null;
+    calculatedStatus: string;
+  };
 }
 
 export interface GetAllContractsParams {
@@ -69,17 +92,14 @@ export const pendingContractApi = createApi({
   tagTypes: ["PendingContracts"],
 
   endpoints: (builder) => ({
-    getAllContractsByFilters: builder.query<GetAllContractsResponse, GetAllContractsByFiltersRequest>({
+    getAllContractsByFilters: builder.query<PendingContractApiResponse[], GetAllContractsByFiltersRequest>({
       query: (params) => ({
         url: "/api/Contracts/GetAllContractsByFilters",
         method: "GET",
         params,
       }),
-      transformResponse: (response: GetAllContractsResponse) => response,
       providesTags: ["PendingContracts"],
     }),
-
-    
 
     getAllContractsForExcel: builder.query<Blob, void>({
       query: () => ({
@@ -92,8 +112,6 @@ export const pendingContractApi = createApi({
 });
 
 export const {
-  
   useGetAllContractsByFiltersQuery,
   useLazyGetAllContractsForExcelQuery,
-  
 } = pendingContractApi;
