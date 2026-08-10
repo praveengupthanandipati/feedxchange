@@ -9,6 +9,8 @@ export interface TransporterAssignmentRow {
   qtyMts: string;
   freightPerMt: string;
   trackUrl: string;
+  /** True once the row has passed validation and been saved — renders as read-only text with an Edit action instead of inputs. */
+  saved: boolean;
 }
 
 export function createEmptyTransporterRow(): TransporterAssignmentRow {
@@ -21,11 +23,32 @@ export function createEmptyTransporterRow(): TransporterAssignmentRow {
     qtyMts: "",
     freightPerMt: "",
     trackUrl: "",
+    saved: false,
   };
 }
 
+/** Fields that must be filled before a row can be saved or a request sent. */
+export const REQUIRED_TRANSPORTER_FIELDS: (keyof TransporterAssignmentRow)[] = [
+  "transporterName",
+  "truckNo",
+  "driverName",
+  "driverPhone",
+  "qtyMts",
+  "freightPerMt",
+];
+
+export function getMissingTransporterFields(
+  row: TransporterAssignmentRow,
+): Set<keyof TransporterAssignmentRow> {
+  const missing = new Set<keyof TransporterAssignmentRow>();
+  REQUIRED_TRANSPORTER_FIELDS.forEach((field) => {
+    if (!String(row[field]).trim()) missing.add(field);
+  });
+  return missing;
+}
+
 export function getSeedTransporterRows(): TransporterAssignmentRow[] {
-  return Array.from({ length: 5 }, () => createEmptyTransporterRow());
+  return [createEmptyTransporterRow()];
 }
 
 export type TransporterRequestStatus = "Agreed" | "Rejected";

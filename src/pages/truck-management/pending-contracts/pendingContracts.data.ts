@@ -40,7 +40,7 @@ export interface PendingContractRow {
   trucks: TruckAssignment[];
 }
 
-export const sellerOptions = [
+const partyOptions = [
   { value: "Chatrai - Lakshmi Poultry", label: "Chatrai - Lakshmi Poultry" },
   { value: "Chilakaluripet - Eswar Traders", label: "Chilakaluripet - Eswar Traders" },
   { value: "Miryalguda - Rayapudi Agro", label: "Miryalguda - Rayapudi Agro" },
@@ -48,7 +48,9 @@ export const sellerOptions = [
   { value: "Mudinepalli - Purnima Feeds", label: "Mudinepalli - Purnima Feeds" },
 ];
 
-export const buyerOptions = sellerOptions;
+export const sellerOptions = [{ value: "All", label: "All Sellers" }, ...partyOptions];
+
+export const buyerOptions = [{ value: "All", label: "All Buyers" }, ...partyOptions];
 
 export const deliveryScheduleOptions = [
   { value: "All", label: "All Schedules" },

@@ -156,7 +156,11 @@ const Assigntransports = () => {
             </button>
           </div>
 
-          {activeTab === "instant" ? <InstantTruckAssignment /> : <ScheduleTruckAssignment />}
+          {activeTab === "instant" ? (
+            <InstantTruckAssignment />
+          ) : (
+            <ScheduleTruckAssignment summary={summary} />
+          )}
         </div>
       </div>
     </div>

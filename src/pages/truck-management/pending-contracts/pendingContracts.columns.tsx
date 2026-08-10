@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { FiTruck } from "react-icons/fi";
 import type { TableColumn } from "../../../components/table/table.types";
 import InfoTooltip from "../../../components/tooltip/InfoTooltip";
@@ -34,7 +35,9 @@ export function buildPendingContractColumns({
         >
           <FiTruck aria-hidden />
         </button>
-        <span className="pending-contracts-table__id-text">{row.id}</span>
+        <Link to={`/contracts/${row.id}`} className="pending-contracts-table__id-text">
+          {row.id}
+        </Link>
       </span>
     ),
     exportValue: (row) => row.id,

@@ -52,6 +52,7 @@ import DriverTruckMapping from './pages/transporters/driver-trucks-mapping/drive
 import TruckTrips from './pages/transporters/truck-trip-management/truck-trip-list/TruckTrip'
 import TruckTripNew from './pages/transporters/truck-trip-management/truck-new-trip/TruckNewTrip'
 import TruckTripView from './pages/transporters/truck-trip-management/truck-trip-view/TruckTripView'
+import TransporReviewAssignTrucks from './pages/truck-management/transporter-review-assign-trucks/ReviewAndAssignTrucks'
 
 function App() {
   return (
@@ -114,6 +115,7 @@ function App() {
           <Route path="/truck-management/transporters/truck-trips" element={<TruckTrips />} />
           <Route path="/truck-management/transporters/truck-trips/new" element={<TruckTripNew />} />
           <Route path="/truck-management/transporters/truck-trips/:id" element={<TruckTripView />} />
+          <Route path="/truck-management/transporters/freight-approval" element={<TransporReviewAssignTrucks />} />
         </Route>
       </Routes>
     </Router>
