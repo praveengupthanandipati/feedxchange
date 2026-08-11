@@ -4,6 +4,44 @@
 // ============================================================
 // Inline "Add / View Transporters" expanded row panel
 // ============================================================
+.transporter-assignment-panel__toast {
+  @include m.flex(row, flex-start, center, v.$spacing-2);
+  position: fixed;
+  top: v.$spacing-5;
+  right: v.$spacing-5;
+  z-index: v.$z-index-tooltip;
+  padding: v.$spacing-3 v.$spacing-5;
+  border-radius: v.$radius-md;
+  background-color: v.$color-success;
+  color: v.$color-white;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+  box-shadow: v.$shadow-lg;
+  animation: transporter-assignment-toast-in v.$transition-base ease-out;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  @include m.respond-below(sm) {
+    top: v.$spacing-3;
+    left: v.$spacing-3;
+    right: v.$spacing-3;
+  }
+}
+
+@keyframes transporter-assignment-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .transporter-assignment-panel {
   display: flex;
   flex-direction: column;
@@ -99,6 +137,42 @@
     }
   }
 
+  &__warning {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    padding: v.$spacing-3 v.$spacing-4;
+    border-radius: v.$radius-md;
+    border: 1px solid rgba(v.$color-orange, 0.4);
+    background-color: rgba(v.$color-orange, 0.12);
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    svg:first-child {
+      flex-shrink: 0;
+      color: v.$color-orange;
+    }
+
+    span {
+      flex: 1;
+    }
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      flex-shrink: 0;
+      width: 1.5rem;
+      height: 1.5rem;
+      border: none;
+      border-radius: v.$radius-sm;
+      background: transparent;
+      color: v.$color-text;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(v.$color-orange, 0.2);
+      }
+    }
+  }
+
   &__footer {
     @include m.flex(row, flex-end, center);
   }
@@ -139,6 +213,10 @@
       position: relative;
       z-index: 2;
     }
+
+    &.has-error .searchable-select__trigger {
+      border-color: v.$color-danger;
+    }
   }
 
   &__control {
@@ -167,6 +245,17 @@
     &--narrow {
       min-width: 5rem;
     }
+
+    &.has-error {
+      border-color: v.$color-danger;
+    }
+  }
+
+  &__text {
+    @include m.font-base;
+    display: inline-block;
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
   }
 
   &__row-actions {

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
@@ -6,9 +7,15 @@ import { buildScheduleTruckColumns } from "./scheduleTruckAssignment.columns";
 import { scheduleTruckRows as seedRows, type ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 import ScheduleRequestDrawer from "./ScheduleRequestDrawer";
 import TransporterAssignmentPanel from "./TransporterAssignmentPanel";
+import type { ContractSummary } from "../assignTransports.data";
 import "./ScheduleTruckAssignment.scss";
 
-const ScheduleTruckAssignment = () => {
+interface ScheduleTruckAssignmentProps {
+  summary: ContractSummary;
+}
+
+const ScheduleTruckAssignment = ({ summary }: ScheduleTruckAssignmentProps) => {
+  const navigate = useNavigate();
   const [rows, setRows] = useState<ScheduleTruckRow[]>(seedRows);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<ScheduleTruckRow | null>(null);
@@ -41,15 +48,24 @@ const ScheduleTruckAssignment = () => {
     setRowPendingDelete(null);
   };
 
+  const handleUpdate = (row: ScheduleTruckRow) => {
+    navigate(
+      `/truck-management/transporters/freight-approval?contract=${encodeURIComponent(
+        summary.contractNumber,
+      )}&schedule=${encodeURIComponent(row.id)}`,
+    );
+  };
+
   const columns = useMemo(
     () =>
       buildScheduleTruckColumns({
         onEdit: handleOpenEdit,
         onDelete: (row) => setRowPendingDelete(row),
+        onUpdate: handleUpdate,
         expandedRowId,
         onToggleTrucks: handleToggleTrucks,
       }),
-    [expandedRowId],
+    [expandedRowId, summary.contractNumber],
   );
 
   return (
@@ -71,7 +87,7 @@ const ScheduleTruckAssignment = () => {
         rowKey={(row) => row.id}
         emptyMessage="No scheduled truck requests yet for this contract."
         expandedRowKey={expandedRowId}
-        renderExpandedRow={(row) => <TransporterAssignmentPanel scheduleRow={row} />}
+        renderExpandedRow={(row) => <TransporterAssignmentPanel scheduleRow={row} summary={summary} />}
       />
 
       <ScheduleRequestDrawer

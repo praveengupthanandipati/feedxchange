@@ -6,6 +6,7 @@ import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 interface ColumnHandlers {
   onEdit: (row: ScheduleTruckRow) => void;
   onDelete: (row: ScheduleTruckRow) => void;
+  onUpdate: (row: ScheduleTruckRow) => void;
   expandedRowId: string | null;
   onToggleTrucks: (row: ScheduleTruckRow) => void;
 }
@@ -13,6 +14,7 @@ interface ColumnHandlers {
 export function buildScheduleTruckColumns({
   onEdit,
   onDelete,
+  onUpdate,
   expandedRowId,
   onToggleTrucks,
 }: ColumnHandlers): TableColumn<ScheduleTruckRow>[] {
@@ -96,7 +98,7 @@ export function buildScheduleTruckColumns({
       key: "update",
       header: "Update",
       render: (row) => (
-        <button type="button" className="schedule-truck-table__update-btn" onClick={() => onEdit(row)}>
+        <button type="button" className="schedule-truck-table__update-btn" onClick={() => onUpdate(row)}>
           <FiEdit2 aria-hidden /> Update
         </button>
       ),

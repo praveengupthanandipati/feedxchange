@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { FiX, FiSave } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
-import MultiSelect from "../../../../components/dropdown/MultiSelect";
 import {
   transporterOptions,
   truckOptions,
+  truckDriverMap,
+  driverNameOptions,
   addressOptions,
   timeOptions,
 } from "../assignTransportsOptions.data";
@@ -17,7 +18,7 @@ type BillChangeOption = "direct" | "changeToBeDone";
 interface FormState {
   billChangeOption: BillChangeOption;
   billChangeMessage: string;
-  transporters: string[];
+  transporter: string;
   truck: string;
   driverName: string;
   driverPhone: string;
@@ -33,7 +34,7 @@ interface FormState {
 const initialFormState: FormState = {
   billChangeOption: "direct",
   billChangeMessage: "",
-  transporters: [],
+  transporter: "",
   truck: "",
   driverName: "",
   driverPhone: "",
@@ -84,7 +85,7 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
       setForm({
         billChangeOption: "direct",
         billChangeMessage: "",
-        transporters: editingRow.transporterName.split(", ").filter(Boolean),
+        transporter: editingRow.transporterName,
         truck: editingRow.truckNo,
         driverName: editingRow.driverName,
         driverPhone: editingRow.driverPhone,
@@ -115,10 +116,20 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleTruckChange = (value: string) => {
+    const driver = truckDriverMap[value];
+    setForm((prev) => ({
+      ...prev,
+      truck: value,
+      driverName: driver?.driverName ?? prev.driverName,
+      driverPhone: driver?.driverPhone ?? prev.driverPhone,
+    }));
+  };
+
   const validate = (): FormErrors => {
     const nextErrors: FormErrors = {};
 
-    if (form.transporters.length === 0) nextErrors.transporters = "Select at least one transporter.";
+    if (!form.transporter) nextErrors.transporter = "Select a transporter.";
     if (!form.truck) nextErrors.truck = "Select a truck.";
     if (!form.driverName.trim()) nextErrors.driverName = "Driver name is required.";
 
@@ -170,7 +181,7 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
       status: editingRow?.status ?? "Assigned",
       scheduleDateTime: formatScheduleDate(form.date, form.time),
       scheduleValue: new Date(`${form.date}T${form.time}`).getTime(),
-      transporterName: form.transporters.join(", "),
+      transporterName: form.transporter,
       truckNo: form.truck,
       driverName: form.driverName.trim(),
       driverPhone: form.driverPhone.trim(),
@@ -244,19 +255,19 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
           </div>
 
           <div className="assign-truck-drawer__grid">
-            <div className="assign-truck-drawer__field assign-truck-drawer__field--full">
+            <div className="assign-truck-drawer__field">
               <label className="assign-truck-drawer__label">
                 Select Transporter <span className="assign-truck-drawer__required">*</span>
               </label>
-              <MultiSelect
+              <SearchableSelect
                 options={transporterOptions}
-                value={form.transporters}
-                onChange={(value) => setField("transporters", value)}
-                placeholder="Select Transporter(s)"
+                value={form.transporter}
+                onChange={(value) => setField("transporter", value)}
+                placeholder="Select Transporter"
                 ariaLabel="Select Transporter"
               />
-              {errors.transporters && (
-                <p className="assign-truck-drawer__error">{errors.transporters}</p>
+              {errors.transporter && (
+                <p className="assign-truck-drawer__error">{errors.transporter}</p>
               )}
             </div>
 
@@ -267,24 +278,25 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
               <SearchableSelect
                 options={truckOptions}
                 value={form.truck}
-                onChange={(value) => setField("truck", value)}
+                onChange={handleTruckChange}
                 placeholder="Select Truck"
                 ariaLabel="Select Truck"
+                allowCustom
               />
               {errors.truck && <p className="assign-truck-drawer__error">{errors.truck}</p>}
             </div>
 
             <div className="assign-truck-drawer__field">
-              <label className="assign-truck-drawer__label" htmlFor="driver-name">
+              <label className="assign-truck-drawer__label">
                 Driver Name <span className="assign-truck-drawer__required">*</span>
               </label>
-              <input
-                id="driver-name"
-                type="text"
-                className="assign-truck-drawer__control"
-                placeholder="Driver Name"
+              <SearchableSelect
+                options={driverNameOptions}
                 value={form.driverName}
-                onChange={(event) => setField("driverName", event.target.value)}
+                onChange={(value) => setField("driverName", value)}
+                placeholder="Select Driver"
+                ariaLabel="Select Driver"
+                allowCustom
               />
               {errors.driverName && <p className="assign-truck-drawer__error">{errors.driverName}</p>}
             </div>

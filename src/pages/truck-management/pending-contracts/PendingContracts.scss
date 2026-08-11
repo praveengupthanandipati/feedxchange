@@ -192,6 +192,12 @@
 
   &__id-text {
     color: v.$color-primary;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   &__name {
@@ -413,6 +419,7 @@
     height: 2.25rem;
     padding: 0 v.$spacing-4;
     font-size: v.$font-size-sm;
+    text-decoration: none;
   }
 
   &__stats {

@@ -13,6 +13,26 @@ export const truckOptions = [
   { value: "AP07TB6612", label: "AP07TB6612" },
 ];
 
+// Maps a truck to its regularly assigned driver, used to auto-populate the
+// Driver Name / Driver Phone fields when a truck is selected.
+export const truckDriverMap: Record<string, { driverName: string; driverPhone: string }> = {
+  TS27C512: { driverName: "Ramesh Kumar", driverPhone: "9848012345" },
+  AP16TA9021: { driverName: "Suresh Babu", driverPhone: "9876543210" },
+  TS09FB3345: { driverName: "Venkatesh Rao", driverPhone: "9963214870" },
+  AP07TB6612: { driverName: "Krishna Murthy", driverPhone: "9700123456" },
+};
+
+export const driverNameOptions = Object.values(truckDriverMap).map(({ driverName }) => ({
+  value: driverName,
+  label: driverName,
+}));
+
+// Maps a driver name to their phone number, used to auto-populate the
+// Driver Contact field when a driver is selected.
+export const driverPhoneByName: Record<string, string> = Object.fromEntries(
+  Object.values(truckDriverMap).map(({ driverName, driverPhone }) => [driverName, driverPhone]),
+);
+
 export const addressOptions = [
   { value: "Narapally", label: "Narapally" },
   { value: "Chowdariguda", label: "Chowdariguda" },

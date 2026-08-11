@@ -1,0 +1,210 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+// ============================================================
+// Send Request — Details offcanvas (50% viewport)
+// ============================================================
+.send-request-offcanvas__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-backdrop;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity v.$transition-base, visibility v.$transition-base;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.send-request-offcanvas {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: v.$z-index-modal;
+  width: 50%;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+  background-color: v.$color-bg;
+  box-shadow: v.$shadow-lg;
+  transform: translateX(100%);
+  transition: transform v.$transition-base;
+
+  &.is-open {
+    transform: translateX(0);
+  }
+
+  @include m.respond-below(lg) {
+    width: 90%;
+    max-width: 90%;
+  }
+
+  @include m.respond-below(sm) {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-shrink: 0;
+    padding: v.$spacing-4 v.$spacing-5;
+    border-bottom: 1px solid v.$color-border;
+
+    h2 {
+      @include m.font-heading(v.$font-weight-semibold);
+      color: v.$color-primary;
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: transparent;
+    color: v.$color-text-muted;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+    padding: v.$spacing-5;
+  }
+
+  // Details table (label / value rows)
+  &__details {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    tr:not(:last-child) td {
+      border-bottom: 1px solid v.$color-border;
+    }
+  }
+
+  &__details-label {
+    width: 40%;
+    padding: v.$spacing-3 v.$spacing-4;
+    background-color: v.$color-bg-muted;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__details-value {
+    padding: v.$spacing-3 v.$spacing-4;
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__section-title {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.font-heading(v.$font-weight-semibold);
+    color: v.$color-primary;
+    font-size: v.$font-size-base;
+    margin: 0;
+  }
+
+  &__table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+  }
+
+  &__table {
+    width: 100%;
+    min-width: 28rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: v.$font-size-sm;
+
+    th {
+      @include m.font-heading(v.$font-weight-semibold);
+      padding: v.$spacing-3 v.$spacing-4;
+      background-color: v.$color-bg-muted;
+      color: v.$color-text;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: v.$spacing-3 v.$spacing-4;
+      color: v.$color-text;
+      white-space: nowrap;
+      border-top: 1px solid v.$color-border;
+    }
+  }
+
+  &__freight {
+    color: v.$color-success;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__note {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__footer {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    flex-shrink: 0;
+    padding: v.$spacing-4 v.$spacing-5;
+    border-top: 1px solid v.$color-border;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &--confirm {
+      background-color: v.$color-success;
+
+      &:hover {
+        background-color: #227a46;
+      }
+    }
+
+    &--cancel {
+      background-color: v.$color-danger;
+
+      &:hover {
+        background-color: #b8352b;
+      }
+    }
+  }
+}

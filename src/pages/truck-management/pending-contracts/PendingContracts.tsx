@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import {
   
   useGetAllContractsByFiltersQuery,
@@ -25,7 +26,6 @@ import {
   FiMapPin,
 } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
-import MultiSelect from "../../../components/dropdown/MultiSelect";
 import Table from "../../../components/table/Table";
 import type { TableColumn } from "../../../components/table/table.types";
 import { buildPendingContractColumns } from "./pendingContracts.columns";
@@ -74,11 +74,6 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
     });
   };
 
-  const handleExpandAll = () => {
-    if (!row) return;
-    setExpandedTrucks(new Set(row.trucks.map((truck) => truck.truckNumber)));
-  };
-
   const handleShare = (truck: TruckAssignment) => {
     navigator.clipboard
       .writeText(`${truck.truckNumber} — Final Qty: ${truck.finalQty}`)
@@ -124,13 +119,12 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
                 <h3>
                   <FiTruck aria-hidden /> Truck Tracking Details
                 </h3>
-                <button
-                  type="button"
+                <Link
+                  to={`/truck-management/assign-transports?contract=${encodeURIComponent(row.id)}`}
                   className="truck-tracking-drawer__add-btn"
-                  onClick={handleExpandAll}
                 >
                   <FiPlus aria-hidden /> Add / View Trucks
-                </button>
+                </Link>
               </div>
 
               <div className="truck-tracking-drawer__stats">
@@ -280,8 +274,8 @@ const PendingContracts = () => {
 
   const [downloadExcel] = useLazyGetAllContractsForExcelQuery();
 
-  const [sellerFilter, setSellerFilter] = useState<string[]>([]);
-  const [buyerFilter, setBuyerFilter] = useState<string[]>([]);
+  const [sellerFilter, setSellerFilter] = useState("All");
+  const [buyerFilter, setBuyerFilter] = useState("All");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [scheduleFilter, setScheduleFilter] = useState("Pending");
@@ -347,8 +341,8 @@ const PendingContracts = () => {
     const q = keyword.trim().toLowerCase();
 
     return pendingContracts.filter((row) => {
-      if (sellerFilter.length > 0 && !sellerFilter.includes(row.seller)) return false;
-      if (buyerFilter.length > 0 && !buyerFilter.includes(row.buyer)) return false;
+      if (sellerFilter !== "All" && row.seller !== sellerFilter) return false;
+      if (buyerFilter !== "All" && row.buyer !== buyerFilter) return false;
       if (scheduleFilter !== "All" && row.deliverySchedule !== scheduleFilter) return false;
 
       if (dateFrom && row.dateValue < new Date(dateFrom).getTime()) return false;
@@ -371,8 +365,8 @@ const PendingContracts = () => {
   );
 
   const handleClearFilters = () => {
-    setSellerFilter([]);
-    setBuyerFilter([]);
+    setSellerFilter("All");
+    setBuyerFilter("All");
     setDateFrom("");
     setDateTo("");
     setScheduleFilter("All");
@@ -431,14 +425,14 @@ const PendingContracts = () => {
         {filtersVisible && (
           <div className="pending-contracts-filters">
             <div className="pending-contracts-filters__row">
-              <MultiSelect
+              <SearchableSelect
                 options={sellerOptions}
                 value={sellerFilter}
                 onChange={setSellerFilter}
                 placeholder="Select Sellers"
                 ariaLabel="Select Sellers"
               />
-              <MultiSelect
+              <SearchableSelect
                 options={buyerOptions}
                 value={buyerFilter}
                 onChange={setBuyerFilter}
