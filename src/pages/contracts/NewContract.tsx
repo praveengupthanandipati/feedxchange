@@ -1,13 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiEye, FiEyeOff } from "react-icons/fi";
 import SearchableSelect from "../../components/dropdown/SearchableSelect";
 import ToggleSwitch from "../../components/toggle/ToggleSwitch";
+import type { Contract } from "./contracts.data";
+import { useSaveContractMutation, useUpdateContractMutation } from "../../store/newContractsApi";
+
 import {
-  sellerOptions,
-  buyerOptions,
-  productOptions,
   quantityMeasureOptions,
   poToleranceOptions,
   deliveryTypeOptions,
@@ -18,6 +18,8 @@ import {
   paymentTermsOptions,
 } from "./newContract.data";
 import "./NewContract.scss";
+import { useGetProductsQuery } from "../../store/productsApi";
+import {useGetBusinessProfileSummaryQuery} from "../../store/businessProfilesApi";
 
 interface ConditionState {
   commission: string;
@@ -78,6 +80,8 @@ const REQUIRED_FIELD_LABELS: Record<string, string> = {
 
 const NewContract = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = (location.state as null | { contract?: Contract; isEdit?: boolean }) || null;
 
   const [summaryVisible, setSummaryVisible] = useState(true);
 
@@ -107,9 +111,54 @@ const NewContract = () => {
   const [buyerPaymentDueDays, setBuyerPaymentDueDays] = useState("");
   const [paymentRemarks, setPaymentRemarks] = useState("");
 
-  const [approved, setApproved] = useState(false);
+  const [status, setStatus] = useState(false);
   const [formError, setFormError] = useState("");
 
+  const resolveOptionValue = (
+    options: { value: string; label: string }[],
+    contractValue: string | undefined,
+  ) => {
+    if (!contractValue) return "";
+    const match = options.find(
+      (option) => option.value === contractValue || option.label === contractValue,
+    );
+    if (match) return match.value;
+    console.warn("Option value not found for contract field", { contractValue, options });
+    return contractValue;
+  };
+
+  // helper to convert `d/m/yyyy` or timestamp into yyyy-mm-dd for <input type="date">
+  const toIsoDate = (value: string | number | undefined) => {
+    if (!value) return "";
+    if (typeof value === "number") return new Date(value).toISOString().slice(0, 10);
+    // value like "12/8/2026" or "12/08/2026"
+    const parts = value.split("/");
+    if (parts.length === 3) {
+      const [d, m, y] = parts.map((p) => p.padStart(2, "0"));
+      return `${y}-${m}-${d}`;
+    }
+    const parsed = Date.parse(value);
+    return Number.isNaN(parsed) ? "" : new Date(parsed).toISOString().slice(0, 10);
+  };
+const { data: products } = useGetProductsQuery();
+    const productOptions = useMemo(
+      () =>
+        (products ?? []).map((product) => ({
+          value: String(product.id),
+          label: product.name ?? "",
+        })),
+      [products],
+    );
+    const { data: businessProfiles } = useGetBusinessProfileSummaryQuery();
+    const businessProfileOptions = useMemo(
+      () =>
+        (businessProfiles ?? []).map((profile) => ({
+          value: String(profile.profileId),
+          label: profile.legalName ?? "",
+        })),
+      [businessProfiles],
+    );
+  
   const baseRate = parseFloat(contractRate) || 0;
   const gstAmount = Math.round(baseRate * ((parseFloat(gstPercent) || 0) / 100) * 100) / 100;
   const netRate = Math.round((baseRate + gstAmount) * 100) / 100;
@@ -118,8 +167,8 @@ const NewContract = () => {
     ? Math.max(0, 100 - (parseFloat(immediateAdvancePercent) || 0))
     : "";
 
-  const sellerLabel = sellerOptions.find((option) => option.value === sellerId)?.label;
-  const buyerLabel = buyerOptions.find((option) => option.value === buyerId)?.label;
+  const sellerLabel = businessProfileOptions.find((option) => option.value === sellerId)?.label;
+  const buyerLabel = businessProfileOptions .find((option) => option.value === buyerId)?.label;
   const productLabel = productOptions.find((option) => option.value === productId)?.label;
   const quantityMeasureLabel = quantityMeasureOptions.find(
     (option) => option.value === quantityMeasure,
@@ -191,6 +240,7 @@ const NewContract = () => {
     ],
   );
 
+
   const handleSellerConditionChange = (patch: Partial<ConditionState>) => {
     setSellerConditions((prev) => ({ ...prev, ...patch }));
   };
@@ -204,19 +254,221 @@ const NewContract = () => {
       setter(event.target.value);
     };
 
-  const handleSubmit = () => {
+  const [updateContract] = useUpdateContractMutation();
+  const [saveContract] = useSaveContractMutation();
+
+  const toIsoDateTime = (value: string) => {
+    if (!value) return "";
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString();
+  };
+
+  const handleSubmit = async () => {
+    const actionType = navState?.isEdit ? "Update" : "Create";
+    console.log(`${actionType} Contract button clicked`, {
+      isEdit: navState?.isEdit,
+      contractNumber: navState?.contract?.id,
+      contractDate,
+      sellerId,
+      buyerId,
+      productId,
+    });
+
     const missing = Object.entries(requiredValues)
       .filter(([, value]) => !value)
       .map(([key]) => REQUIRED_FIELD_LABELS[key]);
 
     if (missing.length > 0) {
+      console.log(`${actionType} Contract missing required fields`, missing);
       setFormError(`Please fill in the required fields: ${missing.join(", ")}.`);
       return;
     }
 
-    setFormError("");
-    navigate("/contracts");
+    const requestBody = {
+      contractDate: toIsoDateTime(contractDate),
+      contractTypeId: 10,
+      businessUnitId: 10,
+      effectiveFrom: toIsoDateTime(contractDate),
+      effectiveTo: toIsoDateTime(contractDate),
+      currencyId: 10,
+      statusId: 10,
+      versionNo: 10,
+      parentContractId: null,
+      referenceNo: "string asdfsafd",
+      remarks: "string good",
+      approvalRequired: true,
+      isActive: true,
+      sellerId: Number(sellerId) || 0,
+      buyerId: Number(buyerId) || 0,
+      productId: Number(productId) || 0,
+      basicDetails: {
+        quantity: Number(qty) || 0,
+        quantityMeasure,
+        minQuantity: 10,
+        maxQuantity: 100,
+        poTolerancePercentage: 100,
+        deliveryType,
+        contractRate: Number(contractRate) || 0,
+        gstPercentage: Number(gstPercent) || 0,
+        gstDetails,
+        baseRate,
+        gstAmount,
+        netRate,
+        indicativeFreight: Number(indicativeFreight) || 0,
+        rateRemarks,
+      },
+      sellerConditions: {
+        commission: Number(sellerConditions.commission) || 0,
+        deliverySchedule: sellerConditions.deliverySchedule,
+        sellerSpecificDays:
+          sellerConditions.deliverySchedule === "specific-days"
+            ? sellerConditions.specificDays
+            : "",
+        sellerFromDate:
+          sellerConditions.deliverySchedule === "forward-contract"
+            ? toIsoDateTime(sellerConditions.fromDate)
+            : null,
+        sellerToDate:
+          sellerConditions.deliverySchedule === "forward-contract"
+            ? toIsoDateTime(sellerConditions.toDate)
+            : null,
+        qualitySpecifications: [],
+        customQualitySpecifications: "",
+        loadingAddressAt: sellerConditions.address,
+        remarksSpecialConditions: sellerConditions.remarks,
+      },
+      buyerConditions: {
+        commission: Number(buyerConditions.commission) || 0,
+        deliverySchedule: buyerConditions.deliverySchedule,
+        buyerFromDate:
+          buyerConditions.deliverySchedule === "forward-contract"
+            ? toIsoDateTime(buyerConditions.fromDate)
+            : null,
+        buyerToDate:
+          buyerConditions.deliverySchedule === "forward-contract"
+            ? toIsoDateTime(buyerConditions.toDate)
+            : null,
+        buyerSpecificDays:
+          buyerConditions.deliverySchedule === "specific-days"
+            ? buyerConditions.specificDays
+            : null,
+        qualitySpecifications: [],
+        customQualitySpecifications: "",
+        loadingAddressAt: buyerConditions.address,
+        remarksSpecialConditions: buyerConditions.remarks,
+      },
+      paymentsInvoices: {
+        paymentBeforeDate: paymentBeforeDate ? toIsoDateTime(paymentBeforeDate) : null,
+        sellerPaymentDueDays: Number(sellerPaymentDueDays) || 0,
+        buyerPaymentDueDays: Number(buyerPaymentDueDays) || 0,
+        immediateAdvancePercentage: Number(immediateAdvancePercent) || 0,
+        immediateAdvanceDate: immediateAdvanceDate ? toIsoDateTime(immediateAdvanceDate) : null,
+        balanceAdvancePercentage: Number(balanceAdvancePercent) || 0,
+        balanceAdvanceDate: balanceAdvanceDate ? toIsoDateTime(balanceAdvanceDate) : null,
+        remarks: paymentRemarks,
+      },
+      actionPerformedBy: 1,
+    };
+
+    try {
+      if (navState?.isEdit && navState.contract) {
+        const payload = {
+          contractNumber: navState.contract.id,
+          updateContract: requestBody,
+        };
+        console.log("Update Contract payload", payload);
+        await updateContract(payload).unwrap();
+      } else {
+        const payload = requestBody;
+        console.log("Create Contract payload", payload);
+        await saveContract(payload).unwrap();
+      }
+
+      setFormError("");
+      navigate("/contracts");
+    } catch (error) {
+      console.error(`${actionType} Contract API failed`, error);
+      setFormError("Unable to save contract. Please try again.");
+    }
   };
+
+  useEffect(() => {
+    if (!navState?.isEdit || !navState.contract) return;
+    const c = navState.contract;
+
+    setContractDate(toIsoDate(c.dateValue ?? c.date));
+    setSellerId(resolveOptionValue(businessProfileOptions, c.seller));
+    setBuyerId(resolveOptionValue(businessProfileOptions, c.buyer));
+    setProductId(resolveOptionValue(productOptions, c.product));
+    setQuantityMeasure(
+      resolveOptionValue(quantityMeasureOptions, c.quantityMeasure) || "mt",
+    );
+    // qty in contracts is like "123 MT" — take the numeric part
+    setQty((c.qty || "").split(" ")[0]);
+    setPoTolerance(
+      poToleranceOptions.find((o) => o.label === c.poTolerance || o.value === c.poTolerance)
+        ?.value ?? "",
+    );
+    setDeliveryType(
+      deliveryTypeOptions.find((o) => o.label === c.deliveryType || o.value === c.deliveryType)
+        ?.value ?? "",
+    );
+    setContractRate(String(c.cRateValue ?? ""));
+    setGstPercent(String((c.gst || "").replace("%", "") || "5"));
+    // gstDetails options use labels like "5% GST" — match by starting number
+    setGstDetails(
+      gstDetailsOptions.find((o) => o.label.startsWith((c.gst || "").replace("%", "")))
+        ?.value ?? "",
+    );
+    setIndicativeFreight(String(c.iFreightValue ?? ""));
+    setRateRemarks(c.rateRemarks ?? "");
+
+    // seller / buyer conditions
+    setSellerConditions((prev) => ({
+      ...prev,
+      commission: (c.sellerConditions?.commission || "").replace("%", ""),
+      deliverySchedule:
+        deliveryScheduleOptions.find((o) => o.label === c.sellerConditions?.deliverySchedule)
+          ?.value ?? prev.deliverySchedule,
+      fromDate: toIsoDate(c.sellerConditions?.fromDate),
+      toDate: toIsoDate(c.sellerConditions?.toDate),
+      specificDays: c.sellerConditions?.specificDays ?? prev.specificDays,
+      qualitySpecSource:
+        qualitySpecSourceOptions.find((o) => o.label === c.sellerConditions?.qualitySpecSource)
+          ?.value ?? prev.qualitySpecSource,
+      address: addressOptions.find((o) => o.label === c.sellerConditions?.address)?.value ?? prev.address,
+      remarks: c.sellerConditions?.remarks ?? prev.remarks,
+    }));
+
+    setBuyerConditions((prev) => ({
+      ...prev,
+      commission: (c.buyerConditions?.commission || "").replace("%", ""),
+      deliverySchedule:
+        deliveryScheduleOptions.find((o) => o.label === c.buyerConditions?.deliverySchedule)
+          ?.value ?? prev.deliverySchedule,
+      fromDate: toIsoDate(c.buyerConditions?.fromDate),
+      toDate: toIsoDate(c.buyerConditions?.toDate),
+      specificDays: c.buyerConditions?.specificDays ?? prev.specificDays,
+      qualitySpecSource:
+        qualitySpecSourceOptions.find((o) => o.label === c.buyerConditions?.qualitySpecSource)
+          ?.value ?? prev.qualitySpecSource,
+      address: addressOptions.find((o) => o.label === c.buyerConditions?.address)?.value ?? prev.address,
+      remarks: c.buyerConditions?.remarks ?? prev.remarks,
+    }));
+
+    setPaymentTerms(paymentTermsOptions.find((o) => o.label === c.paymentTerms)?.value ?? "");
+    setPaymentBeforeDate(toIsoDate(c.paymentBeforeDate));
+    setImmediateAdvancePercent(c.immediateAdvancePercent ?? "");
+    setImmediateAdvanceDate(toIsoDate(c.immediateAdvanceDate));
+    setBalanceAdvanceDate(toIsoDate(c.balanceAdvanceDate));
+    setSellerPaymentDueDays(c.sellerPaymentDueDays ?? "");
+    setBuyerPaymentDueDays(c.buyerPaymentDueDays ?? "");
+    setPaymentRemarks(c.paymentRemarks ?? "");
+    setStatus(Boolean(c.status));
+    setFormError("");
+  }, []);
+
+
 
   return (
     <div className="new-contract">
@@ -297,7 +549,7 @@ const NewContract = () => {
               Select Seller <span className="form-field__required">*</span>
             </span>
             <SearchableSelect
-              options={sellerOptions}
+              options={businessProfileOptions}
               value={sellerId}
               onChange={setSellerId}
               placeholder="Seller"
@@ -310,7 +562,7 @@ const NewContract = () => {
               Select Buyer <span className="form-field__required">*</span>
             </span>
             <SearchableSelect
-              options={buyerOptions}
+              options={businessProfileOptions}
               value={buyerId}
               onChange={setBuyerId}
               placeholder="Buyer"
@@ -913,12 +1165,12 @@ const NewContract = () => {
               <td>
                 <div className="new-contract__setting-value">
                   <ToggleSwitch
-                    checked={approved}
-                    onChange={setApproved}
+                    checked={status}
+                    onChange={setStatus}
                     ariaLabel="Approval status"
                   />
                   <span className="new-contract__setting-status">
-                    {approved ? "Approved" : "Pending"}
+                    {status ? "Approved" : "Pending"}
                   </span>
                 </div>
               </td>
@@ -932,7 +1184,7 @@ const NewContract = () => {
           Cancel
         </Link>
         <button type="button" className="new-contract__submit" onClick={handleSubmit}>
-          Create Contract
+          {navState?.isEdit ? "Update Contract" : "Create Contract"}
         </button>
       </div>
     </div>

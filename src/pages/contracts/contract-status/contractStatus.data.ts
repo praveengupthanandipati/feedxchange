@@ -1,7 +1,7 @@
 // TODO: replace with real data once the contract-status API is wired up.
 
 export interface ContractStatusRecord {
-  contractNumber: string;
+  contractId: string;
   financialYear: string;
   contractDate: string;
   seller: string;
@@ -32,7 +32,7 @@ export const financialYearOptions = [
 
 export const contractStatusRecords: ContractStatusRecord[] = [
   {
-    contractNumber: "2431",
+    contractId: "2431",
     financialYear: "2023-2024",
     contractDate: "24-12-2025",
     seller: "FairSquare Trading Pvt Ltd - Pune",
@@ -53,7 +53,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: true,
   },
   {
-    contractNumber: "2458",
+    contractId: "2458",
     financialYear: "2023-2024",
     contractDate: "02-01-2026",
     seller: "Chatrai - Lakshmi Poultry",
@@ -74,7 +74,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "2210",
+    contractId: "2210",
     financialYear: "2022-2023",
     contractDate: "18-08-2024",
     seller: "Miryalguda - Rayapudi Agro",
@@ -95,7 +95,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3840",
+    contractId: "3840",
     financialYear: "2024-2025",
     contractDate: "15-01-2025",
     seller: "Ankur Animal Feeds",
@@ -116,7 +116,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3841",
+    contractId: "3841",
     financialYear: "2024-2025",
     contractDate: "16-01-2025",
     seller: "Green Valley Dairy",
@@ -137,7 +137,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3842",
+    contractId: "3842",
     financialYear: "2024-2025",
     contractDate: "17-01-2025",
     seller: "Sai Feeds Pvt Ltd",
@@ -158,7 +158,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3843",
+    contractId: "3843",
     financialYear: "2024-2025",
     contractDate: "18-01-2025",
     seller: "Ankur Animal Feeds",
@@ -179,7 +179,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3844",
+    contractId: "3844",
     financialYear: "2024-2025",
     contractDate: "19-01-2025",
     seller: "Green Valley Dairy",
@@ -200,7 +200,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3845",
+    contractId: "3845",
     financialYear: "2024-2025",
     contractDate: "21-01-2025",
     seller: "Ankur Animal Feeds",
@@ -221,7 +221,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3846",
+    contractId: "3846",
     financialYear: "2024-2025",
     contractDate: "22-01-2025",
     seller: "Sai Feeds Pvt Ltd",
@@ -242,7 +242,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3847",
+    contractId: "3847",
     financialYear: "2024-2025",
     contractDate: "23-01-2025",
     seller: "Ankur Animal Feeds",
@@ -263,7 +263,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3848",
+    contractId: "3848",
     financialYear: "2024-2025",
     contractDate: "24-01-2025",
     seller: "Green Valley Dairy",
@@ -284,7 +284,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
     contractClosed: false,
   },
   {
-    contractNumber: "3849",
+    contractId: "3849",
     financialYear: "2024-2025",
     contractDate: "25-01-2025",
     seller: "Sai Feeds Pvt Ltd",
@@ -312,7 +312,7 @@ export const contractStatusRecords: ContractStatusRecord[] = [
 export interface GetContractsRow {
   sNo: number;
   cDate: string;
-  contractNumber: string;
+  contractId: number;
   buyer: string;
   seller: string;
   product: string;
@@ -336,7 +336,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 1,
     cDate: "15-01-2025",
-    contractNumber: "3840",
+    contractId: 3840,
     buyer: "Sai Feeds Pvt Ltd",
     seller: "Ankur Animal Feeds",
     product: "Wheat",
@@ -346,7 +346,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 2,
     cDate: "16-01-2025",
-    contractNumber: "3841",
+    contractId: 3841,
     buyer: "Blue Aqua Farms",
     seller: "Green Valley Dairy",
     product: "Rice",
@@ -356,7 +356,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 3,
     cDate: "17-01-2025",
-    contractNumber: "3842",
+    contractId: 3842,
     buyer: "Green Valley Dairy",
     seller: "Sai Feeds Pvt Ltd",
     product: "Corn",
@@ -366,7 +366,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 4,
     cDate: "18-01-2025",
-    contractNumber: "3843",
+    contractId: 3843,
     buyer: "Blue Aqua Farms",
     seller: "Ankur Animal Feeds",
     product: "Maize",
@@ -376,7 +376,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 5,
     cDate: "19-01-2025",
-    contractNumber: "3844",
+    contractId: 3844,
     buyer: "Sai Feeds Pvt Ltd",
     seller: "Green Valley Dairy",
     product: "Soybean",
@@ -386,7 +386,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 6,
     cDate: "21-01-2025",
-    contractNumber: "3845",
+    contractId: 3845,
     buyer: "Green Valley Dairy",
     seller: "Ankur Animal Feeds",
     product: "Sunflower",
@@ -396,7 +396,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 7,
     cDate: "22-01-2025",
-    contractNumber: "3846",
+    contractId: 3846,
     buyer: "Blue Aqua Farms",
     seller: "Sai Feeds Pvt Ltd",
     product: "Barley",
@@ -406,7 +406,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 8,
     cDate: "23-01-2025",
-    contractNumber: "3847",
+    contractId: 3847,
     buyer: "Sai Feeds Pvt Ltd",
     seller: "Ankur Animal Feeds",
     product: "Bajra",
@@ -416,7 +416,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 9,
     cDate: "24-01-2025",
-    contractNumber: "3848",
+    contractId: 3848,
     buyer: "Blue Aqua Farms",
     seller: "Green Valley Dairy",
     product: "Jowar",
@@ -426,7 +426,7 @@ export const getContractsRows: GetContractsRow[] = [
   {
     sNo: 10,
     cDate: "25-01-2025",
-    contractNumber: "3849",
+    contractId: 3849,
     buyer: "Green Valley Dairy",
     seller: "Sai Feeds Pvt Ltd",
     product: "Cotton Seed",

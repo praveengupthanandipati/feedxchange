@@ -3,7 +3,9 @@ import { businessProfilesApi } from "./businessProfilesApi";
 import { transportersApi } from "./transportersApi";
 import { promotersApi } from "./promotersApi";
 import {categoryApi} from "./categoryApi";
+import { newContractsApi } from "./newContractsApi";
 import {pendingContractApi} from "./pendingContractApi";
+import {contractsApi} from "./contractApi";
 import {productsApi} from "./productsApi";
 import { userProfilesCommonApi } from "./userProfilesCommonApi";
 import { authApi } from "./authApi";
@@ -22,6 +24,8 @@ export const store = configureStore({
     [productsApi.reducerPath]: productsApi.reducer,
     [userProfilesCommonApi.reducerPath]: userProfilesCommonApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
+    [newContractsApi.reducerPath]: newContractsApi.reducer,
+    [contractsApi.reducerPath]: contractsApi.reducer,
     [trucksApi.reducerPath]: trucksApi.reducer,
     [driversApi.reducerPath]: driversApi.reducer,
     [truckTripApi.reducerPath]: truckTripApi.reducer,
@@ -37,6 +41,8 @@ export const store = configureStore({
       categoryApi.middleware,
       productsApi.middleware,
       pendingContractApi.middleware,
+      newContractsApi.middleware,
+      contractsApi.middleware,
       trucksApi.middleware,
       driversApi.middleware,
       truckTripApi.middleware,

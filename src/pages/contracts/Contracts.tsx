@@ -13,13 +13,9 @@ import {
 import Table from "../../components/table/Table";
 import type { TableColumn } from "../../components/table/table.types";
 import SearchableSelect from "../../components/dropdown/SearchableSelect";
+import { useDeleteContractMutation, useGetAllContractsQuery } from "../../store/contractApi";
 import { buildContractColumns } from "./contracts.columns";
-import {
-  contracts as initialContracts,
-  dateRangeOptions,
-  statusOptions,
-  type Contract,
-} from "./contracts.data";
+import { dateRangeOptions, statusOptions, type Contract } from "./contracts.data";
 import "./Contracts.scss";
 
 const PAGE_SIZE = 10;
@@ -35,26 +31,152 @@ function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+interface ApiContract {
+  id: number;
+  contractDate: string;
+  contractNumber: string;
+  status: string;
+  sellerName: string | null;
+  buyerName: string | null;
+  productName: string | null;
+  quantity: number;
+  quantityMeasure: string;
+  dispatchedQuantity: number | null;
+  arrangedQuantity: number | null;
+  pendingQuantity: number | null;
+  contractRate: number;
+  gstPercentage: number | null;
+  baseRate: number | null;
+  gstAmount: number | null;
+  netRate: number | null;
+  deliveryType: string;
+  paymentTerms: string | null;
+  paymentBeforeDate: string | null;
+  immediateAdvancePercentage: number | null;
+  immediateAdvanceDate: string | null;
+  balanceAdvancePercentage: number | null;
+  balanceAdvanceDate: string | null;
+  indicativeFreight: number | null;
+  approvalStatus: boolean;
+  isActive: boolean;
+  remarks: string | null;
+  sellerPaymentDueDays: number | null;
+  buyerPaymentDueDays: number | null;
+}
+
+function mapApiContract(row: ApiContract): Contract {
+  const qtyMeasure = row.quantityMeasure || "mt";
+  return {
+    id: row.contractNumber,
+    contractId: row.id,
+    date: row.contractDate ? new Date(row.contractDate).toLocaleDateString("en-IN") : "",
+    dateValue: row.contractDate ? new Date(row.contractDate).getTime() : 0,
+    status: row.status as Contract["status"],
+    seller: row.sellerName ?? "",
+    buyer: row.buyerName ?? "",
+    product: row.productName ?? "",
+    quantityMeasure: qtyMeasure,
+    qty: `${row.quantity} ${qtyMeasure}`,
+    qtyValue: row.quantity,
+    poTolerance: "",
+    aQty: `${row.arrangedQuantity ?? 0} ${qtyMeasure}`,
+    pQty: `${row.pendingQuantity ?? 0} ${qtyMeasure}`,
+    dQty: `${row.dispatchedQuantity ?? 0} ${qtyMeasure}`,
+    cRate: `₹${row.contractRate}`,
+    cRateValue: row.contractRate,
+    gst: `${row.gstPercentage ?? 0}%`,
+    netRate: `₹${row.netRate ?? 0}`,
+    netRateValue: row.netRate ?? 0,
+    indicativeFreight:
+      row.indicativeFreight !== null && row.indicativeFreight !== undefined
+        ? `₹${row.indicativeFreight}`
+        : "",
+    rateRemarks: row.remarks ?? "",
+    deliveryType: row.deliveryType,
+    paymentTerms: row.paymentTerms ?? "",
+    paymentBeforeDate: row.paymentBeforeDate ?? "",
+    immediateAdvancePercent: row.immediateAdvancePercentage?.toString() ?? "",
+    immediateAdvanceDate: row.immediateAdvanceDate ?? "",
+    balanceAdvancePercent: row.balanceAdvancePercentage?.toString() ?? "",
+    balanceAdvanceDate: row.balanceAdvanceDate ?? "",
+    sellerPaymentDueDays: row.sellerPaymentDueDays?.toString() ?? "",
+    buyerPaymentDueDays: row.buyerPaymentDueDays?.toString() ?? "",
+    paymentRemarks: "",
+    iFreight:
+      row.indicativeFreight !== null && row.indicativeFreight !== undefined
+        ? `₹${row.indicativeFreight}`
+        : "",
+    iFreightValue: row.indicativeFreight ?? 0,
+    sellerConditions: {
+      commission: "",
+      deliverySchedule: "ready-loading",
+      fromDate: "",
+      toDate: "",
+      specificDays: "",
+      qualitySpecSource: "",
+      address: "",
+      remarks: "",
+    },
+    buyerConditions: {
+      commission: "",
+      deliverySchedule: "ready-loading",
+      fromDate: "",
+      toDate: "",
+      specificDays: "",
+      qualitySpecSource: "",
+      address: "",
+      remarks: "",
+    },
+    approved: row.approvalStatus,
+  };
+}
+
+const ContractsLoader = () => {
+  return (
+    <div className="contracts-loader">
+      <div className="contracts-loader__spinner" />
+    </div>
+  );
+};
+
 const Contracts = () => {
   const navigate = useNavigate();
-  const [rows, setRows] = useState<Contract[]>(initialContracts);
   const [keyword, setKeyword] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [dateRangeFilter, setDateRangeFilter] = useState("Today");
+  const [rows, setRows] = useState<Contract[]>([]);
+  const { data, isLoading, isFetching } = useGetAllContractsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+  });
+  const [deleteContract] = useDeleteContractMutation();
+  const [dateRangeFilter, setDateRangeFilter] = useState("All");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const handleEdit = (_contract: Contract) => {
-    // TODO: open the edit-contract form once it exists.
-  };
+  const handleEdit = (contract: Contract) => {
+      navigate("new",{
+        state:{ contract,isEdit:true }
+      });
+    };
 
-  const handleDelete = (contract: Contract) => {
-    setRows((prev) => prev.filter((row) => row.id !== contract.id));
-    setSelectedRowIds((prev) => prev.filter((id) => id !== contract.id));
-  };
+  useEffect(() => {
+    if (!data?.contracts) return;
+
+    setRows(data.contracts.map(mapApiContract));
+  }, [data]);
+
+  const handleDelete = async (contract: Contract) => {
+    try {
+      await deleteContract({ contractId: contract.contractId }).unwrap();
+      setRows((prev) => prev.filter((row) => row.id !== contract.id));
+      setSelectedRowIds((prev) => prev.filter((id) => id !== contract.id));
+    } catch (error) {
+      console.error("Delete Contract API failed", error);
+    }
+  };  
 
   const handleToggleRow = (id: string) => {
     setSelectedRowIds((prev) =>
@@ -81,16 +203,7 @@ const Contracts = () => {
   }, [keyword, statusFilter, dateRangeFilter, customFrom, customTo]);
 
   const filteredRows = useMemo(() => {
-    const q = keyword.trim().toLowerCase();
-
     return rows.filter((row) => {
-      if (statusFilter && statusFilter !== "All" && row.status !== statusFilter) return false;
-
-      if (q) {
-        const haystack = [row.id, row.seller, row.buyer, row.product].join(" ").toLowerCase();
-        if (!haystack.includes(q)) return false;
-      }
-
       if (dateRangeFilter === "Today") {
         const rowDate = new Date(row.dateValue);
         const today = new Date();
@@ -162,12 +275,14 @@ const Contracts = () => {
     URL.revokeObjectURL(url);
   };
 
+  const totalContractsValue = rows.length;
+
   return (
     <div className="contracts-page">
       <div className="contracts-page__summary">
         <div className="contracts-summary contracts-summary--primary">
           <span>Total Contracts</span>
-          <strong>{rows.length}</strong>
+          <strong>{totalContractsValue}</strong>
         </div>
         <div className="contracts-summary contracts-summary--success">
           <span>Total Quantity</span>
@@ -264,6 +379,9 @@ const Contracts = () => {
           </div>
         )}
 
+        {isLoading || isFetching ? (
+  <ContractsLoader />
+) : (
         <Table
           columns={columns}
           data={pagedRows}
@@ -275,6 +393,7 @@ const Contracts = () => {
           emptyMessage="No contracts match the current filters."
           minHeight
         />
+)}
 
         <div className="contracts-pagination">
           <p>

@@ -307,7 +307,9 @@ const PendingContracts = () => {
     });
 
   useEffect(() => {
-   
+    console.log("Filtered Data:", filteredContracts);
+    console.log("Filter Loading:", isLoading);
+    console.log("Filter Error:", error);
   }, [filteredContracts, isLoading, error]);
 
   const handleDownloadExcel = async () => {

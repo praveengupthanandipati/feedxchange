@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
-import { FiImage, FiChevronLeft, FiChevronRight,FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiImage, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import ConfirmDialog from "../../../components/dialog/ConfirmDialog";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
 //import RowActionsMenu from "../../../components/table/RowActionsMenu";
@@ -61,7 +62,6 @@ const Categories = () => {
 }, [apiCategories]);
   const [currentPage, setCurrentPage] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [editingId, setEditingId] = useState<string | null>(null);
   const [categoryName, setCategoryName] = useState("");
   //const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
@@ -72,6 +72,8 @@ const Categories = () => {
   const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
   const [imageError, setImageError] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+  const [pendingDeleteRow, setPendingDeleteRow] = useState<Category | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
@@ -126,18 +128,39 @@ const Categories = () => {
     setErrors({});
   };
 
-  const handleDelete = async (row: Category) => {
+//   const handleDelete = async (row: Category) => {
+//   try {
+//     await deleteCategory({
+//       categoryId: Number(row.id),
+//       actionPerformedBy: 1,
+//     }).unwrap();
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+const handleDelete = (row: Category) => {
+  setDeleteError(null);
+  setPendingDeleteRow(row);
+};
+
+const confirmDelete = async () => {
+  if (!pendingDeleteRow) return;
+
   try {
     await deleteCategory({
-      categoryId: Number(row.id),
+      categoryId: Number(pendingDeleteRow.id),
       actionPerformedBy: 1,
     }).unwrap();
+
+    setPendingDeleteRow(null);
   } catch (err) {
-    console.error(err);
+    setDeleteError(
+      err instanceof Error ? err.message : "Failed to delete category."
+    );
   }
 };
 
-  const handleSave = async () => {
+const handleSave = async () => {
     
     const trimmedName = categoryName.trim();
     const trimmedSeoName = seoName.trim();
@@ -211,7 +234,7 @@ const Categories = () => {
       {
         key: "categoryName",
         header: "Category Name",
-        width: "45%",
+        width: "10%",
         render: (row) => (
           <button type="button" className="categories__link" onClick={() => handleEdit(row)}>
             {row.categoryName}
@@ -219,34 +242,47 @@ const Categories = () => {
         ),
         exportValue: (row) => row.categoryName,
       },
+         {
+  key: "actions",
+  header: "",
+  align: "center",
+  width: "15%",
+  render: (row) => (
+    <RowActionsMenu
+      variant="menu"
+      onEdit={() => handleEdit(row)}
+      onDelete={() => handleDelete(row)}
+    />
+  ),
+},
       {
         key: "status",
         header: "Status",
-         width: "20%",
+         width: "15%",
         render: (row) => <StatusBadge status={row.status} />,
         exportValue: (row) => row.status,
       },
       {
         key: "priority",
         header: "Priority",
-        width: "15%",
+        width: "10%",
         sortable: true,
         sortValue: (row) => row.priority,
         exportValue: (row) => String(row.priority),
       },
-      {
-  key: "actions",
-  header: "",
-  align: "center",
-  width: "90px",
-  render: (row) => (
-    <RowActionsMenu
-      variant="inline"
-      onEdit={() => handleEdit(row)}
-      onDelete={() => handleDelete(row)}
-    />
-  ),
-},
+//       {
+//   key: "actions",
+//   header: "",
+//   align: "center",
+//   width: "90px",
+//   render: (row) => (
+//     <RowActionsMenu
+//       variant="menu"
+//       onEdit={() => handleEdit(row)}
+//       onDelete={() => handleDelete(row)}
+//     />
+//   ),
+// },
     ],
     [rows],
   );
@@ -405,6 +441,19 @@ if (error) {
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        open={pendingDeleteRow !== null}
+        title="Remove this category?"
+        message={
+          deleteError ||
+          `This will permanently delete "${pendingDeleteRow?.categoryName}". This cannot be undone.`
+        }
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setPendingDeleteRow(null);
+          setDeleteError(null);
+        }}
+      />
     </div>
   );
 };

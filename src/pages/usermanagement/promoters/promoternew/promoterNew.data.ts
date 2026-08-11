@@ -1,9 +1,9 @@
 // TODO: replace with real reference data once the promoter masters are wired up.
 
 import { indianStates } from "../../businessowners/BusinessList/businessOwners.data";
-import { productOptions } from "../../../contracts/newContract.data";
+//import { productOptions } from "../../../contracts/newContract.data";
 
-export { productOptions };
+//export { productOptions };
 
 export const cityOptions = [
   { value: "vijayawada", label: "Vijayawada" },
