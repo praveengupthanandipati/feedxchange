@@ -35,6 +35,17 @@
       }
     }
 
+    .searchable-select__clear {
+      @include m.focus-ring(v.$color-orange);
+      border-radius: v.$radius-pill;
+      transition: color v.$transition-fast, background-color v.$transition-fast;
+
+      &:hover {
+        color: v.$color-danger;
+        background-color: v.$color-gray-100;
+      }
+    }
+
     &:hover {
       border-color: v.$color-primary;
     }

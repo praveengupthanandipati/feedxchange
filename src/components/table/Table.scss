@@ -14,6 +14,14 @@
   &--min-height {
     min-height: 65vh;
   }
+
+  // Rounds the container border without clipping (no overflow:hidden), so
+  // popovers rendered from within a cell — a row-actions menu, an open
+  // SearchableSelect panel — aren't cut off at the table's edge.
+  &--light {
+    border-radius: v.$radius-md;
+    border-color: v.$color-border;
+  }
 }
 
 .table {
@@ -131,5 +139,39 @@
     padding: v.$spacing-3 v.$spacing-4;
     color: v.$color-text;
     white-space: nowrap;
+  }
+
+  // Quieter alternative to the default solid-navy header — a soft muted
+  // background with a single accent underline instead of a heavy block.
+  &--light {
+    th {
+      background-color: v.$color-bg-muted !important;
+      color: v.$color-text !important;
+      border-bottom: 2px solid v.$color-primary;
+
+      &:first-child {
+        border-top-left-radius: v.$radius-md;
+      }
+
+      &:last-child {
+        border-top-right-radius: v.$radius-md;
+      }
+
+      &.is-sortable:hover {
+        background-color: v.$color-gray-100 !important;
+      }
+    }
+
+    .table__sort-icons svg {
+      color: v.$color-gray-400;
+
+      &.is-active {
+        color: v.$color-primary;
+      }
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: rgba(v.$color-bg-muted, 0.5);
+    }
   }
 }

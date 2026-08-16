@@ -20,6 +20,10 @@ interface TableProps<T> {
   expandedRowKey?: string | null;
   /** Renders a full-width panel in a row inserted directly below the row matching `expandedRowKey`. */
   renderExpandedRow?: (row: T) => ReactNode;
+  /** "light" swaps the default solid navy header for a softer, bordered look — for pages that want a quieter table. */
+  variant?: "default" | "light";
+  /** Extra class on the outer wrapper, for page-scoped style overrides without touching every table. */
+  className?: string;
 }
 
 function defaultSortValue<T>(row: T, key: string): string | number {
@@ -66,6 +70,8 @@ function Table<T>({
   minHeight = false,
   expandedRowKey = null,
   renderExpandedRow,
+  variant = "default",
+  className = "",
 }: TableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
@@ -108,9 +114,13 @@ function Table<T>({
   const someSelected = visibleKeys.some((key) => selectedSet.has(key));
 
   return (
-    <div className={`table-wrapper ${minHeight ? "table-wrapper--min-height" : ""}`}>
+    <div
+      className={`table-wrapper ${minHeight ? "table-wrapper--min-height" : ""} ${
+        variant === "light" ? "table-wrapper--light" : ""
+      } ${className}`}
+    >
       {/* <div className="table-scroll"> */}
-      <table className="table">
+      <table className={`table ${variant === "light" ? "table--light" : ""}`}>
         <thead>
           <tr>
             {selectable && (

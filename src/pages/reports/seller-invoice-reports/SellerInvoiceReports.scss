@@ -1,0 +1,238 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.seller-invoice-report-page {
+  padding-bottom: v.$spacing-6;
+}
+
+.seller-invoice-report-card {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      color: v.$color-primary;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    flex-wrap: wrap;
+  }
+}
+
+.seller-invoice-report-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+  white-space: nowrap;
+
+  &--info {
+    background-color: v.$color-info;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: #1f6fae;
+    }
+  }
+
+  &--warning {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+}
+
+// ============================================================
+// Filters
+// ============================================================
+.seller-invoice-report-filters {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+
+  &__parties {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    align-items: center;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__clear-row {
+    @include m.flex(row, flex-end, center);
+  }
+
+  &__clear {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-danger, 0.1);
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: rgba(v.$color-danger, 0.18);
+    }
+  }
+
+  &__date-range {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    height: 2.5rem;
+    min-width: 0;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+
+    input {
+      @include m.font-base;
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+
+    span {
+      flex-shrink: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+}
+
+// ============================================================
+// Party summary banner
+// ============================================================
+.seller-invoice-report-summary {
+  @include m.flex(row, flex-start, center, v.$spacing-5);
+  flex-wrap: wrap;
+  padding: v.$spacing-3 v.$spacing-4;
+  border-radius: v.$radius-md;
+  background-color: rgba(v.$color-info, 0.1);
+  font-size: v.$font-size-sm;
+
+  span {
+    color: v.$color-text-muted;
+  }
+
+  strong {
+    color: v.$color-text;
+    font-weight: v.$font-weight-semibold;
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.seller-invoice-table {
+  &__contract {
+    color: v.$color-primary;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__qty--pending {
+    color: v.$color-primary;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__net-amount {
+    color: v.$color-success;
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.seller-invoice-report-pagination {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-bg-muted;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
