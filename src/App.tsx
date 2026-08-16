@@ -54,6 +54,10 @@ import TruckTripNew from './pages/transporters/truck-trip-management/truck-new-t
 import TruckTripView from './pages/transporters/truck-trip-management/truck-trip-view/TruckTripView'
 import TransporReviewAssignTrucks from './pages/truck-management/transporter-review-assign-trucks/ReviewAndAssignTrucks'
 
+//reports
+import SellerInvoiceReports from './pages/reports/seller-invoice-reports/SellerInvoiceReports'
+import SellerBuyerAccounts from './pages/reports/seller-buyer-accounts/SellerBuyerAccounts'
+
 function App() {
   return (
     <Router>
@@ -116,6 +120,8 @@ function App() {
           <Route path="/truck-management/transporters/truck-trips/new" element={<TruckTripNew />} />
           <Route path="/truck-management/transporters/truck-trips/:id" element={<TruckTripView />} />
           <Route path="/truck-management/transporters/freight-approval" element={<TransporReviewAssignTrucks />} />
+          <Route path="/reports/seller-invoice-reports" element={<SellerInvoiceReports />} />
+          <Route path="/reports/seller-buyer-accounts" element={<SellerBuyerAccounts />} />
         </Route>
       </Routes>
     </Router>

@@ -9,6 +9,8 @@ export interface RowAction {
   icon: IconType;
   onClick: () => void;
   danger?: boolean;
+  /** Renders a separator line above this item, for grouping (e.g. destructive actions apart from the rest). */
+  dividerBefore?: boolean;
 }
 
 interface RowActionsMenuProps {
@@ -118,6 +120,7 @@ const RowActionsMenu = ({
           {actions ? (
             actions.map((action) => (
               <li key={action.key}>
+                {action.dividerBefore && <hr className="row-actions__divider" />}
                 <button
                   type="button"
                   className={action.danger ? "row-actions__item--danger" : ""}

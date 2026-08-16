@@ -190,26 +190,32 @@ export const asideNavSections: AsideNavSection[] = [
           },
         ],
       },
-      {
-        id: "profile",
-        label: "Profile",
-        icon: FiUser,
-        children: [
-          { id: "profile-view", label: "View Profile", path: "/profile/view" },
-          { id: "profile-edit", label: "Edit Profile", path: "/profile/edit" },
-        ],
-      },
-      {
-        id: "account",
-        label: "Account",
-        icon: FiSettings,
-        children: [
-          { id: "account-security", label: "Security", path: "/account/security" },
-          { id: "account-billing", label: "Billing", path: "/account/billing" },
-        ],
-      },
+     
       { id: "notifications", label: "Notifications", icon: FiBell, path: "/notifications" },
-      
+
     ],
-  }, 
+  },
+   {
+    id: "reports-statements",
+    title: "Reports & Statements",
+    items: [     
+      {
+        id: "reports",
+        label: "Reports",
+        icon: FiFileText,
+        children: [
+          { id: "reports-seller-invoice", label: "Seller Invoice Reports", path: "/reports/seller-invoice-reports" },
+          { id: "reports-seller-buyer-account", label: "Seller Buyer Account", path: "/reports/seller-buyer-accounts" },
+          { id: "reports-contract-wise-status", label: "Contract wise Status", path: "/reports/contract-wise-status" },
+          { id: "reports-contract-summary", label: "Contract Summary", path: "/reports/contract-summary" },
+          { id: "reports-account-statement", label: "Account Statement", path: "/reports/account-statement" },
+          { id: "reports-pending-payments", label: "Pending Payments", path: "/reports/pending-payments" },
+          { id: "reports-pending-supplies", label: "Pending Supplies", path: "/reports/pending-supplies" },
+          { id: "reports-monthly-reports", label: "Monthly Reports", path: "/reports/monthly-reports" },
+          { id: "reports-do-truck-history", label: "DO Truck History", path: "/reports/do-truck-history" },
+        ],
+      },    
+
+    ],
+  },
 ];

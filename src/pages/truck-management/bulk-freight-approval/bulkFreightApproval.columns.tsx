@@ -20,7 +20,7 @@ export function buildBulkFreightColumns(): TableColumn<BulkFreightRow>[] {
       render: (row) => (
         <span className="bulk-freight-table__contract">
           <Link
-            to={`/truck-management/assign-transports?contract=${encodeURIComponent(row.contractNumber)}`}
+            to={`/truck-management/transporters/freight-approval?contract=${encodeURIComponent(row.contractNumber)}`}
             className="bulk-freight-table__contract-badge"
             aria-label={`Assign transport for contract ${row.contractNumber}`}
             title="Assign Transport"

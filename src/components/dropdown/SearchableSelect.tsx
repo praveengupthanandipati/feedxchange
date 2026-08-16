@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiChevronDown, FiPlus, FiSearch } from "react-icons/fi";
+import { FiChevronDown, FiPlus, FiSearch, FiX } from "react-icons/fi";
 import "./SearchableSelect.scss";
 
 export interface SearchableSelectOption {
@@ -16,6 +16,8 @@ interface SearchableSelectProps {
   /** When true, shows a "+" button beside the search box that saves the typed text as a new option, appended to the end of the list. */
   allowCustom?: boolean;
   disabled?: boolean;
+  /** When true, shows an "x" button in the trigger to clear the current value once one is selected. */
+  clearable?: boolean;
 }
 
 const SearchableSelect = ({
@@ -26,6 +28,7 @@ const SearchableSelect = ({
   ariaLabel,
   allowCustom = false,
   disabled = false,
+  clearable = false,
 }: SearchableSelectProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -109,6 +112,24 @@ const SearchableSelect = ({
         disabled={disabled}
       >
         <span>{selectedLabel ?? placeholder}</span>
+        {clearable && value && (
+          <FiX
+            className="searchable-select__clear"
+            aria-label="Clear selection"
+            role="button"
+            tabIndex={0}
+            onClick={(event) => {
+              event.stopPropagation();
+              onChange("");
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.stopPropagation();
+                onChange("");
+              }
+            }}
+          />
+        )}
         <FiChevronDown className={open ? "is-open" : ""} aria-hidden />
       </button>
 
