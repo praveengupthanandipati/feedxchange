@@ -9,7 +9,7 @@ import {
   useGetBusinessSubTypesQuery,
 } from "../../../../store/businessProfilesApi";
 import { useGetProductsQuery } from "../../../../store/productsApi";
-import { areaOptions, establishmentYearOptions } from "./newBusiness.data";
+import { areaOptions, collectionAreaOptions, establishmentYearOptions } from "./newBusiness.data";
 
 export interface BrokerageRow {
   id: string;
@@ -289,8 +289,6 @@ interface BusinessProfileProps {
   onCollectionAreaChange: (value: string) => void;
   referredBy: string;
   onReferredByChange: (value: string) => void;
-  referralName: string;
-  onReferralNameChange: (value: string) => void;
   aboutProfile: string;
   onAboutProfileChange: (value: string) => void;
   buyBrokerageCharges: string;
@@ -326,8 +324,6 @@ const BusinessProfile = ({
   onCollectionAreaChange,
   referredBy,
   onReferredByChange,
-  referralName,
-  onReferralNameChange,
   aboutProfile,
   onAboutProfileChange,
   buyBrokerageCharges,
@@ -510,16 +506,14 @@ const BusinessProfile = ({
         </div>
 
         <div className="form-field">
-          <label className="form-field__label" htmlFor="collectionArea">
-            Collection Area
-          </label>
-          <input
-            id="collectionArea"
-            type="text"
-            className="form-field__control"
-            placeholder="Enter Collection Area"
+          <span className="form-field__label">Collection Area</span>
+          <SearchableSelect
+            options={collectionAreaOptions}
             value={collectionArea}
-            onChange={(event) => onCollectionAreaChange(event.target.value)}
+            onChange={onCollectionAreaChange}
+            placeholder="Select or type..."
+            ariaLabel="Collection Area"
+            allowCustom
           />
         </div>
 
@@ -534,20 +528,6 @@ const BusinessProfile = ({
             placeholder="Enter Referral Code"
             value={referredBy}
             onChange={(event) => onReferredByChange(event.target.value)}
-          />
-        </div>
-
-        <div className="form-field">
-          <label className="form-field__label" htmlFor="referralName">
-            Referral Name
-          </label>
-          <input
-            id="referralName"
-            type="text"
-            className="form-field__control"
-            placeholder="Enter Referral Name"
-            value={referralName}
-            onChange={(event) => onReferralNameChange(event.target.value)}
           />
         </div>
 

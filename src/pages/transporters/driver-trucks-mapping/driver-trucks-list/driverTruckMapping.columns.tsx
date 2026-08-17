@@ -37,6 +37,19 @@ export function buildDriverTruckMappingColumns({
       exportValue: (row) => row.truckNumber,
     },
     {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu
+          onView={() => onView(row)}
+          onDelete={() => onDelete(row)}
+          deleteIcon={FiUnlock}
+          deleteLabel="Release"
+        />
+      ),
+    },
+    {
       key: "driverName",
       header: "Driver Name",
       sortable: true,
@@ -69,20 +82,6 @@ export function buildDriverTruckMappingColumns({
       key: "status",
       header: "Status",
       sortable: true,
-    },
-    {
-      key: "actions",
-      header: "",
-      align: "center",
-      render: (row) => (
-        <RowActionsMenu
-          variant="inline"
-          onView={() => onView(row)}
-          onDelete={() => onDelete(row)}
-          deleteIcon={FiUnlock}
-          deleteLabel="Release"
-        />
-      ),
     },
   ];
 }

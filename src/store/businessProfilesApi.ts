@@ -103,7 +103,6 @@ export interface AddBusinessProfilePayload {
   collectionArea: string;
   area: string;
   referredBy: string;
-  referralName: string;
   aboutProfile: string;
   status: string;
   createdBy: number;

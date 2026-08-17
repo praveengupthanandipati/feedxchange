@@ -22,6 +22,7 @@ export interface ConditionInfo {
 
 export interface Contract {
   id: string;
+  contractId: number;
   date: string;
   dateValue: number;
   status: ContractStatus;
@@ -156,6 +157,7 @@ function buildContracts(): Contract[] {
 
     rows.push({
       id: `2026-${ROW_COUNT - i}`,
+      contractId: ROW_COUNT - i,
       date: formatDate(date),
       dateValue: date.getTime(),
       status,

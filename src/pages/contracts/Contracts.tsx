@@ -13,7 +13,11 @@ import {
 import Table from "../../components/table/Table";
 import type { TableColumn } from "../../components/table/table.types";
 import SearchableSelect from "../../components/dropdown/SearchableSelect";
-import { useDeleteContractMutation, useGetAllContractsQuery } from "../../store/contractApi";
+import {
+  useDeleteContractMutation,
+  useGetAllContractsQuery,
+  type GetAllContractsRow,
+} from "../../store/contractsApi";
 import { buildContractColumns } from "./contracts.columns";
 import { dateRangeOptions, statusOptions, type Contract } from "./contracts.data";
 import "./Contracts.scss";
@@ -31,40 +35,7 @@ function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-interface ApiContract {
-  id: number;
-  contractDate: string;
-  contractNumber: string;
-  status: string;
-  sellerName: string | null;
-  buyerName: string | null;
-  productName: string | null;
-  quantity: number;
-  quantityMeasure: string;
-  dispatchedQuantity: number | null;
-  arrangedQuantity: number | null;
-  pendingQuantity: number | null;
-  contractRate: number;
-  gstPercentage: number | null;
-  baseRate: number | null;
-  gstAmount: number | null;
-  netRate: number | null;
-  deliveryType: string;
-  paymentTerms: string | null;
-  paymentBeforeDate: string | null;
-  immediateAdvancePercentage: number | null;
-  immediateAdvanceDate: string | null;
-  balanceAdvancePercentage: number | null;
-  balanceAdvanceDate: string | null;
-  indicativeFreight: number | null;
-  approvalStatus: boolean;
-  isActive: boolean;
-  remarks: string | null;
-  sellerPaymentDueDays: number | null;
-  buyerPaymentDueDays: number | null;
-}
-
-function mapApiContract(row: ApiContract): Contract {
+function mapApiContract(row: GetAllContractsRow): Contract {
   const qtyMeasure = row.quantityMeasure || "mt";
   return {
     id: row.contractNumber,
@@ -87,26 +58,22 @@ function mapApiContract(row: ApiContract): Contract {
     gst: `${row.gstPercentage ?? 0}%`,
     netRate: `₹${row.netRate ?? 0}`,
     netRateValue: row.netRate ?? 0,
-    indicativeFreight:
-      row.indicativeFreight !== null && row.indicativeFreight !== undefined
-        ? `₹${row.indicativeFreight}`
-        : "",
-    rateRemarks: row.remarks ?? "",
-    deliveryType: row.deliveryType,
-    paymentTerms: row.paymentTerms ?? "",
-    paymentBeforeDate: row.paymentBeforeDate ?? "",
-    immediateAdvancePercent: row.immediateAdvancePercentage?.toString() ?? "",
-    immediateAdvanceDate: row.immediateAdvanceDate ?? "",
-    balanceAdvancePercent: row.balanceAdvancePercentage?.toString() ?? "",
-    balanceAdvanceDate: row.balanceAdvanceDate ?? "",
-    sellerPaymentDueDays: row.sellerPaymentDueDays?.toString() ?? "",
-    buyerPaymentDueDays: row.buyerPaymentDueDays?.toString() ?? "",
+    // Not returned by the GetAllContracts summary endpoint — populated when the
+    // full contract is loaded (e.g. via GetContractByContractId on edit).
+    indicativeFreight: "",
+    rateRemarks: "",
+    deliveryType: row.deliveryType ?? "",
+    paymentTerms: "",
+    paymentBeforeDate: "",
+    immediateAdvancePercent: "",
+    immediateAdvanceDate: "",
+    balanceAdvancePercent: "",
+    balanceAdvanceDate: "",
+    sellerPaymentDueDays: "",
+    buyerPaymentDueDays: "",
     paymentRemarks: "",
-    iFreight:
-      row.indicativeFreight !== null && row.indicativeFreight !== undefined
-        ? `₹${row.indicativeFreight}`
-        : "",
-    iFreightValue: row.indicativeFreight ?? 0,
+    iFreight: "",
+    iFreightValue: 0,
     sellerConditions: {
       commission: "",
       deliverySchedule: "ready-loading",

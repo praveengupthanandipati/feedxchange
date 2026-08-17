@@ -36,6 +36,14 @@ export function buildProductColumns({ onView, onEdit, onDelete }: ColumnHandlers
       exportValue: (row) => row.name ?? "",
     },
     {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+      ),
+    },
+    {
       key: "categoryName",
       header: "Category",
       sortable: true,
@@ -66,19 +74,6 @@ export function buildProductColumns({ onView, onEdit, onDelete }: ColumnHandlers
       render: (row) => <StatusBadge status={getProductStatus(row)} />,
       sortValue: (row) => getProductStatus(row),
       exportValue: (row) => getProductStatus(row),
-    },
-    {
-      key: "actions",
-      header: "",
-      align: "center",
-      render: (row) => (
-        <RowActionsMenu
-          variant="inline"
-          onView={() => onView(row)}
-          onEdit={() => onEdit(row)}
-          onDelete={() => onDelete(row)}
-        />
-      ),
     },
   ];
 }

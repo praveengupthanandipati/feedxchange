@@ -35,6 +35,12 @@ export function buildTruckTripColumns({ onView, onEdit }: ColumnHandlers): Table
       sortable: true,
     },
     {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => <RowActionsMenu onView={() => onView(row)} onEdit={() => onEdit(row)} />,
+    },
+    {
       key: "driverName",
       header: "Driver Name",
       sortable: true,
@@ -76,14 +82,6 @@ export function buildTruckTripColumns({ onView, onEdit }: ColumnHandlers): Table
       key: "tripStatus",
       header: "Status",
       sortable: true,
-    },
-    {
-      key: "actions",
-      header: "",
-      align: "center",
-      render: (row) => (
-        <RowActionsMenu variant="inline" onView={() => onView(row)} onEdit={() => onEdit(row)} />
-      ),
     },
   ];
 }

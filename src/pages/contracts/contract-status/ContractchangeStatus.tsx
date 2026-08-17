@@ -4,18 +4,18 @@ import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { FiLink, FiEye, FiEyeOff, FiX } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
-import ToggleSwitch from "../../../components/toggle/ToggleSwitch";
 import Table from "../../../components/table/Table";
 import type { TableColumn } from "../../../components/table/table.types";
+import { useGetBusinessProfileSummaryQuery } from "../../../store/businessProfilesApi";
 import {
-  financialYearOptions,
-  contractStatusRecords,
-  drawerSellerOptions,
-  drawerBuyerOptions,
-  getContractsRows,
-  type ContractStatusRecord,
-  type GetContractsRow,
-} from "./contractStatus.data";
+  useLazyGetAllContractsByFiltersQuery,
+  useGetAllContractStatusesQuery,
+  useLazyGetContractByContractIdQuery,
+  useUpdateContractStatusMutation,
+  type PendingContractApiResponse,
+  type GetContractDto,
+} from "../../../store/contractsApi";
+import { financialYearOptions } from "./contractStatus.data";
 import "../NewContract.scss";
 import "../ContractDetail.scss";
 import "./ContractchangeStatus.scss";
@@ -37,15 +37,26 @@ const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const formatINR = (value: number) => `₹${value.toLocaleString("en-IN")}`;
 
+const formatDisplayDate = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${day}-${month}-${date.getFullYear()}`;
+};
+
 interface GetContractsDrawerProps {
   open: boolean;
   seller: string;
   buyer: string;
-  rows: GetContractsRow[] | null;
+  sellerOptions: { value: string; label: string }[];
+  buyerOptions: { value: string; label: string }[];
+  rows: PendingContractApiResponse[] | null;
+  loading: boolean;
   onSellerChange: (value: string) => void;
   onBuyerChange: (value: string) => void;
   onGetContracts: () => void;
-  onAdd: (row: GetContractsRow) => void;
+  onAdd: (row: PendingContractApiResponse) => void;
   onClose: () => void;
 }
 
@@ -53,7 +64,10 @@ const GetContractsDrawer = ({
   open,
   seller,
   buyer,
+  sellerOptions,
+  buyerOptions,
   rows,
+  loading,
   onSellerChange,
   onBuyerChange,
   onGetContracts,
@@ -69,22 +83,37 @@ const GetContractsDrawer = ({
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
 
-  const columns: TableColumn<GetContractsRow>[] = useMemo(
+  const columns: TableColumn<PendingContractApiResponse>[] = useMemo(
     () => [
-      { key: "sNo", header: "S.No", sortable: true, width: "4rem" },
-      { key: "cDate", header: "C.Date", sortable: true },
-      { key: "contractNumber", header: "Contract #", sortable: true },
-      { key: "buyer", header: "Buyer", sortable: true },
-      { key: "seller", header: "Seller", sortable: true },
-      { key: "product", header: "Product", sortable: true },
-      { key: "totalMTs", header: "Total MTs", sortable: true, align: "right" },
       {
-        key: "rateMT",
+        key: "contractDate",
+        header: "C.Date",
+        sortable: true,
+        render: (row) => formatDisplayDate(row.contractDate),
+        sortValue: (row) => new Date(row.contractDate).getTime(),
+        exportValue: (row) => formatDisplayDate(row.contractDate),
+      },
+      { key: "contractNumber", header: "Contract #", sortable: true },
+      { key: "buyerName", header: "Buyer", sortable: true },
+      { key: "sellerName", header: "Seller", sortable: true },
+      { key: "productName", header: "Product", sortable: true },
+      {
+        key: "quantity",
+        header: "Total MTs",
+        sortable: true,
+        align: "right",
+        render: (row) => `${row.basicDetails.quantity} ${row.basicDetails.quantityMeasure}`,
+        sortValue: (row) => row.basicDetails.quantity,
+        exportValue: (row) => `${row.basicDetails.quantity} ${row.basicDetails.quantityMeasure}`,
+      },
+      {
+        key: "contractRate",
         header: "Rate MT",
         sortable: true,
         align: "right",
-        render: (row) => formatINR(row.rateMT),
-        exportValue: (row) => formatINR(row.rateMT),
+        render: (row) => formatINR(row.basicDetails.contractRate),
+        sortValue: (row) => row.basicDetails.contractRate,
+        exportValue: (row) => formatINR(row.basicDetails.contractRate),
       },
       {
         key: "actions",
@@ -132,7 +161,7 @@ const GetContractsDrawer = ({
             <div className="form-field">
               <span className="form-field__label">Select Seller</span>
               <SearchableSelect
-                options={drawerSellerOptions}
+                options={sellerOptions}
                 value={seller}
                 onChange={onSellerChange}
                 placeholder="Select Seller"
@@ -142,7 +171,7 @@ const GetContractsDrawer = ({
             <div className="form-field">
               <span className="form-field__label">Select Buyer</span>
               <SearchableSelect
-                options={drawerBuyerOptions}
+                options={buyerOptions}
                 value={buyer}
                 onChange={onBuyerChange}
                 placeholder="Select Buyer"
@@ -155,8 +184,9 @@ const GetContractsDrawer = ({
             type="button"
             className="get-contracts-drawer__submit"
             onClick={onGetContracts}
+            disabled={loading}
           >
-            Get Contracts
+            {loading ? "Loading…" : "Get Contracts"}
           </button>
 
           {rows !== null && (
@@ -180,31 +210,53 @@ const ContractchangeStatus = () => {
   const [financialYear, setFinancialYear] = useState(financialYearOptions[2]?.value ?? "");
   const [contractNumber, setContractNumber] = useState("");
   const [contractCloseDate, setContractCloseDate] = useState(todayISO());
-  const [record, setRecord] = useState<ContractStatusRecord | null>(null);
+  const [record, setRecord] = useState<GetContractDto | null>(null);
   const [detailsVisible, setDetailsVisible] = useState(true);
-
-  const [deliveryCompleted, setDeliveryCompleted] = useState(false);
-  const [paymentDone, setPaymentDone] = useState(false);
-  const [contractClosed, setContractClosed] = useState(false);
+  const [status, setStatus] = useState("");
+  const [reviewRemarks, setReviewRemarks] = useState("");
 
   const [error, setError] = useState("");
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerSeller, setDrawerSeller] = useState("");
   const [drawerBuyer, setDrawerBuyer] = useState("");
-  const [drawerRows, setDrawerRows] = useState<GetContractsRow[] | null>(null);
+  const [drawerRows, setDrawerRows] = useState<PendingContractApiResponse[] | null>(null);
 
-  const activateRecord = (found: ContractStatusRecord) => {
-    setFinancialYear(found.financialYear);
+  const { data: businessProfiles } = useGetBusinessProfileSummaryQuery();
+  const businessProfileOptions = useMemo(
+    () =>
+      (businessProfiles ?? []).map((profile) => ({
+        value: String(profile.profileId),
+        label: profile.legalName,
+      })),
+    [businessProfiles],
+  );
+
+  const { data: contractStatusOptions } = useGetAllContractStatusesQuery();
+  const statusOptions = useMemo(
+    () =>
+      (contractStatusOptions ?? [])
+        .filter((option) => option.isActive)
+        .slice()
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((option) => ({ value: option.name, label: option.displayName })),
+    [contractStatusOptions],
+  );
+
+  const [searchContracts, { isFetching: searching }] = useLazyGetAllContractsByFiltersQuery();
+  const [searchDrawerContracts, { isFetching: drawerLoading }] = useLazyGetAllContractsByFiltersQuery();
+  const [fetchContract, { isFetching: loadingContract }] = useLazyGetContractByContractIdQuery();
+  const [updateContractStatus, { isLoading: updating }] = useUpdateContractStatusMutation();
+
+  const loadContract = async (contractId: number) => {
+    const contract = await fetchContract(contractId).unwrap();
     setError("");
-    setRecord(found);
+    setRecord(contract);
     setDetailsVisible(true);
-    setDeliveryCompleted(found.deliveryCompleted);
-    setPaymentDone(found.paymentDone);
-    setContractClosed(found.contractClosed);
+    setStatus(contract.basicDetails?.calculatedStatus ?? "");
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     const trimmed = contractNumber.trim();
     if (!trimmed) {
       setError("Please enter a contract number to search.");
@@ -212,15 +264,23 @@ const ContractchangeStatus = () => {
       return;
     }
 
-    const found = contractStatusRecords.find((row) => row.contractNumber === trimmed);
+    try {
+      const rows = await searchContracts({ SearchText: trimmed }).unwrap();
+      const match = rows.find(
+        (row) => row.contractNumber?.toLowerCase() === trimmed.toLowerCase(),
+      );
 
-    if (!found) {
-      setError(`No contract found for number "${trimmed}".`);
+      if (!match) {
+        setError(`No contract found for number "${trimmed}".`);
+        setRecord(null);
+        return;
+      }
+
+      await loadContract(match.contractId);
+    } catch {
+      setError("Failed to search for the contract.");
       setRecord(null);
-      return;
     }
-
-    activateRecord(found);
   };
 
   const handleOpenDrawer = () => {
@@ -230,30 +290,34 @@ const ContractchangeStatus = () => {
     setDrawerRows(null);
   };
 
-  const handleGetContracts = () => {
-    const sellerLabel = drawerSellerOptions.find((option) => option.value === drawerSeller)?.label;
-    const buyerLabel = drawerBuyerOptions.find((option) => option.value === drawerBuyer)?.label;
-    setDrawerRows(
-      getContractsRows.filter(
-        (row) => (!sellerLabel || row.seller === sellerLabel) && (!buyerLabel || row.buyer === buyerLabel),
-      ),
-    );
+  const handleGetContracts = async () => {
+    try {
+      const rows = await searchDrawerContracts({}).unwrap();
+      const sellerId = drawerSeller ? Number(drawerSeller) : null;
+      const buyerId = drawerBuyer ? Number(drawerBuyer) : null;
+      setDrawerRows(
+        rows.filter(
+          (row) => (!sellerId || row.sellerId === sellerId) && (!buyerId || row.buyerId === buyerId),
+        ),
+      );
+    } catch {
+      setError("Failed to fetch contracts for the selected Seller and Buyer.");
+    }
   };
 
-  const handleAddFromDrawer = (row: GetContractsRow) => {
+  const handleAddFromDrawer = async (row: PendingContractApiResponse) => {
     setContractNumber(row.contractNumber);
     setDrawerOpen(false);
 
-    const found = contractStatusRecords.find((r) => r.contractNumber === row.contractNumber);
-    if (found) {
-      activateRecord(found);
-    } else {
+    try {
+      await loadContract(row.contractId);
+    } catch {
       setError(`No contract details found for number "${row.contractNumber}".`);
       setRecord(null);
     }
   };
 
-  const handleChange = () => {
+  const handleChange = async () => {
     if (!record) {
       setError("Search and select a valid contract before changing its status.");
       return;
@@ -262,14 +326,33 @@ const ContractchangeStatus = () => {
       setError("Contract Close Date is required.");
       return;
     }
-    if (contractClosed && (!deliveryCompleted || !paymentDone)) {
-      setError("Delivery Completed and Payment Done must be enabled before closing the contract.");
+    if (!status) {
+      setError("Please select a status.");
       return;
     }
 
-    setError("");
-    navigate("/contracts");
+    const currentUserId = Number(localStorage.getItem("userId")) || 0;
+
+    try {
+      await updateContractStatus({
+        contractId: record.id,
+        calculatedStatus: status,
+        reviewRemarks: reviewRemarks.trim() || undefined,
+        actionPerformedBy: currentUserId,
+      }).unwrap();
+
+      setError("");
+      navigate("/contracts");
+    } catch {
+      setError("Failed to update contract status.");
+    }
   };
+
+  const basicDetails = record?.basicDetails;
+  const contractValue =
+    basicDetails?.contractRate != null && basicDetails?.quantity != null
+      ? formatINR(basicDetails.contractRate * basicDetails.quantity)
+      : "";
 
   return (
     <div className="contract-change-status">
@@ -353,62 +436,74 @@ const ContractchangeStatus = () => {
 
           {!record ? (
             <p className="contract-change-status__placeholder">
-              Enter a contract number and search to view contract details.
+              {searching || loadingContract
+                ? "Loading contract details…"
+                : "Enter a contract number and search to view contract details."}
             </p>
           ) : (
             detailsVisible && (
               <div className="new-contract__grid">
                 <DetailField label="Contract Number" value={record.contractNumber} />
-                <DetailField label="Contract Date" value={record.contractDate} />
-                <DetailField label="Seller" value={record.seller} />
-                <DetailField label="Buyer" value={record.buyer} />
+                <DetailField label="Contract Date" value={formatDisplayDate(record.contractDate)} />
+                <DetailField label="Seller" value={record.sellerName} />
+                <DetailField label="Buyer" value={record.buyerName} />
 
                 <DetailField label="Product Name" value={record.productName} />
-                <DetailField label="Delivery Type" value={record.deliveryType} />
-                <DetailField label="Contract Quantity" value={record.contractQuantity} />
-                <DetailField label="Supplied Quantity" value={record.suppliedQuantity} />
-
-                <DetailField label="Invoice Rate per MT" value={record.invoiceRatePerMT} />
-                <DetailField label="GST %" value={record.gstPercent} />
-                <DetailField label="Invoice Net Rate per MT" value={record.invoiceNetRatePerMT} />
-                <DetailField label="Contract Value" value={record.contractValue} />
-
-                <DetailField label="Total Invoices Amount" value={record.totalInvoicesAmount} />
+                <DetailField label="Delivery Type" value={basicDetails?.deliveryType} />
                 <DetailField
-                  label="Total Invoices Net Amount (+D)"
-                  value={record.totalInvoicesNetAmount}
+                  label="Contract Quantity"
+                  value={
+                    basicDetails?.quantity != null
+                      ? `${basicDetails.quantity} ${basicDetails.quantityMeasure ?? ""}`
+                      : ""
+                  }
                 />
-                <DetailField label="Paid Amount" value={record.paidAmount} />
+
+                <DetailField
+                  label="Invoice Rate per MT"
+                  value={basicDetails?.contractRate != null ? formatINR(basicDetails.contractRate) : ""}
+                />
+                <DetailField
+                  label="GST %"
+                  value={basicDetails?.gstPercentage != null ? `${basicDetails.gstPercentage}%` : ""}
+                />
+                <DetailField
+                  label="Invoice Net Rate per MT"
+                  value={basicDetails?.netRate != null ? formatINR(basicDetails.netRate) : ""}
+                />
+                <DetailField label="Contract Value" value={contractValue} />
               </div>
             )
           )}
         </div>
 
         <div className="contract-change-status__toggle-bar">
-          <ToggleSwitch
-            checked={deliveryCompleted}
-            onChange={setDeliveryCompleted}
-            onLabel="Delivery Completed"
-            offLabel="Delivery Completed"
-            ariaLabel="Delivery Completed"
-            disabled={!record}
-          />
-          <ToggleSwitch
-            checked={paymentDone}
-            onChange={setPaymentDone}
-            onLabel="Payment Done"
-            offLabel="Payment Done"
-            ariaLabel="Payment Done"
-            disabled={!record}
-          />
-          <ToggleSwitch
-            checked={contractClosed}
-            onChange={setContractClosed}
-            onLabel="Contract Closed"
-            offLabel="Contract Closed"
-            ariaLabel="Contract Closed"
-            disabled={!record}
-          />
+          <div className="form-field">
+            <span className="form-field__label">Status</span>
+            <SearchableSelect
+              options={statusOptions}
+              value={status}
+              onChange={setStatus}
+              placeholder="Select Status"
+              ariaLabel="Status"
+              disabled={!record}
+            />
+          </div>
+
+          <div className="form-field">
+            <label className="form-field__label" htmlFor="reviewRemarks">
+              Review Remarks
+            </label>
+            <input
+              id="reviewRemarks"
+              type="text"
+              className="form-field__control"
+              placeholder="Optional remarks"
+              value={reviewRemarks}
+              onChange={(event) => setReviewRemarks(event.target.value)}
+              disabled={!record}
+            />
+          </div>
         </div>
       </div>
 
@@ -416,8 +511,13 @@ const ContractchangeStatus = () => {
         <Link to="/contracts" className="contract-change-status__cancel">
           Cancel
         </Link>
-        <button type="button" className="contract-change-status__submit" onClick={handleChange}>
-          Change
+        <button
+          type="button"
+          className="contract-change-status__submit"
+          onClick={handleChange}
+          disabled={updating}
+        >
+          {updating ? "Changing…" : "Change"}
         </button>
       </div>
 
@@ -425,7 +525,10 @@ const ContractchangeStatus = () => {
         open={drawerOpen}
         seller={drawerSeller}
         buyer={drawerBuyer}
+        sellerOptions={businessProfileOptions}
+        buyerOptions={businessProfileOptions}
         rows={drawerRows}
+        loading={drawerLoading}
         onSellerChange={setDrawerSeller}
         onBuyerChange={setDrawerBuyer}
         onGetContracts={handleGetContracts}
