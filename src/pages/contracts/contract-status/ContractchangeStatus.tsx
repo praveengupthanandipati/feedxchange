@@ -293,11 +293,13 @@ const ContractchangeStatus = () => {
   const handleGetContracts = async () => {
     try {
       const rows = await searchDrawerContracts({}).unwrap();
-      const sellerId = drawerSeller ? Number(drawerSeller) : null;
-      const buyerId = drawerBuyer ? Number(drawerBuyer) : null;
+      const sellerLabel = businessProfileOptions.find((option) => option.value === drawerSeller)?.label;
+      const buyerLabel = businessProfileOptions.find((option) => option.value === drawerBuyer)?.label;
       setDrawerRows(
         rows.filter(
-          (row) => (!sellerId || row.sellerId === sellerId) && (!buyerId || row.buyerId === buyerId),
+          (row) =>
+            (!sellerLabel || row.sellerName === sellerLabel) &&
+            (!buyerLabel || row.buyerName === buyerLabel),
         ),
       );
     } catch {
