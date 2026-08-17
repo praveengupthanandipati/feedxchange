@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -10,7 +11,12 @@ import {
   FiDownload,
   FiClock,
 } from "react-icons/fi";
-import { contracts } from "./contracts.data";
+import {
+  useLazyGetAllContractsByFiltersQuery,
+  useLazyGetContractByContractIdQuery,
+  useGetAllContractStatusesQuery,
+  type GetContractDto,
+} from "../../store/contractsApi";
 import "./ContractDetail.scss";
 import "./NewContract.scss";
 
@@ -27,6 +33,17 @@ const DetailField = ({ label, value, full }: DetailFieldProps) => (
   </div>
 );
 
+const formatINR = (value: number) => `₹${value.toLocaleString("en-IN")}`;
+
+const formatDisplayDate = (value: string | null | undefined) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${day}-${month}-${date.getFullYear()}`;
+};
+
 // TODO: wire these up to the real workflow actions once they exist.
 const NEXT_STEPS = [
   { label: "Manage Trucks", icon: FiTruck },
@@ -40,7 +57,59 @@ const NEXT_STEPS = [
 
 const ContractDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const contract = contracts.find((row) => row.id === id);
+  const [contract, setContract] = useState<GetContractDto | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  const [searchContracts] = useLazyGetAllContractsByFiltersQuery();
+  const [fetchContract] = useLazyGetContractByContractIdQuery();
+  const { data: statusOptions } = useGetAllContractStatusesQuery();
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      setNotFound(false);
+      setContract(null);
+
+      try {
+        const rows = await searchContracts({ SearchText: id }).unwrap();
+        const match = rows.find((row) => row.contractNumber?.toLowerCase() === id.toLowerCase());
+        if (!match) {
+          if (!cancelled) setNotFound(true);
+          return;
+        }
+
+        const detail = await fetchContract(match.contractId).unwrap();
+        if (!cancelled) setContract(detail);
+      } catch {
+        if (!cancelled) setNotFound(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, searchContracts, fetchContract]);
+
+  const basicDetails = contract?.basicDetails;
+  const sellerConditions = contract?.sellerConditions;
+  const buyerConditions = contract?.buyerConditions;
+  const paymentsInvoices = contract?.paymentsInvoices;
+
+  const calculatedStatus = basicDetails?.calculatedStatus ?? "";
+  const statusLabel =
+    statusOptions?.find((option) => option.name === calculatedStatus)?.displayName || calculatedStatus;
+  const statusModifier = calculatedStatus.toLowerCase();
+
+  const poTolerance =
+    basicDetails?.poTolerance ||
+    (basicDetails?.poTolerancePercentage != null ? `${basicDetails.poTolerancePercentage}%` : "");
 
   return (
     <div className="contract-detail">
@@ -48,7 +117,11 @@ const ContractDetail = () => {
         <FiArrowLeft aria-hidden /> Back to Contracts
       </Link>
 
-      {!contract ? (
+      {loading ? (
+        <div className="contract-detail__card">
+          <p>Loading contract…</p>
+        </div>
+      ) : notFound || !contract ? (
         <div className="contract-detail__card">
           <p>No contract found for id "{id}".</p>
         </div>
@@ -57,14 +130,14 @@ const ContractDetail = () => {
           <div className="contract-detail__card">
             <div className="contract-detail__header">
               <div>
-                <h1>Contract {contract.id}</h1>
-                <p>{contract.date}</p>
+                <h1>Contract {contract.contractNumber}</h1>
+                <p>{formatDisplayDate(contract.contractDate)}</p>
               </div>
-              <span
-                className={`contracts-table__status contracts-table__status--${contract.status.toLowerCase()}`}
-              >
-                {contract.status === "In-transit" ? "In-Transit" : contract.status}
-              </span>
+              {calculatedStatus && (
+                <span className={`contracts-table__status contracts-table__status--${statusModifier}`}>
+                  {statusLabel}
+                </span>
+              )}
             </div>
           </div>
 
@@ -73,23 +146,43 @@ const ContractDetail = () => {
               <section className="new-contract__section">
                 <h2 className="new-contract__section-title">1. Basic Details</h2>
                 <div className="new-contract__grid">
-                  <DetailField label="Date of Contract" value={contract.date} />
-                  <DetailField label="Seller" value={contract.seller} />
-                  <DetailField label="Buyer" value={contract.buyer} />
-                  <DetailField label="Product" value={contract.product} />
+                  <DetailField label="Date of Contract" value={formatDisplayDate(contract.contractDate)} />
+                  <DetailField label="Seller" value={contract.sellerName} />
+                  <DetailField label="Buyer" value={contract.buyerName} />
+                  <DetailField label="Product" value={contract.productName} />
 
-                  <DetailField label="Quantity Measure" value={contract.quantityMeasure} />
-                  <DetailField label="Qty" value={contract.qty} />
-                  <DetailField label="PO Tolerance" value={contract.poTolerance} />
-                  <DetailField label="Delivery Type" value={contract.deliveryType} />
+                  <DetailField label="Quantity Measure" value={basicDetails?.quantityMeasure} />
+                  <DetailField
+                    label="Qty"
+                    value={
+                      basicDetails?.quantity != null
+                        ? `${basicDetails.quantity} ${basicDetails.quantityMeasure ?? ""}`
+                        : ""
+                    }
+                  />
+                  <DetailField label="PO Tolerance" value={poTolerance} />
+                  <DetailField label="Delivery Type" value={basicDetails?.deliveryType} />
 
-                  <DetailField label="Contract Rate" value={contract.cRate} />
-                  <DetailField label="GST % Value" value={contract.gst} />
-                  <DetailField label="Net Rate" value={contract.netRate} />
-                  <DetailField label="Indicative Freight" value={contract.indicativeFreight} />
+                  <DetailField
+                    label="Contract Rate"
+                    value={basicDetails?.contractRate != null ? formatINR(basicDetails.contractRate) : ""}
+                  />
+                  <DetailField
+                    label="GST % Value"
+                    value={basicDetails?.gstPercentage != null ? `${basicDetails.gstPercentage}%` : ""}
+                  />
+                  <DetailField
+                    label="Net Rate"
+                    value={basicDetails?.netRate != null ? formatINR(basicDetails.netRate) : ""}
+                  />
+                  <DetailField
+                    label="Indicative Freight"
+                    value={
+                      basicDetails?.indicativeFreight != null ? formatINR(basicDetails.indicativeFreight) : ""
+                    }
+                  />
 
-                  <DetailField label="Inland Freight" value={contract.iFreight} />
-                  <DetailField label="Rate Remarks" value={contract.rateRemarks} full />
+                  <DetailField label="Rate Remarks" value={basicDetails?.rateRemarks} full />
                 </div>
               </section>
 
@@ -99,39 +192,36 @@ const ContractDetail = () => {
                   <div className="new-contract__condition-card">
                     <h3>Seller Conditions</h3>
                     <div className="new-contract__grid new-contract__grid--condition">
-                      <DetailField
-                        label="Commission"
-                        value={contract.sellerConditions.commission}
-                      />
-                      <DetailField
-                        label="Delivery schedule"
-                        value={contract.sellerConditions.deliverySchedule}
-                      />
-                      {contract.sellerConditions.fromDate && (
-                        <DetailField label="From Date" value={contract.sellerConditions.fromDate} />
-                      )}
-                      {contract.sellerConditions.toDate && (
-                        <DetailField label="To Date" value={contract.sellerConditions.toDate} />
-                      )}
-                      {contract.sellerConditions.specificDays && (
+                      <DetailField label="Commission" value={sellerConditions?.commission} />
+                      <DetailField label="Delivery schedule" value={sellerConditions?.deliverySchedule} />
+                      {sellerConditions?.sellerFromDate && (
                         <DetailField
-                          label="Specific Days"
-                          value={contract.sellerConditions.specificDays}
+                          label="From Date"
+                          value={formatDisplayDate(sellerConditions.sellerFromDate)}
                         />
+                      )}
+                      {sellerConditions?.sellerToDate && (
+                        <DetailField
+                          label="To Date"
+                          value={formatDisplayDate(sellerConditions.sellerToDate)}
+                        />
+                      )}
+                      {sellerConditions?.specificDays && (
+                        <DetailField label="Specific Days" value={sellerConditions.specificDays} />
                       )}
                       <DetailField
                         label="Quality Spec Source"
-                        value={contract.sellerConditions.qualitySpecSource}
+                        value={sellerConditions?.qualitySpecificationSource}
                         full
                       />
                       <DetailField
                         label="Loading Address At"
-                        value={contract.sellerConditions.address}
+                        value={sellerConditions?.loadingAddressAt}
                         full
                       />
                       <DetailField
                         label="Remarks / Special Conditions"
-                        value={contract.sellerConditions.remarks}
+                        value={sellerConditions?.remarksSpecialConditions}
                         full
                       />
                     </div>
@@ -140,39 +230,36 @@ const ContractDetail = () => {
                   <div className="new-contract__condition-card">
                     <h3>Buyer Conditions</h3>
                     <div className="new-contract__grid new-contract__grid--condition">
-                      <DetailField
-                        label="Commission"
-                        value={contract.buyerConditions.commission}
-                      />
-                      <DetailField
-                        label="Delivery schedule"
-                        value={contract.buyerConditions.deliverySchedule}
-                      />
-                      {contract.buyerConditions.fromDate && (
-                        <DetailField label="From Date" value={contract.buyerConditions.fromDate} />
-                      )}
-                      {contract.buyerConditions.toDate && (
-                        <DetailField label="To Date" value={contract.buyerConditions.toDate} />
-                      )}
-                      {contract.buyerConditions.specificDays && (
+                      <DetailField label="Commission" value={buyerConditions?.commission} />
+                      <DetailField label="Delivery schedule" value={buyerConditions?.deliverySchedule} />
+                      {buyerConditions?.buyerFromDate && (
                         <DetailField
-                          label="Specific Days"
-                          value={contract.buyerConditions.specificDays}
+                          label="From Date"
+                          value={formatDisplayDate(buyerConditions.buyerFromDate)}
                         />
+                      )}
+                      {buyerConditions?.buyerToDate && (
+                        <DetailField
+                          label="To Date"
+                          value={formatDisplayDate(buyerConditions.buyerToDate)}
+                        />
+                      )}
+                      {buyerConditions?.specificDays && (
+                        <DetailField label="Specific Days" value={buyerConditions.specificDays} />
                       )}
                       <DetailField
                         label="Quality Spec Source"
-                        value={contract.buyerConditions.qualitySpecSource}
+                        value={buyerConditions?.qualitySpecificationSource}
                         full
                       />
                       <DetailField
                         label="Delivery Address At"
-                        value={contract.buyerConditions.address}
+                        value={buyerConditions?.loadingAddressAt}
                         full
                       />
                       <DetailField
                         label="Remarks / Special Conditions"
-                        value={contract.buyerConditions.remarks}
+                        value={buyerConditions?.remarksSpecialConditions}
                         full
                       />
                     </div>
@@ -183,44 +270,50 @@ const ContractDetail = () => {
               <section className="new-contract__section">
                 <h2 className="new-contract__section-title">3. Payments</h2>
                 <div className="new-contract__grid">
-                  <DetailField label="Payment terms" value={contract.paymentTerms} />
-                  {contract.paymentBeforeDate && (
-                    <DetailField label="Payment Before Date" value={contract.paymentBeforeDate} />
+                  <DetailField label="Payment terms" value={paymentsInvoices?.paymentTerms} />
+                  {paymentsInvoices?.paymentBeforeDate && (
+                    <DetailField
+                      label="Payment Before Date"
+                      value={formatDisplayDate(paymentsInvoices.paymentBeforeDate)}
+                    />
                   )}
-                  {contract.immediateAdvancePercent && (
+                  {paymentsInvoices?.immediateAdvancePercentage != null && (
                     <DetailField
                       label="Immediate Advance %"
-                      value={`${contract.immediateAdvancePercent}%`}
+                      value={`${paymentsInvoices.immediateAdvancePercentage}%`}
                     />
                   )}
-                  {contract.immediateAdvanceDate && (
+                  {paymentsInvoices?.immediateAdvanceDate && (
                     <DetailField
                       label="Immediate Advance Date"
-                      value={contract.immediateAdvanceDate}
+                      value={formatDisplayDate(paymentsInvoices.immediateAdvanceDate)}
                     />
                   )}
-                  {contract.balanceAdvancePercent && (
+                  {paymentsInvoices?.balanceAdvancePercentage != null && (
                     <DetailField
                       label="Balance Advance %"
-                      value={`${contract.balanceAdvancePercent}%`}
+                      value={`${paymentsInvoices.balanceAdvancePercentage}%`}
                     />
                   )}
-                  {contract.balanceAdvanceDate && (
-                    <DetailField label="Balance Advance Date" value={contract.balanceAdvanceDate} />
+                  {paymentsInvoices?.balanceAdvanceDate && (
+                    <DetailField
+                      label="Balance Advance Date"
+                      value={formatDisplayDate(paymentsInvoices.balanceAdvanceDate)}
+                    />
                   )}
-                  {contract.sellerPaymentDueDays && (
+                  {paymentsInvoices?.sellerPaymentDueDays != null && (
                     <DetailField
                       label="Seller Payment Due Days"
-                      value={contract.sellerPaymentDueDays}
+                      value={paymentsInvoices.sellerPaymentDueDays}
                     />
                   )}
-                  {contract.buyerPaymentDueDays && (
+                  {paymentsInvoices?.buyerPaymentDueDays != null && (
                     <DetailField
                       label="Buyer Payment Due Days"
-                      value={contract.buyerPaymentDueDays}
+                      value={paymentsInvoices.buyerPaymentDueDays}
                     />
                   )}
-                  <DetailField label="Remarks" value={contract.paymentRemarks} full />
+                  <DetailField label="Remarks" value={paymentsInvoices?.remarks} full />
                 </div>
               </section>
 
@@ -244,10 +337,10 @@ const ContractDetail = () => {
                       <td>
                         <span
                           className={`contracts-table__status contracts-table__status--${
-                            contract.approved ? "open" : "pending"
+                            contract.contractSettings?.approvalStatus ? "open" : "pending"
                           }`}
                         >
-                          {contract.approved ? "Approved" : "Pending"}
+                          {contract.contractSettings?.approvalStatus ? "Approved" : "Pending"}
                         </span>
                       </td>
                     </tr>
