@@ -86,6 +86,14 @@ function buildBusinessOwnerColumns({ onView, onEdit, onDelete }: ColumnHandlers)
       exportValue: (row) => row.legalName,
     },
     {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+      ),
+    },
+    {
       key: "status",
       header: "Status",
       sortable: true,
@@ -117,19 +125,6 @@ function buildBusinessOwnerColumns({ onView, onEdit, onDelete }: ColumnHandlers)
       key: "stateName",
       header: "State",
       sortable: true,
-    },
-    {
-      key: "actions",
-      header: "",
-      align: "center",
-      render: (row) => (
-        <RowActionsMenu
-          variant="inline"
-          onView={() => onView(row)}
-          onEdit={() => onEdit(row)}
-          onDelete={() => onDelete(row)}
-        />
-      ),
     },
   ];
 }

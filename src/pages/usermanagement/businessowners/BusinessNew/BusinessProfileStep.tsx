@@ -74,9 +74,8 @@ const BusinessProfileStep = () => {
           brokerageRows={draft.brokerageRows}
           onBrokerageRowsChange={(rows) => updateDraft({ brokerageRows: rows })}
           capacityRows={draft.capacityRows}
-          onCapacityRowsChange={(rows) => updateDraft({ capacityRows: rows })} referralName={""} onReferralNameChange={function (value: string): void {
-            throw new Error("Function not implemented.");
-          } }        />
+          onCapacityRowsChange={(rows) => updateDraft({ capacityRows: rows })}
+        />
       </section>
 
       {existingProfileLoadError && (

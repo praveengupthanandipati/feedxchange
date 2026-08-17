@@ -31,6 +31,14 @@ export function buildPromoterColumns({ onEdit, onView, onDelete }: ColumnHandler
       exportValue: (row) => row.legalName,
     },
     {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+      ),
+    },
+    {
       key: "commissionStructure",
       header: "Commission Structure",
       sortable: true,
@@ -71,19 +79,6 @@ export function buildPromoterColumns({ onEdit, onView, onDelete }: ColumnHandler
         </a>
       ),
       exportValue: (row) => row.emailId,
-    },
-    {
-      key: "actions",
-      header: "",
-      align: "center",
-      render: (row) => (
-        <RowActionsMenu
-          variant="inline"
-          onView={() => onView(row)}
-          onEdit={() => onEdit(row)}
-          onDelete={() => onDelete(row)}
-        />
-      ),
     },
   ];
 }

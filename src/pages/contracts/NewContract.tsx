@@ -5,7 +5,7 @@ import { FiArrowLeft, FiEye, FiEyeOff } from "react-icons/fi";
 import SearchableSelect from "../../components/dropdown/SearchableSelect";
 import ToggleSwitch from "../../components/toggle/ToggleSwitch";
 import type { Contract } from "./contracts.data";
-import { useSaveContractMutation, useUpdateContractMutation } from "../../store/newContractsApi";
+import { useSaveContractMutation, useUpdateContractMutation } from "../../store/contractsApi";
 
 import {
   quantityMeasureOptions,
@@ -284,18 +284,24 @@ const { data: products } = useGetProductsQuery();
       return;
     }
 
+    const currentUserId = Number(localStorage.getItem("userId")) || 0;
+
     const requestBody = {
       contractDate: toIsoDateTime(contractDate),
-      contractTypeId: 10,
-      businessUnitId: 10,
+      // No reference-data endpoint exists yet for contract type / business unit /
+      // currency, and statusId is unrelated to the calculatedStatus workflow
+      // (see ContractchangeStatus) — send null (all nullable server-side) rather
+      // than a guessed id until that lookup data is wired up.
+      contractTypeId: null,
+      businessUnitId: null,
       effectiveFrom: toIsoDateTime(contractDate),
       effectiveTo: toIsoDateTime(contractDate),
-      currencyId: 10,
-      statusId: 10,
-      versionNo: 10,
+      currencyId: null,
+      statusId: null,
+      versionNo: null,
       parentContractId: null,
-      referenceNo: "string asdfsafd",
-      remarks: "string good",
+      referenceNo: "",
+      remarks: "",
       approvalRequired: true,
       isActive: true,
       sellerId: Number(sellerId) || 0,
@@ -367,13 +373,13 @@ const { data: products } = useGetProductsQuery();
         balanceAdvanceDate: balanceAdvanceDate ? toIsoDateTime(balanceAdvanceDate) : null,
         remarks: paymentRemarks,
       },
-      actionPerformedBy: 1,
+      actionPerformedBy: currentUserId,
     };
 
     try {
       if (navState?.isEdit && navState.contract) {
         const payload = {
-          contractNumber: navState.contract.id,
+          contractId: navState.contract.contractId,
           updateContract: requestBody,
         };
         console.log("Update Contract payload", payload);

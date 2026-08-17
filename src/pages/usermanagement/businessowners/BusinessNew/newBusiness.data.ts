@@ -9,6 +9,13 @@ export const areaOptions = [
   { value: "chittoor", label: "Chittoor" },
 ];
 
+export const collectionAreaOptions = [
+  { value: "achutapuram", label: "Achutapuram" },
+  { value: "nellore", label: "Nellore" },
+  { value: "eluru", label: "Eluru" },
+  { value: "chittoor", label: "Chittoor" },
+];
+
 const CURRENT_YEAR = new Date().getFullYear();
 export const establishmentYearOptions = Array.from({ length: 76 }, (_, index) => {
   const year = String(CURRENT_YEAR - index);
