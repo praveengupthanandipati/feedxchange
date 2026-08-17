@@ -85,6 +85,62 @@ export interface GetContractBasicDetails {
   reviewRemarks: string | null;
 }
 
+export interface QualitySpecificationDetail {
+  parameter: string | null;
+  minValue: number | null;
+  maxValue: number | null;
+  unit: string | null;
+}
+
+export interface GetSellerConditionsDetail {
+  commission: number | null;
+  deliverySchedule: string | null;
+  specificDays: string | null;
+  sellerFromDate: string | null;
+  sellerToDate: string | null;
+  qualitySpecificationSource: string | null;
+  qualitySpecifications: QualitySpecificationDetail[] | null;
+  customQualitySpecifications: string | null;
+  loadingAddressAt: string | null;
+  remarksSpecialConditions: string | null;
+}
+
+export interface GetBuyerConditionsDetail {
+  commission: number | null;
+  deliverySchedule: string | null;
+  specificDays: string | null;
+  buyerFromDate: string | null;
+  buyerToDate: string | null;
+  qualitySpecificationSource: string | null;
+  qualitySpecifications: QualitySpecificationDetail[] | null;
+  customQualitySpecifications: string | null;
+  loadingAddressAt: string | null;
+  remarksSpecialConditions: string | null;
+}
+
+export interface GetPaymentsInvoicesDetail {
+  paymentTerms: string | null;
+  paymentBeforeDate: string | null;
+  sellerPaymentDueDays: number | null;
+  buyerPaymentDueDays: number | null;
+  immediateAdvancePercentage: number | null;
+  immediateAdvanceAmount: number | null;
+  immediateAdvanceDate: string | null;
+  balanceAdvancePercentage: number | null;
+  balanceAdvanceAmount: number | null;
+  balanceAdvanceDate: string | null;
+  remarks: string | null;
+}
+
+export interface GetContractSettingsDetail {
+  showContractStatus: boolean | null;
+  approvalStatus: boolean | null;
+  sendNotificationsToBuyer: boolean | null;
+  sendNotificationsToSeller: boolean | null;
+  sendNotificationsToTransporter: boolean | null;
+  editContractUserPermissions: boolean | null;
+}
+
 export interface GetContractDto {
   id: number;
   contractNumber: string | null;
@@ -97,6 +153,10 @@ export interface GetContractDto {
   productName: string | null;
   statusId: number | null;
   basicDetails: GetContractBasicDetails;
+  sellerConditions: GetSellerConditionsDetail;
+  buyerConditions: GetBuyerConditionsDetail;
+  paymentsInvoices: GetPaymentsInvoicesDetail;
+  contractSettings: GetContractSettingsDetail;
   createdOn: string;
   modifiedOn: string | null;
 }

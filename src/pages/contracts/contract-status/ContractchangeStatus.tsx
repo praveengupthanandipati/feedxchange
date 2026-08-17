@@ -293,11 +293,17 @@ const ContractchangeStatus = () => {
   const handleGetContracts = async () => {
     try {
       const rows = await searchDrawerContracts({}).unwrap();
-      const sellerId = drawerSeller ? Number(drawerSeller) : null;
-      const buyerId = drawerBuyer ? Number(drawerBuyer) : null;
+      // GetAllContractsByFilters doesn't populate sellerId/buyerId (always null) —
+      // match on the resolved seller/buyer name instead. Case-sensitive: distinct
+      // business profiles can legitimately share a name that differs only in case
+      // (e.g. "abc solutions" vs "ABC solutions").
+      const sellerLabel = businessProfileOptions.find((option) => option.value === drawerSeller)?.label;
+      const buyerLabel = businessProfileOptions.find((option) => option.value === drawerBuyer)?.label;
       setDrawerRows(
         rows.filter(
-          (row) => (!sellerId || row.sellerId === sellerId) && (!buyerId || row.buyerId === buyerId),
+          (row) =>
+            (!sellerLabel || row.sellerName === sellerLabel) &&
+            (!buyerLabel || row.buyerName === buyerLabel),
         ),
       );
     } catch {
