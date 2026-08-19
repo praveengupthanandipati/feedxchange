@@ -9,7 +9,7 @@ import type { Contract } from "./contracts.data";
 
 const parseQtyOrNA = (value: string) => (value === "N/A" ? -1 : parseFloat(value));
 
-const ContractIdCell = ({ id }: { id: string }) => {
+const ContractIdCell = ({ id, contractId }: { id: string; contractId: number }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = (event: MouseEvent) => {
@@ -25,7 +25,7 @@ const ContractIdCell = ({ id }: { id: string }) => {
 
   return (
     <span className="contracts-table__id">
-      <Link to={`/contracts/${id}`} className="contracts-table__id-link">
+      <Link to={`/contracts/${contractId}`} className="contracts-table__id-link">
         {id}
       </Link>
       <button
@@ -48,12 +48,20 @@ const TruncatedName = ({ value }: { value: string }) => (
   </span>
 );
 
-const StatusBadge = ({ status }: { status: Contract["status"] }) => (
-  <span className={`contracts-table__status contracts-table__status--${status.toLowerCase()}`}>
-    {status === "In-transit" ? "In-Transit" : status}
-  </span>
-);
 
+
+const StatusBadge = ({ status }: { status: Contract["status"] }) => {
+  const safeStatus = status ?? "";
+  const normalizedStatus = safeStatus.toLowerCase();
+
+  return (
+    <span
+      className={`contracts-table__status contracts-table__status--${normalizedStatus}`}
+    >
+      {safeStatus === "In-transit" ? "In-Transit" : safeStatus || "N/A"}
+    </span>
+  );
+};
 interface ColumnHandlers {
   onEdit: (contract: Contract) => void;
   onDelete: (contract: Contract) => void;
@@ -71,7 +79,7 @@ export function buildContractColumns({ onEdit, onDelete }: ColumnHandlers): Tabl
       key: "id",
       header: "Contract",
       sortable: true,
-      render: (row) => <ContractIdCell id={row.id} />,
+      render: (row) => <ContractIdCell id={row.id} contractId={row.contractId} />,
       exportValue: (row) => row.id,
     },
     {

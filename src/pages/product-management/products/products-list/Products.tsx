@@ -4,6 +4,8 @@ import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
+import SuccessToast from "../../../../components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
 import ProductsFilters from "./ProductsFilters";
 import Pagination from "./Pagination";
 import { buildProductColumns, getProductStatus } from "./products.columns";
@@ -49,6 +51,7 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteProduct, setPendingDeleteProduct] = useState<Product | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleView = (product: Product) => {
     navigate(`${product.id}`);
@@ -71,6 +74,7 @@ const Products = () => {
     try {
       await deleteProduct({ productId: pendingDeleteProduct.id, actionPerformedBy }).unwrap();
       setPendingDeleteProduct(null);
+      showSuccessMessage("Product deleted successfully");
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : "Failed to delete product.");
     }
@@ -149,6 +153,7 @@ const Products = () => {
 
   return (
     <div className="products-list-page">
+      <SuccessToast message={successMessage} />
       <div className="products-list-card">
         <div className="products-list-card__header">
           <h1>All Products</h1>

@@ -5,7 +5,7 @@ import { FiArrowLeft, FiEye, FiEyeOff } from "react-icons/fi";
 import SearchableSelect from "../../components/dropdown/SearchableSelect";
 import ToggleSwitch from "../../components/toggle/ToggleSwitch";
 import type { Contract } from "./contracts.data";
-import { useSaveContractMutation, useUpdateContractMutation } from "../../store/contractsApi";
+import { useSaveContractMutation, useUpdateContractMutation ,   useLazyGetContractByContractIdQuery, } from "../../store/contractsApi";
 
 import {
   quantityMeasureOptions,
@@ -83,6 +83,8 @@ const NewContract = () => {
   const location = useLocation();
   const navState = (location.state as null | { contract?: Contract; isEdit?: boolean }) || null;
 
+  const [getContractByContractId] = useLazyGetContractByContractIdQuery();
+
   const [summaryVisible, setSummaryVisible] = useState(true);
 
   const [contractDate, setContractDate] = useState("");
@@ -123,7 +125,6 @@ const NewContract = () => {
       (option) => option.value === contractValue || option.label === contractValue,
     );
     if (match) return match.value;
-    console.warn("Option value not found for contract field", { contractValue, options });
     return contractValue;
   };
 
@@ -279,7 +280,6 @@ const { data: products } = useGetProductsQuery();
       .map(([key]) => REQUIRED_FIELD_LABELS[key]);
 
     if (missing.length > 0) {
-      console.log(`${actionType} Contract missing required fields`, missing);
       setFormError(`Please fill in the required fields: ${missing.join(", ")}.`);
       return;
     }
@@ -288,10 +288,6 @@ const { data: products } = useGetProductsQuery();
 
     const requestBody = {
       contractDate: toIsoDateTime(contractDate),
-      // No reference-data endpoint exists yet for contract type / business unit /
-      // currency, and statusId is unrelated to the calculatedStatus workflow
-      // (see ContractchangeStatus) — send null (all nullable server-side) rather
-      // than a guessed id until that lookup data is wired up.
       contractTypeId: null,
       businessUnitId: null,
       effectiveFrom: toIsoDateTime(contractDate),
@@ -382,98 +378,281 @@ const { data: products } = useGetProductsQuery();
           contractId: navState.contract.contractId,
           updateContract: requestBody,
         };
-        console.log("Update Contract payload", payload);
         await updateContract(payload).unwrap();
       } else {
         const payload = requestBody;
-        console.log("Create Contract payload", payload);
         await saveContract(payload).unwrap();
       }
 
       setFormError("");
+      const nextMessage = navState?.isEdit
+        ? "Contract updated successfully"
+        : "Contract added successfully";
+      localStorage.setItem("contractsSuccessMessage", nextMessage);
       navigate("/contracts");
     } catch (error) {
-      console.error(`${actionType} Contract API failed`, error);
       setFormError("Unable to save contract. Please try again.");
     }
   };
 
-  useEffect(() => {
-    if (!navState?.isEdit || !navState.contract) return;
-    const c = navState.contract;
+ useEffect(() => {
+  const loadContractDetails = async () => {
+    if (!navState?.isEdit || !navState.contract?.contractId) {
+      return;
+    }
 
-    setContractDate(toIsoDate(c.dateValue ?? c.date));
-    setSellerId(resolveOptionValue(businessProfileOptions, c.seller));
-    setBuyerId(resolveOptionValue(businessProfileOptions, c.buyer));
-    setProductId(resolveOptionValue(productOptions, c.product));
-    setQuantityMeasure(
-      resolveOptionValue(quantityMeasureOptions, c.quantityMeasure) || "mt",
-    );
-    // qty in contracts is like "123 MT" — take the numeric part
-    setQty((c.qty || "").split(" ")[0]);
-    setPoTolerance(
-      poToleranceOptions.find((o) => o.label === c.poTolerance || o.value === c.poTolerance)
-        ?.value ?? "",
-    );
-    setDeliveryType(
-      deliveryTypeOptions.find((o) => o.label === c.deliveryType || o.value === c.deliveryType)
-        ?.value ?? "",
-    );
-    setContractRate(String(c.cRateValue ?? ""));
-    setGstPercent(String((c.gst || "").replace("%", "") || "5"));
-    // gstDetails options use labels like "5% GST" — match by starting number
-    setGstDetails(
-      gstDetailsOptions.find((o) => o.label.startsWith((c.gst || "").replace("%", "")))
-        ?.value ?? "",
-    );
-    setIndicativeFreight(String(c.iFreightValue ?? ""));
-    setRateRemarks(c.rateRemarks ?? "");
+    try {
+      const contract = await getContractByContractId(
+        Number(navState.contract.contractId)
+      ).unwrap();
 
-    // seller / buyer conditions
-    setSellerConditions((prev) => ({
-      ...prev,
-      commission: (c.sellerConditions?.commission || "").replace("%", ""),
-      deliverySchedule:
-        deliveryScheduleOptions.find((o) => o.label === c.sellerConditions?.deliverySchedule)
-          ?.value ?? prev.deliverySchedule,
-      fromDate: toIsoDate(c.sellerConditions?.fromDate),
-      toDate: toIsoDate(c.sellerConditions?.toDate),
-      specificDays: c.sellerConditions?.specificDays ?? prev.specificDays,
-      qualitySpecSource:
-        qualitySpecSourceOptions.find((o) => o.label === c.sellerConditions?.qualitySpecSource)
-          ?.value ?? prev.qualitySpecSource,
-      address: addressOptions.find((o) => o.label === c.sellerConditions?.address)?.value ?? prev.address,
-      remarks: c.sellerConditions?.remarks ?? prev.remarks,
-    }));
+      // console.log("FULL CONTRACT DETAILS:", contract);
 
-    setBuyerConditions((prev) => ({
-      ...prev,
-      commission: (c.buyerConditions?.commission || "").replace("%", ""),
-      deliverySchedule:
-        deliveryScheduleOptions.find((o) => o.label === c.buyerConditions?.deliverySchedule)
-          ?.value ?? prev.deliverySchedule,
-      fromDate: toIsoDate(c.buyerConditions?.fromDate),
-      toDate: toIsoDate(c.buyerConditions?.toDate),
-      specificDays: c.buyerConditions?.specificDays ?? prev.specificDays,
-      qualitySpecSource:
-        qualitySpecSourceOptions.find((o) => o.label === c.buyerConditions?.qualitySpecSource)
-          ?.value ?? prev.qualitySpecSource,
-      address: addressOptions.find((o) => o.label === c.buyerConditions?.address)?.value ?? prev.address,
-      remarks: c.buyerConditions?.remarks ?? prev.remarks,
-    }));
+      setContractDate(toIsoDate(contract.contractDate));
 
-    setPaymentTerms(paymentTermsOptions.find((o) => o.label === c.paymentTerms)?.value ?? "");
-    setPaymentBeforeDate(toIsoDate(c.paymentBeforeDate));
-    setImmediateAdvancePercent(c.immediateAdvancePercent ?? "");
-    setImmediateAdvanceDate(toIsoDate(c.immediateAdvanceDate));
-    setBalanceAdvanceDate(toIsoDate(c.balanceAdvanceDate));
-    setSellerPaymentDueDays(c.sellerPaymentDueDays ?? "");
-    setBuyerPaymentDueDays(c.buyerPaymentDueDays ?? "");
-    setPaymentRemarks(c.paymentRemarks ?? "");
-    setStatus(Boolean(c.status));
-    setFormError("");
-  }, []);
+      setSellerId(
+        contract.sellerId != null
+          ? String(contract.sellerId)
+          : ""
+      );
 
+      setBuyerId(
+        contract.buyerId != null
+          ? String(contract.buyerId)
+          : ""
+      );
+
+      setProductId(
+        contract.productId != null
+          ? String(contract.productId)
+          : ""
+      );
+
+      // =========================
+      // BASIC DETAILS
+      // =========================
+
+      setQuantityMeasure(
+        resolveOptionValue(
+          quantityMeasureOptions,
+          contract.basicDetails?.quantityMeasure ?? ""
+        ) || "mt"
+      );
+
+      setQty(
+        contract.basicDetails?.quantity != null
+          ? String(contract.basicDetails.quantity)
+          : ""
+      );
+
+      setPoTolerance(
+        contract.basicDetails?.poTolerancePercentage != null
+          ? String(contract.basicDetails.poTolerancePercentage)
+          : ""
+      );
+
+      setDeliveryType(
+        resolveOptionValue(
+          deliveryTypeOptions,
+          contract.basicDetails?.deliveryType ?? ""
+        )
+      );
+
+      setContractRate(
+        contract.basicDetails?.contractRate != null
+          ? String(contract.basicDetails.contractRate)
+          : ""
+      );
+
+      setGstPercent(
+        contract.basicDetails?.gstPercentage != null
+          ? String(contract.basicDetails.gstPercentage)
+          : "5"
+      );
+
+      setGstDetails(
+        resolveOptionValue(
+          gstDetailsOptions,
+          contract.basicDetails?.gstDetails ?? ""
+        )
+      );
+
+      setIndicativeFreight(
+        contract.basicDetails?.indicativeFreight != null
+          ? String(contract.basicDetails.indicativeFreight)
+          : ""
+      );
+
+      setRateRemarks(
+        contract.basicDetails?.rateRemarks ?? ""
+      );
+
+      // =========================
+      // SELLER CONDITIONS
+      // =========================
+
+      const seller = contract.sellerConditions;
+
+      setSellerConditions({
+        commission:
+          seller?.commission != null
+            ? String(seller.commission)
+            : "",
+
+        deliverySchedule: resolveOptionValue(
+          deliveryScheduleOptions,
+          seller?.deliverySchedule ?? ""
+        ),
+
+        fromDate: toIsoDate(
+          seller?.sellerFromDate ?? ""
+        ),
+
+        toDate: toIsoDate(
+          seller?.sellerToDate ?? ""
+        ),
+
+        specificDays:
+          seller?.specificDays ?? "",
+
+        qualitySpecSource: resolveOptionValue(
+          qualitySpecSourceOptions,
+          seller?.qualitySpecificationSource ?? ""
+        ),
+
+        address: resolveOptionValue(
+          addressOptions,
+          seller?.loadingAddressAt ?? ""
+        ),
+
+        remarks:
+          seller?.remarksSpecialConditions ?? "",
+      });
+
+      // =========================
+      // BUYER CONDITIONS
+      // =========================
+
+      const buyer = contract.buyerConditions;
+
+      setBuyerConditions({
+        commission:
+          buyer?.commission != null
+            ? String(buyer.commission)
+            : "",
+
+        deliverySchedule: resolveOptionValue(
+          deliveryScheduleOptions,
+          buyer?.deliverySchedule ?? ""
+        ),
+
+        fromDate: toIsoDate(
+          buyer?.buyerFromDate ?? ""
+        ),
+
+        toDate: toIsoDate(
+          buyer?.buyerToDate ?? ""
+        ),
+
+        specificDays:
+          buyer?.specificDays ?? "",
+
+        qualitySpecSource: resolveOptionValue(
+          qualitySpecSourceOptions,
+          buyer?.qualitySpecificationSource ?? ""
+        ),
+
+        address: resolveOptionValue(
+          addressOptions,
+          buyer?.loadingAddressAt ?? ""
+        ),
+
+        remarks:
+          buyer?.remarksSpecialConditions ?? "",
+      });
+
+      // =========================
+      // PAYMENTS
+      // =========================
+
+      const payments = contract.paymentsInvoices;
+
+      setPaymentTerms(
+        resolveOptionValue(
+          paymentTermsOptions,
+          payments?.paymentTerms ?? ""
+        )
+      );
+
+      setPaymentBeforeDate(
+        toIsoDate(
+          payments?.paymentBeforeDate ?? ""
+        )
+      );
+
+      setImmediateAdvancePercent(
+        payments?.immediateAdvancePercentage != null
+          ? String(payments.immediateAdvancePercentage)
+          : ""
+      );
+
+      setImmediateAdvanceDate(
+        toIsoDate(
+          payments?.immediateAdvanceDate ?? ""
+        )
+      );
+
+      setBalanceAdvanceDate(
+        toIsoDate(
+          payments?.balanceAdvanceDate ?? ""
+        )
+      );
+
+      setSellerPaymentDueDays(
+        payments?.sellerPaymentDueDays != null
+          ? String(payments.sellerPaymentDueDays)
+          : ""
+      );
+
+      setBuyerPaymentDueDays(
+        payments?.buyerPaymentDueDays != null
+          ? String(payments.buyerPaymentDueDays)
+          : ""
+      );
+
+      setPaymentRemarks(
+        payments?.remarks ?? ""
+      );
+
+      // =========================
+      // SETTINGS
+      // =========================
+
+      setStatus(
+        Boolean(
+          contract.contractSettings?.approvalStatus
+        )
+      );
+
+      setFormError("");
+    } catch (error) {
+      console.error(
+        "Failed to load contract details:",
+        error
+      );
+
+      setFormError(
+        "Unable to load contract details. Please try again."
+      );
+    }
+  };
+
+  loadContractDetails();
+}, [
+  navState?.isEdit,
+  navState?.contract?.contractId,
+  getContractByContractId,
+]);
 
 
   return (

@@ -7,6 +7,10 @@ import RowActionsMenu from "../../../../components/table/RowActionsMenu";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import Pagination from "./Pagination";
+import SuccessToast from "../../../../components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
+
+
 import "./Businessowners.scss";
 import {
   useGetBusinessProfileSummaryQuery,
@@ -235,6 +239,7 @@ const Businessowners = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteOwner, setPendingDeleteOwner] = useState<BusinessOwner | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleView = (owner: BusinessOwner) => {
     navigate(`/business-owners/${owner.profileId}`);
@@ -261,6 +266,7 @@ const Businessowners = () => {
         modifiedBy,
       }).unwrap();
       setPendingDeleteOwner(null);
+      showSuccessMessage("Business owner deleted successfully");
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : "Failed to delete business owner.");
     }
@@ -344,6 +350,7 @@ const Businessowners = () => {
 
   return (
     <div className="business-owners-page">
+      <SuccessToast message={successMessage} />
       <div className="business-owners-card">
         <div className="business-owners-card__header">
           <h1>Business Owners</h1>

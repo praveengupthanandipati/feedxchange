@@ -12,6 +12,8 @@ import {
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
 } from "../../../store/categoryApi";
+import { useSuccessToast } from "../../../components/toast/useSuccessToast";
+import SuccessToast from "../../../components/toast/SuccessToast";
 import type { Category } from "../../../store/categoryApi";
 import "../../contracts/NewContract.scss";
 import "./Categories.scss";
@@ -74,6 +76,8 @@ const Categories = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Category | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const resetForm = () => {
     setEditingId(null);
@@ -153,6 +157,7 @@ const confirmDelete = async () => {
     }).unwrap();
 
     setPendingDeleteRow(null);
+    showSuccessMessage("Category deleted successfully.");
   } catch (err) {
     setDeleteError(
       err instanceof Error ? err.message : "Failed to delete category."
@@ -203,6 +208,7 @@ const handleSave = async () => {
     }).unwrap();
 
     resetForm();
+    showSuccessMessage("Category updated successfully.");
   } catch (err) {
     console.error("Failed to update category:", err);
   }
@@ -224,6 +230,7 @@ const handleSave = async () => {
     }).unwrap();
 
     resetForm();
+    showSuccessMessage("Category added successfully.");
   } catch (err) {
     console.error("Failed to add category:", err);
   }
@@ -441,6 +448,7 @@ if (error) {
           </div>
         </div>
       </div>
+     <SuccessToast message={successMessage} />
       <ConfirmDialog
         open={pendingDeleteRow !== null}
         title="Remove this category?"

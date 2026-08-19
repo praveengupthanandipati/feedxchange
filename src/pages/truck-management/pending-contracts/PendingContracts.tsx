@@ -25,12 +25,8 @@ import {
 } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
-import type { TableColumn } from "../../../components/table/table.types";
 import { buildPendingContractColumns } from "./pendingContracts.columns";
 import {
-  pendingContracts,
-  sellerOptions,
-  buyerOptions,
   deliveryScheduleOptions,
   type PendingContractRow,
   type TruckAssignment,
@@ -257,16 +253,6 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
   );
 };
 
-function getExportCellValue(row: PendingContractRow, column: TableColumn<PendingContractRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 const PendingContracts = () => {
 
 
@@ -276,7 +262,7 @@ const PendingContracts = () => {
   const [buyerFilter, setBuyerFilter] = useState("All");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [scheduleFilter, setScheduleFilter] = useState("Pending");
+  const [scheduleFilter, setScheduleFilter] = useState("All");
   const [keyword, setKeyword] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -285,24 +271,61 @@ const PendingContracts = () => {
 
   const searchKeyword = keyword.trim();
 
-  // Single source of truth for the filters query — backend only accepts
-  // Status and SearchText (confirmed via Swagger). Fires whenever there's
-  // a search keyword; skipped when the search box is empty.
   const {
-    data: filteredContracts,
-    isLoading, 
+    data: pendingContractApiRows,
+    isLoading,
     error,
-  } = useGetAllContractsByFiltersQuery(
-    {
-      Status: scheduleFilter,
-      SearchText: keyword.trim(),
-    });
+  } = useGetAllContractsByFiltersQuery({
+    Status: "Pending",
+  });
+
+  const apiRows = useMemo(
+    () => (pendingContractApiRows ?? []).map((row) => {
+      const quantity = Number(row.basicDetails?.quantity ?? 0);
+      const quantityMeasure = row.basicDetails?.quantityMeasure || "MT";
+      const contractRate = Number(row.basicDetails?.contractRate ?? 0);
+      const dateValue = row.contractDate ? new Date(row.contractDate).getTime() : 0;
+
+      return {
+        id: row.contractNumber || String(row.contractId),
+        date: row.contractDate ? new Date(row.contractDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "",
+        dateValue,
+        seller: row.sellerName || "N/A",
+        buyer: row.buyerName || "N/A",
+        cRate: `₹${contractRate.toLocaleString("en-IN")}`,
+        cRateValue: contractRate,
+        cQty: `${quantity} ${quantityMeasure}`,
+        cQtyValue: quantity,
+        dQty: "0 MT",
+        dQtyValue: 0,
+        aQty: "0 MT",
+        aQtyValue: 0,
+        pQty: `${quantity} ${quantityMeasure}`,
+        pQtyValue: quantity,
+        product: row.productName || "N/A",
+        fromDate: row.basicDetails?.deliveryFromDate ? new Date(row.basicDetails.deliveryFromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "",
+        toDate: row.basicDetails?.deliveryToDate ? new Date(row.basicDetails.deliveryToDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "",
+        deliveryType: row.basicDetails?.deliveryType || "N/A",
+        deliverySchedule: row.basicDetails?.deliverySchedule || "N/A",
+        paymentType: "N/A",
+        trucks: [],
+      } as PendingContractRow;
+    }),
+    [pendingContractApiRows],
+  );
+
+  const sellerOptions = useMemo(
+    () => [{ value: "All", label: "All Sellers" }, ...Array.from(new Set(apiRows.map((row) => row.seller).filter(Boolean))).map((value) => ({ value, label: value }))],
+    [apiRows],
+  );
+
+  const buyerOptions = useMemo(
+    () => [{ value: "All", label: "All Buyers" }, ...Array.from(new Set(apiRows.map((row) => row.buyer).filter(Boolean))).map((value) => ({ value, label: value }))],
+    [apiRows],
+  );
 
   useEffect(() => {
-    console.log("Filtered Data:", filteredContracts);
-    console.log("Filter Loading:", isLoading);
-    console.log("Filter Error:", error);
-  }, [filteredContracts, isLoading, error]);
+  }, [pendingContractApiRows, isLoading, error]);
 
   const handleDownloadExcel = async () => {
     try {
@@ -316,7 +339,7 @@ const PendingContracts = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Excel Download Failed", err);
+      //console.error("Excel Download Failed", err);
     }
   };
 
@@ -336,9 +359,9 @@ const PendingContracts = () => {
   }, [sellerFilter, buyerFilter, dateFrom, dateTo, scheduleFilter, keyword]);
 
   const filteredRows = useMemo(() => {
-    const q = keyword.trim().toLowerCase();
+    const q = searchKeyword.toLowerCase();
 
-    return pendingContracts.filter((row) => {
+    return apiRows.filter((row) => {
       if (sellerFilter !== "All" && row.seller !== sellerFilter) return false;
       if (buyerFilter !== "All" && row.buyer !== buyerFilter) return false;
       if (scheduleFilter !== "All" && row.deliverySchedule !== scheduleFilter) return false;
@@ -353,7 +376,7 @@ const PendingContracts = () => {
 
       return true;
     });
-  }, [sellerFilter, buyerFilter, scheduleFilter, dateFrom, dateTo, keyword]);
+  }, [apiRows, sellerFilter, buyerFilter, scheduleFilter, dateFrom, dateTo, searchKeyword]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -369,31 +392,6 @@ const PendingContracts = () => {
     setDateTo("");
     setScheduleFilter("All");
     setKeyword("");
-  };
-
-  const handleExportToExcel = () => {
-    const headerRow = pendingContractColumns
-      .map((column) => `<th>${escapeHtml(column.header)}</th>`)
-      .join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = pendingContractColumns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "pending-contracts.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
   };
 
   return (

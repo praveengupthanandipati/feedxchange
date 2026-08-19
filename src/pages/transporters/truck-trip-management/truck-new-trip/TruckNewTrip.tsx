@@ -208,8 +208,10 @@ const TruckNewTrip = () => {
     try {
       if (isEditMode && editingTrip) {
         await updateTrip({ tripId: editingTrip.tripId, updateTrip: tripDetails }).unwrap();
+        localStorage.setItem("successMessage", "Truck trip updated successfully");
       } else {
         await addTrip(tripDetails).unwrap();
+        localStorage.setItem("successMessage", "Truck trip added successfully");
       }
       navigate("/truck-management/transporters/truck-trips");
     } catch (err) {
