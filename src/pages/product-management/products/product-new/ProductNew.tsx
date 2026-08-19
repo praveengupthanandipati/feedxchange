@@ -234,6 +234,7 @@ const ProductNew = () => {
           updatedBy: currentUserId,
           image: imageFile ?? undefined,
         }).unwrap();
+        localStorage.setItem("successMessage", "Product updated successfully");
       } else {
         await createProduct({
           name: trimmedName,
@@ -252,6 +253,7 @@ const ProductNew = () => {
           actionPerfomedBy: currentUserId,
           image: imageFile ?? undefined,
         }).unwrap();
+        localStorage.setItem("successMessage", "Product added successfully");
       }
       navigate("/products");
     } catch (err) {

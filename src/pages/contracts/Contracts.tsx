@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   FiSearch,
   FiEye,
@@ -13,17 +13,24 @@ import {
 import Table from "../../components/table/Table";
 import type { TableColumn } from "../../components/table/table.types";
 import SearchableSelect from "../../components/dropdown/SearchableSelect";
+import ConfirmDialog from "../../components/dialog/ConfirmDialog";
 import {
   useDeleteContractMutation,
   useGetAllContractsQuery,
+    useGetAllContractStatusesQuery,   useLazyGetAllContractsByFiltersQuery,
   type GetAllContractsRow,
+    type PendingContractApiResponse,
+
 } from "../../store/contractsApi";
 import { buildContractColumns } from "./contracts.columns";
-import { dateRangeOptions, statusOptions, type Contract } from "./contracts.data";
+import { useSuccessToast } from "../../components/toast/useSuccessToast";
+import SuccessToast from "../../components/toast/SuccessToast";
+import { dateRangeOptions, type Contract } from "./contracts.data";
 import "./Contracts.scss";
 
 const PAGE_SIZE = 10;
 const DAY_MS = 24 * 60 * 60 * 1000;
+const SUCCESS_MESSAGE_STORAGE_KEY = "contractsSuccessMessage";
 
 function getExportCellValue(row: Contract, column: TableColumn<Contract>): string {
   if (column.exportValue) return column.exportValue(row);
@@ -42,7 +49,8 @@ function mapApiContract(row: GetAllContractsRow): Contract {
     contractId: row.id,
     date: row.contractDate ? new Date(row.contractDate).toLocaleDateString("en-IN") : "",
     dateValue: row.contractDate ? new Date(row.contractDate).getTime() : 0,
-    status: row.status as Contract["status"],
+    //status: row.status as Contract["status"],
+    status: row.status ?? "",
     seller: row.sellerName ?? "",
     buyer: row.buyerName ?? "",
     product: row.productName ?? "",
@@ -98,6 +106,94 @@ function mapApiContract(row: GetAllContractsRow): Contract {
   };
 }
 
+function mapFilteredContract(row: PendingContractApiResponse): Contract {
+  const basic = row.basicDetails;
+
+  const quantity = basic?.quantity ?? 0;
+  const quantityMeasure = basic?.quantityMeasure || "mt";
+  const contractRate = basic?.contractRate ?? 0;
+  const status = basic?.calculatedStatus ?? "";
+
+  return {
+    id: row.contractNumber,
+    contractId: row.contractId,
+
+    date: row.contractDate
+      ? new Date(row.contractDate).toLocaleDateString("en-IN")
+      : "",
+
+    dateValue: row.contractDate
+      ? new Date(row.contractDate).getTime()
+      : 0,
+
+    status: status as Contract["status"],
+
+    seller: row.sellerName ?? "",
+    buyer: row.buyerName ?? "",
+    product: row.productName ?? "",
+
+    quantityMeasure,
+
+    qty: `${quantity} ${quantityMeasure}`,
+    qtyValue: quantity,
+
+    poTolerance: "",
+
+    aQty: "0",
+    pQty: `${quantity} ${quantityMeasure}`,
+    dQty: "0",
+
+    cRate: `₹${contractRate}`,
+    cRateValue: contractRate,
+
+    gst: "0%",
+    netRate: `₹${contractRate}`,
+    netRateValue: contractRate,
+
+    indicativeFreight: "",
+    rateRemarks: "",
+
+    deliveryType: basic?.deliveryType ?? "",
+
+    paymentTerms: "",
+    paymentBeforeDate: "",
+    immediateAdvancePercent: "",
+    immediateAdvanceDate: "",
+    balanceAdvancePercent: "",
+    balanceAdvanceDate: "",
+    sellerPaymentDueDays: "",
+    buyerPaymentDueDays: "",
+    paymentRemarks: "",
+
+    iFreight: "",
+    iFreightValue: 0,
+
+    sellerConditions: {
+      commission: "",
+      deliverySchedule: basic?.deliverySchedule ?? "ready-loading",
+      fromDate: basic?.deliveryFromDate ?? "",
+      toDate: basic?.deliveryToDate ?? "",
+      specificDays: "",
+      qualitySpecSource: "",
+      address: "",
+      remarks: "",
+    },
+
+    buyerConditions: {
+      commission: "",
+      deliverySchedule: basic?.deliverySchedule ?? "ready-loading",
+      fromDate: basic?.deliveryFromDate ?? "",
+      toDate: basic?.deliveryToDate ?? "",
+      specificDays: "",
+      qualitySpecSource: "",
+      address: "",
+      remarks: "",
+    },
+
+    approved: false,
+  };
+}
+
 const ContractsLoader = () => {
   return (
     <div className="contracts-loader">
@@ -108,13 +204,32 @@ const ContractsLoader = () => {
 
 const Contracts = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [keyword, setKeyword] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [rows, setRows] = useState<Contract[]>([]);
+  //const [successMessage, setSuccessMessage] = useState("");
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
   const { data, isLoading, isFetching } = useGetAllContractsQuery(undefined, {
     refetchOnMountOrArgChange: true,
     refetchOnReconnect: true,
   });
+  
+  const { data: contractStatuses = [] } = useGetAllContractStatusesQuery();
+
+  const [getContractsByFilters, { isFetching: isFiltering }] =
+  useLazyGetAllContractsByFiltersQuery();
+
+  const statusOptions = useMemo(
+  () =>
+    contractStatuses
+      .filter((status) => status.isActive)
+      .map((status) => ({
+        value: status.name,
+        label: status.displayName || status.name,
+      })),
+  [contractStatuses],
+);
   const [deleteContract] = useDeleteContractMutation();
   const [dateRangeFilter, setDateRangeFilter] = useState("All");
   const [customFrom, setCustomFrom] = useState("");
@@ -122,6 +237,16 @@ const Contracts = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pendingDeleteRow, setPendingDeleteRow] = useState<Contract | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Same toast pattern as Categories.tsx: show the message, auto-clear after 3s.
+  // const showSuccessMessage = (message: string) => {
+  //   setSuccessMessage(message);
+  //   setTimeout(() => {
+  //     setSuccessMessage("");
+  //   }, 3000);
+  // };
 
   const handleEdit = (contract: Contract) => {
       navigate("new",{
@@ -129,21 +254,79 @@ const Contracts = () => {
       });
     };
 
+  // useEffect(() => {
+  //   if (!data?.contracts) return;
+
+  //   setRows(data.contracts.map(mapApiContract));
+  // }, [data]);
+
   useEffect(() => {
-    if (!data?.contracts) return;
+  if (!data?.contracts) return;
 
+  // Only populate from GetAllContracts when
+  // no status filter is selected.
+  if (!statusFilter) {
     setRows(data.contracts.map(mapApiContract));
-  }, [data]);
+  }
+}, [data, statusFilter]);
 
-  const handleDelete = async (contract: Contract) => {
+useEffect(() => {
+  const loadContractsByStatus = async () => {
+    // When no status is selected, GetAllContractsQuery
+    // will provide all contracts.
+    if (!statusFilter) {
+      return;
+    }
+
     try {
-      await deleteContract({ contractId: contract.contractId }).unwrap();
-      setRows((prev) => prev.filter((row) => row.id !== contract.id));
-      setSelectedRowIds((prev) => prev.filter((id) => id !== contract.id));
+      const result = await getContractsByFilters({
+        Status: statusFilter,
+      }).unwrap();
+
+setRows(result.map(mapFilteredContract));    } catch (error) {
+      console.error("Failed to load contracts by status:", error);
+      setRows([]);
+    }
+  };
+
+  loadContractsByStatus();
+}, [statusFilter, getContractsByFilters]);
+
+  //   useEffect(() => {
+  //   const incomingMessage =
+  //     (location.state as { successMessage?: string } | null)?.successMessage ??
+  //     localStorage.getItem(SUCCESS_MESSAGE_STORAGE_KEY);
+
+  //   if (incomingMessage) {
+  //     localStorage.removeItem(SUCCESS_MESSAGE_STORAGE_KEY);
+  //     showSuccessMessage(incomingMessage);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [location.state]);
+
+  
+  const handleDelete = (contract: Contract) => {
+    setDeleteError(null);
+    setPendingDeleteRow(contract);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteRow) return;
+
+    try {
+      await deleteContract({ contractId: pendingDeleteRow.contractId }).unwrap();
+      setRows((prev) => prev.filter((row) => row.id !== pendingDeleteRow.id));
+      setSelectedRowIds((prev) => prev.filter((id) => id !== pendingDeleteRow.id));
+      setPendingDeleteRow(null);
+      setDeleteError(null);
+      showSuccessMessage("Contract deleted successfully");
     } catch (error) {
       console.error("Delete Contract API failed", error);
+      setDeleteError(
+        error instanceof Error ? error.message : "Failed to delete contract."
+      );
     }
-  };  
+  };
 
   const handleToggleRow = (id: string) => {
     setSelectedRowIds((prev) =>
@@ -169,30 +352,100 @@ const Contracts = () => {
     setCurrentPage(1);
   }, [keyword, statusFilter, dateRangeFilter, customFrom, customTo]);
 
-  const filteredRows = useMemo(() => {
-    return rows.filter((row) => {
-      if (dateRangeFilter === "Today") {
-        const rowDate = new Date(row.dateValue);
-        const today = new Date();
-        if (rowDate.toDateString() !== today.toDateString()) return false;
-      } else if (dateRangeFilter === "Last 7 Days") {
-        if (row.dateValue < Date.now() - 7 * DAY_MS) return false;
-      } else if (dateRangeFilter === "Last 30 Days") {
-        if (row.dateValue < Date.now() - 30 * DAY_MS) return false;
-      } else if (dateRangeFilter === "Previous Month") {
-        const today = new Date();
-        const firstOfThisMonth = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
-        const firstOfPrevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1).getTime();
-        if (row.dateValue < firstOfPrevMonth || row.dateValue >= firstOfThisMonth) return false;
-      } else if (dateRangeFilter === "Custom Date Range") {
-        if (customFrom && row.dateValue < new Date(customFrom).getTime()) return false;
-        if (customTo && row.dateValue > new Date(customTo).getTime() + DAY_MS - 1) return false;
+
+const filteredRows = useMemo(() => {
+  const searchText = keyword.trim().toLowerCase();
+
+  return rows.filter((row) => {
+    
+
+    // Date filters
+    if (dateRangeFilter === "Today") {
+      const rowDate = new Date(row.dateValue);
+      const today = new Date();
+
+      if (rowDate.toDateString() !== today.toDateString()) {
+        return false;
+      }
+    }
+
+    if (dateRangeFilter === "Last 7 Days") {
+      if (row.dateValue < Date.now() - 7 * DAY_MS) {
+        return false;
+      }
+    }
+
+    if (dateRangeFilter === "Last 30 Days") {
+      if (row.dateValue < Date.now() - 30 * DAY_MS) {
+        return false;
+      }
+    }
+
+    if (dateRangeFilter === "Previous Month") {
+      const today = new Date();
+
+      const firstOfThisMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        1,
+      ).getTime();
+
+      const firstOfPreviousMonth = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        1,
+      ).getTime();
+
+      if (
+        row.dateValue < firstOfPreviousMonth ||
+        row.dateValue >= firstOfThisMonth
+      ) {
+        return false;
+      }
+    }
+
+    if (dateRangeFilter === "Custom Date Range") {
+      if (
+        customFrom &&
+        row.dateValue < new Date(customFrom).getTime()
+      ) {
+        return false;
       }
 
-      return true;
-    });
-  }, [rows, statusFilter, keyword, dateRangeFilter, customFrom, customTo]);
+      if (
+        customTo &&
+        row.dateValue >
+          new Date(customTo).getTime() + DAY_MS - 1
+      ) {
+        return false;
+      }
+    }
 
+    // Search
+    if (searchText) {
+      const searchableText = [
+        row.id,
+        row.seller,
+        row.buyer,
+        row.product,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      if (!searchableText.includes(searchText)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}, [
+  rows,
+  keyword,
+  dateRangeFilter,
+  customFrom,
+  customTo,
+]);
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
   const pagedRows = filteredRows.slice(
@@ -346,7 +599,7 @@ const Contracts = () => {
           </div>
         )}
 
-        {isLoading || isFetching ? (
+        {isLoading || isFetching || isFiltering ? (
   <ContractsLoader />
 ) : (
         <Table
@@ -401,6 +654,22 @@ const Contracts = () => {
           </div>
         </div>
       </div>
+      
+      <SuccessToast message={successMessage} />
+      <ConfirmDialog
+        open={pendingDeleteRow !== null}
+        title="Remove this contract?"
+        message={
+          deleteError ||
+          `This will permanently delete contract "${pendingDeleteRow?.id}". This cannot be undone.`
+        }
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setPendingDeleteRow(null);
+          setDeleteError(null);
+        }}
+      />
+
     </div>
   );
 };

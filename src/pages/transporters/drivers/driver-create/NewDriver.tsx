@@ -170,8 +170,10 @@ const NewDriver = () => {
     try {
       if (isEditMode && editingDriver) {
         await updateDriver({ driverId: editingDriver.driverId, updateDriver: driverDetails }).unwrap();
+        localStorage.setItem("successMessage", "Driver updated successfully");
       } else {
         await addDriver(driverDetails).unwrap();
+        localStorage.setItem("successMessage", "Driver added successfully");
       }
       navigate("/truck-management/transporters/driver-master");
     } catch (err) {

@@ -29,6 +29,7 @@ export const useSaveTransporterProfileStep = (nextPath: string) => {
     try {
       const currentUserId = Number(localStorage.getItem("userId")) || 0;
       const payload = buildTransporterProfilePayload(draft, currentUserId);
+      const isUpdate = Boolean(profileId);
 
       if (profileId) {
         await updateTransporterProfile({ ...payload, profileId, modifiedBy: currentUserId }).unwrap();
@@ -40,6 +41,10 @@ export const useSaveTransporterProfileStep = (nextPath: string) => {
         setProfileId(createdId);
       }
 
+      localStorage.setItem(
+        "successMessage",
+        isUpdate ? "Transporter updated successfully" : "Transporter added successfully",
+      );
       navigate(nextPath);
     } catch (err) {
       setSubmitError(getErrorMessage(err));

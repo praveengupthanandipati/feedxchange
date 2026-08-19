@@ -4,6 +4,8 @@ import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
+import SuccessToast from "../../../../components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
 import TransportersFilters from "./TransportersFilters";
 import Pagination from "./Pagination";
 import { buildTransporterColumns } from "./transporters.columns";
@@ -44,6 +46,7 @@ const Transprters = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Transporter | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleEdit = (transporter: Transporter) => {
     navigate(`/transporters/profile?id=${transporter.profileId}`);
@@ -70,6 +73,7 @@ const Transprters = () => {
         modifiedBy,
       }).unwrap();
       setPendingDeleteRow(null);
+      showSuccessMessage("Transporter deleted successfully");
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : "Failed to delete transporter.");
     }
@@ -149,6 +153,7 @@ const Transprters = () => {
 
   return (
     <div className="transporters-page">
+      <SuccessToast message={successMessage} />
       <div className="transporters-card">
         <div className="transporters-card__header">
           <h1>Transporters</h1>
