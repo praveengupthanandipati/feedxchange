@@ -165,16 +165,16 @@ export function buildContractColumns({ onEdit, onDelete }: ColumnHandlers): Tabl
       header: "Delivery Type",
       sortable: true,
     },
-    {
-      key: "paymentTerms",
-      header: "Payment Terms",
-      sortable: true,
-    },
-    {
-      key: "iFreight",
-      header: "I.Freight",
-      sortable: true,
-      sortValue: (row) => row.iFreightValue,
-    },
+    // {
+    //   key: "paymentTerms",
+    //   header: "Payment Terms",
+    //   sortable: true,
+    // },
+    // {
+    //   key: "iFreight",
+    //   header: "I.Freight",
+    //   sortable: true,
+    //   sortValue: (row) => row.iFreightValue,
+    // },
   ];
 }

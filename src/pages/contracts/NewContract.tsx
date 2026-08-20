@@ -387,8 +387,8 @@ const { data: products } = useGetProductsQuery();
       setFormError("");
       const nextMessage = navState?.isEdit
         ? "Contract updated successfully"
-        : "Contract added successfully";
-      localStorage.setItem("contractsSuccessMessage", nextMessage);
+        : "contract created successfully";
+      localStorage.setItem("successMessage", nextMessage);
       navigate("/contracts");
     } catch (error) {
       setFormError("Unable to save contract. Please try again.");
@@ -1042,6 +1042,7 @@ const { data: products } = useGetProductsQuery();
                   options={addressOptions}
                   value={sellerConditions.address}
                   onChange={(value) => handleSellerConditionChange({ address: value })}
+                  allowCustom
                   ariaLabel="Seller loading address"
                 />
               </div>
@@ -1167,6 +1168,7 @@ const { data: products } = useGetProductsQuery();
                   options={addressOptions}
                   value={buyerConditions.address}
                   onChange={(value) => handleBuyerConditionChange({ address: value })}
+                  allowCustom
                   ariaLabel="Buyer delivery address"
                 />
               </div>

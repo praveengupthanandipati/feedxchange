@@ -35,7 +35,10 @@ export function buildPendingContractColumns({
         >
           <FiTruck aria-hidden />
         </button>
-        <Link to={`/contracts/${row.id}`} className="pending-contracts-table__id-text">
+        <Link
+          to={`/contracts/${row.contractId ?? row.id}`}
+          className="pending-contracts-table__id-text"
+        >
           {row.id}
         </Link>
       </span>
