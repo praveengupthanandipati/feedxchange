@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import {
+  useGetAllContractsQuery,
   useGetAllContractsByFiltersQuery,
   useLazyGetAllContractsForExcelQuery,
 } from "../../../store/contractsApi";
@@ -34,6 +35,18 @@ import {
 import "./PendingContracts.scss";
 
 const PAGE_SIZE = 10;
+
+const PendingContractsLoader = () => (
+  <div
+    className="pending-contracts-loader"
+    role="status"
+    aria-live="polite"
+    aria-label="Loading pending contracts"
+  >
+    <div className="pending-contracts-loader__spinner" />
+    <span>Loading pending contracts...</span>
+  </div>
+);
 
 interface TruckTrackingDrawerProps {
   open: boolean;
@@ -278,9 +291,20 @@ const PendingContracts = () => {
   } = useGetAllContractsByFiltersQuery({
     Status: "Pending",
   });
+  const { data: allContracts, isLoading: isLoadingAllContracts } = useGetAllContractsQuery();
+
+  const activeContractIds = useMemo(
+    () =>
+      new Set(
+        (allContracts?.contracts ?? [])
+          .filter((contract) => contract.isActive)
+          .map((contract) => contract.id),
+      ),
+    [allContracts],
+  );
 
   const apiRows = useMemo(
-    () => (pendingContractApiRows ?? []).map((row) => {
+    () => (allContracts ? pendingContractApiRows ?? [] : []).filter((row) => activeContractIds.has(row.contractId)).map((row) => {
       const quantity = Number(row.basicDetails?.quantity ?? 0);
       const quantityMeasure = row.basicDetails?.quantityMeasure || "MT";
       const contractRate = Number(row.basicDetails?.contractRate ?? 0);
@@ -288,6 +312,7 @@ const PendingContracts = () => {
 
       return {
         id: row.contractNumber || String(row.contractId),
+        contractId: row.contractId,
         date: row.contractDate ? new Date(row.contractDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "",
         dateValue,
         seller: row.sellerName || "N/A",
@@ -311,7 +336,7 @@ const PendingContracts = () => {
         trucks: [],
       } as PendingContractRow;
     }),
-    [pendingContractApiRows],
+    [pendingContractApiRows, allContracts, activeContractIds],
   );
 
   const sellerOptions = useMemo(
@@ -482,13 +507,17 @@ const PendingContracts = () => {
           </div>
         )}
 
-        <Table
-          columns={pendingContractColumns}
-          data={pagedRows}
-          rowKey={(row) => row.id}
-          emptyMessage="No pending contracts match the current filters."
-          minHeight
-        />
+        {isLoading || isLoadingAllContracts ? (
+          <PendingContractsLoader />
+        ) : (
+          <Table
+            columns={pendingContractColumns}
+            data={pagedRows}
+            rowKey={(row) => row.id}
+            emptyMessage="No pending contracts match the current filters."
+            minHeight
+          />
+        )}
 
         <div className="pending-contracts-pagination">
           <p>

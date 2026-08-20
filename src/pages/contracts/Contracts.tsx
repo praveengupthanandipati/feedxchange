@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   FiSearch,
   FiEye,
@@ -17,9 +17,8 @@ import ConfirmDialog from "../../components/dialog/ConfirmDialog";
 import {
   useDeleteContractMutation,
   useGetAllContractsQuery,
-    useGetAllContractStatusesQuery,   useLazyGetAllContractsByFiltersQuery,
+    useGetAllContractStatusesQuery,
   type GetAllContractsRow,
-    type PendingContractApiResponse,
 
 } from "../../store/contractsApi";
 import { buildContractColumns } from "./contracts.columns";
@@ -30,8 +29,6 @@ import "./Contracts.scss";
 
 const PAGE_SIZE = 10;
 const DAY_MS = 24 * 60 * 60 * 1000;
-const SUCCESS_MESSAGE_STORAGE_KEY = "contractsSuccessMessage";
-
 function getExportCellValue(row: Contract, column: TableColumn<Contract>): string {
   if (column.exportValue) return column.exportValue(row);
   const raw = (row as unknown as Record<string, unknown>)[column.key];
@@ -50,7 +47,7 @@ function mapApiContract(row: GetAllContractsRow): Contract {
     date: row.contractDate ? new Date(row.contractDate).toLocaleDateString("en-IN") : "",
     dateValue: row.contractDate ? new Date(row.contractDate).getTime() : 0,
     //status: row.status as Contract["status"],
-    status: row.status ?? "",
+    status: (row.status ?? "Pending") as Contract["status"],
     seller: row.sellerName ?? "",
     buyer: row.buyerName ?? "",
     product: row.productName ?? "",
@@ -106,105 +103,17 @@ function mapApiContract(row: GetAllContractsRow): Contract {
   };
 }
 
-function mapFilteredContract(row: PendingContractApiResponse): Contract {
-  const basic = row.basicDetails;
-
-  const quantity = basic?.quantity ?? 0;
-  const quantityMeasure = basic?.quantityMeasure || "mt";
-  const contractRate = basic?.contractRate ?? 0;
-  const status = basic?.calculatedStatus ?? "";
-
-  return {
-    id: row.contractNumber,
-    contractId: row.contractId,
-
-    date: row.contractDate
-      ? new Date(row.contractDate).toLocaleDateString("en-IN")
-      : "",
-
-    dateValue: row.contractDate
-      ? new Date(row.contractDate).getTime()
-      : 0,
-
-    status: status as Contract["status"],
-
-    seller: row.sellerName ?? "",
-    buyer: row.buyerName ?? "",
-    product: row.productName ?? "",
-
-    quantityMeasure,
-
-    qty: `${quantity} ${quantityMeasure}`,
-    qtyValue: quantity,
-
-    poTolerance: "",
-
-    aQty: "0",
-    pQty: `${quantity} ${quantityMeasure}`,
-    dQty: "0",
-
-    cRate: `₹${contractRate}`,
-    cRateValue: contractRate,
-
-    gst: "0%",
-    netRate: `₹${contractRate}`,
-    netRateValue: contractRate,
-
-    indicativeFreight: "",
-    rateRemarks: "",
-
-    deliveryType: basic?.deliveryType ?? "",
-
-    paymentTerms: "",
-    paymentBeforeDate: "",
-    immediateAdvancePercent: "",
-    immediateAdvanceDate: "",
-    balanceAdvancePercent: "",
-    balanceAdvanceDate: "",
-    sellerPaymentDueDays: "",
-    buyerPaymentDueDays: "",
-    paymentRemarks: "",
-
-    iFreight: "",
-    iFreightValue: 0,
-
-    sellerConditions: {
-      commission: "",
-      deliverySchedule: basic?.deliverySchedule ?? "ready-loading",
-      fromDate: basic?.deliveryFromDate ?? "",
-      toDate: basic?.deliveryToDate ?? "",
-      specificDays: "",
-      qualitySpecSource: "",
-      address: "",
-      remarks: "",
-    },
-
-    buyerConditions: {
-      commission: "",
-      deliverySchedule: basic?.deliverySchedule ?? "ready-loading",
-      fromDate: basic?.deliveryFromDate ?? "",
-      toDate: basic?.deliveryToDate ?? "",
-      specificDays: "",
-      qualitySpecSource: "",
-      address: "",
-      remarks: "",
-    },
-
-    approved: false,
-  };
-}
-
 const ContractsLoader = () => {
   return (
-    <div className="contracts-loader">
+    <div className="contracts-loader" role="status" aria-live="polite" aria-label="Loading contracts">
       <div className="contracts-loader__spinner" />
+      <span>Loading contracts...</span>
     </div>
   );
 };
 
 const Contracts = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [keyword, setKeyword] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [rows, setRows] = useState<Contract[]>([]);
@@ -216,9 +125,6 @@ const Contracts = () => {
   });
   
   const { data: contractStatuses = [] } = useGetAllContractStatusesQuery();
-
-  const [getContractsByFilters, { isFetching: isFiltering }] =
-  useLazyGetAllContractsByFiltersQuery();
 
   const statusOptions = useMemo(
   () =>
@@ -263,34 +169,13 @@ const Contracts = () => {
   useEffect(() => {
   if (!data?.contracts) return;
 
-  // Only populate from GetAllContracts when
-  // no status filter is selected.
-  if (!statusFilter) {
-    setRows(data.contracts.map(mapApiContract));
-  }
+    setRows(
+      data.contracts
+        .filter((contract) => contract.isActive)
+        .filter((contract) => !statusFilter || contract.status === statusFilter)
+        .map(mapApiContract),
+    );
 }, [data, statusFilter]);
-
-useEffect(() => {
-  const loadContractsByStatus = async () => {
-    // When no status is selected, GetAllContractsQuery
-    // will provide all contracts.
-    if (!statusFilter) {
-      return;
-    }
-
-    try {
-      const result = await getContractsByFilters({
-        Status: statusFilter,
-      }).unwrap();
-
-setRows(result.map(mapFilteredContract));    } catch (error) {
-      console.error("Failed to load contracts by status:", error);
-      setRows([]);
-    }
-  };
-
-  loadContractsByStatus();
-}, [statusFilter, getContractsByFilters]);
 
   //   useEffect(() => {
   //   const incomingMessage =
@@ -357,6 +242,7 @@ const filteredRows = useMemo(() => {
   const searchText = keyword.trim().toLowerCase();
 
   return rows.filter((row) => {
+    if (row.status.toLowerCase() === "deleted") return false;
     
 
     // Date filters
@@ -599,7 +485,7 @@ const filteredRows = useMemo(() => {
           </div>
         )}
 
-        {isLoading || isFetching || isFiltering ? (
+        {isLoading || isFetching ? (
   <ContractsLoader />
 ) : (
         <Table

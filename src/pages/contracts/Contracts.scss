@@ -86,6 +86,29 @@
   }
 }
 
+.contracts-loader {
+  @include m.flex(column, center, center);
+  min-height: 18rem;
+  gap: v.$spacing-3;
+  color: v.$color-text-muted;
+  font-size: v.$font-size-sm;
+
+  &__spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid v.$color-border;
+    border-top-color: v.$color-navy;
+    border-radius: 50%;
+    animation: contracts-loader-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes contracts-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .contracts-btn {
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
