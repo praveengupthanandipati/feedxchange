@@ -1,22 +1,23 @@
 import { useMemo, useState } from "react";
 import { FiSearch, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import Table from "../../../components/table/Table";
-import { buildOverDuePayColumns } from "./sellerBuyerAccounts.columns";
-import { overDuePayRows } from "./sellerBuyerAccounts.data";
+import Table from "../../../../components/table/Table";
+import { buildUnaccountBalanceColumns } from "./unaccountBalance.columns";
+import { unaccountBalanceRows } from "./unaccountBalance.data";
+import "./UnaccountBalance.scss";
 
 const PAGE_SIZE = 10;
 
-const OverDuePay = () => {
+const UnaccountBalance = () => {
   const [keyword, setKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const columns = useMemo(() => buildOverDuePayColumns(), []);
+  const columns = useMemo(() => buildUnaccountBalanceColumns(), []);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
-    if (!q) return overDuePayRows;
-    return overDuePayRows.filter((row) =>
-      [row.invoiceNum, row.buyerName].join(" ").toLowerCase().includes(q),
+    if (!q) return unaccountBalanceRows;
+    return unaccountBalanceRows.filter((row) =>
+      [row.seller, row.mode].join(" ").toLowerCase().includes(q),
     );
   }, [keyword]);
 
@@ -29,7 +30,7 @@ const OverDuePay = () => {
 
   return (
     <>
-      <div className="seller-buyer-accounts-search">
+      <div className="unaccount-balance-search">
         <FiSearch aria-hidden />
         <input
           type="text"
@@ -38,7 +39,7 @@ const OverDuePay = () => {
             setKeyword(event.target.value);
             setCurrentPage(1);
           }}
-          placeholder={`${overDuePayRows.length} records...`}
+          placeholder={`${unaccountBalanceRows.length} records...`}
         />
       </div>
 
@@ -48,16 +49,15 @@ const OverDuePay = () => {
         rowKey={(row) => row.id}
         emptyMessage="No records match the current search."
         minHeight
-        variant="light"
       />
 
-      <div className="seller-buyer-accounts-pagination">
+      <div className="unaccount-balance-pagination">
         <p>
           {filteredRows.length === 0
             ? "Showing 0 Results"
             : `Showing ${pagedRows.length} of ${filteredRows.length} Results`}
         </p>
-        <div className="seller-buyer-accounts-pagination__controls">
+        <div className="unaccount-balance-pagination__controls">
           <button
             type="button"
             disabled={currentPageClamped === 1}
@@ -90,4 +90,4 @@ const OverDuePay = () => {
   );
 };
 
-export default OverDuePay;
+export default UnaccountBalance;

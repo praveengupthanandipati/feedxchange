@@ -1,0 +1,132 @@
+@use "sass:color";
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+$contact-info-accents: (
+  "navy": v.$color-navy,
+  "success": v.$color-success,
+  "info": v.$color-info,
+);
+
+.contact-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-4;
+  align-items: start;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include m.respond-to(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.contact-info-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: v.$radius-lg;
+  background-color: v.$color-bg;
+  box-shadow: v.$shadow-sm;
+  transition: box-shadow v.$transition-fast, transform v.$transition-fast;
+  min-width: 0;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: v.$shadow-md;
+    transform: translateY(-1px);
+  }
+
+  @each $name, $color in $contact-info-accents {
+    &--#{$name} .contact-info-card__header {
+      background: linear-gradient(90deg, $color 0%, color.adjust($color, $lightness: -10%) 100%);
+    }
+  }
+
+  &__header {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    flex-shrink: 0;
+    padding: v.$spacing-3 v.$spacing-4;
+    color: v.$color-white;
+  }
+
+  &__icon {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-white, 0.2);
+    color: v.$color-white;
+    font-size: 1rem;
+  }
+
+  &__title {
+    @include m.font-heading(v.$font-weight-semibold);
+    font-size: v.$font-size-base;
+    margin: 0;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+    padding: v.$spacing-4;
+  }
+}
+
+.contact-info-address {
+  &__city {
+    @include m.font-heading(v.$font-weight-bold);
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__company {
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__line {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    margin-top: v.$spacing-2;
+    padding-top: v.$spacing-3;
+    border-top: 1px solid v.$color-border;
+  }
+}
+
+.contact-info-row {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  padding-bottom: v.$spacing-2;
+  border-bottom: 1px dashed v.$color-border;
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  &__label {
+    @include m.font-base(v.$font-weight-semibold);
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+  }
+
+  &__value {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: right;
+    word-break: break-word;
+  }
+}
