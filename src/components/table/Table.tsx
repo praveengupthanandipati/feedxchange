@@ -24,6 +24,8 @@ interface TableProps<T> {
   variant?: "default" | "light";
   /** Extra class on the outer wrapper, for page-scoped style overrides without touching every table. */
   className?: string;
+  /** Makes each data row clickable (e.g. to toggle its expanded panel) — the whole <tr>, not just a cell control. */
+  onRowClick?: (row: T) => void;
 }
 
 function defaultSortValue<T>(row: T, key: string): string | number {
@@ -72,6 +74,7 @@ function Table<T>({
   renderExpandedRow,
   variant = "default",
   className = "",
+  onRowClick,
 }: TableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
@@ -177,7 +180,10 @@ function Table<T>({
               const isExpanded = Boolean(renderExpandedRow) && expandedRowKey === key;
               return (
                 <Fragment key={key}>
-                  <tr className={isSelected ? "is-selected" : ""}>
+                  <tr
+                    className={`${isSelected ? "is-selected" : ""} ${onRowClick ? "is-clickable" : ""}`}
+                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  >
                     {selectable && (
                       <td className="table__select-col">
                         <input

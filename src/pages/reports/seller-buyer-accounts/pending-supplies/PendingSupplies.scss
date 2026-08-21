@@ -1,0 +1,119 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+// ============================================================
+// Summary line
+// ============================================================
+.pending-supplies-summary {
+  color: v.$color-text-muted;
+  font-size: v.$font-size-sm;
+  margin: 0;
+
+  strong {
+    color: v.$color-text;
+    font-weight: v.$font-weight-semibold;
+  }
+}
+
+// ============================================================
+// Search
+// ============================================================
+.pending-supplies-search {
+  @include m.flex(row, flex-start, center, v.$spacing-2);
+  width: 100%;
+  max-width: 20rem;
+  height: 2.5rem;
+  padding: 0 v.$spacing-3;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+  color: v.$color-text-muted;
+
+  input {
+    @include m.font-base;
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.pending-supplies-table {
+  &__contract {
+    color: v.$color-primary;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__balance--pending {
+    color: v.$color-danger;
+    font-weight: v.$font-weight-semibold;
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.pending-supplies-pagination {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-bg-muted;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
+
+// ============================================================
+// Responsive — mobile / tablet
+// ============================================================
+@include m.respond-below(sm) {
+  .pending-supplies-search {
+    max-width: 100%;
+  }
+}
