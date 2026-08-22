@@ -1,0 +1,211 @@
+// TODO: replace with real data once the reports API is wired up.
+
+function toTimestamp(isoDate: string): number {
+  return new Date(isoDate).getTime();
+}
+
+export function money(value: number): string {
+  return `₹${value.toLocaleString("en-IN")}`;
+}
+
+export interface ContractSummaryRow {
+  id: string;
+  sNo: number;
+  contractDt: string;
+  contractDtValue: number;
+  contractNumber: string;
+  seller: string;
+  buyer: string;
+  commodity: string;
+  qty: string;
+  qtyValue: number;
+  rate: number;
+  gstPercent: number;
+  netRate: number;
+  deliveryType: string;
+  packing: string;
+  contractType: string;
+}
+
+export const contractSummaryRows: ContractSummaryRow[] = [
+  {
+    id: "CT001",
+    sNo: 1,
+    contractDt: "2026-04-01",
+    contractDtValue: toTimestamp("2026-04-01"),
+    contractNumber: "CT001",
+    seller: "Sai Feeds Pvt Ltd",
+    buyer: "Rajesh Kumar",
+    commodity: "GN Cake",
+    qty: "100 MT",
+    qtyValue: 100,
+    rate: 32000,
+    gstPercent: 5,
+    netRate: 33600,
+    deliveryType: "F.O.R",
+    packing: "PP Bags",
+    contractType: "Credit",
+  },
+  {
+    id: "CT002",
+    sNo: 2,
+    contractDt: "2026-04-02",
+    contractDtValue: toTimestamp("2026-04-02"),
+    contractNumber: "CT002",
+    seller: "Ankur Animal Feeds",
+    buyer: "Venkatesh Iyer",
+    commodity: "DORB",
+    qty: "200 MT",
+    qtyValue: 200,
+    rate: 18500,
+    gstPercent: 5,
+    netRate: 19425,
+    deliveryType: "Ex-Loading",
+    packing: "Loose",
+    contractType: "100%",
+  },
+  {
+    id: "CT003",
+    sNo: 3,
+    contractDt: "2026-04-03",
+    contractDtValue: toTimestamp("2026-04-03"),
+    contractNumber: "CT003",
+    seller: "Blue Aqua Farms",
+    buyer: "Ramesh Gowda",
+    commodity: "Rice DDGS",
+    qty: "150 MT",
+    qtyValue: 150,
+    rate: 14000,
+    gstPercent: 0,
+    netRate: 14000,
+    deliveryType: "F.O.R",
+    packing: "PP Bags",
+    contractType: "Credit",
+  },
+  {
+    id: "CT004",
+    sNo: 4,
+    contractDt: "2026-04-04",
+    contractDtValue: toTimestamp("2026-04-04"),
+    contractNumber: "CT004",
+    seller: "Green Valley Dairy",
+    buyer: "Priya Sharma",
+    commodity: "Repeseed DOC",
+    qty: "120 MT",
+    qtyValue: 120,
+    rate: 16000,
+    gstPercent: 5,
+    netRate: 16800,
+    deliveryType: "Ex-Loading",
+    packing: "Loose",
+    contractType: "100%",
+  },
+  {
+    id: "CT005",
+    sNo: 5,
+    contractDt: "2026-04-05",
+    contractDtValue: toTimestamp("2026-04-05"),
+    contractNumber: "CT005",
+    seller: "Shree Animal Nutrition",
+    buyer: "Anil Kapoor",
+    commodity: "Maize DDGS",
+    qty: "90 MT",
+    qtyValue: 90,
+    rate: 28000,
+    gstPercent: 5,
+    netRate: 29400,
+    deliveryType: "F.O.R",
+    packing: "PP Bags",
+    contractType: "Credit",
+  },
+  {
+    id: "CT006",
+    sNo: 6,
+    contractDt: "2026-04-06",
+    contractDtValue: toTimestamp("2026-04-06"),
+    contractNumber: "CT006",
+    seller: "Sai Feeds Pvt Ltd",
+    buyer: "Venkatesh Iyer",
+    commodity: "Soybean Meal",
+    qty: "100 MT",
+    qtyValue: 100,
+    rate: 32500,
+    gstPercent: 5,
+    netRate: 34125,
+    deliveryType: "F.O.R",
+    packing: "PP Bags",
+    contractType: "100%",
+  },
+  {
+    id: "CT007",
+    sNo: 7,
+    contractDt: "2026-04-07",
+    contractDtValue: toTimestamp("2026-04-07"),
+    contractNumber: "CT007",
+    seller: "Ankur Animal Feeds",
+    buyer: "Ramesh Gowda",
+    commodity: "Corn",
+    qty: "180 MT",
+    qtyValue: 180,
+    rate: 18800,
+    gstPercent: 5,
+    netRate: 19740,
+    deliveryType: "Ex-Loading",
+    packing: "Loose",
+    contractType: "Credit",
+  },
+  {
+    id: "CT008",
+    sNo: 8,
+    contractDt: "2026-04-08",
+    contractDtValue: toTimestamp("2026-04-08"),
+    contractNumber: "CT008",
+    seller: "Blue Aqua Farms",
+    buyer: "Priya Sharma",
+    commodity: "Wheat Bran",
+    qty: "140 MT",
+    qtyValue: 140,
+    rate: 14200,
+    gstPercent: 0,
+    netRate: 14200,
+    deliveryType: "F.O.R",
+    packing: "PP Bags",
+    contractType: "100%",
+  },
+  {
+    id: "CT009",
+    sNo: 9,
+    contractDt: "2026-04-09",
+    contractDtValue: toTimestamp("2026-04-09"),
+    contractNumber: "CT009",
+    seller: "Green Valley Dairy",
+    buyer: "Anil Kapoor",
+    commodity: "Rice Bran",
+    qty: "110 MT",
+    qtyValue: 110,
+    rate: 16300,
+    gstPercent: 5,
+    netRate: 17115,
+    deliveryType: "Ex-Loading",
+    packing: "Loose",
+    contractType: "Credit",
+  },
+  {
+    id: "CT010",
+    sNo: 10,
+    contractDt: "2026-04-10",
+    contractDtValue: toTimestamp("2026-04-10"),
+    contractNumber: "CT010",
+    seller: "Shree Animal Nutrition",
+    buyer: "Rajesh Kumar",
+    commodity: "Cottonseed Meal",
+    qty: "95 MT",
+    qtyValue: 95,
+    rate: 28400,
+    gstPercent: 5,
+    netRate: 29820,
+    deliveryType: "F.O.R",
+    packing: "PP Bags",
+    contractType: "100%",
+  },
+];

@@ -1,0 +1,92 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.account-summary-tab {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__toolbar {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    flex-wrap: wrap;
+  }
+
+  &__print-all,
+  &__download-all {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+    white-space: nowrap;
+  }
+
+  &__print-all {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+
+  &__download-all {
+    background-color: v.$color-success;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: #227a46;
+    }
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.account-summary-tab-table__party {
+  color: v.$color-primary;
+  font-weight: v.$font-weight-semibold;
+}
+
+.account-summary-tab-table__actions {
+  @include m.flex(row, flex-start, center, v.$spacing-2);
+  flex-wrap: wrap;
+}
+
+.account-summary-tab-table__print,
+.account-summary-tab-table__download {
+  @include m.flex(row, center, center, v.$spacing-1);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2rem;
+  padding: 0 v.$spacing-3;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+  white-space: nowrap;
+}
+
+.account-summary-tab-table__print {
+  background-color: v.$color-primary;
+  color: v.$color-white;
+
+  &:hover {
+    background-color: v.$color-primary-dark;
+  }
+}
+
+.account-summary-tab-table__download {
+  background-color: v.$color-success;
+  color: v.$color-white;
+
+  &:hover {
+    background-color: #227a46;
+  }
+}

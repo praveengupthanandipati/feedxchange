@@ -112,25 +112,27 @@ const SearchableSelect = ({
         disabled={disabled}
       >
         <span>{selectedLabel ?? placeholder}</span>
-        {clearable && value && (
-          <FiX
-            className="searchable-select__clear"
-            aria-label="Clear selection"
-            role="button"
-            tabIndex={0}
-            onClick={(event) => {
-              event.stopPropagation();
-              onChange("");
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
+        <span className="searchable-select__trigger-icons">
+          {clearable && value && (
+            <FiX
+              className="searchable-select__clear"
+              aria-label="Clear selection"
+              role="button"
+              tabIndex={0}
+              onClick={(event) => {
                 event.stopPropagation();
                 onChange("");
-              }
-            }}
-          />
-        )}
-        <FiChevronDown className={open ? "is-open" : ""} aria-hidden />
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.stopPropagation();
+                  onChange("");
+                }
+              }}
+            />
+          )}
+          <FiChevronDown className={open ? "is-open" : ""} aria-hidden />
+        </span>
       </button>
 
       {open && (
