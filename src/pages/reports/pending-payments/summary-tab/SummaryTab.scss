@@ -1,0 +1,86 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.summary-tab {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__stat {
+    @include m.card(v.$spacing-4);
+    text-align: center;
+  }
+
+  &__stat-label {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0 0 v.$spacing-2;
+  }
+
+  &__stat-value {
+    @include m.font-heading(v.$font-weight-bold);
+    color: v.$color-text;
+    font-size: v.$font-size-2xl;
+    margin: 0;
+
+    &--danger {
+      color: v.$color-danger;
+    }
+  }
+
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    p {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      margin: 0;
+    }
+
+    &-controls {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      flex-wrap: wrap;
+
+      button {
+        @include m.flex-center;
+        @include m.focus-ring(v.$color-orange);
+        min-width: 2rem;
+        height: 2rem;
+        padding: 0 v.$spacing-2;
+        border: 1px solid v.$color-border;
+        border-radius: v.$radius-md;
+        background-color: v.$color-bg;
+        color: v.$color-text;
+        font-size: v.$font-size-sm;
+        cursor: pointer;
+        transition: background-color v.$transition-fast, color v.$transition-fast;
+
+        &:hover:not(:disabled) {
+          background-color: v.$color-bg-muted;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        &.is-active {
+          background-color: v.$color-primary;
+          border-color: v.$color-primary;
+          color: v.$color-white;
+        }
+      }
+    }
+  }
+}

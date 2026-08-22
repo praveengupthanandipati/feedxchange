@@ -58,6 +58,9 @@ import TransporReviewAssignTrucks from './pages/truck-management/transporter-rev
 import SellerInvoiceReports from './pages/reports/seller-invoice-reports/SellerInvoiceReports'
 import SellerBuyerAccounts from './pages/reports/seller-buyer-accounts/SellerBuyerAccounts'
 import ContractWiseStatus from './pages/reports/contract-wise-status/ContractwiseStatus'
+import ContractSummary from './pages/reports/contract-summary/ContractSummary'
+import AccountStatement from './pages/reports/account-statement/AccountStatement'
+import PendingPayments from './pages/reports/pending-payments/PendingPayments'
 
 function App() {
   return (
@@ -124,6 +127,9 @@ function App() {
           <Route path="/reports/seller-invoice-reports" element={<SellerInvoiceReports />} />
           <Route path="/reports/seller-buyer-accounts" element={<SellerBuyerAccounts />} />
           <Route path="/reports/contract-wise-status" element={<ContractWiseStatus />} />
+          <Route path="/reports/contract-summary" element={<ContractSummary />} />
+          <Route path="/reports/account-statement" element={<AccountStatement />} />
+          <Route path="/reports/pending-payments" element={<PendingPayments />} />
         </Route>
       </Routes>
     </Router>
