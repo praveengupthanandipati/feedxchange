@@ -57,6 +57,7 @@ import TransporReviewAssignTrucks from './pages/truck-management/transporter-rev
 //reports
 import SellerInvoiceReports from './pages/reports/seller-invoice-reports/SellerInvoiceReports'
 import SellerBuyerAccounts from './pages/reports/seller-buyer-accounts/SellerBuyerAccounts'
+import ContractWiseStatus from './pages/reports/contract-wise-status/ContractwiseStatus'
 
 function App() {
   return (
@@ -122,6 +123,7 @@ function App() {
           <Route path="/truck-management/transporters/freight-approval" element={<TransporReviewAssignTrucks />} />
           <Route path="/reports/seller-invoice-reports" element={<SellerInvoiceReports />} />
           <Route path="/reports/seller-buyer-accounts" element={<SellerBuyerAccounts />} />
+          <Route path="/reports/contract-wise-status" element={<ContractWiseStatus />} />
         </Route>
       </Routes>
     </Router>

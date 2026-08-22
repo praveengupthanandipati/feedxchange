@@ -19,10 +19,18 @@
     font-size: v.$font-size-sm;
     cursor: pointer;
 
-    span {
+    > span:first-child {
+      flex: 1;
+      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-align: left;
+    }
+
+    .searchable-select__trigger-icons {
+      @include m.flex(row, flex-end, center, v.$spacing-2);
+      flex-shrink: 0;
     }
 
     svg {
