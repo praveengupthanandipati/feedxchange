@@ -1,0 +1,222 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.pending-supplies-page {
+  padding-bottom: v.$spacing-6;
+}
+
+// ============================================================
+// Card shell
+// ============================================================
+.pending-supplies-card {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+  }
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    flex-wrap: wrap;
+
+    h1 {
+      color: v.$color-primary;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+
+    @include m.respond-to(sm) {
+      flex-direction: row;
+      align-items: baseline;
+      gap: v.$spacing-3;
+    }
+  }
+
+  &__subtitle {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    flex-wrap: wrap;
+  }
+}
+
+.pending-supplies-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+  white-space: nowrap;
+
+  &--info {
+    background-color: v.$color-info;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: #1f6fae;
+    }
+  }
+
+  &--warning {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+}
+
+// ============================================================
+// Filters — Select / From Date / To Date / Show, hidden by
+// default and toggled open by the header's Hide/Show button.
+// ============================================================
+.pending-supplies-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+  align-items: center;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include m.respond-to(lg) {
+    grid-template-columns: 1fr 1fr 1fr auto auto;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__date {
+    @include m.font-base;
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:hover {
+      border-color: v.$color-primary;
+    }
+  }
+
+  &__show,
+  &__reset {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+    white-space: nowrap;
+  }
+
+  &__show {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+
+  &__reset {
+    background-color: rgba(v.$color-danger, 0.1);
+    color: v.$color-danger;
+
+    &:hover {
+      background-color: rgba(v.$color-danger, 0.18);
+    }
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.pending-supplies-table {
+  &__type {
+    color: v.$color-text;
+
+    &--credits {
+      color: v.$color-primary;
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.pending-supplies-pagination {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-bg-muted;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}

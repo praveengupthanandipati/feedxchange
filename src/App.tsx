@@ -61,6 +61,9 @@ import ContractWiseStatus from './pages/reports/contract-wise-status/Contractwis
 import ContractSummary from './pages/reports/contract-summary/ContractSummary'
 import AccountStatement from './pages/reports/account-statement/AccountStatement'
 import PendingPayments from './pages/reports/pending-payments/PendingPayments'
+import PendingSupplies from './pages/reports/pending-supplies/PendingSupplies'
+import MonthlyReports from './pages/reports/monthly-reports/MonthlyReports'
+
 
 function App() {
   return (
@@ -130,6 +133,8 @@ function App() {
           <Route path="/reports/contract-summary" element={<ContractSummary />} />
           <Route path="/reports/account-statement" element={<AccountStatement />} />
           <Route path="/reports/pending-payments" element={<PendingPayments />} />
+          <Route path="/reports/pending-supplies" element={<PendingSupplies />} />
+          <Route path="/reports/monthly-reports" element={<MonthlyReports />} />
         </Route>
       </Routes>
     </Router>

@@ -1,0 +1,134 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.commodity-wise {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h2 {
+      @include m.font-heading(v.$font-weight-semibold);
+      color: v.$color-text;
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+  }
+
+  &__print {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: v.$spacing-2;
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+  // ============================================================
+  // Month stat cards — responsive auto-fill grid so the 12 tiles
+  // reflow cleanly at any viewport width instead of relying on
+  // fixed breakpoint column counts.
+  // ============================================================
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+    gap: v.$spacing-3;
+  }
+
+  &__stat {
+    @include m.card(v.$spacing-4);
+    text-align: center;
+  }
+
+  &__stat-label {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0 0 v.$spacing-2;
+    white-space: nowrap;
+  }
+
+  &__stat-value {
+    @include m.font-heading(v.$font-weight-bold);
+    color: v.$color-text;
+    font-size: v.$font-size-xl;
+    margin: 0;
+  }
+
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    p {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      margin: 0;
+    }
+
+    &-controls {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      flex-wrap: wrap;
+
+      button {
+        @include m.flex-center;
+        @include m.focus-ring(v.$color-orange);
+        min-width: 2rem;
+        height: 2rem;
+        padding: 0 v.$spacing-2;
+        border: 1px solid v.$color-border;
+        border-radius: v.$radius-md;
+        background-color: v.$color-bg;
+        color: v.$color-text;
+        font-size: v.$font-size-sm;
+        cursor: pointer;
+        transition: background-color v.$transition-fast, color v.$transition-fast;
+
+        &:hover:not(:disabled) {
+          background-color: v.$color-bg-muted;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        &.is-active {
+          background-color: v.$color-primary;
+          border-color: v.$color-primary;
+          color: v.$color-white;
+        }
+      }
+    }
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.commodity-wise-table {
+  &__product {
+    color: v.$color-primary;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__total {
+    font-weight: v.$font-weight-semibold;
+  }
+}
