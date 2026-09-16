@@ -64,6 +64,9 @@ import PendingPayments from './pages/reports/pending-payments/PendingPayments'
 import PendingSupplies from './pages/reports/pending-supplies/PendingSupplies'
 import MonthlyReports from './pages/reports/monthly-reports/MonthlyReports'
 
+//payment
+import Sellerinvoice from './pages/payments/seller-invoice/SellerInvoice'
+
 
 function App() {
   return (
@@ -135,6 +138,7 @@ function App() {
           <Route path="/reports/pending-payments" element={<PendingPayments />} />
           <Route path="/reports/pending-supplies" element={<PendingSupplies />} />
           <Route path="/reports/monthly-reports" element={<MonthlyReports />} />
+          <Route path="/payments/seller-invoice" element={<Sellerinvoice />} />
         </Route>
       </Routes>
     </Router>
