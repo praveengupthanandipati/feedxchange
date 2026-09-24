@@ -194,6 +194,7 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
       documentNumber: document.documentNumber,
       issuingAuthority: document.issuingAuthority,
       issuedDate: document.issuedDate.slice(0, 10),
+      expiryDate: document.expiryDate ? document.expiryDate.slice(0, 10) : "",
       fileName: document.fileName,
       fileError: "",
       meta: document.documentId

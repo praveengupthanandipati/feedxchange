@@ -65,6 +65,7 @@ export interface DocumentPayload {
   fileName: string;
   issuingAuthority: string;
   issuedDate: string;
+  expiryDate?: string;
 }
 
 export interface CreateProfileDocumentEntry extends DocumentPayload {

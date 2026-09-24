@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import {
   useGetAllContractsQuery,
   useGetAllContractsByFiltersQuery,
-  useLazyGetAllContractsForExcelQuery,
 } from "../../../store/contractsApi";
 import {
   FiEye,
@@ -21,52 +20,24 @@ import {
 } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
+import type { TableColumn } from "../../../components/table/table.types";
+import TruckList from "../contract-trucks/TruckList";
+import { useContractTruckDetails } from "../contract-trucks/useContractTruckDetails";
 import { buildPendingContractColumns } from "./pendingContracts.columns";
-import {
-  deliveryScheduleOptions,
-  type PendingContractRow,
-  type TruckAssignment,
-} from "./pendingContracts.data";
+import { type PendingContractRow } from "./pendingContracts.data";
 import "./PendingContracts.scss";
 
 const PAGE_SIZE = 10;
 const ALL_OPTION = { value: "All", label: "All" };
 
-const formatShortDate = (value: string) => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-};
+function getExportCellValue(row: PendingContractRow, column: TableColumn<PendingContractRow>): string {
+  if (column.exportValue) return column.exportValue(row);
+  const raw = (row as unknown as Record<string, unknown>)[column.key];
+  return raw === undefined || raw === null ? "" : String(raw);
+}
 
-function mapOpenAndPendingContract(row: OpenAndPendingContract): PendingContractRow {
-  const dispatched = row.dispatchedQuantityMT ?? 0;
-  const pending = row.pendingQuantityMT ?? 0;
-  const total = row.totalQuantityMT ?? 0;
-  const arranged = Math.max(total - dispatched - pending, 0);
-  const dateValue = new Date(row.contractDate).getTime();
-
-  return {
-    id: row.contractNumber,
-    date: formatShortDate(row.contractDate),
-    dateValue: Number.isNaN(dateValue) ? 0 : dateValue,
-    seller: row.seller ?? "-",
-    buyer: row.buyer ?? "-",
-    cRate: `₹${row.pricePerKg.toLocaleString("en-IN")}`,
-    cRateValue: row.pricePerKg,
-    cQty: `${total} MT`,
-    cQtyValue: total,
-    dQty: `${dispatched} MT`,
-    dQtyValue: dispatched,
-    aQty: `${arranged} MT`,
-    aQtyValue: arranged,
-    pQty: `${pending} MT`,
-    pQtyValue: pending,
-    product: row.productName,
-    fromDate: formatShortDate(row.effectiveFrom),
-    toDate: formatShortDate(row.effectiveTo),
-    deliverySchedule: row.deliverySchedule,
-    paymentType: row.paymentTermName,
-  };
+function escapeHtml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 const PendingContractsLoader = () => (
@@ -257,42 +228,12 @@ const PendingContracts = () => {
   useEffect(() => {
   }, [pendingContractApiRows, isLoading, error]);
 
-  const handleDownloadExcel = async () => {
-    try {
-      const result = await downloadExcel().unwrap();
-      const url = window.URL.createObjectURL(result);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "Contracts.xlsx";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      //console.error("Excel Download Failed", err);
-    }
-  };
-
-  const sellerOptions = useMemo(() => {
-    const names = Array.from(new Set(pendingContracts.map((row) => row.seller))).filter(
-      (name) => name && name !== "-",
-    );
-    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: name }))];
-  }, [pendingContracts]);
-
-  const buyerOptions = useMemo(() => {
-    const names = Array.from(new Set(pendingContracts.map((row) => row.buyer))).filter(
-      (name) => name && name !== "-",
-    );
-    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: name }))];
-  }, [pendingContracts]);
-
   const deliveryScheduleOptions = useMemo(() => {
-    const schedules = Array.from(new Set(pendingContracts.map((row) => row.deliverySchedule))).filter(
-      Boolean,
+    const schedules = Array.from(new Set(apiRows.map((row) => row.deliverySchedule))).filter(
+      (schedule) => schedule && schedule !== "N/A",
     );
     return [ALL_OPTION, ...schedules.map((schedule) => ({ value: schedule, label: schedule }))];
-  }, [pendingContracts]);
+  }, [apiRows]);
 
   const handleOpenTruckDetails = (row: PendingContractRow) => {
     setTruckDrawerRow(row);
@@ -342,6 +283,31 @@ const PendingContracts = () => {
     setDateTo("");
     setScheduleFilter("All");
     setKeyword("");
+  };
+
+  const handleExportToExcel = () => {
+    const headerRow = pendingContractColumns
+      .map((column) => `<th>${escapeHtml(column.header)}</th>`)
+      .join("");
+    const bodyRows = filteredRows
+      .map((row) => {
+        const cells = pendingContractColumns
+          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
+          .join("");
+        return `<tr>${cells}</tr>`;
+      })
+      .join("");
+
+    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
+    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "pending-contracts.xls";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   };
 
   return (

@@ -293,7 +293,7 @@ export interface ContractTruckChainTrip {
   passThroughAddresses: ContractTruckChainPassThrough[];
 }
 
-/** What one party is shown of the chain: only the legs of contracts they are on. */
+
 export interface ContractTruckChainParticipant {
   profileId: number;
   name: string;
