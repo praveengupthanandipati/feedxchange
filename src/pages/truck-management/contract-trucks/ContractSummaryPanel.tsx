@@ -5,6 +5,7 @@ import {
   useGetAllOpenAndPendingContractsQuery,
 } from "../../../store/contractsApi";
 import { useContractTruckDetails } from "./useContractTruckDetails";
+import { useContractQuantitySummary } from "./useContractQuantitySummary";
 import "../assign-transports/Assigntransports.scss";
 
 function formatDisplayDate(value: string | null | undefined): string {
@@ -34,10 +35,12 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
     [openAndPendingContracts, contractNumber],
   );
 
-  const totalQty = matchingOpenContract?.totalQuantityMT ?? contract?.basicDetails?.quantity ?? 0;
-  const dispatchedQty = matchingOpenContract?.dispatchedQuantityMT ?? 0;
-  const pendingQty = matchingOpenContract?.pendingQuantityMT ?? 0;
-  const arrangedQty = Math.max(totalQty - dispatchedQty - pendingQty, 0);
+  // Pending and arranged come from what transporters have accepted, not from the list
+  // endpoint's pendingQuantityMT, which does not move when a schedule is accepted.
+  const { totalQty, dispatchedQty, committedQty, availableQty } =
+    useContractQuantitySummary(contractNumber);
+  const pendingQty = availableQty;
+  const arrangedQty = Math.max(committedQty - dispatchedQty, 0);
 
   return (
     <>

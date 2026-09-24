@@ -192,7 +192,6 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       const succeeded = await addContractTrucks({
         contractId,
         truckAssignmentTypeId,
-        dispatchScheduleTransporterId: 0,
         transporterProfileId: Number(form.transporter),
         truckId: Number(form.truck),
         driverId: Number(form.driverName),
