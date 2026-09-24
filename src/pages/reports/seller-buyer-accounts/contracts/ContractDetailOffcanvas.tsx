@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FiX } from "react-icons/fi";
-import { money, type ContractRow } from "./sellerBuyerAccounts.data";
+import { money, type ContractRow } from "./contracts.data";
 import "./ContractDetailOffcanvas.scss";
 
 interface ContractDetailOffcanvasProps {

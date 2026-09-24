@@ -146,8 +146,10 @@ const TruckNew = () => {
     try {
       if (isEditMode && editingTruck) {
         await updateTruckDetails({ truckId: editingTruck.truckId, updateTruckDetails: truckDetails }).unwrap();
+        localStorage.setItem("successMessage", "Truck updated successfully");
       } else {
         await addTruckDetails(truckDetails).unwrap();
+        localStorage.setItem("successMessage", "Truck added successfully");
       }
       navigate("/truck-management/transporters/truck-master");
     } catch (err) {

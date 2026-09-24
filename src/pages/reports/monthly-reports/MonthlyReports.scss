@@ -1,0 +1,178 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.monthly-reports-page {
+  padding-bottom: v.$spacing-6;
+}
+
+// ============================================================
+// Card shell
+// ============================================================
+.monthly-reports-card {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      color: v.$color-text;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    flex-wrap: wrap;
+  }
+}
+
+.monthly-reports-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: v.$spacing-2;
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+  white-space: nowrap;
+
+  &--hide {
+    background-color: v.$color-danger;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: darken(v.$color-danger, 8%);
+    }
+  }
+
+  &--export {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+}
+
+// ============================================================
+// Filters
+// ============================================================
+.monthly-reports-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+  align-items: center;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: 1fr auto auto;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    max-width: 100%;
+
+    @include m.respond-to(sm) {
+      max-width: 18rem;
+    }
+  }
+
+  &__apply,
+  &__reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: start;
+    gap: v.$spacing-2;
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+    white-space: nowrap;
+  }
+
+  &__apply {
+    background-color: v.$color-success;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: darken(v.$color-success, 8%);
+    }
+  }
+
+  &__reset {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+}
+
+// ============================================================
+// Tabs — equal-width segments matching the app-wide tab pattern
+// (contract-summary-tabs / pending-payments-tabs): the active tab
+// fills its column with a solid navy block, inactive tabs stay
+// plain muted text. Scales down in place rather than needing a
+// mobile dropdown fallback.
+// ============================================================
+.monthly-reports-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid v.$color-border;
+
+  button {
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.75rem;
+    padding: 0 v.$spacing-3;
+    border: none;
+    background-color: transparent;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover:not(.is-active) {
+      background-color: v.$color-bg-muted;
+      color: v.$color-text;
+    }
+
+    &.is-active {
+      background-color: v.$color-navy;
+      color: v.$color-white;
+    }
+  }
+
+  @include m.respond-to(md) {
+    button {
+      font-size: v.$font-size-base;
+    }
+  }
+}

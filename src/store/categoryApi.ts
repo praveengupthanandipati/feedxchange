@@ -118,21 +118,6 @@ export const categoryApi = createApi({
       transformResponse: transformCategories,
       providesTags: ["Category"],
     }),
-// commented code can be used in future if needed
-    // // ===========================
-    // // GET CATEGORY BY ID
-    // // ===========================
-    // getCategoryById: builder.query<
-    //   Category | null,
-    //   { categoryId: number; seoName: string }
-    // >({
-    //   query: ({ categoryId, seoName }) =>
-    //     `/api/Category/GetCategoryById?categoryId=${categoryId}&seoName=${encodeURIComponent(
-    //       seoName
-    //     )}`,
-    //   transformResponse: transformSingleCategory,
-    //   providesTags: ["Category"],
-    // }),
 
     // ===========================
     // ADD CATEGORY
@@ -207,40 +192,12 @@ export const categoryApi = createApi({
       }),
       invalidatesTags: ["Category"],
     }),
-
-    // // ===========================
-    // // UPDATE CATEGORY STATUS
-    // // ===========================
-    // updateCategoryStatus: builder.mutation<boolean, CategoryStatusPayload>({
-    //   query: ({ categoryId, isActive }) => ({
-    //     url: `/api/Category/UpdateCategoryStatus?categoryId=${categoryId}&isActive=${isActive}`,
-    //     method: "POST",
-    //     responseHandler: "text",
-    //   }),
-    //   invalidatesTags: ["Category"],
-    // }),
-
-    // // ===========================
-    // // CATEGORY PRIORITY CHANGE
-    // // ===========================
-    // categoryPriorityChange: builder.mutation<number, CategoryPriorityItem[]>({
-    //   query: (body) => ({
-    //     url: "/api/Category/CategoryPriorityChange",
-    //     method: "POST",
-    //     body,
-    //   }),
-    //   invalidatesTags: ["Category"],
-    // }),
   }),
 });
 
 export const {
-  //useGetAllCategoriesQuery,
   useGetAllActiveCategoriesQuery,
-  //useGetCategoryByIdQuery,
   useAddCategoryMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
-  //useUpdateCategoryStatusMutation,
-  //useCategoryPriorityChangeMutation,
 } = categoryApi;

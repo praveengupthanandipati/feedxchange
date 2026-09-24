@@ -3,6 +3,8 @@ import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
+import SuccessToast from "../../../../components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
 import DriverTruckMappingFilters from "./DriverTruckMappingFilters";
 import Pagination from "./Pagination";
 import DriverTruckMappingOffcanvas from "./DriverTruckMappingOffcanvas";
@@ -68,6 +70,7 @@ const DriverTruckMappingPage = () => {
   const [offcanvasOpen, setOffcanvasOpen] = useState(false);
   const [offcanvasMode, setOffcanvasMode] = useState<"create" | "view">("create");
   const [activeRow, setActiveRow] = useState<DriverTruckMapping | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleOpenCreate = () => {
     setOffcanvasMode("create");
@@ -99,6 +102,7 @@ const DriverTruckMappingPage = () => {
         actionPerformedBy,
       }).unwrap();
       setPendingReleaseRow(null);
+      showSuccessMessage("Driver-truck mapping released successfully");
     } catch (err) {
       setReleaseError(err instanceof Error ? err.message : "Failed to release mapping.");
     }
@@ -115,6 +119,7 @@ const DriverTruckMappingPage = () => {
         actionPerformedBy: values.actionPerformedBy,
       }).unwrap();
       setOffcanvasOpen(false);
+      showSuccessMessage("Driver-truck mapping added successfully");
     } catch {
       // TODO: surface a form-level error once the offcanvas supports one.
     }
@@ -183,6 +188,7 @@ const DriverTruckMappingPage = () => {
 
   return (
     <div className="driver-truck-mapping-page">
+      <SuccessToast message={successMessage} />
       <div className="driver-truck-mapping-card">
         <div className="driver-truck-mapping-card__header">
           <h1>Driver-Truck Mapping</h1>

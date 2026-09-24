@@ -54,9 +54,6 @@ export interface GetAllContractsResponse {
   contracts: GetAllContractsRow[];
 }
 
-/* =========================
-   CONTRACT STATUS CHANGE
-========================= */
 
 export interface ContractStatusOption {
   contractStatusId: number;
@@ -194,7 +191,6 @@ export interface UpdateContractStatusRequest {
 
 /* =========================
    SAVE / UPDATE CONTRACT
-========================= */
 
 export interface BasicDetailsPayload {
   quantity: number;
@@ -288,7 +284,6 @@ export type SaveContractRequest = UpdateContractPayload;
 
 /* =========================
    PENDING CONTRACTS / FILTERS
-========================= */
 
 export interface PendingContractApiResponse {
   contractId: number;
@@ -304,20 +299,154 @@ export interface PendingContractApiResponse {
   createdAt: string;
   updatedBy: string | null;
   updatedAt: string | null;
-
   basicDetails: {
     contractRate: number;
     quantity: number;
     quantityMeasure: string;
     minQuantity: number;
     maxQuantity: number;
-    deliverySchedule: string;
-    deliveryType: string;
+    deliverySchedule: string | null;
+    deliveryType: string | null;
     deliveryFromDate: string | null;
     deliveryToDate: string | null;
     calculatedStatus: string;
   };
 }
+/*save contract request interface*/
+export interface SaveContractRequest {
+  contractNumber: string;
+  sellerId: number;
+  buyerId: number;
+  contractDate: string;
+  effectiveFrom: string;
+  effectiveTo: string;
+  totalQuantityMT: number;
+  productId: number;
+  tolerancePercentage: number;
+  minQuantityMT: number;
+  maxQuantityMT: number;
+  dispatchedQuantityMT: number;
+  pendingQuantityMT: number;
+  pricePerKg: number;
+  currencyId: number;
+  contractStatusId: number;
+
+  sellerCommission: number;
+  sellerDeliverySchedule: string;
+  sellerSpecificDays: number;
+  sellerFromDate: string;
+  sellerToDate: string;
+  loadingAddressId: number;
+  sellerRemarksSpecialConditions: string;
+
+  sellerQualitySpecifications: {
+    profileId: number;
+    parameterId: number;
+    minValue: number;
+    maxValue: number;
+    unit: string;
+  }[];
+
+  buyerCommission: number;
+  buyerDeliverySchedule: string;
+  buyerSpecificDays: number;
+  buyerFromDate: string;
+  buyerToDate: string;
+  deliveryAddressId: number;
+  buyerRemarksSpecialConditions: string;
+
+  buyerQualitySpecifications: {
+    profileId: number;
+    parameterId: number;
+    minValue: number;
+    maxValue: number;
+    unit: string;
+  }[];
+
+  remarks: string;
+  approvalRequired: boolean;
+  createdBy: number;
+
+  paymentTerms: {
+    paymentTermName: string;
+    paymentBeforeDate: string;
+    sellerPaymentDueDays: number;
+    buyerPaymentDueDays: number;
+    immediateAdvancePercentage: number;
+    immediateAdvanceDate: string;
+    balanceAdvancePercentage: number;
+    balanceAdvanceDate: string;
+    remarks: string;
+  };
+}
+
+/* UpdateContract expects the existing contract number and a flat update DTO. */
+export interface UpdateContractRequest {
+  contractNumber: string;
+  updateContract: {
+    contractNumber: string;
+    sellerId: number;
+    buyerId: number;
+    contractDate: string;
+    effectiveFrom: string;
+    effectiveTo: string;
+    totalQuantityMT: number;
+    productId: number;
+    tolerancePercentage: number;
+    minQuantityMT: number;
+    maxQuantityMT: number;
+    dispatchedQuantityMT: number;
+    pendingQuantityMT: number;
+    pricePerKg: number;
+    currencyId: number;
+    contractStatusId: number;
+    sellerCommission: number;
+    sellerDeliverySchedule: string;
+    sellerSpecificDays: number;
+    sellerFromDate: string;
+    sellerToDate: string;
+    loadingAddressId: number;
+    sellerRemarksSpecialConditions: string;
+    sellerQualitySpecifications: SaveContractRequest["sellerQualitySpecifications"];
+    buyerCommission: number;
+    buyerDeliverySchedule: string;
+    buyerSpecificDays: number;
+    buyerFromDate: string;
+    buyerToDate: string;
+    deliveryAddressId: number;
+    buyerRemarksSpecialConditions: string;
+    buyerQualitySpecifications: SaveContractRequest["buyerQualitySpecifications"];
+    remarks: string;
+    approvalRequired: boolean;
+    createdBy: number;
+    paymentTerms: SaveContractRequest["paymentTerms"];
+  };
+}
+
+
+/* =========================
+   CONTRACT STATUS CHANGE
+========================= */
+
+export interface ContractStatusOption {
+  contractStatusId: number;
+  statusName: string;
+  displayName: string;
+  description: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export interface UpdateContractStatusRequest {
+  contractId: number;
+  calculatedStatus: string;
+  reviewRemarks?: string | null;
+  actionPerformedBy: number;
+}
+
+/* =========================
+   PENDING CONTRACTS / FILTERS
+========================= */
 
 export interface GetAllContractsParams {
   DateFilter?: string;
@@ -351,33 +480,6 @@ export interface TransporterContract {
   paymentType: string;
   createdAt: string;
   updatedAt: string;
-}
-
-// Backend only accepts Status + SearchText for this endpoint (confirmed via Swagger).
-export interface GetAllContractsByFiltersRequest {
-  Status?: string;
-  SearchText?: string;
-}
-
-export interface TruckAssignmentType {
-  truckAssignmentTypeId: number;
-  truckAssignmentTypeName: string;
-}
-
-export interface OpenAndPendingContract {
-  contractNumber: string;
-  contractDate: string;
-  seller: string | null;
-  buyer: string | null;
-  pricePerKg: number;
-  totalQuantityMT: number;
-  dispatchedQuantityMT: number;
-  pendingQuantityMT: number;
-  productName: string;
-  effectiveFrom: string;
-  effectiveTo: string;
-  deliverySchedule: string;
-  paymentTermName: string;
 }
 
 export interface GetAllContractsForTransporterParams {
@@ -415,6 +517,27 @@ export const contractsApi = createApi({
       providesTags: ["PendingContracts"],
     }),
 
+    saveContract: builder.mutation<unknown, SaveContractRequest>({
+  query: (body) => ({
+    url: "/api/Contracts/SaveContract",
+    method: "POST",
+    body,
+  }),
+  invalidatesTags: ["Contract", "PendingContracts"],
+}),
+
+updateContract: builder.mutation<unknown, UpdateContractRequest>({
+  query: (body) => ({
+    url: "/api/Contracts/UpdateContract",
+    method: "PUT",
+    body,
+    // The endpoint may return 200 with an empty or plain-text response.
+    // Treat either as a successful mutation instead of attempting JSON parsing.
+    responseHandler: "text",
+  }),
+  invalidatesTags: ["Contract", "PendingContracts"],
+}),
+
     /* =========================
        DELETE CONTRACT
     ========================= */
@@ -442,15 +565,6 @@ export const contractsApi = createApi({
       transformResponse: unwrapArray<ContractStatusOption>,
     }),
 
-    getContractByContractNumber: builder.query<GetContractDto, string>({
-      query: (contractNumber) => ({
-        url: "/api/Contracts/GetContractByContractNumber",
-        method: "GET",
-        params: { contractNo: contractNumber },
-      }),
-      transformResponse: (payload: unknown) => unwrapObject<GetContractDto>(payload) as GetContractDto,
-    }),
-
     updateContractStatus: builder.mutation<void, UpdateContractStatusRequest>({
       query: (body) => ({
         url: "/api/Contracts/UpdateContractStatus",
@@ -460,49 +574,20 @@ export const contractsApi = createApi({
       invalidatesTags: ["PendingContracts"],
     }),
 
-    /* =========================
-       SAVE / UPDATE CONTRACT
-    ========================= */
-
-    updateContract: builder.mutation<void, UpdateContractRequest>({
-      query: (body) => ({
-        url: "/api/Contracts/UpdateContract",
-        method: "PUT",
-        body,
-      }),
-      invalidatesTags: ["PendingContracts"],
-    }),
-
-    saveContract: builder.mutation<void, SaveContractRequest>({
-      query: (body) => ({
-        url: "/api/Contracts/SaveContract",
-        method: "POST",
-        body,
-      }),
-      invalidatesTags: ["PendingContracts"],
-    }),
-
-    /* =========================
-       PENDING CONTRACTS / FILTERS
-    ========================= */
-
-    getAllContractsByFilters: builder.query<PendingContractApiResponse[], GetAllContractsByFiltersRequest>({
-      query: (params) => ({
+    getAllContractsByFilters: builder.query<PendingContractApiResponse[], void>({
+      query: () => ({
         url: "/api/Contracts/GetAllContractsByFilters",
         method: "GET",
-        params,
       }),
-      transformResponse: unwrapArray<PendingContractApiResponse>,
       providesTags: ["PendingContracts"],
     }),
 
-    getAllOpenAndPendingContracts: builder.query<OpenAndPendingContract[], void>({
-      query: () => ({
-        url: "/api/Contracts/GetAllOpenAndPendingContracts",
+    getContractByContractNumber: builder.query<unknown, string>({
+      query: (contractNo) => ({
+        url: "/api/Contracts/GetContractByContractNumber",
         method: "GET",
+        params: { contractNo },
       }),
-      transformResponse: unwrapArray<OpenAndPendingContract>,
-      providesTags: ["PendingContracts"],
     }),
 
     getTruckAssignmentTypes: builder.query<TruckAssignmentType[], void>({
@@ -535,19 +620,14 @@ export const contractsApi = createApi({
 
 export const {
   useGetAllContractsQuery,
+  useSaveContractMutation,
+  useUpdateContractMutation,
   useDeleteContractMutation,
   useGetAllContractStatusesQuery,
-  useGetContractByContractNumberQuery,
-  useLazyGetContractByContractNumberQuery,
   useUpdateContractStatusMutation,
-  useUpdateContractMutation,
-  useSaveContractMutation,
   useGetAllContractsByFiltersQuery,
   useLazyGetAllContractsByFiltersQuery,
-  useGetAllOpenAndPendingContractsQuery,
-  useLazyGetAllOpenAndPendingContractsQuery,
-  useGetTruckAssignmentTypesQuery,
-  useGetScheduleStatusesQuery,
-  useGetAllContractsForTransporterQuery,
-  useLazyGetAllContractsForTransporterQuery,
+  useGetContractByContractNumberQuery,
+  useLazyGetContractByContractNumberQuery,
+  useLazyGetAllContractsForExcelQuery,
 } = contractsApi;

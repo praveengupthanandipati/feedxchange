@@ -1,4 +1,17 @@
-export type ContractStatus = "Open" | "Pending" | "In-transit" | "Rejected";
+export type ContractStatus =
+  | "Open"
+  | "Pending"
+  | "In-transit"
+  | "Rejected";
+
+export interface QualitySpecification {
+  profileId?: number;
+  parameterId?: number;
+  parameter?: string;
+  minValue?: number;
+  maxValue?: number;
+  unit?: string | null;
+}
 
 export interface ConditionInfo {
   commission: string;
@@ -12,8 +25,10 @@ export interface ConditionInfo {
 }
 
 export interface Contract {
+  // Existing display fields
   id: string;
   contractId: number;
+  contractNumber: string;
   date: string;
   dateValue: number;
   status: ContractStatus;
@@ -34,6 +49,7 @@ export interface Contract {
   netRateValue: number;
   indicativeFreight: string;
   rateRemarks: string;
+  gstDetails?: string;
   deliveryType: string;
   paymentTerms: string;
   paymentBeforeDate: string;
@@ -49,6 +65,45 @@ export interface Contract {
   sellerConditions: ConditionInfo;
   buyerConditions: ConditionInfo;
   approved: boolean;
+
+  // --------------------------------------------------
+  // API values needed when editing a contract
+  // --------------------------------------------------
+
+  sellerId?: number;
+  buyerId?: number;
+  productId?: number;
+
+  minQuantityMT?: number;
+  maxQuantityMT?: number;
+  dispatchedQuantityMT?: number;
+  pendingQuantityMT?: number;
+
+  currencyId?: number;
+  contractStatusId?: number;
+
+  sellerCommission?: number;
+  sellerDeliverySchedule?: string;
+  sellerSpecificDays?: number;
+  sellerFromDate?: string;
+  sellerToDate?: string;
+  loadingAddressId?: number;
+  sellerRemarksSpecialConditions?: string;
+  sellerQualitySpecifications?: QualitySpecification[];
+
+  buyerCommission?: number;
+  buyerDeliverySchedule?: string;
+  buyerSpecificDays?: number;
+  buyerFromDate?: string;
+  buyerToDate?: string;
+  deliveryAddressId?: number;
+  buyerRemarksSpecialConditions?: string;
+  buyerQualitySpecifications?: QualitySpecification[];
+
+  approvalRequired?: boolean;
+  createdById?: number;
+
+  paymentTermName?: string;
 }
 
 export const statusOptions = [

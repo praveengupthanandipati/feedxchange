@@ -4,6 +4,8 @@ import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
+import SuccessToast from "../../../../components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
 import DriversFilters from "./DriversFilters";
 import Pagination from "./Pagination";
 import { buildDriverColumns } from "./drivers.columns";
@@ -53,6 +55,7 @@ const DriversList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Driver | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleEdit = (driver: Driver) => {
     navigate(`/truck-management/transporters/driver-master/new?id=${driver.driverId}`);
@@ -78,6 +81,7 @@ const DriversList = () => {
         actionPerformedBy,
       }).unwrap();
       setPendingDeleteRow(null);
+      showSuccessMessage("Driver deleted successfully");
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : "Failed to delete driver.");
     }
@@ -145,6 +149,7 @@ const DriversList = () => {
 
   return (
     <div className="drivers-page">
+      <SuccessToast message={successMessage} />
       <div className="drivers-card">
         <div className="drivers-card__header">
           <h1>Drivers</h1>

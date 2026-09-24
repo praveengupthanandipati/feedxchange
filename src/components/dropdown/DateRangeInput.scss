@@ -1,0 +1,93 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.date-range-input {
+  position: relative;
+  min-width: 12rem;
+
+  &__trigger {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-medium);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    > span:first-child {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: left;
+      color: inherit;
+
+      &.is-placeholder {
+        color: v.$color-gray-400;
+      }
+    }
+
+    &:hover {
+      border-color: v.$color-primary;
+    }
+  }
+
+  &__trigger-icons {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    flex-shrink: 0;
+    color: v.$color-text-muted;
+  }
+
+  &__clear {
+    @include m.focus-ring(v.$color-orange);
+    border-radius: v.$radius-pill;
+    transition: color v.$transition-fast, background-color v.$transition-fast;
+
+    &:hover {
+      color: v.$color-danger;
+      background-color: v.$color-gray-100;
+    }
+  }
+
+  &__panel {
+    position: absolute;
+    top: calc(100% + #{v.$spacing-2});
+    left: 0;
+    z-index: v.$z-index-popover;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+    width: 100%;
+    min-width: 16rem;
+    padding: v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-lg;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    font-size: v.$font-size-sm;
+    color: v.$color-text-muted;
+
+    input {
+      @include m.font-base;
+      height: 2.25rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+  }
+}

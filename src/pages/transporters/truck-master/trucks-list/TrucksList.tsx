@@ -4,6 +4,8 @@ import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
+import SuccessToast from "../../../../components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
 import TrucksFilters from "./TrucksFilters";
 import Pagination from "./Pagination";
 import { buildTruckColumns } from "./trucks.columns";
@@ -65,6 +67,7 @@ const TrucksList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Truck | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleEdit = (truck: Truck) => {
     navigate(`/truck-management/transporters/truck-master/new?id=${truck.truckId}`);
@@ -90,6 +93,7 @@ const TrucksList = () => {
         actionPerformedBy,
       }).unwrap();
       setPendingDeleteRow(null);
+      showSuccessMessage("Truck deleted successfully");
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : "Failed to delete truck.");
     }
@@ -188,6 +192,7 @@ const TrucksList = () => {
 
   return (
     <div className="trucks-page">
+      <SuccessToast message={successMessage} />
       <div className="trucks-card">
         <div className="trucks-card__header">
           <h1>Trucks</h1>

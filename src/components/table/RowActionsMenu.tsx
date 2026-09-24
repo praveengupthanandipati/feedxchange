@@ -27,6 +27,8 @@ interface RowActionsMenuProps {
   deleteIcon?: IconType;
   /** Overrides the "Delete" label/tooltip for onDelete. */
   deleteLabel?: string;
+  /** Non-interactive label rendered above the actions list (e.g. "Interest of Payments"), for grouping menu items under a heading. Only used with `actions`. */
+  menuHeader?: string;
 }
 
 const RowActionsMenu = ({
@@ -38,6 +40,7 @@ const RowActionsMenu = ({
   menuAlign = "right",
   deleteIcon: DeleteIcon = FiTrash2,
   deleteLabel = "Delete",
+  menuHeader,
 }: RowActionsMenuProps) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -117,6 +120,7 @@ const RowActionsMenu = ({
 
       {open && (
         <ul className={`row-actions__menu ${menuAlign === "left" ? "row-actions__menu--align-left" : ""}`}>
+          {actions && menuHeader && <li className="row-actions__header">{menuHeader}</li>}
           {actions ? (
             actions.map((action) => (
               <li key={action.key}>

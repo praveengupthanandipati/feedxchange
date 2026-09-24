@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import Table from "../../../components/table/Table";
+import Table from "../../../../components/table/Table";
 import ContractDetailOffcanvas from "./ContractDetailOffcanvas";
-import { buildContractColumns } from "./sellerBuyerAccounts.columns";
-import { contractRows, contractSummaryTotals, money, type ContractRow } from "./sellerBuyerAccounts.data";
+import { buildContractColumns } from "./contracts.columns";
+import { contractRows, contractSummaryTotals, money, type ContractRow } from "./contracts.data";
+import "./Contracts.scss";
 
 const ContractInvoicesPanel = ({ row }: { row: ContractRow }) => (
   <div className="seller-buyer-accounts-invoices">

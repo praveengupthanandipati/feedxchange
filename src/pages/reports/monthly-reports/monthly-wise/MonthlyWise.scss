@@ -1,0 +1,46 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.monthly-wise {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__stat {
+    @include m.card(v.$spacing-5);
+    align-self: flex-start;
+    min-width: 12rem;
+    text-align: center;
+
+    @include m.respond-below(sm) {
+      align-self: stretch;
+    }
+  }
+
+  &__stat-label {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0 0 v.$spacing-2;
+  }
+
+  &__stat-value {
+    @include m.font-heading(v.$font-weight-bold);
+    color: v.$color-text;
+    font-size: v.$font-size-2xl;
+    margin: 0;
+  }
+}
+
+.monthly-wise-table {
+  &__variation {
+    font-weight: v.$font-weight-semibold;
+
+    &--up {
+      color: v.$color-success;
+    }
+
+    &--down {
+      color: v.$color-danger;
+    }
+  }
+}

@@ -1,0 +1,253 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.contract-wise-status-page {
+  padding-bottom: v.$spacing-6;
+}
+
+.contract-wise-status-card {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      color: v.$color-primary;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    flex-wrap: wrap;
+  }
+}
+
+.contract-wise-status-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast, opacity v.$transition-fast;
+  white-space: nowrap;
+
+  &--info {
+    background-color: v.$color-info;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: #1f6fae;
+    }
+  }
+
+  &--warning {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+  &--primary {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover:not(:disabled) {
+      background-color: v.$color-primary-dark;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================================
+// Filters
+// ============================================================
+.contract-wise-status-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+  align-items: center;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include m.respond-to(lg) {
+    grid-template-columns: 1fr 1fr auto auto;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__date-range {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    height: 2.5rem;
+    min-width: 0;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+
+    input {
+      @include m.font-base;
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+
+    span {
+      flex-shrink: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__apply,
+  &__reset {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+    white-space: nowrap;
+  }
+
+  &__apply {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+
+  &__reset {
+    background-color: rgba(v.$color-danger, 0.1);
+    color: v.$color-danger;
+
+    &:hover {
+      background-color: rgba(v.$color-danger, 0.18);
+    }
+  }
+}
+
+// ============================================================
+// Expanded supplies panel
+// ============================================================
+.contract-wise-status-supplies {
+  padding: v.$spacing-4;
+  background-color: v.$color-bg-muted;
+
+  &__table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-primary, 0.04);
+  }
+
+  &__table {
+    width: 100%;
+    min-width: 40rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: v.$font-size-sm;
+
+    td {
+      padding: v.$spacing-5 v.$spacing-6;
+      color: v.$color-text;
+      text-align: left;
+      white-space: nowrap;
+      border-top: 1px solid v.$color-border;
+    }
+  }
+}
+
+// See seller-buyer-accounts Contracts.scss for why this needs the extra
+// element selector: it must outrank the global `.table th` descendant rule
+// that forces every table header navy, since this sub-table nests inside
+// the shared Table component's expanded-row cell.
+table.contract-wise-status-supplies__table th {
+  @include m.font-heading(v.$font-weight-semibold);
+  padding: v.$spacing-4 v.$spacing-5;
+  background-color: v.$color-bg-muted !important;
+  color: v.$color-text !important;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 2px solid v.$color-primary;
+}
+
+.contract-wise-status-table.table-wrapper .table tbody tr.table__expanded-row td {
+  padding: v.$spacing-3;
+}
+
+// ============================================================
+// Table cells (Contract# / expand button)
+// ============================================================
+.contract-wise-status-table__contract {
+  @include m.flex(row, flex-start, center, v.$spacing-2);
+}
+
+.contract-wise-status-table__contract-link {
+  @include m.font-base(v.$font-weight-semibold);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: v.$color-primary;
+  font-size: inherit;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    color: v.$color-primary-dark;
+    text-decoration: underline;
+  }
+}
+
+.contract-wise-status-table__expand-btn {
+  @include m.flex-center;
+  @include m.focus-ring(v.$color-orange);
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: v.$radius-pill;
+  background: transparent;
+  color: v.$color-text-muted;
+  cursor: pointer;
+  transition: background-color v.$transition-fast, color v.$transition-fast;
+
+  &:hover {
+    background-color: v.$color-gray-100;
+    color: v.$color-primary;
+  }
+}

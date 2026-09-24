@@ -1,0 +1,119 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+// ============================================================
+// Header
+// ============================================================
+.payments-header {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  h2 {
+    @include m.font-heading(v.$font-weight-semibold);
+    color: v.$color-text;
+    font-size: v.$font-size-lg;
+    margin: 0;
+  }
+}
+
+.payments-expand-all-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  flex-shrink: 0;
+  height: 2.25rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  background-color: v.$color-orange;
+  color: v.$color-navy-dark;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast, opacity v.$transition-fast;
+
+  &:hover:not(:disabled) {
+    background-color: v.$color-orange-dark;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.payments-table {
+  &__ref,
+  &__buyer {
+    color: v.$color-primary;
+    font-weight: v.$font-weight-semibold;
+  }
+}
+
+// ============================================================
+// Sub-table (Towards / Payment of / Remarks)
+// ============================================================
+.payments-entries {
+  padding: v.$spacing-4;
+  background-color: v.$color-bg-muted;
+
+  &__table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-primary, 0.04);
+  }
+
+  &__table {
+    width: 100%;
+    min-width: 30rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: v.$font-size-sm;
+
+    td {
+      padding: v.$spacing-3 v.$spacing-4;
+      color: v.$color-text;
+      white-space: nowrap;
+      border-top: 1px solid v.$color-border;
+    }
+  }
+}
+
+// Nested inside the primary Table's expanded-row <td>, so the global
+// `.table th { background: navy !important }` descendant rule would
+// otherwise bleed through onto this sub-table's header too. See the same
+// fix applied to the Contracts tab's invoice sub-table.
+table.payments-entries__table th {
+  @include m.font-heading(v.$font-weight-semibold);
+  padding: v.$spacing-3 v.$spacing-4;
+  background-color: v.$color-bg-muted !important;
+  color: v.$color-text !important;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 2px solid v.$color-primary;
+}
+
+// Scoped to this page's table only (via the className passed to <Table>) —
+// the shared Table component defaults this cell to padding: 0 so other
+// pages' full-bleed expanded panels (e.g. TransporterAssignmentPanel)
+// aren't affected.
+.payments-main-table.table-wrapper .table tbody tr.table__expanded-row td {
+  padding: v.$spacing-3;
+}
+
+// ============================================================
+// Responsive — mobile / tablet
+// ============================================================
+@include m.respond-below(sm) {
+  .payments-header {
+    align-items: flex-start;
+
+    h2 {
+      font-size: v.$font-size-base;
+    }
+  }
+}

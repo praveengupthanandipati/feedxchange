@@ -14,6 +14,7 @@ import {
   FiCheckSquare,
   FiPackage,
   FiSend,
+  FiFolder,
 } from "react-icons/fi";
 import type { AsideNavSection } from "./aside.types";
 
@@ -153,6 +154,23 @@ export const asideNavSections: AsideNavSection[] = [
     ],
   },
   {
+    id: "payments-management",
+    title: "Payments Management",
+    items: [
+      {
+        id: "payments",
+        label: "Payments",
+        icon: FiFolder,
+        children: [
+          { id: "payments-seller-invoice", label: "Seller Invoice", path: "/payments/seller-invoice" },
+          { id: "payments-payment-advice", label: "Payment Advice", path: "/payments/payment-advice" },
+          { id: "payments-payment-allocation", label: "Payment Allocation", path: "/payments/payment-allocation" },
+          { id: "payments-refunds", label: "Refunds", path: "/payments/refunds" },
+        ],
+      },
+    ],
+  },
+   {
     id: "user-management",
     title: "User Management",
     items: [

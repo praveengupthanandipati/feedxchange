@@ -41,6 +41,7 @@ export const useSaveBusinessProfileMainStep = (nextPath: string) => {
       const payload = buildBusinessProfilePayload(draft, currentUserId);
 
       let currentProfileId = profileId;
+      const isUpdate = Boolean(currentProfileId);
       if (currentProfileId) {
         await updateBusinessProfile({ ...payload, profileId: currentProfileId, modifiedBy: currentUserId }).unwrap();
       } else {
@@ -130,6 +131,10 @@ export const useSaveBusinessProfileMainStep = (nextPath: string) => {
       }
       await Promise.all(updatedBrokerageRows.map((entry) => updateBusinessBuySellCharge(entry).unwrap()));
 
+      localStorage.setItem(
+        "successMessage",
+        isUpdate ? "Business owner updated successfully" : "Business owner added successfully",
+      );
       navigate(nextPath);
     } catch (err) {
       setSubmitError(getErrorMessage(err));

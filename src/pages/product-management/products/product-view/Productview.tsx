@@ -314,6 +314,7 @@ const Productview = () => {
 
           try {
             await deleteProduct({ productId: product.id, actionPerformedBy }).unwrap();
+            localStorage.setItem("successMessage", "Product deleted successfully");
             navigate("/products");
           } catch (err) {
             setDeleteError(err instanceof Error ? err.message : "Failed to delete product.");

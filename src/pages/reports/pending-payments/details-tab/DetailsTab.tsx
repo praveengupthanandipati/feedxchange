@@ -1,24 +1,36 @@
-import { useMemo, useState } from "react";
-import { FiSearch, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import Table from "../../../components/table/Table";
-import { buildOverDuePayColumns } from "./sellerBuyerAccounts.columns";
-import { overDuePayRows } from "./sellerBuyerAccounts.data";
+import { useEffect, useMemo, useState } from "react";
+import { FiChevronLeft, FiChevronRight, FiSearch } from "react-icons/fi";
+import Table from "../../../../components/table/Table";
+import { buildDetailsColumns } from "./detailsTab.columns";
+import InvoiceDetailsOffcanvas from "./InvoiceDetailsOffcanvas";
+import type { PendingPaymentRow } from "../pendingPayments.data";
+import "./DetailsTab.scss";
 
 const PAGE_SIZE = 10;
 
-const OverDuePay = () => {
+interface DetailsTabProps {
+  rows: PendingPaymentRow[];
+}
+
+const DetailsTab = ({ rows }: DetailsTabProps) => {
   const [keyword, setKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewRow, setViewRow] = useState<PendingPaymentRow | null>(null);
 
-  const columns = useMemo(() => buildOverDuePayColumns(), []);
+  const columns = useMemo(
+    () => buildDetailsColumns({ onViewInvoice: (row) => setViewRow(row) }),
+    [],
+  );
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
-    if (!q) return overDuePayRows;
-    return overDuePayRows.filter((row) =>
-      [row.invoiceNum, row.buyerName].join(" ").toLowerCase().includes(q),
-    );
-  }, [keyword]);
+    if (!q) return rows;
+    return rows.filter((row) => [row.invoiceNum, row.buyerName].join(" ").toLowerCase().includes(q));
+  }, [rows, keyword]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [rows, keyword]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -28,17 +40,14 @@ const OverDuePay = () => {
   );
 
   return (
-    <>
-      <div className="seller-buyer-accounts-search">
+    <div className="details-tab">
+      <div className="details-tab__search">
         <FiSearch aria-hidden />
         <input
           type="text"
           value={keyword}
-          onChange={(event) => {
-            setKeyword(event.target.value);
-            setCurrentPage(1);
-          }}
-          placeholder={`${overDuePayRows.length} records...`}
+          onChange={(event) => setKeyword(event.target.value)}
+          placeholder={`${rows.length} records...`}
         />
       </div>
 
@@ -46,18 +55,18 @@ const OverDuePay = () => {
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}
-        emptyMessage="No records match the current search."
+        emptyMessage="No invoices match the current filters."
         minHeight
-        variant="light"
+        className="details-tab-table"
       />
 
-      <div className="seller-buyer-accounts-pagination">
+      <div className="details-tab__pagination">
         <p>
           {filteredRows.length === 0
             ? "Showing 0 Results"
             : `Showing ${pagedRows.length} of ${filteredRows.length} Results`}
         </p>
-        <div className="seller-buyer-accounts-pagination__controls">
+        <div className="details-tab__pagination-controls">
           <button
             type="button"
             disabled={currentPageClamped === 1}
@@ -86,8 +95,10 @@ const OverDuePay = () => {
           </button>
         </div>
       </div>
-    </>
+
+      <InvoiceDetailsOffcanvas open={viewRow !== null} row={viewRow} onClose={() => setViewRow(null)} />
+    </div>
   );
 };
 
-export default OverDuePay;
+export default DetailsTab;

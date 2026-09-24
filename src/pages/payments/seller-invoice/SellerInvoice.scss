@@ -1,0 +1,308 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.seller-invoice-page {
+  padding-bottom: v.$spacing-6;
+
+  &__toast {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    position: fixed;
+    top: v.$spacing-5;
+    right: v.$spacing-5;
+    left: v.$spacing-5;
+    z-index: v.$z-index-tooltip;
+    padding: v.$spacing-3 v.$spacing-5;
+    border-radius: v.$radius-md;
+    background-color: v.$color-success;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    box-shadow: v.$shadow-lg;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    @include m.respond-to(sm) {
+      left: auto;
+    }
+  }
+}
+
+// ============================================================
+// Card shell
+// ============================================================
+.seller-invoice-card {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-5;
+
+  &__header {
+    h1 {
+      color: v.$color-primary;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__top-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+    max-width: 40rem;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}
+
+// ============================================================
+// Shared form-field styling for the top Invoice Date field
+// ============================================================
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  min-width: 0;
+
+  &__label {
+    @include m.font-base(v.$font-weight-semibold);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  &__control {
+    @include m.font-base;
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+  }
+}
+
+// ============================================================
+// Editable invoice table cells (rendered via Table's column.render)
+// ============================================================
+.seller-invoice-table {
+  &__contract-cell {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    min-width: 11rem;
+  }
+
+  &__control {
+    @include m.font-base;
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    min-width: 7rem;
+    height: 2.25rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+
+    &--narrow {
+      min-width: 5.5rem;
+    }
+
+    &.has-error {
+      border-color: v.$color-danger;
+    }
+  }
+
+  &__icon-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 1.9rem;
+    height: 1.9rem;
+    flex-shrink: 0;
+    border: none;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: filter v.$transition-fast, opacity v.$transition-fast;
+
+    &:hover:not(:disabled) {
+      filter: brightness(0.92);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &--link,
+    &--search {
+      background-color: v.$color-orange;
+      color: v.$color-navy-dark;
+    }
+
+    &--delete {
+      background-color: rgba(v.$color-danger, 0.12);
+      color: v.$color-danger;
+    }
+
+    &--add {
+      background-color: v.$color-success;
+    }
+  }
+
+  &__deductions-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2.25rem;
+    padding: 0 v.$spacing-3;
+    border: none;
+    border-radius: v.$radius-md;
+    background-color: v.$color-primary;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+
+  &__row-actions {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.seller-invoice-pagination {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-bg-muted;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
+
+// ============================================================
+// Cancel / Save Invoices footer actions
+// ============================================================
+.seller-invoice-actions {
+  @include m.flex(row, flex-end, center, v.$spacing-3);
+
+  // Pin the primary actions to the bottom of the viewport on mobile,
+  // where scrolling past them to find "Save Invoices" is poor UX.
+  @include m.respond-below(md) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: v.$z-index-sticky;
+    padding: v.$spacing-3 v.$spacing-4;
+    background-color: v.$color-bg;
+    border-top: 1px solid v.$color-border;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
+
+    .seller-invoice-actions__cancel,
+    .seller-invoice-actions__save {
+      flex: 1;
+    }
+  }
+
+  &__cancel,
+  &__save {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2.75rem;
+    padding: 0 v.$spacing-5;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+  }
+
+  &__cancel {
+    border: 1px solid v.$color-border;
+    background-color: v.$color-white;
+    color: v.$color-orange-dark;
+
+    &:hover {
+      background-color: v.$color-gray-50;
+    }
+  }
+
+  &__save {
+    border: none;
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+}

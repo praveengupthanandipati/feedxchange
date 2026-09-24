@@ -123,6 +123,10 @@
       background-color: rgba(v.$color-orange, 0.06);
     }
 
+    &.is-clickable {
+      cursor: pointer;
+    }
+
     &.table__expanded-row {
       &:hover {
         background-color: transparent;

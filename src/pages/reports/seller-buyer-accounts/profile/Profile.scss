@@ -1,0 +1,165 @@
+@use "sass:color";
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    h2 {
+      @include m.font-heading(v.$font-weight-semibold);
+      color: v.$color-text;
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+
+    p {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      margin: 0;
+    }
+  }
+}
+
+.profile-grid {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+}
+
+// Each section gets its own accent color, carried by a solid header band
+// (with a darker gradient edge) so the five sections read as distinct
+// "tabs" at a glance instead of leaning on generic navy for all.
+$profile-accents: (
+  "navy": v.$color-navy,
+  "orange": v.$color-orange,
+  "info": v.$color-info,
+  "success": v.$color-success,
+  "danger": v.$color-danger,
+);
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: v.$radius-lg;
+  background-color: v.$color-bg;
+  box-shadow: v.$shadow-sm;
+  transition: box-shadow v.$transition-fast, transform v.$transition-fast;
+  min-width: 0;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: v.$shadow-md;
+    transform: translateY(-1px);
+  }
+
+  @each $name, $color in $profile-accents {
+    &--#{$name} .profile-card__header {
+      background: linear-gradient(90deg, $color 0%, color.adjust($color, $lightness: -10%) 100%);
+    }
+  }
+
+  &__header {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    flex-shrink: 0;
+    padding: v.$spacing-3 v.$spacing-5;
+    color: v.$color-white;
+  }
+
+  &__icon {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-white, 0.2);
+    color: v.$color-white;
+    font-size: 1rem;
+  }
+
+  &__title {
+    @include m.font-heading(v.$font-weight-semibold);
+    font-size: v.$font-size-base;
+    margin: 0;
+  }
+
+  &__fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4 v.$spacing-5;
+    padding: v.$spacing-4 v.$spacing-5;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  padding-bottom: v.$spacing-3;
+  border-bottom: 1px dashed v.$color-border;
+
+  &__label {
+    color: v.$color-text-muted;
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  &__value {
+    @include m.font-heading(v.$font-weight-semibold);
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    word-break: break-word;
+
+    a {
+      @include m.flex(row, flex-start, center, v.$spacing-1);
+      display: inline-flex;
+      color: v.$color-info;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 0.2rem v.$spacing-3;
+  border-radius: v.$radius-pill;
+  font-size: 0.75rem;
+  font-weight: v.$font-weight-semibold;
+
+  &--on {
+    background-color: rgba(v.$color-success, 0.15);
+    color: v.$color-success;
+  }
+
+  &--off {
+    background-color: rgba(v.$color-danger, 0.15);
+    color: v.$color-danger;
+  }
+}

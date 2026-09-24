@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
+import SuccessToast from "../../../../components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
 import TruckTripFilters from "./TruckTripFilters";
 import Pagination from "./Pagination";
 import { buildTruckTripColumns } from "./truckTrip.columns";
@@ -43,6 +45,7 @@ const TruckTripPage = () => {
   const [tripStatusFilter, setTripStatusFilter] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const { message: successMessage } = useSuccessToast();
 
   useEffect(() => {
     if (data) setRows(data);
@@ -125,6 +128,7 @@ const TruckTripPage = () => {
 
   return (
     <div className="truck-trip-page">
+      <SuccessToast message={successMessage} />
       <div className="truck-trip-card">
         <div className="truck-trip-card__header">
           <h1>Truck Trips</h1>

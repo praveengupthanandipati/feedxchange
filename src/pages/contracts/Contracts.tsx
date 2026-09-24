@@ -13,18 +13,22 @@ import {
 import Table from "../../components/table/Table";
 import type { TableColumn } from "../../components/table/table.types";
 import SearchableSelect from "../../components/dropdown/SearchableSelect";
+import ConfirmDialog from "../../components/dialog/ConfirmDialog";
 import {
   useDeleteContractMutation,
-  useGetAllContractsQuery,
-  type GetAllContractsRow,
+  useGetAllContractsByFiltersQuery,
+    useGetAllContractStatusesQuery,
+  type PendingContractApiResponse,
+
 } from "../../store/contractsApi";
 import { buildContractColumns } from "./contracts.columns";
-import { dateRangeOptions, statusOptions, type Contract } from "./contracts.data";
+import { useSuccessToast } from "../../components/toast/useSuccessToast";
+import SuccessToast from "../../components/toast/SuccessToast";
+import { dateRangeOptions, type Contract } from "./contracts.data";
 import "./Contracts.scss";
 
 const PAGE_SIZE = 10;
 const DAY_MS = 24 * 60 * 60 * 1000;
-
 function getExportCellValue(row: Contract, column: TableColumn<Contract>): string {
   if (column.exportValue) return column.exportValue(row);
   const raw = (row as unknown as Record<string, unknown>)[column.key];
@@ -35,34 +39,40 @@ function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function mapApiContract(row: GetAllContractsRow): Contract {
-  const qtyMeasure = row.quantityMeasure || "mt";
+function normalizeStatus(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function mapApiContract(row: PendingContractApiResponse): Contract {
+  const qtyMeasure = row.basicDetails.quantityMeasure || "mt";
+  const quantity = row.basicDetails.quantity ?? 0;
+  const contractRate = row.basicDetails.contractRate ?? 0;
   return {
     id: row.contractNumber,
-    contractId: row.id,
+    contractId: row.contractId,
+    contractNumber: row.contractNumber,
     date: row.contractDate ? new Date(row.contractDate).toLocaleDateString("en-IN") : "",
     dateValue: row.contractDate ? new Date(row.contractDate).getTime() : 0,
-    status: row.status as Contract["status"],
+    status: row.basicDetails.calculatedStatus as Contract["status"],
     seller: row.sellerName ?? "",
     buyer: row.buyerName ?? "",
     product: row.productName ?? "",
     quantityMeasure: qtyMeasure,
-    qty: `${row.quantity} ${qtyMeasure}`,
-    qtyValue: row.quantity,
+    qty: `${quantity} ${qtyMeasure}`,
+    qtyValue: quantity,
     poTolerance: "",
-    aQty: `${row.arrangedQuantity ?? 0} ${qtyMeasure}`,
-    pQty: `${row.pendingQuantity ?? 0} ${qtyMeasure}`,
-    dQty: `${row.dispatchedQuantity ?? 0} ${qtyMeasure}`,
-    cRate: `₹${row.contractRate}`,
-    cRateValue: row.contractRate,
-    gst: `${row.gstPercentage ?? 0}%`,
-    netRate: `₹${row.netRate ?? 0}`,
-    netRateValue: row.netRate ?? 0,
-    // Not returned by the GetAllContracts summary endpoint — populated when the
-    // full contract is loaded (e.g. via GetContractByContractNumber on edit).
+    aQty: `0 ${qtyMeasure}`,
+    pQty: `${quantity} ${qtyMeasure}`,
+    dQty: `0 ${qtyMeasure}`,
+    cRate: `₹${contractRate}`,
+    cRateValue: contractRate,
+    gst: "0%",
+    netRate: `₹${contractRate}`,
+    netRateValue: contractRate,
+    // Not returned by the GetAllContracts summary endpoint.
     indicativeFreight: "",
     rateRemarks: "",
-    deliveryType: row.deliveryType ?? "",
+    deliveryType: row.basicDetails.deliveryType ?? "",
     paymentTerms: "",
     paymentBeforeDate: "",
     immediateAdvancePercent: "",
@@ -94,14 +104,15 @@ function mapApiContract(row: GetAllContractsRow): Contract {
       address: "",
       remarks: "",
     },
-    approved: row.approvalStatus,
+    approved: false,
   };
 }
 
 const ContractsLoader = () => {
   return (
-    <div className="contracts-loader">
+    <div className="contracts-loader" role="status" aria-live="polite" aria-label="Loading contracts">
       <div className="contracts-loader__spinner" />
+      <span>Loading contracts...</span>
     </div>
   );
 };
@@ -111,10 +122,22 @@ const Contracts = () => {
   const [keyword, setKeyword] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [rows, setRows] = useState<Contract[]>([]);
-  const { data, isLoading, isFetching } = useGetAllContractsQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-    refetchOnReconnect: true,
-  });
+  //const [successMessage, setSuccessMessage] = useState("");
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
+  const { data, isLoading, isFetching } = useGetAllContractsByFiltersQuery();
+  
+  const { data: contractStatuses = [] } = useGetAllContractStatusesQuery();
+
+  const statusOptions = useMemo(
+  () =>
+    contractStatuses
+      .filter((status) => status.isActive)
+      .map((status) => ({
+        value: status.statusName,
+        label: status.displayName || status.statusName,
+      })),
+  [contractStatuses],
+);
   const [deleteContract] = useDeleteContractMutation();
   const [dateRangeFilter, setDateRangeFilter] = useState("All");
   const [customFrom, setCustomFrom] = useState("");
@@ -122,6 +145,16 @@ const Contracts = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pendingDeleteRow, setPendingDeleteRow] = useState<Contract | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Same toast pattern as Categories.tsx: show the message, auto-clear after 3s.
+  // const showSuccessMessage = (message: string) => {
+  //   setSuccessMessage(message);
+  //   setTimeout(() => {
+  //     setSuccessMessage("");
+  //   }, 3000);
+  // };
 
   const handleEdit = (contract: Contract) => {
       navigate("new",{
@@ -129,21 +162,55 @@ const Contracts = () => {
       });
     };
 
+  // useEffect(() => {
+  //   if (!data?.contracts) return;
+
+  //   setRows(data.contracts.map(mapApiContract));
+  // }, [data]);
+
   useEffect(() => {
-    if (!data?.contracts) return;
+  if (!data) return;
 
-    setRows(data.contracts.map(mapApiContract));
-  }, [data]);
+    setRows(
+      data.map(mapApiContract),
+    );
+}, [data]);
 
-  const handleDelete = async (contract: Contract) => {
+  //   useEffect(() => {
+  //   const incomingMessage =
+  //     (location.state as { successMessage?: string } | null)?.successMessage ??
+  //     localStorage.getItem(SUCCESS_MESSAGE_STORAGE_KEY);
+
+  //   if (incomingMessage) {
+  //     localStorage.removeItem(SUCCESS_MESSAGE_STORAGE_KEY);
+  //     showSuccessMessage(incomingMessage);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [location.state]);
+
+  
+  const handleDelete = (contract: Contract) => {
+    setDeleteError(null);
+    setPendingDeleteRow(contract);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteRow) return;
+
     try {
-      await deleteContract({ contractId: contract.contractId }).unwrap();
-      setRows((prev) => prev.filter((row) => row.id !== contract.id));
-      setSelectedRowIds((prev) => prev.filter((id) => id !== contract.id));
+      await deleteContract({ contractId: pendingDeleteRow.contractId }).unwrap();
+      setRows((prev) => prev.filter((row) => row.id !== pendingDeleteRow.id));
+      setSelectedRowIds((prev) => prev.filter((id) => id !== pendingDeleteRow.id));
+      setPendingDeleteRow(null);
+      setDeleteError(null);
+      showSuccessMessage("Contract deleted successfully");
     } catch (error) {
       console.error("Delete Contract API failed", error);
+      setDeleteError(
+        error instanceof Error ? error.message : "Failed to delete contract."
+      );
     }
-  };  
+  };
 
   const handleToggleRow = (id: string) => {
     setSelectedRowIds((prev) =>
@@ -169,30 +236,119 @@ const Contracts = () => {
     setCurrentPage(1);
   }, [keyword, statusFilter, dateRangeFilter, customFrom, customTo]);
 
-  const filteredRows = useMemo(() => {
-    return rows.filter((row) => {
-      if (dateRangeFilter === "Today") {
-        const rowDate = new Date(row.dateValue);
-        const today = new Date();
-        if (rowDate.toDateString() !== today.toDateString()) return false;
-      } else if (dateRangeFilter === "Last 7 Days") {
-        if (row.dateValue < Date.now() - 7 * DAY_MS) return false;
-      } else if (dateRangeFilter === "Last 30 Days") {
-        if (row.dateValue < Date.now() - 30 * DAY_MS) return false;
-      } else if (dateRangeFilter === "Previous Month") {
-        const today = new Date();
-        const firstOfThisMonth = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
-        const firstOfPrevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1).getTime();
-        if (row.dateValue < firstOfPrevMonth || row.dateValue >= firstOfThisMonth) return false;
-      } else if (dateRangeFilter === "Custom Date Range") {
-        if (customFrom && row.dateValue < new Date(customFrom).getTime()) return false;
-        if (customTo && row.dateValue > new Date(customTo).getTime() + DAY_MS - 1) return false;
+
+const filteredRows = useMemo(() => {
+  const searchText = keyword.trim().toLowerCase();
+  const selectedStatus = normalizeStatus(statusFilter.trim());
+
+  return rows.filter((row) => {
+    if (row.status.toLowerCase() === "deleted") return false;
+
+    if (selectedStatus) {
+      const matchedStatus = contractStatuses.find(
+        (status) =>
+          normalizeStatus(status.statusName) === selectedStatus ||
+          normalizeStatus(status.displayName) === selectedStatus,
+      );
+      const rowStatus = normalizeStatus(row.status);
+      const matchesStatus = matchedStatus
+        ? rowStatus === normalizeStatus(matchedStatus.statusName) ||
+          rowStatus === normalizeStatus(matchedStatus.displayName)
+        : rowStatus === selectedStatus;
+
+      if (!matchesStatus) return false;
+    }
+    
+
+    // Date filters
+    if (dateRangeFilter === "Today") {
+      const rowDate = new Date(row.dateValue);
+      const today = new Date();
+
+      if (rowDate.toDateString() !== today.toDateString()) {
+        return false;
+      }
+    }
+
+    if (dateRangeFilter === "Last 7 Days") {
+      if (row.dateValue < Date.now() - 7 * DAY_MS) {
+        return false;
+      }
+    }
+
+    if (dateRangeFilter === "Last 30 Days") {
+      if (row.dateValue < Date.now() - 30 * DAY_MS) {
+        return false;
+      }
+    }
+
+    if (dateRangeFilter === "Previous Month") {
+      const today = new Date();
+
+      const firstOfThisMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        1,
+      ).getTime();
+
+      const firstOfPreviousMonth = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        1,
+      ).getTime();
+
+      if (
+        row.dateValue < firstOfPreviousMonth ||
+        row.dateValue >= firstOfThisMonth
+      ) {
+        return false;
+      }
+    }
+
+    if (dateRangeFilter === "Custom Date Range") {
+      if (
+        customFrom &&
+        row.dateValue < new Date(customFrom).getTime()
+      ) {
+        return false;
       }
 
-      return true;
-    });
-  }, [rows, statusFilter, keyword, dateRangeFilter, customFrom, customTo]);
+      if (
+        customTo &&
+        row.dateValue >
+          new Date(customTo).getTime() + DAY_MS - 1
+      ) {
+        return false;
+      }
+    }
 
+    // Search
+    if (searchText) {
+      const searchableText = [
+        row.id,
+        row.seller,
+        row.buyer,
+        row.product,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      if (!searchableText.includes(searchText)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}, [
+  rows,
+  contractStatuses,
+  keyword,
+  statusFilter,
+  dateRangeFilter,
+  customFrom,
+  customTo,
+]);
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
   const pagedRows = filteredRows.slice(
@@ -241,7 +397,8 @@ const Contracts = () => {
     link.remove();
     URL.revokeObjectURL(url);
   };
-
+  
+  
   const totalContractsValue = rows.length;
 
   return (
@@ -401,6 +558,22 @@ const Contracts = () => {
           </div>
         </div>
       </div>
+      
+      <SuccessToast message={successMessage} />
+      <ConfirmDialog
+        open={pendingDeleteRow !== null}
+        title="Remove this contract?"
+        message={
+          deleteError ||
+          `This will permanently delete contract "${pendingDeleteRow?.id}". This cannot be undone.`
+        }
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setPendingDeleteRow(null);
+          setDeleteError(null);
+        }}
+      />
+
     </div>
   );
 };

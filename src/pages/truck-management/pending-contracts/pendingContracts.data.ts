@@ -1,5 +1,6 @@
 export interface PendingContractRow {
   id: string;
+  contractId?: number;
   date: string;
   dateValue: number;
   seller: string;

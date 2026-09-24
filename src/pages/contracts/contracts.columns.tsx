@@ -25,7 +25,7 @@ const ContractIdCell = ({ id }: { id: string }) => {
 
   return (
     <span className="contracts-table__id">
-      <Link to={`/contracts/${id}`} className="contracts-table__id-link">
+      <Link to={`/contracts/${encodeURIComponent(id)}`} className="contracts-table__id-link">
         {id}
       </Link>
       <button
@@ -48,12 +48,20 @@ const TruncatedName = ({ value }: { value: string }) => (
   </span>
 );
 
-const StatusBadge = ({ status }: { status: Contract["status"] }) => (
-  <span className={`contracts-table__status contracts-table__status--${status.toLowerCase()}`}>
-    {status === "In-transit" ? "In-Transit" : status}
-  </span>
-);
 
+
+const StatusBadge = ({ status }: { status: Contract["status"] }) => {
+  const safeStatus = status ?? "";
+  const normalizedStatus = safeStatus.toLowerCase();
+
+  return (
+    <span
+      className={`contracts-table__status contracts-table__status--${normalizedStatus}`}
+    >
+      {safeStatus === "In-transit" ? "In-Transit" : safeStatus || "N/A"}
+    </span>
+  );
+};
 interface ColumnHandlers {
   onEdit: (contract: Contract) => void;
   onDelete: (contract: Contract) => void;
@@ -157,16 +165,16 @@ export function buildContractColumns({ onEdit, onDelete }: ColumnHandlers): Tabl
       header: "Delivery Type",
       sortable: true,
     },
-    {
-      key: "paymentTerms",
-      header: "Payment Terms",
-      sortable: true,
-    },
-    {
-      key: "iFreight",
-      header: "I.Freight",
-      sortable: true,
-      sortValue: (row) => row.iFreightValue,
-    },
+    // {
+    //   key: "paymentTerms",
+    //   header: "Payment Terms",
+    //   sortable: true,
+    // },
+    // {
+    //   key: "iFreight",
+    //   header: "I.Freight",
+    //   sortable: true,
+    //   sortValue: (row) => row.iFreightValue,
+    // },
   ];
 }
