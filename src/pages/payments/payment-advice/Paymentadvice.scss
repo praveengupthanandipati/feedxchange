@@ -1,0 +1,388 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.payment-advice-page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+
+  &__toast {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    position: fixed;
+    top: v.$spacing-5;
+    right: v.$spacing-5;
+    left: v.$spacing-5;
+    z-index: v.$z-index-tooltip;
+    padding: v.$spacing-3 v.$spacing-5;
+    border-radius: v.$radius-md;
+    background-color: v.$color-success;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    box-shadow: v.$shadow-lg;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    @include m.respond-to(sm) {
+      left: auto;
+    }
+  }
+}
+
+// ============================================================
+// Card shell — one for the entry form, one for the allocation list
+// ============================================================
+.payment-advice-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  // Keeps the sticky app header from covering the form after "Edit" scrolls to it.
+  scroll-margin-top: v.$spacing-5;
+
+  &__title {
+    @include m.font-heading(v.$font-weight-semibold);
+    padding-bottom: v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    color: v.$color-primary;
+    font-size: v.$font-size-xl;
+    margin: 0;
+  }
+
+  &__error {
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    margin: calc(-1 * #{v.$spacing-2}) 0 0;
+  }
+}
+
+// ============================================================
+// Seller / buyer selects
+// ============================================================
+.payment-advice-parties {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$spacing-4;
+  }
+
+  @include m.respond-to(xl) {
+    max-width: 62rem;
+  }
+}
+
+// ============================================================
+// Payment mode — segmented radio pills (native radios stay in the DOM
+// for keyboard + screen-reader support, only visually hidden)
+// ============================================================
+.payment-advice-mode {
+  min-width: 0;
+  margin: 0;
+  padding: v.$spacing-4 0 0;
+  border: none;
+  border-top: 1px solid v.$color-border;
+
+  &__legend {
+    @include m.font-base(v.$font-weight-semibold);
+    float: left;
+    width: 100%;
+    margin-bottom: v.$spacing-3;
+    padding: 0;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    + * {
+      clear: both;
+    }
+  }
+
+  &__options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$spacing-2;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(4, minmax(0, 10rem));
+      gap: v.$spacing-3;
+    }
+  }
+
+  &__option {
+    position: relative;
+    display: block;
+    cursor: pointer;
+
+    input {
+      @include m.visually-hidden;
+    }
+  }
+
+  &__pill {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    min-height: 2.75rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+    transition: background-color v.$transition-fast, border-color v.$transition-fast, color v.$transition-fast,
+      box-shadow v.$transition-fast;
+
+    svg {
+      flex-shrink: 0;
+      font-size: 1rem;
+      color: v.$color-text-muted;
+      transition: color v.$transition-fast;
+    }
+  }
+
+  &__option:hover &__pill {
+    border-color: v.$color-primary;
+    background-color: v.$color-bg-muted;
+  }
+
+  &__option input:checked + &__pill {
+    border-color: v.$color-primary;
+    background-color: v.$color-primary;
+    color: v.$color-white;
+    box-shadow: v.$shadow-sm;
+
+    svg {
+      color: v.$color-orange;
+    }
+  }
+
+  &__option input:focus-visible + &__pill {
+    outline: 2px solid v.$color-orange;
+    outline-offset: 2px;
+  }
+}
+
+// ============================================================
+// Mode-driven inputs. auto-fit lets the columns follow the available
+// width (1 on phones, 2 on tablets, 4–5 on laptops) with no per-breakpoint
+// rules, and the field count varies by mode without leaving gaps.
+// ============================================================
+.payment-advice-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: v.$spacing-4;
+}
+
+.payment-advice-field {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  min-width: 0;
+
+  label {
+    @include m.font-base(v.$font-weight-semibold);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  input {
+    @include m.font-base;
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    height: 2.75rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+
+    &:hover {
+      border-color: v.$color-gray-400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+
+    &.has-error {
+      border-color: v.$color-danger;
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(v.$color-danger, 0.15);
+      }
+    }
+  }
+
+  &__error {
+    color: v.$color-danger;
+    font-size: 0.8rem;
+  }
+}
+
+// ============================================================
+// Cancel / Save
+// ============================================================
+.payment-advice-actions {
+  display: flex;
+  gap: v.$spacing-3;
+  padding-top: v.$spacing-2;
+
+  @include m.respond-to(sm) {
+    justify-content: flex-end;
+  }
+
+  &__cancel,
+  &__save {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    @include m.font-base(v.$font-weight-semibold);
+    flex: 1;
+    height: 2.75rem;
+    padding: 0 v.$spacing-5;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    @include m.respond-to(sm) {
+      flex: 0 0 auto;
+    }
+  }
+
+  &__cancel {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+  &__save {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+}
+
+// ============================================================
+// Allocation table cells (rendered via Table's column.render)
+// ============================================================
+.payment-advice-table {
+  &__allocate-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    background-color: v.$color-primary;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+
+  &__actions {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+  }
+
+  &__icon-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border: none;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: filter v.$transition-fast;
+
+    &:hover {
+      filter: brightness(0.92);
+    }
+
+    &--edit {
+      background-color: v.$color-orange;
+      color: v.$color-navy-dark;
+    }
+
+    &--delete {
+      background-color: v.$color-danger;
+    }
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.payment-advice-pagination {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-bg-muted;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
