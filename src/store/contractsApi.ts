@@ -281,9 +281,15 @@ export interface UpdateContractRequest {
 }
 
 export type SaveContractRequest = UpdateContractPayload;
+========================= */
 
 /* =========================
    PENDING CONTRACTS / FILTERS
+========================= */
+
+export interface GetAllContractsByFiltersParams {
+  Status?: string;
+}
 
 export interface PendingContractApiResponse {
   contractId: number;
@@ -482,6 +488,27 @@ export interface TransporterContract {
   updatedAt: string;
 }
 
+export interface TruckAssignmentType {
+  truckAssignmentTypeId: number;
+  truckAssignmentTypeName: string;
+}
+
+export interface OpenAndPendingContract {
+  contractNumber: string;
+  contractDate: string;
+  seller: string | null;
+  buyer: string | null;
+  pricePerKg: number;
+  totalQuantityMT: number;
+  dispatchedQuantityMT: number;
+  pendingQuantityMT: number;
+  productName: string;
+  effectiveFrom: string;
+  effectiveTo: string;
+  deliverySchedule: string;
+  paymentTermName: string;
+}
+
 export interface GetAllContractsForTransporterParams {
   SellerName?: string;
   BuyerName?: string;
@@ -574,10 +601,14 @@ updateContract: builder.mutation<unknown, UpdateContractRequest>({
       invalidatesTags: ["PendingContracts"],
     }),
 
-    getAllContractsByFilters: builder.query<PendingContractApiResponse[], void>({
-      query: () => ({
+    getAllContractsByFilters: builder.query<
+      PendingContractApiResponse[],
+      GetAllContractsByFiltersParams | void
+    >({
+      query: (params) => ({
         url: "/api/Contracts/GetAllContractsByFilters",
         method: "GET",
+        params: params || undefined,
       }),
       providesTags: ["PendingContracts"],
     }),
@@ -588,6 +619,15 @@ updateContract: builder.mutation<unknown, UpdateContractRequest>({
         method: "GET",
         params: { contractNo },
       }),
+    }),
+
+    getAllOpenAndPendingContracts: builder.query<OpenAndPendingContract[], void>({
+      query: () => ({
+        url: "/api/Contracts/GetAllOpenAndPendingContracts",
+        method: "GET",
+      }),
+      transformResponse: unwrapArray<OpenAndPendingContract>,
+      providesTags: ["PendingContracts"],
     }),
 
     getTruckAssignmentTypes: builder.query<TruckAssignmentType[], void>({
@@ -629,5 +669,9 @@ export const {
   useLazyGetAllContractsByFiltersQuery,
   useGetContractByContractNumberQuery,
   useLazyGetContractByContractNumberQuery,
-  useLazyGetAllContractsForExcelQuery,
+  useGetAllOpenAndPendingContractsQuery,
+  useLazyGetAllOpenAndPendingContractsQuery,
+  useGetTruckAssignmentTypesQuery,
+  useGetScheduleStatusesQuery,
+  useGetAllContractsForTransporterQuery,
 } = contractsApi;
