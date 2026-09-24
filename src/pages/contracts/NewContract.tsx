@@ -25,7 +25,10 @@ import { useGetProductsQuery } from "../../store/productsApi";
 import {
   useGetBusinessProfileSummaryQuery,
 } from "../../store/businessProfilesApi";
-import { useGetProfileAddressQuery } from "../../store/userProfilesCommonApi";
+import {
+  useGetProfileAddressQuery,
+  type ProfileAddressDetail,
+} from "../../store/userProfilesCommonApi";
 
 
 interface ConditionState {
@@ -99,6 +102,33 @@ const formatProfileAddress = (address: {
   ]
     .filter(Boolean)
     .join(", ");
+
+/** Dropdown values backed by a database id are always digits. */
+const isProfileId = (value: string) => /^\d+$/.test(value);
+
+/** Narrows a hydrated value to an id, discarding nulls, names and NaN. */
+const asOptionId = (value: unknown) =>
+  value != null && isProfileId(String(value)) ? String(value) : "";
+
+const normalizeAddressText = (value: string) =>
+  value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/**
+ * GetContractByContractNumber returns the chosen address as free text
+ * (sellerConditions.loadingAddressAt) rather than an id, while the dropdown is keyed
+ * by addressId. The text is matched back against the profile's address list so the
+ * saved address shows up — and is re-sent — when an existing contract is edited.
+ */
+const findAddressByLabel = (addresses: ProfileAddressDetail[], label: string) => {
+  const target = normalizeAddressText(label);
+  if (!target) return undefined;
+
+  return (
+    addresses.find((address) => normalizeAddressText(formatProfileAddress(address)) === target) ??
+    addresses.find((address) => normalizeAddressText(address.officeName ?? "") === target) ??
+    addresses.find((address) => normalizeAddressText(formatProfileAddress(address)).includes(target))
+  );
+};
 
 // const normalizeQualitySpecifications = (
 //   specifications: Contract["sellerQualitySpecifications"],
@@ -348,6 +378,18 @@ const NewContract = () => {
     return contractValue;
   };
 
+  /**
+   * resolveOptionValue for dropdowns whose value is a database id. An unmatched label
+   * is dropped rather than kept, so a display name never reaches a request expecting
+   * an id — GetProfileAddress rejects one with a 400, and Number() turns it into NaN
+   * on save, which serialises as null. Returns "" until the options have loaded; the
+   * hydration effect re-runs on businessProfileOptions/productOptions and fills it in.
+   */
+  const resolveOptionId = (
+    options: { value: string; label: string }[],
+    contractValue: string | undefined,
+  ) => asOptionId(resolveOptionValue(options, contractValue));
+
   // helper to convert `d/m/yyyy` or timestamp into yyyy-mm-dd for <input type="date">
   const toIsoDate = (value: string | number | undefined) => {
     if (!value) return "";
@@ -413,11 +455,13 @@ const { data: products } = useGetProductsQuery();
       },
       [businessProfiles],
     );
+    // Guarded on the id shape, not just emptiness: the endpoint binds profileId as an
+    // int and 400s on anything else.
     const { data: sellerAddresses = [] } = useGetProfileAddressQuery(sellerId, {
-      skip: !sellerId,
+      skip: !isProfileId(sellerId),
     });
     const { data: buyerAddresses = [] } = useGetProfileAddressQuery(buyerId, {
-      skip: !buyerId,
+      skip: !isProfileId(buyerId),
     });
     const sellerAddressOptions = useMemo(
       () =>
@@ -435,6 +479,20 @@ const { data: products } = useGetProductsQuery();
         })),
       [buyerAddresses],
     );
+
+    // On edit the address arrives as free text, which matches no option and is sent
+    // back as 0. Swap it for the matching addressId as soon as the list is available.
+    useEffect(() => {
+      if (!sellerConditions.address || /^\d+$/.test(sellerConditions.address)) return;
+      const match = findAddressByLabel(sellerAddresses, sellerConditions.address);
+      if (match) setSellerConditions((prev) => ({ ...prev, address: String(match.addressId) }));
+    }, [sellerAddresses, sellerConditions.address]);
+
+    useEffect(() => {
+      if (!buyerConditions.address || /^\d+$/.test(buyerConditions.address)) return;
+      const match = findAddressByLabel(buyerAddresses, buyerConditions.address);
+      if (match) setBuyerConditions((prev) => ({ ...prev, address: String(match.addressId) }));
+    }, [buyerAddresses, buyerConditions.address]);
   
   const baseRate = parseFloat(contractRate) || 0;
   const gstAmount = Math.round(baseRate * ((parseFloat(gstPercent) || 0) / 100) * 100) / 100;
@@ -624,8 +682,10 @@ const { data: products } = useGetProductsQuery();
         totalQuantityMT: quantity,
         productId: Number(productId),
         tolerancePercentage: tolerance,
-        minQuantityMT: existingContract?.minQuantityMT ?? quantity,
-        maxQuantityMT: existingContract?.maxQuantityMT ?? quantity,
+        // Derived from the quantity on the form, not the stored contract — otherwise
+        // editing the quantity leaves the old min/max behind.
+        minQuantityMT: quantity,
+        maxQuantityMT: quantity,
         dispatchedQuantityMT: existingContract?.dispatchedQuantityMT ?? 0,
         pendingQuantityMT: Math.max(0, quantity - (existingContract?.dispatchedQuantityMT ?? 0)),
         pricePerKg: rate,
@@ -898,30 +958,18 @@ const { data: products } = useGetProductsQuery();
   // Use actual API IDs if they exist.
   // Do NOT find the ID from the display name.
   setSellerId(
-    contract.sellerId !== undefined
-      ? String(contract.sellerId)
-      : resolveOptionValue(
-          businessProfileOptions,
-          contract.seller
-        )
+    asOptionId(contract.sellerId) ||
+      resolveOptionId(businessProfileOptions, contract.seller)
   );
 
   setBuyerId(
-    contract.buyerId !== undefined
-      ? String(contract.buyerId)
-      : resolveOptionValue(
-          businessProfileOptions,
-          contract.buyer
-        )
+    asOptionId(contract.buyerId) ||
+      resolveOptionId(businessProfileOptions, contract.buyer)
   );
 
   setProductId(
-    contract.productId !== undefined
-      ? String(contract.productId)
-      : resolveOptionValue(
-          productOptions,
-          contract.product
-        )
+    asOptionId(contract.productId) ||
+      resolveOptionId(productOptions, contract.product)
   );
 
   setQuantityMeasure(
