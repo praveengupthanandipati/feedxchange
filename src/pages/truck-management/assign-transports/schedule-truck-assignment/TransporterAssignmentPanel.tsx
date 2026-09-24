@@ -10,7 +10,13 @@ import {
   getSeedTransporterRows,
   type TransporterAssignmentRow,
 } from "./transporterAssignment.data";
-import { driverPhoneByName } from "../assignTransportsOptions.data";
+import { useGetTransporterProfileSummaryQuery } from "../../../../store/transportersApi";
+import { useGetAllActiveTruckDetailsQuery } from "../../../../store/trucksApi";
+import { useGetAllActiveDriversQuery } from "../../../../store/driversApi";
+import {
+  useGetScheduleTrucksDispatchDetailsQuery,
+  useGetTransporterScheduleResponseStatusesQuery,
+} from "../../../../store/contractTrucksApi";
 import type { ContractSummary } from "../assignTransports.data";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 import RequestHistoryModal from "./RequestHistoryModal";
@@ -18,12 +24,60 @@ import ApprovedTrucksOffcanvas from "./ApprovedTrucksOffcanvas";
 import SendRequestOffcanvas from "./SendRequestOffcanvas";
 import "./TransporterAssignmentPanel.scss";
 
+interface TransporterResponseRowProps {
+  contractId: number;
+  transporterId: number;
+  transporterName: string;
+  statusLabelById: Record<number, string>;
+}
+
+const TransporterResponseRow = ({
+  contractId,
+  transporterId,
+  transporterName,
+  statusLabelById,
+}: TransporterResponseRowProps) => {
+  const { data, isFetching } = useGetScheduleTrucksDispatchDetailsQuery(
+    { contractId, transporterId },
+    { skip: !contractId || !transporterId },
+  );
+
+  const latest = data?.[0];
+
+  return (
+    <div className="transporter-assignment-panel__response-row">
+      <span className="transporter-assignment-panel__response-name">{transporterName}</span>
+      {isFetching ? (
+        <span className="transporter-assignment-panel__response-status">Loading…</span>
+      ) : !latest ? (
+        <span className="transporter-assignment-panel__response-status">No response yet</span>
+      ) : (
+        <div className="transporter-assignment-panel__response-details">
+          <span className="transporter-assignment-panel__response-status">
+            {statusLabelById[latest.responseStatusId] ?? `Status #${latest.responseStatusId}`}
+          </span>
+          <span>
+            Offered: {latest.offeredQuantityMT} MT @ ₹{latest.offeredFreightPerMT}/MT
+          </span>
+          {latest.acceptedQuantityMT != null && (
+            <span>
+              Accepted: {latest.acceptedQuantityMT} MT @ ₹{latest.acceptedFreightPerMT ?? "-"}/MT
+            </span>
+          )}
+          {latest.responseRemarks && <span>Remarks: {latest.responseRemarks}</span>}
+        </div>
+      )}
+    </div>
+  );
+};
+
 interface TransporterAssignmentPanelProps {
   scheduleRow: ScheduleTruckRow;
   summary: ContractSummary;
+  contractId: number;
 }
 
-const TransporterAssignmentPanel = ({ scheduleRow, summary }: TransporterAssignmentPanelProps) => {
+const TransporterAssignmentPanel = ({ scheduleRow, summary, contractId }: TransporterAssignmentPanelProps) => {
   const [rows, setRows] = useState<TransporterAssignmentRow[]>(getSeedTransporterRows);
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const [historyRow, setHistoryRow] = useState<TransporterAssignmentRow | null>(null);
@@ -35,6 +89,43 @@ const TransporterAssignmentPanel = ({ scheduleRow, summary }: TransporterAssignm
   const [saveWarning, setSaveWarning] = useState(false);
   const [sendOffcanvasOpen, setSendOffcanvasOpen] = useState(false);
   const [sendSuccessToast, setSendSuccessToast] = useState(false);
+
+  const { data: transporters } = useGetTransporterProfileSummaryQuery();
+  const { data: trucks } = useGetAllActiveTruckDetailsQuery();
+  const { data: drivers } = useGetAllActiveDriversQuery();
+  const { data: responseStatuses } = useGetTransporterScheduleResponseStatusesQuery();
+
+  const statusLabelById = useMemo(
+    () => Object.fromEntries((responseStatuses ?? []).map((s) => [s.responseStatusId, s.displayName])),
+    [responseStatuses],
+  );
+
+  const notifiedTransporters = useMemo(
+    () =>
+      scheduleRow.transporterProfileIds
+        .map((id) => {
+          const transporter = transporters?.find((t) => t.profileId === id);
+          return { id, name: transporter?.legalName ?? `Transporter #${id}` };
+        }),
+    [scheduleRow.transporterProfileIds, transporters],
+  );
+
+  const transporterOptions = useMemo(
+    () => (transporters ?? []).map((t) => ({ value: t.legalName, label: t.legalName })),
+    [transporters],
+  );
+  const truckOptions = useMemo(
+    () => (trucks ?? []).map((t) => ({ value: t.truckNumber, label: t.truckNumber })),
+    [trucks],
+  );
+  const driverOptions = useMemo(
+    () => (drivers ?? []).map((d) => ({ value: d.driverName, label: d.driverName })),
+    [drivers],
+  );
+  const driverPhoneByName = useMemo(
+    () => Object.fromEntries((drivers ?? []).map((d) => [d.driverName, d.mobileNumber])),
+    [drivers],
+  );
 
   useEffect(() => {
     if (!sendSuccessToast) return;
@@ -172,8 +263,11 @@ const TransporterAssignmentPanel = ({ scheduleRow, summary }: TransporterAssignm
         onAddRow: handleAddRow,
         lastRowId,
         invalidFields,
+        transporterOptions,
+        truckOptions,
+        driverOptions,
       }),
-    [lastRowId, invalidFields],
+    [lastRowId, invalidFields, transporterOptions, truckOptions, driverOptions],
   );
 
   return (
@@ -237,6 +331,21 @@ const TransporterAssignmentPanel = ({ scheduleRow, summary }: TransporterAssignm
           emptyMessage="No transporters added yet. Use the + button to add one."
         />
       </div>
+
+      {notifiedTransporters.length > 0 && (
+        <div className="transporter-assignment-panel__responses">
+          <h4 className="transporter-assignment-panel__responses-title">Transporter Responses</h4>
+          {notifiedTransporters.map((transporter) => (
+            <TransporterResponseRow
+              key={transporter.id}
+              contractId={contractId}
+              transporterId={transporter.id}
+              transporterName={transporter.name}
+              statusLabelById={statusLabelById}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="transporter-assignment-panel__footer">
         <button

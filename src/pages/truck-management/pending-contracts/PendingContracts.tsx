@@ -14,15 +14,10 @@ import {
   FiX,
   FiChevronLeft,
   FiChevronRight,
-  FiChevronDown,
-  FiChevronUp,
   FiHome,
   FiUser,
   FiTruck,
   FiPlus,
-  FiShare2,
-  FiPhone,
-  FiMapPin,
 } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
@@ -35,6 +30,44 @@ import {
 import "./PendingContracts.scss";
 
 const PAGE_SIZE = 10;
+const ALL_OPTION = { value: "All", label: "All" };
+
+const formatShortDate = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+};
+
+function mapOpenAndPendingContract(row: OpenAndPendingContract): PendingContractRow {
+  const dispatched = row.dispatchedQuantityMT ?? 0;
+  const pending = row.pendingQuantityMT ?? 0;
+  const total = row.totalQuantityMT ?? 0;
+  const arranged = Math.max(total - dispatched - pending, 0);
+  const dateValue = new Date(row.contractDate).getTime();
+
+  return {
+    id: row.contractNumber,
+    date: formatShortDate(row.contractDate),
+    dateValue: Number.isNaN(dateValue) ? 0 : dateValue,
+    seller: row.seller ?? "-",
+    buyer: row.buyer ?? "-",
+    cRate: `₹${row.pricePerKg.toLocaleString("en-IN")}`,
+    cRateValue: row.pricePerKg,
+    cQty: `${total} MT`,
+    cQtyValue: total,
+    dQty: `${dispatched} MT`,
+    dQtyValue: dispatched,
+    aQty: `${arranged} MT`,
+    aQtyValue: arranged,
+    pQty: `${pending} MT`,
+    pQtyValue: pending,
+    product: row.productName,
+    fromDate: formatShortDate(row.effectiveFrom),
+    toDate: formatShortDate(row.effectiveTo),
+    deliverySchedule: row.deliverySchedule,
+    paymentType: row.paymentTermName,
+  };
+}
 
 const PendingContractsLoader = () => (
   <div
@@ -55,13 +88,7 @@ interface TruckTrackingDrawerProps {
 }
 
 const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) => {
-  const [expandedTrucks, setExpandedTrucks] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (!open || !row) return;
-    const last = row.trucks[row.trucks.length - 1];
-    setExpandedTrucks(last ? new Set([last.truckNumber]) : new Set());
-  }, [open, row]);
+  const { trucks, isLoading: trucksLoading } = useContractTruckDetails(row?.id ?? "", open && Boolean(row));
 
   useEffect(() => {
     if (!open) return;
@@ -71,21 +98,6 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
-
-  const toggleTruck = (truckNumber: string) => {
-    setExpandedTrucks((prev) => {
-      const next = new Set(prev);
-      if (next.has(truckNumber)) next.delete(truckNumber);
-      else next.add(truckNumber);
-      return next;
-    });
-  };
-
-  const handleShare = (truck: TruckAssignment) => {
-    navigator.clipboard
-      .writeText(`${truck.truckNumber} — Final Qty: ${truck.finalQty}`)
-      .catch(() => undefined);
-  };
 
   return createPortal(
     <>
@@ -153,110 +165,7 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
                 </div>
               </div>
 
-              {row.trucks.length === 0 ? (
-                <p className="truck-tracking-drawer__empty">
-                  No trucks arranged yet for this contract.
-                </p>
-              ) : (
-                <div className="truck-tracking-drawer__truck-list">
-                  {row.trucks.map((truck) => {
-                    const expanded = expandedTrucks.has(truck.truckNumber);
-                    return (
-                      <div className="truck-tracking-drawer__truck-card" key={truck.truckNumber}>
-                        <button
-                          type="button"
-                          className="truck-tracking-drawer__truck-header"
-                          onClick={() => toggleTruck(truck.truckNumber)}
-                          aria-expanded={expanded}
-                        >
-                          <span className="truck-tracking-drawer__truck-title">
-                            <FiTruck aria-hidden />
-                            <strong>{truck.truckNumber}</strong>
-                            <span>(Final Qty: {truck.finalQty})</span>
-                          </span>
-                          <span className="truck-tracking-drawer__truck-meta">
-                            <span
-                              className="truck-tracking-drawer__share-btn"
-                              role="button"
-                              tabIndex={0}
-                              aria-label={`Share ${truck.truckNumber} details`}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleShare(truck);
-                              }}
-                              onKeyDown={(event) => {
-                                if (event.key === "Enter") {
-                                  event.stopPropagation();
-                                  handleShare(truck);
-                                }
-                              }}
-                            >
-                              <FiShare2 aria-hidden />
-                            </span>
-                            <span className="truck-tracking-drawer__status-badge">
-                              {truck.status}
-                            </span>
-                            {expanded ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
-                          </span>
-                        </button>
-
-                        {expanded && (
-                          <div className="truck-tracking-drawer__truck-details">
-                            <div>
-                              <span>Transporter Name:</span>
-                              <p>{truck.transporterName}</p>
-                            </div>
-                            <div>
-                              <span>
-                                <FiMapPin aria-hidden /> Transporter Location:
-                              </span>
-                              <p>{truck.transporterLocation}</p>
-                            </div>
-                            <div>
-                              <span>Assignment Type:</span>
-                              <p className="truck-tracking-drawer__assignment-badge">
-                                {truck.assignmentType}
-                              </p>
-                            </div>
-
-                            <div>
-                              <span>Driver Name:</span>
-                              <p>{truck.driverName}</p>
-                            </div>
-                            <div>
-                              <span>
-                                <FiPhone aria-hidden /> Driver Phone:
-                              </span>
-                              <p>{truck.driverPhone}</p>
-                            </div>
-                            <div>
-                              <span>Maximum Capacity:</span>
-                              <p>{truck.maxCapacity}</p>
-                            </div>
-
-                            <div>
-                              <span>Start Date &amp; Time:</span>
-                              <p>{truck.startDateTime}</p>
-                            </div>
-                            <div>
-                              <span>
-                                <FiMapPin aria-hidden /> Start Location:
-                              </span>
-                              <p>{truck.startLocation}</p>
-                            </div>
-                            <div>
-                              <span>
-                                <FiMapPin aria-hidden /> Destination:
-                              </span>
-                              <p>{truck.destination}</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <TruckList trucks={trucks} isLoading={trucksLoading} />
             </div>
           </>
         )}
@@ -267,10 +176,6 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
 };
 
 const PendingContracts = () => {
-
-
-  const [downloadExcel] = useLazyGetAllContractsForExcelQuery();
-
   const [sellerFilter, setSellerFilter] = useState("All");
   const [buyerFilter, setBuyerFilter] = useState("All");
   const [dateFrom, setDateFrom] = useState("");
@@ -368,6 +273,26 @@ const PendingContracts = () => {
     }
   };
 
+  const sellerOptions = useMemo(() => {
+    const names = Array.from(new Set(pendingContracts.map((row) => row.seller))).filter(
+      (name) => name && name !== "-",
+    );
+    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: name }))];
+  }, [pendingContracts]);
+
+  const buyerOptions = useMemo(() => {
+    const names = Array.from(new Set(pendingContracts.map((row) => row.buyer))).filter(
+      (name) => name && name !== "-",
+    );
+    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: name }))];
+  }, [pendingContracts]);
+
+  const deliveryScheduleOptions = useMemo(() => {
+    const schedules = Array.from(new Set(pendingContracts.map((row) => row.deliverySchedule))).filter(
+      Boolean,
+    );
+    return [ALL_OPTION, ...schedules.map((schedule) => ({ value: schedule, label: schedule }))];
+  }, [pendingContracts]);
 
   const handleOpenTruckDetails = (row: PendingContractRow) => {
     setTruckDrawerRow(row);
@@ -436,7 +361,7 @@ const PendingContracts = () => {
             <button
               type="button"
               className="pending-contracts-btn pending-contracts-btn--warning"
-              onClick={handleDownloadExcel}
+              onClick={handleExportToExcel}
             >
               <FiDownload aria-hidden /> Export
             </button>

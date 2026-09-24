@@ -73,6 +73,15 @@ export const driversApi = createApi({
       transformResponse: unwrapObject<Driver>,
       providesTags: ["Driver"],
     }),
+    getDriverByMobile: builder.query<Driver | null, string>({
+      query: (mobileNumber) => ({
+        url: "/api/Drivers/GetDriverByMobile",
+        method: "GET",
+        params: { mobileNumber },
+      }),
+      transformResponse: unwrapObject<Driver>,
+      providesTags: ["Driver"],
+    }),
     addDriver: builder.mutation<string, AddDriverPayload>({
       query: (body) => ({
         url: "/api/Drivers/AddDriver",
@@ -106,6 +115,8 @@ export const driversApi = createApi({
 export const {
   useGetAllActiveDriversQuery,
   useGetDriverByIdQuery,
+  useGetDriverByMobileQuery,
+  useLazyGetDriverByMobileQuery,
   useAddDriverMutation,
   useUpdateDriverMutation,
   useDeleteDriverMutation,

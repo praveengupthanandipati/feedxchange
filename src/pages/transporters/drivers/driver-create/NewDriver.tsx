@@ -9,12 +9,10 @@ import {
 } from "../../../../store/driversApi";
 import {
   bloodGroupOptions,
+  buildDriverDetailsPayload,
   licenseTypeOptions,
-  MOBILE_NUMBER_REGEX,
-  AADHAR_NUMBER_REGEX,
-  PAN_NUMBER_REGEX,
-  MIN_DRIVER_AGE,
-  calculateAge,
+  validateDriverForm,
+  type DriverFormErrors,
 } from "./driverNew.data";
 import "../../../contracts/NewContract.scss";
 
@@ -24,23 +22,6 @@ function toDateInputValue(isoValue: string): string {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   return `${date.getFullYear()}-${month}-${day}`;
-}
-
-interface FormErrors {
-  driverName?: string;
-  mobileNumber?: string;
-  dateOfBirth?: string;
-  bloodGroup?: string;
-  experienceYears?: string;
-  address?: string;
-  licenseType?: string;
-  licenseNumber?: string;
-  licenseIssuedDate?: string;
-  licenseExpiryDate?: string;
-  emergencyContactName?: string;
-  emergencyContactNumber?: string;
-  aadharNumber?: string;
-  panNumber?: string;
 }
 
 const NewDriver = () => {
@@ -68,7 +49,7 @@ const NewDriver = () => {
   const [aadharNumber, setAadharNumber] = useState("");
   const [panNumber, setPanNumber] = useState("");
 
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<DriverFormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -91,78 +72,28 @@ const NewDriver = () => {
   }, [editingDriver]);
 
   const handleSave = async () => {
-    const trimmedName = driverName.trim();
-    const trimmedAddress = address.trim();
-    const trimmedLicenseNumber = licenseNumber.trim();
-    const trimmedEmergencyName = emergencyContactName.trim();
+    const values = {
+      driverName,
+      mobileNumber,
+      dateOfBirth,
+      bloodGroup,
+      experienceYears,
+      address,
+      licenseType,
+      licenseNumber,
+      licenseIssuedDate,
+      licenseExpiryDate,
+      emergencyContactName,
+      emergencyContactNumber,
+      aadharNumber,
+      panNumber,
+    };
 
-    const nextErrors: FormErrors = {};
-
-    if (!trimmedName) nextErrors.driverName = "Driver Name is required.";
-    else if (trimmedName.length < 3) nextErrors.driverName = "Driver Name must be at least 3 characters.";
-
-    if (!mobileNumber) nextErrors.mobileNumber = "Mobile Number is required.";
-    else if (!MOBILE_NUMBER_REGEX.test(mobileNumber))
-      nextErrors.mobileNumber = "Enter a valid 10-digit mobile number.";
-
-    if (!dateOfBirth) nextErrors.dateOfBirth = "Date of Birth is required.";
-    else if (calculateAge(dateOfBirth) < MIN_DRIVER_AGE)
-      nextErrors.dateOfBirth = `Driver must be at least ${MIN_DRIVER_AGE} years old.`;
-
-    if (!bloodGroup) nextErrors.bloodGroup = "Blood Group is required.";
-
-    if (!experienceYears) nextErrors.experienceYears = "Experience is required.";
-    else if (Number(experienceYears) < 0 || Number(experienceYears) > 50)
-      nextErrors.experienceYears = "Enter a valid number of years (0-50).";
-
-    if (!trimmedAddress) nextErrors.address = "Address is required.";
-
-    if (!licenseType) nextErrors.licenseType = "License Type is required.";
-
-    if (!trimmedLicenseNumber) nextErrors.licenseNumber = "License Number is required.";
-
-    if (!licenseIssuedDate) nextErrors.licenseIssuedDate = "License Issued Date is required.";
-    else if (new Date(licenseIssuedDate) > new Date())
-      nextErrors.licenseIssuedDate = "License Issued Date cannot be in the future.";
-
-    if (!licenseExpiryDate) nextErrors.licenseExpiryDate = "License Expiry Date is required.";
-    else if (licenseIssuedDate && new Date(licenseExpiryDate) <= new Date(licenseIssuedDate))
-      nextErrors.licenseExpiryDate = "License Expiry Date must be after the Issued Date.";
-
-    if (!trimmedEmergencyName) nextErrors.emergencyContactName = "Emergency Contact Name is required.";
-
-    if (!emergencyContactNumber) nextErrors.emergencyContactNumber = "Emergency Contact Number is required.";
-    else if (!MOBILE_NUMBER_REGEX.test(emergencyContactNumber))
-      nextErrors.emergencyContactNumber = "Enter a valid 10-digit mobile number.";
-
-    if (!aadharNumber) nextErrors.aadharNumber = "Aadhar Number is required.";
-    else if (!AADHAR_NUMBER_REGEX.test(aadharNumber))
-      nextErrors.aadharNumber = "Enter a valid 12-digit Aadhar number.";
-
-    if (!panNumber) nextErrors.panNumber = "PAN Number is required.";
-    else if (!PAN_NUMBER_REGEX.test(panNumber))
-      nextErrors.panNumber = "Enter a valid PAN number (e.g. ABCDE1234F).";
-
+    const nextErrors = validateDriverForm(values);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    const driverDetails = {
-      driverName: trimmedName,
-      mobileNumber,
-      licenseNumber: trimmedLicenseNumber,
-      licenseExpiryDate: new Date(licenseExpiryDate).toISOString(),
-      dateOfBirth: new Date(dateOfBirth).toISOString(),
-      address: trimmedAddress,
-      licenseType,
-      licenseIssuedDate: new Date(licenseIssuedDate).toISOString(),
-      emergencyContactName: trimmedEmergencyName,
-      emergencyContactNumber,
-      bloodGroup,
-      experienceYears: Number(experienceYears),
-      aadharNumber,
-      panNumber,
-      actionPerformedBy: Number(localStorage.getItem("userId")) || 0,
-    };
+    const driverDetails = buildDriverDetailsPayload(values);
 
     setSubmitting(true);
     setSubmitError(null);

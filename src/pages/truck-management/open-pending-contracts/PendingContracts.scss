@@ -1,0 +1,64 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+// Reuses .pending-contracts-* / .truck-tracking-drawer styles from the
+// existing pending-contracts module (see ../pending-contracts/PendingContracts.scss);
+// this file only adds what's new for this screen.
+.pending-contracts-card__badge {
+  display: inline-block;
+  margin-left: v.$spacing-2;
+  padding: 0.15rem 0.6rem;
+  border-radius: v.$radius-pill;
+  background-color: v.$color-orange;
+  color: v.$color-navy-dark;
+  font-size: 0.65rem;
+  font-weight: v.$font-weight-semibold;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.truck-tracking-drawer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-2;
+}
+
+.pending-contracts-table__status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: v.$radius-pill;
+  font-size: 0.7rem;
+  font-weight: v.$font-weight-semibold;
+  white-space: nowrap;
+
+  &--open {
+    background-color: v.$color-success;
+    color: v.$color-white;
+  }
+
+  &--pending {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+  }
+}
+
+// Reassign lives at the foot of an expanded truck card on View All Trucks.
+.truck-tracking-drawer__truck-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.truck-tracking-drawer__reassign-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.button-variant(v.$color-white, v.$color-primary, v.$color-gray-50);
+  @include m.font-base(v.$font-weight-semibold);
+  // The surrounding grid cell is a column flexbox, which would otherwise stretch it.
+  align-self: flex-end;
+  flex: 0 0 auto;
+  width: fit-content;
+  height: 2.25rem;
+  padding: 0 v.$spacing-4;
+  border: 1px solid v.$color-primary;
+  font-size: v.$font-size-sm;
+}

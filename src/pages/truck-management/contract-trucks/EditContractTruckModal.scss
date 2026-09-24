@@ -1,0 +1,46 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.edit-contract-truck-modal {
+  max-width: 46rem;
+  text-align: left;
+
+  &__icon {
+    background-color: rgba(v.$color-primary, 0.12);
+    color: v.$color-primary;
+  }
+
+  &__scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: v.$spacing-2;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__confirm {
+    background-color: v.$color-primary;
+
+    &:hover:not(:disabled) {
+      background-color: darken(v.$color-primary, 8%);
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    position: absolute;
+    top: v.$spacing-4;
+    right: v.$spacing-4;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    background: transparent;
+    color: v.$color-text-muted;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+  }
+}

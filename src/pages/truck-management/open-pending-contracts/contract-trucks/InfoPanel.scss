@@ -1,0 +1,52 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.info-panel {
+  @include m.card(v.$spacing-6);
+  @include m.flex(column, center, center, v.$spacing-3);
+  max-width: 32rem;
+  margin: v.$spacing-6 auto;
+  text-align: center;
+
+  &__icon {
+    @include m.flex-center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-primary, 0.1);
+    color: v.$color-primary;
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    margin: 0;
+    color: v.$color-primary;
+    font-size: v.$font-size-lg;
+  }
+
+  p {
+    margin: 0;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__action {
+    @include m.flex-center;
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    margin-top: v.$spacing-2;
+    border: none;
+    border-radius: v.$radius-md;
+    background-color: v.$color-primary;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    text-decoration: none;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-navy-dark;
+    }
+  }
+}

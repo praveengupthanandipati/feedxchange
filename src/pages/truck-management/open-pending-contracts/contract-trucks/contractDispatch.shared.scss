@@ -1,0 +1,23 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+// Success banner shown after a save on the full-screen dispatch forms.
+// No equivalent already exists in the reused assign-transports/*-drawer styles.
+.dispatch-form-success {
+  @include m.flex(row, flex-start, center, v.$spacing-2);
+  padding: v.$spacing-3 v.$spacing-4;
+  border-radius: v.$radius-md;
+  background-color: rgba(v.$color-success, 0.12);
+  color: v.$color-success;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+
+  button {
+    margin-left: auto;
+    display: flex;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+}

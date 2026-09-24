@@ -4,7 +4,7 @@ import { FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import { buildScheduleTruckColumns } from "./scheduleTruckAssignment.columns";
-import { scheduleTruckRows as seedRows, type ScheduleTruckRow } from "./scheduleTruckAssignment.data";
+import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 import ScheduleRequestDrawer from "./ScheduleRequestDrawer";
 import TransporterAssignmentPanel from "./TransporterAssignmentPanel";
 import type { ContractSummary } from "../assignTransports.data";
@@ -12,11 +12,19 @@ import "./ScheduleTruckAssignment.scss";
 
 interface ScheduleTruckAssignmentProps {
   summary: ContractSummary;
+  contractId: number;
+  sellerId: number;
+  buyerId: number;
 }
 
-const ScheduleTruckAssignment = ({ summary }: ScheduleTruckAssignmentProps) => {
+const ScheduleTruckAssignment = ({
+  summary,
+  contractId,
+  sellerId,
+  buyerId,
+}: ScheduleTruckAssignmentProps) => {
   const navigate = useNavigate();
-  const [rows, setRows] = useState<ScheduleTruckRow[]>(seedRows);
+  const [rows, setRows] = useState<ScheduleTruckRow[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<ScheduleTruckRow | null>(null);
   const [rowPendingDelete, setRowPendingDelete] = useState<ScheduleTruckRow | null>(null);
@@ -87,12 +95,17 @@ const ScheduleTruckAssignment = ({ summary }: ScheduleTruckAssignmentProps) => {
         rowKey={(row) => row.id}
         emptyMessage="No scheduled truck requests yet for this contract."
         expandedRowKey={expandedRowId}
-        renderExpandedRow={(row) => <TransporterAssignmentPanel scheduleRow={row} summary={summary} />}
+        renderExpandedRow={(row) => (
+          <TransporterAssignmentPanel scheduleRow={row} summary={summary} contractId={contractId} />
+        )}
       />
 
       <ScheduleRequestDrawer
         open={drawerOpen}
         editingRow={editingRow}
+        contractId={contractId}
+        sellerId={sellerId}
+        buyerId={buyerId}
         onClose={() => setDrawerOpen(false)}
         onSave={handleSave}
       />

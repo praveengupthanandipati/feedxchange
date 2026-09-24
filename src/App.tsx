@@ -1,5 +1,6 @@
 import './assets/styles/App.scss'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { SelectedContractProvider } from './context/SelectedContractContext'
 import AppLayout from './components/layout/AppLayout'
 import Login from './pages/login/Login'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -40,6 +41,15 @@ import ProductPriceTracking from './pages/product-management/price-tracking/Prod
 import PriceHistory from './pages/product-management/price-history/ProductPrieHistory'
 import FormulaCalculations from './pages/product-management/formula-calculations/FormulaCalculations'
 import PendingContracts from './pages/truck-management/pending-contracts/PendingContracts'
+import OpenPendingContracts from './pages/truck-management/open-pending-contracts/PendingContracts'
+import AddInstantTruck from './pages/truck-management/open-pending-contracts/contract-trucks/instant-trucks/AddInstantTruck'
+import ScheduleDispatch from './pages/truck-management/open-pending-contracts/contract-trucks/schedule-trucks/ScheduleDispatch'
+import ViewTrucksByContract from './pages/truck-management/open-pending-contracts/contract-trucks/view-trucks/ViewTrucksByContract'
+import AddTruckToSchedule from './pages/truck-management/open-pending-contracts/contract-trucks/add-truck-to-schedule/AddTruckToSchedule'
+import ManageSchedule from './pages/truck-management/open-pending-contracts/contract-trucks/manage-schedule/ManageSchedule'
+import UpdateTruckStatus from './pages/truck-management/open-pending-contracts/contract-trucks/update-truck-status/UpdateTruckStatus'
+import ReassignTruck from './pages/truck-management/open-pending-contracts/contract-trucks/reassign-truck/ReassignTruck'
+import ContractTruckChain from './pages/truck-management/open-pending-contracts/contract-trucks/truck-chain/ContractTruckChain'
 import BulkFreightApproval from './pages/truck-management/bulk-freight-approval/BulkFreightApproval'
 import Assigntransports from './pages/truck-management/assign-transports/Assigntransports'
 import DriversList from './pages/transporters/drivers/drivers-list/DriversList'
@@ -70,6 +80,7 @@ import Sellerinvoice from './pages/payments/seller-invoice/SellerInvoice'
 
 function App() {
   return (
+    <SelectedContractProvider>
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -117,6 +128,21 @@ function App() {
           <Route path="/products/price-history" element={<PriceHistory />} />
           <Route path="/products/formula-calculations" element={<FormulaCalculations />} />
           <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
+          <Route path="/truck-management/open-pending-contracts" element={<OpenPendingContracts />} />
+          <Route path="/truck-management/open-pending-contracts/instant-truck" element={<AddInstantTruck />} />
+          <Route path="/truck-management/open-pending-contracts/schedule-dispatch" element={<ScheduleDispatch />} />
+          <Route path="/truck-management/open-pending-contracts/view-trucks" element={<ViewTrucksByContract />} />
+          <Route path="/truck-management/open-pending-contracts/reassign-truck" element={<ReassignTruck />} />
+          <Route path="/truck-management/open-pending-contracts/truck-chain" element={<ContractTruckChain />} />
+          <Route path="/truck-management/open-pending-contracts/manage-schedule" element={<ManageSchedule />} />
+          <Route
+            path="/truck-management/open-pending-contracts/add-truck-to-schedule"
+            element={<AddTruckToSchedule />}
+          />
+          <Route
+            path="/truck-management/open-pending-contracts/update-truck-status"
+            element={<UpdateTruckStatus />}
+          />
           <Route path="/truck-management/bulk-freight-approval" element={<BulkFreightApproval />} />
           <Route path="/truck-management/assign-transports" element={<Assigntransports />} />
           <Route path="/truck-management/transporters/driver-master" element={<DriversList />} />
@@ -142,6 +168,7 @@ function App() {
         </Route>
       </Routes>
     </Router>
+    </SelectedContractProvider>
   )
 }
 

@@ -1,8 +1,8 @@
 import { FiSave, FiEdit2, FiTrash2, FiRotateCcw, FiPlus } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import type { SearchableSelectOption } from "../../../../components/dropdown/SearchableSelect";
 import RowActionsMenu from "../../../../components/table/RowActionsMenu";
 import type { TableColumn } from "../../../../components/table/table.types";
-import { transporterOptions, truckOptions, driverNameOptions } from "../assignTransportsOptions.data";
 import type { TransporterAssignmentRow } from "./transporterAssignment.data";
 
 interface ColumnHandlers {
@@ -21,6 +21,9 @@ interface ColumnHandlers {
   lastRowId: string | null;
   /** Field keys still missing a value per row id, set after a failed Save. */
   invalidFields: Record<string, Set<keyof TransporterAssignmentRow>>;
+  transporterOptions: SearchableSelectOption[];
+  truckOptions: SearchableSelectOption[];
+  driverOptions: SearchableSelectOption[];
 }
 
 function controlClass(row: TransporterAssignmentRow, field: keyof TransporterAssignmentRow, invalidFields: ColumnHandlers["invalidFields"]) {
@@ -43,6 +46,9 @@ export function buildTransporterAssignmentColumns({
   onAddRow,
   lastRowId,
   invalidFields,
+  transporterOptions,
+  truckOptions,
+  driverOptions,
 }: ColumnHandlers): TableColumn<TransporterAssignmentRow>[] {
   return [
     {
@@ -90,7 +96,7 @@ export function buildTransporterAssignmentColumns({
         ) : (
           <div className={dropdownCellClass(row, "driverName", invalidFields)}>
             <SearchableSelect
-              options={driverNameOptions}
+              options={driverOptions}
               value={row.driverName}
               onChange={(value) => onDriverNameChange(row.id, value)}
               placeholder="Select Driver"

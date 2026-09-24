@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FiX, FiSave } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import { timeOptions } from "../assignTransportsOptions.data";
+import { useGetTransporterProfileSummaryQuery } from "../../../../store/transportersApi";
+import { useGetAllActiveTruckDetailsQuery } from "../../../../store/trucksApi";
+import DriverSelectFields from "../../contract-trucks/DriverSelectFields";
+import AddressSelectField from "../../contract-trucks/AddressSelectField";
 import {
-  transporterOptions,
-  truckOptions,
-  truckDriverMap,
-  driverNameOptions,
-  addressOptions,
-  timeOptions,
-} from "../assignTransportsOptions.data";
+  useAddContractTrucksMutation,
+  useUpdateContractTrucksMutation,
+} from "../../../../store/contractTrucksApi";
 import type { InstantTruckRow } from "./instantTruckAssignment.data";
 import "./InstantTruckAssignment.scss";
 
@@ -28,6 +29,7 @@ interface FormState {
   time: string;
   qty: string;
   freight: string;
+  lrNumber: string;
   trackingUrl: string;
 }
 
@@ -44,6 +46,7 @@ const initialFormState: FormState = {
   time: "",
   qty: "",
   freight: "",
+  lrNumber: "",
   trackingUrl: "",
 };
 
@@ -66,16 +69,64 @@ function parseNumeric(value: string): string {
   return value.replace(/[^\d.]/g, "");
 }
 
+function getCurrentDateValue(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getCurrentTimeValue(): string {
+  return `${String(new Date().getHours()).padStart(2, "0")}:00`;
+}
+
 interface AssignNewTruckDrawerProps {
   open: boolean;
   editingRow?: InstantTruckRow | null;
+  contractId: number;
+  sellerId: number;
+  buyerId: number;
+  truckAssignmentTypeId: number;
   onClose: () => void;
   onSave: (row: InstantTruckRow) => void;
 }
 
-const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: AssignNewTruckDrawerProps) => {
+const DEFAULT_DISPATCH_STATUS_ID = 1;
+
+const AssignNewTruckDrawer = ({
+  open,
+  editingRow = null,
+  contractId,
+  sellerId,
+  buyerId,
+  truckAssignmentTypeId,
+  onClose,
+  onSave,
+}: AssignNewTruckDrawerProps) => {
   const [form, setForm] = useState<FormState>(initialFormState);
+  // form.driverName and the address fields hold ids; these keep the labels for the saved row.
+  const [driverNameLabel, setDriverNameLabel] = useState("");
+  const [loadingAddressLabel, setLoadingAddressLabel] = useState("");
+  const [deliveryAddressLabel, setDeliveryAddressLabel] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+  const [submitError, setSubmitError] = useState("");
+
+  const { data: transporters } = useGetTransporterProfileSummaryQuery();
+  const { data: trucks } = useGetAllActiveTruckDetailsQuery();
+
+  const [addContractTrucks, { isLoading: adding }] = useAddContractTrucksMutation();
+  const [updateContractTrucks, { isLoading: updating }] = useUpdateContractTrucksMutation();
+  const saving = adding || updating;
+
+  const transporterOptions = useMemo(
+    () => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })),
+    [transporters],
+  );
+  const truckOptions = useMemo(
+    () => (trucks ?? []).map((t) => ({ value: String(t.truckId), label: t.truckNumber })),
+    [trucks],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -85,22 +136,30 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
       setForm({
         billChangeOption: "direct",
         billChangeMessage: "",
-        transporter: editingRow.transporterName,
-        truck: editingRow.truckNo,
-        driverName: editingRow.driverName,
+        transporter: String(editingRow.transporterProfileId),
+        truck: String(editingRow.truckId),
+        driverName: String(editingRow.driverId),
         driverPhone: editingRow.driverPhone,
-        loadingAddress: editingRow.loadingAddress,
-        deliveryAddress: editingRow.deliveryAddress,
+        loadingAddress: String(editingRow.fromAddressId),
+        deliveryAddress: String(editingRow.toAddressId),
         date,
         time,
         qty: parseNumeric(editingRow.qty),
         freight: parseNumeric(editingRow.freight),
+        lrNumber: editingRow.lrNumber,
         trackingUrl: editingRow.trackingUrl === "-" ? "" : editingRow.trackingUrl,
       });
+      setDriverNameLabel(editingRow.driverName);
+      setLoadingAddressLabel(editingRow.loadingAddress);
+      setDeliveryAddressLabel(editingRow.deliveryAddress);
     } else {
-      setForm(initialFormState);
+      setForm({ ...initialFormState, date: getCurrentDateValue(), time: getCurrentTimeValue() });
+      setDriverNameLabel("");
+      setLoadingAddressLabel("");
+      setDeliveryAddressLabel("");
     }
     setErrors({});
+    setSubmitError("");
   }, [open, editingRow]);
 
   useEffect(() => {
@@ -114,16 +173,6 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleTruckChange = (value: string) => {
-    const driver = truckDriverMap[value];
-    setForm((prev) => ({
-      ...prev,
-      truck: value,
-      driverName: driver?.driverName ?? prev.driverName,
-      driverPhone: driver?.driverPhone ?? prev.driverPhone,
-    }));
   };
 
   const validate = (): FormErrors => {
@@ -171,29 +220,112 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
     return nextErrors;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const nextErrors = validate();
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    const newRow: InstantTruckRow = {
-      id: editingRow?.id ?? `itr-${Date.now()}`,
-      status: editingRow?.status ?? "Assigned",
-      scheduleDateTime: formatScheduleDate(form.date, form.time),
-      scheduleValue: new Date(`${form.date}T${form.time}`).getTime(),
-      transporterName: form.transporter,
-      truckNo: form.truck,
-      driverName: form.driverName.trim(),
-      driverPhone: form.driverPhone.trim(),
-      loadingAddress: form.loadingAddress,
-      deliveryAddress: form.deliveryAddress,
-      qty: `${form.qty} MT`,
-      freight: `₹${Number(form.freight).toLocaleString("en-IN")}`,
-      trackingUrl: form.trackingUrl.trim() || "-",
-    };
+    setSubmitError("");
 
-    onSave(newRow);
-    onClose();
+    const currentUserId = Number(localStorage.getItem("userId")) || 0;
+    const assignedOn = new Date(`${form.date}T${form.time}`).toISOString();
+    const nowIso = new Date().toISOString();
+
+    const transporterName =
+      transporterOptions.find((option) => option.value === form.transporter)?.label ?? form.transporter;
+    const truckNo = truckOptions.find((option) => option.value === form.truck)?.label ?? form.truck;
+
+    try {
+      let contractTruckId = editingRow?.contractTruckId ?? null;
+
+      if (editingRow?.contractTruckId) {
+        const succeeded = await updateContractTrucks({
+          contractTruckId: editingRow.contractTruckId,
+          updateContractTruck: {
+            contractDispatchId: editingRow.contractTruckId,
+            contractId,
+            // Carried from the row: an edit must not re-type the assignment or drop
+            // its link to the schedule it came from.
+            truckAssignmentTypeId: editingRow.truckAssignmentTypeId || truckAssignmentTypeId,
+            scheduledNotificationId: editingRow.dispatchScheduleTransporterId,
+            transporterProfileId: Number(form.transporter),
+            truckId: Number(form.truck),
+            driverId: Number(form.driverName),
+            assignedOn,
+            lrNumber: form.lrNumber.trim(),
+            quantityMT: Number(form.qty),
+            freightPerMT: Number(form.freight),
+            fromAddressId: Number(form.loadingAddress),
+            toAddressId: Number(form.deliveryAddress),
+            // Status is changed from the status screen, and the audit fields belong
+            // to whoever created the dispatch — editing must leave all three alone.
+            dispatchStatusId: editingRow.dispatchStatusId || DEFAULT_DISPATCH_STATUS_ID,
+            createdBy: editingRow.createdBy || currentUserId,
+            createdOn: editingRow.createdOn || nowIso,
+            modifiedBy: currentUserId,
+            modifiedOn: nowIso,
+          },
+        }).unwrap();
+        if (!succeeded) {
+          setSubmitError("The server rejected this update. Please try again.");
+          return;
+        }
+      } else {
+        const succeeded = await addContractTrucks({
+          contractId,
+          truckAssignmentTypeId,
+          dispatchScheduleTransporterId: 0,
+          transporterProfileId: Number(form.transporter),
+          truckId: Number(form.truck),
+          driverId: Number(form.driverName),
+          assignedOn,
+          lrNumber: form.lrNumber.trim(),
+          quantityMT: Number(form.qty),
+          freightPerMT: Number(form.freight),
+          fromAddressId: Number(form.loadingAddress),
+          toAddressId: Number(form.deliveryAddress),
+          dispatchStatusId: DEFAULT_DISPATCH_STATUS_ID,
+          createdBy: currentUserId,
+        }).unwrap();
+        if (!succeeded) {
+          setSubmitError("The server rejected this truck assignment. Please try again.");
+          return;
+        }
+      }
+
+      const newRow: InstantTruckRow = {
+        id: editingRow?.id ?? `itr-${Date.now()}`,
+        contractTruckId,
+        status: editingRow?.status ?? "Assigned",
+        dispatchStatusId: editingRow?.dispatchStatusId ?? DEFAULT_DISPATCH_STATUS_ID,
+        truckAssignmentTypeId: editingRow?.truckAssignmentTypeId ?? truckAssignmentTypeId,
+        dispatchScheduleTransporterId: editingRow?.dispatchScheduleTransporterId ?? 0,
+        createdBy: editingRow?.createdBy ?? currentUserId,
+        createdOn: editingRow?.createdOn ?? nowIso,
+        scheduleDateTime: formatScheduleDate(form.date, form.time),
+        scheduleValue: new Date(`${form.date}T${form.time}`).getTime(),
+        transporterProfileId: Number(form.transporter),
+        transporterName,
+        truckId: Number(form.truck),
+        truckNo,
+        driverId: Number(form.driverName),
+        driverName: driverNameLabel || form.driverName,
+        driverPhone: form.driverPhone.trim(),
+        fromAddressId: Number(form.loadingAddress),
+        loadingAddress: loadingAddressLabel || form.loadingAddress,
+        toAddressId: Number(form.deliveryAddress),
+        deliveryAddress: deliveryAddressLabel || form.deliveryAddress,
+        lrNumber: form.lrNumber.trim(),
+        qty: `${form.qty} MT`,
+        freight: `₹${Number(form.freight).toLocaleString("en-IN")}`,
+        trackingUrl: form.trackingUrl.trim() || "-",
+      };
+
+      onSave(newRow);
+      onClose();
+    } catch {
+      setSubmitError("Failed to save the truck assignment. Please try again.");
+    }
   };
 
   return createPortal(
@@ -278,54 +410,41 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
               <SearchableSelect
                 options={truckOptions}
                 value={form.truck}
-                onChange={handleTruckChange}
+                onChange={(value) => setField("truck", value)}
                 placeholder="Select Truck"
                 ariaLabel="Select Truck"
-                allowCustom
               />
               {errors.truck && <p className="assign-truck-drawer__error">{errors.truck}</p>}
             </div>
 
-            <div className="assign-truck-drawer__field">
-              <label className="assign-truck-drawer__label">
-                Driver Name <span className="assign-truck-drawer__required">*</span>
-              </label>
-              <SearchableSelect
-                options={driverNameOptions}
-                value={form.driverName}
-                onChange={(value) => setField("driverName", value)}
-                placeholder="Select Driver"
-                ariaLabel="Select Driver"
-                allowCustom
-              />
-              {errors.driverName && <p className="assign-truck-drawer__error">{errors.driverName}</p>}
-            </div>
-
-            <div className="assign-truck-drawer__field">
-              <label className="assign-truck-drawer__label" htmlFor="driver-phone">
-                Driver Contact No <span className="assign-truck-drawer__required">*</span>
-              </label>
-              <input
-                id="driver-phone"
-                type="tel"
-                className="assign-truck-drawer__control"
-                placeholder="Driver Contact No"
-                value={form.driverPhone}
-                onChange={(event) => setField("driverPhone", event.target.value)}
-              />
-              {errors.driverPhone && <p className="assign-truck-drawer__error">{errors.driverPhone}</p>}
-            </div>
+            <DriverSelectFields
+              value={{
+                driverId: form.driverName,
+                driverPhone: form.driverPhone,
+                driverLabel: driverNameLabel,
+              }}
+              onChange={({ driverId, driverPhone, driverLabel }) => {
+                setForm((prev) => ({ ...prev, driverName: driverId, driverPhone }));
+                setDriverNameLabel(driverLabel ?? "");
+              }}
+              nameError={errors.driverName}
+              phoneError={errors.driverPhone}
+            />
 
             <div className="assign-truck-drawer__field">
               <label className="assign-truck-drawer__label">
                 Select Loading Address <span className="assign-truck-drawer__required">*</span>
               </label>
-              <SearchableSelect
-                options={addressOptions}
+              <AddressSelectField
+                profileId={sellerId}
                 value={form.loadingAddress}
-                onChange={(value) => setField("loadingAddress", value)}
+                onChange={(addressId, label) => {
+                  setField("loadingAddress", addressId);
+                  setLoadingAddressLabel(label);
+                }}
                 placeholder="Select Loading Address"
                 ariaLabel="Select Loading Address"
+                modalTitle="New Loading Address"
               />
               {errors.loadingAddress && (
                 <p className="assign-truck-drawer__error">{errors.loadingAddress}</p>
@@ -336,12 +455,17 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
               <label className="assign-truck-drawer__label">
                 Select Delivery Address <span className="assign-truck-drawer__required">*</span>
               </label>
-              <SearchableSelect
-                options={addressOptions}
+              <AddressSelectField
+                profileId={buyerId}
                 value={form.deliveryAddress}
-                onChange={(value) => setField("deliveryAddress", value)}
+                onChange={(addressId, label) => {
+                  setField("deliveryAddress", addressId);
+                  setDeliveryAddressLabel(label);
+                }}
                 placeholder="Select Delivery Address"
                 ariaLabel="Select Delivery Address"
+                modalTitle="New Delivery Address"
+                defaultUnloading
               />
               {errors.deliveryAddress && (
                 <p className="assign-truck-drawer__error">{errors.deliveryAddress}</p>
@@ -409,6 +533,20 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
             </div>
 
             <div className="assign-truck-drawer__field">
+              <label className="assign-truck-drawer__label" htmlFor="lr-number">
+                LR Number
+              </label>
+              <input
+                id="lr-number"
+                type="text"
+                className="assign-truck-drawer__control"
+                placeholder="Lorry Receipt Number"
+                value={form.lrNumber}
+                onChange={(event) => setField("lrNumber", event.target.value)}
+              />
+            </div>
+
+            <div className="assign-truck-drawer__field">
               <label className="assign-truck-drawer__label" htmlFor="tracking-url">
                 Truck Tracking URL
               </label>
@@ -427,13 +565,14 @@ const AssignNewTruckDrawer = ({ open, editingRow = null, onClose, onSave }: Assi
           <p className="assign-truck-drawer__notice">
             Click on &quot;Save.&quot; The Truck details will then be shared with the Seller for Loading.
           </p>
+          {submitError && <p className="assign-truck-drawer__error">{submitError}</p>}
         </div>
 
         <div className="assign-truck-drawer__footer">
-          <button type="button" className="assign-truck-drawer__save" onClick={handleSave}>
-            <FiSave aria-hidden /> Save &amp; Send
+          <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving}>
+            <FiSave aria-hidden /> {saving ? "Saving…" : "Save & Send"}
           </button>
-          <button type="button" className="assign-truck-drawer__cancel" onClick={onClose}>
+          <button type="button" className="assign-truck-drawer__cancel" onClick={onClose} disabled={saving}>
             <FiX aria-hidden /> Cancel
           </button>
         </div>

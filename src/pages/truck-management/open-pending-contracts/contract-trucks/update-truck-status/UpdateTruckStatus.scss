@@ -1,0 +1,182 @@
+@use "../../../../../assets/styles/variables" as v;
+@use "../../../../../assets/styles/mixins" as m;
+
+.update-truck-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+}
+
+.update-truck-status-card {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  padding: v.$spacing-4;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+
+  // Truck, transporter and qty read left to right, with the status and the
+  // buttons closing the same line rather than taking rows of their own.
+  &__header {
+    @include m.flex(row, flex-start, center, v.$spacing-4);
+    flex-wrap: wrap;
+  }
+
+  &__truck {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    min-width: 0;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    strong,
+    span {
+      @include m.truncate-text;
+    }
+
+    svg {
+      color: v.$color-primary;
+    }
+  }
+
+  &__current {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex: 0 0 auto;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+  }
+
+  &__status {
+    padding: 0.1rem v.$spacing-2;
+    border-radius: v.$radius-pill;
+    font-size: 0.65rem;
+    white-space: nowrap;
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background-color: v.$color-gray-100;
+    color: v.$color-text-muted;
+
+    &--assigned {
+      background-color: rgba(v.$color-info, 0.15);
+      color: v.$color-info;
+    }
+
+    &--loaded {
+      background-color: rgba(v.$color-orange, 0.18);
+      color: v.$color-orange-dark;
+    }
+
+    &--transit {
+      background-color: rgba(v.$color-primary, 0.12);
+      color: v.$color-primary;
+    }
+
+    &--delivered {
+      background-color: rgba(v.$color-success, 0.15);
+      color: v.$color-success;
+    }
+
+    &--cancelled {
+      background-color: rgba(v.$color-danger, 0.15);
+      color: v.$color-danger;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: v.$spacing-4;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+
+    strong {
+      color: v.$color-text;
+    }
+  }
+
+  &__control {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    gap: v.$spacing-2;
+
+    // The dropdown keeps a fixed, modest width so the row ends with the buttons
+    // instead of the controls stretching across the card.
+    > .searchable-select {
+      flex: 0 0 11rem;
+      min-width: 9rem;
+    }
+  }
+
+  &__save {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.button-variant(v.$color-primary, v.$color-white, v.$color-navy-dark);
+    @include m.font-base(v.$font-weight-semibold);
+    flex: 0 0 auto;
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    font-size: v.$font-size-sm;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__upload {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.button-variant(v.$color-white, v.$color-primary, v.$color-gray-50);
+    @include m.font-base(v.$font-weight-semibold);
+    flex: 0 0 auto;
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    border: 1px solid v.$color-primary;
+    font-size: v.$font-size-sm;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__edit {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.button-variant(v.$color-white, v.$color-primary, v.$color-gray-50);
+    @include m.font-base(v.$font-weight-semibold);
+    flex: 0 0 auto;
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    border: 1px solid v.$color-primary;
+    font-size: v.$font-size-sm;
+  }
+
+  &__file-input {
+    display: none;
+  }
+
+  &__success {
+    margin: 0;
+    color: v.$color-success;
+    font-size: 0.8rem;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__error {
+    margin: 0;
+    color: v.$color-danger;
+    font-size: 0.8rem;
+  }
+
+  &__empty {
+    margin: 0;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+}

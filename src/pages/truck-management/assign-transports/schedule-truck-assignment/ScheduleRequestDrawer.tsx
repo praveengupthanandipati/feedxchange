@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FiX, FiSave } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
 import MultiSelect from "../../../../components/dropdown/MultiSelect";
-import {
-  transporterOptions,
-  addressOptions,
-  timeOptions,
-} from "../assignTransportsOptions.data";
+import { timeOptions } from "../assignTransportsOptions.data";
+import { useGetTransporterProfileSummaryQuery } from "../../../../store/transportersApi";
+import AddressSelectField from "../../contract-trucks/AddressSelectField";
+import { useGetScheduleStatusesQuery } from "../../../../store/contractsApi";
+import { useScheduleContractTrucksMutation } from "../../../../store/contractTrucksApi";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 import "./ScheduleTruckAssignment.scss";
 
@@ -26,6 +26,7 @@ interface FormState {
   time: string;
   qty: string;
   freight: string;
+  remarks: string;
   autoApprove: boolean;
 }
 
@@ -39,6 +40,7 @@ const initialFormState: FormState = {
   time: "",
   qty: "",
   freight: "",
+  remarks: "",
   autoApprove: false,
 };
 
@@ -64,6 +66,9 @@ function parseNumeric(value: string): string {
 interface ScheduleRequestDrawerProps {
   open: boolean;
   editingRow?: ScheduleTruckRow | null;
+  contractId: number;
+  sellerId: number;
+  buyerId: number;
   onClose: () => void;
   onSave: (row: ScheduleTruckRow) => void;
 }
@@ -71,11 +76,27 @@ interface ScheduleRequestDrawerProps {
 const ScheduleRequestDrawer = ({
   open,
   editingRow = null,
+  contractId,
+  sellerId,
+  buyerId,
   onClose,
   onSave,
 }: ScheduleRequestDrawerProps) => {
   const [form, setForm] = useState<FormState>(initialFormState);
+  // The address fields hold ids; these keep the labels for the saved row.
+  const [loadingAddressLabel, setLoadingAddressLabel] = useState("");
+  const [deliveryAddressLabel, setDeliveryAddressLabel] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+  const [submitError, setSubmitError] = useState("");
+
+  const { data: transporters } = useGetTransporterProfileSummaryQuery();
+  const { data: scheduleStatuses } = useGetScheduleStatusesQuery();
+  const [scheduleContractTrucks, { isLoading: saving }] = useScheduleContractTrucksMutation();
+
+  const transporterOptions = useMemo(
+    () => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })),
+    [transporters],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -85,19 +106,21 @@ const ScheduleRequestDrawer = ({
       setForm({
         billChangeOption: "direct",
         billChangeMessage: DEFAULT_BILL_MESSAGE,
-        transporters: [],
-        loadingAddress: editingRow.loadingAddress,
-        deliveryAddress: editingRow.deliveryAddress,
+        transporters: editingRow.transporterProfileIds.map(String),
+        loadingAddress: String(editingRow.fromAddressId),
+        deliveryAddress: String(editingRow.toAddressId),
         date,
         time,
         qty: parseNumeric(editingRow.qty),
         freight: parseNumeric(editingRow.freight),
+        remarks: editingRow.remarks,
         autoApprove: editingRow.autoApprove,
       });
     } else {
       setForm(initialFormState);
     }
     setErrors({});
+    setSubmitError("");
   }, [open, editingRow]);
 
   useEffect(() => {
@@ -145,10 +168,12 @@ const ScheduleRequestDrawer = ({
     return nextErrors;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const nextErrors = validate();
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
+
+    setSubmitError("");
 
     const newRow: ScheduleTruckRow = {
       id: editingRow?.id ?? `str-${Date.now()}`,
@@ -156,15 +181,55 @@ const ScheduleRequestDrawer = ({
       autoApprove: form.autoApprove,
       scheduleDateTime: formatScheduleDate(form.date, form.time),
       scheduleValue: new Date(`${form.date}T${form.time}`).getTime(),
-      loadingAddress: form.loadingAddress,
-      deliveryAddress: form.deliveryAddress,
+      transporterProfileIds: form.transporters.map(Number),
+      fromAddressId: Number(form.loadingAddress),
+      loadingAddress: loadingAddressLabel || form.loadingAddress,
+      toAddressId: Number(form.deliveryAddress),
+      deliveryAddress: deliveryAddressLabel || form.deliveryAddress,
+      remarks: form.remarks.trim(),
       qty: `${form.qty} MT`,
       freight: `₹${Number(form.freight).toLocaleString("en-IN")}`,
       trucksAssigned: editingRow?.trucksAssigned ?? 0,
     };
 
-    onSave(newRow);
-    onClose();
+    if (editingRow) {
+      // No update endpoint exists yet for scheduled requests — apply the edit locally only.
+      onSave(newRow);
+      onClose();
+      return;
+    }
+
+    try {
+      const currentUserId = Number(localStorage.getItem("userId")) || 0;
+      const defaultStatus =
+        scheduleStatuses?.find((s) => s.statusName.toLowerCase() === "planned") ?? scheduleStatuses?.[0];
+
+      const succeeded = await scheduleContractTrucks({
+        transporters: form.transporters.map(Number),
+        contractId,
+        scheduleDateTime: new Date(`${form.date}T${form.time}`).toISOString(),
+        quantityMT: Number(form.qty),
+        remainingQuantityMT: Number(form.qty),
+        fromAddressId: Number(form.loadingAddress),
+        toAddressId: Number(form.deliveryAddress),
+        scheduleStatusId: defaultStatus?.scheduleStatusId ?? 1,
+        remarks: form.remarks.trim(),
+        freightPerMT: Number(form.freight),
+        autoApprove: form.autoApprove,
+        createdBy: currentUserId,
+        createdOn: new Date().toISOString(),
+      }).unwrap();
+
+      if (!succeeded) {
+        setSubmitError("The server rejected this scheduled request. Please try again.");
+        return;
+      }
+
+      onSave(newRow);
+      onClose();
+    } catch {
+      setSubmitError("Failed to save the scheduled request. Please try again.");
+    }
   };
 
   return createPortal(
@@ -251,12 +316,16 @@ const ScheduleRequestDrawer = ({
               <label className="schedule-request-drawer__label">
                 Select Loading Address <span className="schedule-request-drawer__required">*</span>
               </label>
-              <SearchableSelect
-                options={addressOptions}
+              <AddressSelectField
+                profileId={sellerId}
                 value={form.loadingAddress}
-                onChange={(value) => setField("loadingAddress", value)}
+                onChange={(addressId, label) => {
+                  setField("loadingAddress", addressId);
+                  setLoadingAddressLabel(label);
+                }}
                 placeholder="Select Loading Address"
                 ariaLabel="Select Loading Address"
+                modalTitle="New Loading Address"
               />
               {errors.loadingAddress && (
                 <p className="schedule-request-drawer__error">{errors.loadingAddress}</p>
@@ -267,12 +336,17 @@ const ScheduleRequestDrawer = ({
               <label className="schedule-request-drawer__label">
                 Select Delivery Address <span className="schedule-request-drawer__required">*</span>
               </label>
-              <SearchableSelect
-                options={addressOptions}
+              <AddressSelectField
+                profileId={buyerId}
                 value={form.deliveryAddress}
-                onChange={(value) => setField("deliveryAddress", value)}
+                onChange={(addressId, label) => {
+                  setField("deliveryAddress", addressId);
+                  setDeliveryAddressLabel(label);
+                }}
                 placeholder="Select Delivery Address"
                 ariaLabel="Select Delivery Address"
+                modalTitle="New Delivery Address"
+                defaultUnloading
               />
               {errors.deliveryAddress && (
                 <p className="schedule-request-drawer__error">{errors.deliveryAddress}</p>
@@ -339,6 +413,19 @@ const ScheduleRequestDrawer = ({
               {errors.freight && <p className="schedule-request-drawer__error">{errors.freight}</p>}
             </div>
 
+            <div className="schedule-request-drawer__field schedule-request-drawer__field--full">
+              <label className="schedule-request-drawer__label" htmlFor="schedule-remarks">
+                Remarks
+              </label>
+              <textarea
+                id="schedule-remarks"
+                className="schedule-request-drawer__textarea"
+                placeholder="Optional remarks"
+                value={form.remarks}
+                onChange={(event) => setField("remarks", event.target.value)}
+              />
+            </div>
+
             <div className="schedule-request-drawer__field schedule-request-drawer__field--checkbox">
               <label className="schedule-request-drawer__checkbox">
                 <input
@@ -350,13 +437,14 @@ const ScheduleRequestDrawer = ({
               </label>
             </div>
           </div>
+          {submitError && <p className="schedule-request-drawer__error">{submitError}</p>}
         </div>
 
         <div className="schedule-request-drawer__footer">
-          <button type="button" className="schedule-request-drawer__save" onClick={handleSave}>
-            <FiSave aria-hidden /> Save &amp; Send
+          <button type="button" className="schedule-request-drawer__save" onClick={handleSave} disabled={saving}>
+            <FiSave aria-hidden /> {saving ? "Saving…" : "Save & Send"}
           </button>
-          <button type="button" className="schedule-request-drawer__cancel" onClick={onClose}>
+          <button type="button" className="schedule-request-drawer__cancel" onClick={onClose} disabled={saving}>
             <FiX aria-hidden /> Cancel
           </button>
         </div>

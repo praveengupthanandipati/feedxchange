@@ -356,6 +356,12 @@ const ContractchangeStatus = () => {
     }
 
     const currentUserId = Number(localStorage.getItem("userId")) || 0;
+    const selectedStatus = contractStatusOptions?.find((option) => option.statusName === status);
+
+    if (!selectedStatus) {
+      setError("Please select a valid status.");
+      return;
+    }
 
     try {
       await updateContractStatus({
