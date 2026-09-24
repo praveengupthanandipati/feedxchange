@@ -82,6 +82,8 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  const autoApproveDisabled = form.transporters.length > 1;
+
   // Give the success note a moment, then go back to Manage Schedule.
   useEffect(() => {
     if (!saved) return;
@@ -233,7 +235,15 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
           <MultiSelect
             options={transporterOptions}
             value={form.transporters}
-            onChange={(value) => setField("transporters", value)}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                transporters: value,
+                // Auto approve covers a single transporter only, so a second one
+                // clears it rather than leaving a ticked box that cannot be unticked.
+                autoApprove: value.length > 1 ? false : prev.autoApprove,
+              }))
+            }
             placeholder="Select Transporter(s)"
             ariaLabel="Select Transporter"
           />
@@ -351,10 +361,16 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
             <input
               type="checkbox"
               checked={form.autoApprove}
+              disabled={autoApproveDisabled}
               onChange={(event) => setField("autoApprove", event.target.checked)}
             />
             Auto Approve
           </label>
+          {autoApproveDisabled && (
+            <p className="schedule-request-drawer__hint">
+              Auto approve is available only when a single transporter is selected.
+            </p>
+          )}
         </div>
       </div>
       {submitError && <p className="schedule-request-drawer__error">{submitError}</p>}
