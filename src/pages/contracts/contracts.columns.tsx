@@ -9,7 +9,7 @@ import type { Contract } from "./contracts.data";
 
 const parseQtyOrNA = (value: string) => (value === "N/A" ? -1 : parseFloat(value));
 
-const ContractIdCell = ({ id, contractId }: { id: string; contractId: number }) => {
+const ContractIdCell = ({ id }: { id: string }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = (event: MouseEvent) => {
@@ -25,7 +25,7 @@ const ContractIdCell = ({ id, contractId }: { id: string; contractId: number }) 
 
   return (
     <span className="contracts-table__id">
-      <Link to={`/contracts/${contractId}`} className="contracts-table__id-link">
+      <Link to={`/contracts/${encodeURIComponent(id)}`} className="contracts-table__id-link">
         {id}
       </Link>
       <button
@@ -79,7 +79,7 @@ export function buildContractColumns({ onEdit, onDelete }: ColumnHandlers): Tabl
       key: "id",
       header: "Contract",
       sortable: true,
-      render: (row) => <ContractIdCell id={row.id} contractId={row.contractId} />,
+      render: (row) => <ContractIdCell id={row.id} />,
       exportValue: (row) => row.id,
     },
     {

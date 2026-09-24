@@ -8,12 +8,9 @@ import Table from "../../../components/table/Table";
 import type { TableColumn } from "../../../components/table/table.types";
 import { useGetBusinessProfileSummaryQuery } from "../../../store/businessProfilesApi";
 import {
-  useLazyGetAllContractsByFiltersQuery,
+  useGetAllContractsQuery,
   useGetAllContractStatusesQuery,
-  useLazyGetContractByContractIdQuery,
   useUpdateContractStatusMutation,
-  type PendingContractApiResponse,
-  type GetContractDto,
 } from "../../../store/contractsApi";
 import { financialYearOptions } from "./contractStatus.data";
 import "../NewContract.scss";
@@ -45,18 +42,34 @@ const formatDisplayDate = (value: string) => {
   return `${day}-${month}-${date.getFullYear()}`;
 };
 
+interface ContractStatusRow {
+  contractId: number;
+  contractNumber: string;
+  contractDate: string;
+  sellerName: string | null;
+  buyerName: string | null;
+  productName: string | null;
+  basicDetails: {
+    contractRate: number;
+    quantity: number;
+    quantityMeasure: string | null;
+    deliveryType: string | null;
+    calculatedStatus: string;
+  };
+}
+
 interface GetContractsDrawerProps {
   open: boolean;
   seller: string;
   buyer: string;
   sellerOptions: { value: string; label: string }[];
   buyerOptions: { value: string; label: string }[];
-  rows: PendingContractApiResponse[] | null;
+  rows: ContractStatusRow[] | null;
   loading: boolean;
   onSellerChange: (value: string) => void;
   onBuyerChange: (value: string) => void;
   onGetContracts: () => void;
-  onAdd: (row: PendingContractApiResponse) => void;
+  onAdd: (row: ContractStatusRow) => void;
   onClose: () => void;
 }
 
@@ -83,7 +96,7 @@ const GetContractsDrawer = ({
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
 
-  const columns: TableColumn<PendingContractApiResponse>[] = useMemo(
+  const columns: TableColumn<ContractStatusRow>[] = useMemo(
     () => [
       {
         key: "contractDate",
@@ -210,7 +223,7 @@ const ContractchangeStatus = () => {
   const [financialYear, setFinancialYear] = useState(financialYearOptions[2]?.value ?? "");
   const [contractNumber, setContractNumber] = useState("");
   const [contractCloseDate, setContractCloseDate] = useState(todayISO());
-  const [record, setRecord] = useState<GetContractDto | null>(null);
+  const [record, setRecord] = useState<ContractStatusRow | null>(null);
   const [detailsVisible, setDetailsVisible] = useState(true);
   const [status, setStatus] = useState("");
   const [reviewRemarks, setReviewRemarks] = useState("");
@@ -220,7 +233,7 @@ const ContractchangeStatus = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerSeller, setDrawerSeller] = useState("");
   const [drawerBuyer, setDrawerBuyer] = useState("");
-  const [drawerRows, setDrawerRows] = useState<PendingContractApiResponse[] | null>(null);
+  const [drawerRows, setDrawerRows] = useState<ContractStatusRow[] | null>(null);
 
   const { data: businessProfiles } = useGetBusinessProfileSummaryQuery();
   const businessProfileOptions = useMemo(
@@ -239,22 +252,32 @@ const ContractchangeStatus = () => {
         .filter((option) => option.isActive)
         .slice()
         .sort((a, b) => a.sortOrder - b.sortOrder)
-        .map((option) => ({ value: option.name, label: option.displayName })),
+        .map((option) => ({ value: option.statusName, label: option.displayName })),
     [contractStatusOptions],
   );
 
-  const [searchContracts, { isFetching: searching }] = useLazyGetAllContractsByFiltersQuery();
-  const [searchDrawerContracts, { isFetching: drawerLoading }] = useLazyGetAllContractsByFiltersQuery();
-  const [fetchContract, { isFetching: loadingContract }] = useLazyGetContractByContractIdQuery();
+  const { data: contractsData, isLoading: searching } = useGetAllContractsQuery();
   const [updateContractStatus, { isLoading: updating }] = useUpdateContractStatusMutation();
 
-  const loadContract = async (contractId: number) => {
-    const contract = await fetchContract(contractId).unwrap();
-    setError("");
-    setRecord(contract);
-    setDetailsVisible(true);
-    setStatus(contract.basicDetails?.calculatedStatus ?? "");
-  };
+  const contractRows = useMemo<ContractStatusRow[]>(
+    () =>
+      (contractsData?.contracts ?? []).map((contract) => ({
+        contractId: contract.id,
+        contractNumber: contract.contractNumber,
+        contractDate: contract.contractDate,
+        sellerName: contract.sellerName,
+        buyerName: contract.buyerName,
+        productName: contract.productName,
+        basicDetails: {
+          contractRate: contract.contractRate,
+          quantity: contract.quantity,
+          quantityMeasure: contract.quantityMeasure,
+          deliveryType: contract.deliveryType,
+          calculatedStatus: contract.status,
+        },
+      })),
+    [contractsData],
+  );
 
   const handleSearch = async () => {
     const trimmed = contractNumber.trim();
@@ -265,8 +288,7 @@ const ContractchangeStatus = () => {
     }
 
     try {
-      const rows = await searchContracts({ SearchText: trimmed }).unwrap();
-      const match = rows.find(
+      const match = contractRows.find(
         (row) => row.contractNumber?.toLowerCase() === trimmed.toLowerCase(),
       );
 
@@ -276,7 +298,10 @@ const ContractchangeStatus = () => {
         return;
       }
 
-      await loadContract(match.contractId);
+      setError("");
+      setRecord(match);
+      setDetailsVisible(true);
+      setStatus(match.basicDetails?.calculatedStatus ?? "");
     } catch {
       setError("Failed to search for the contract.");
       setRecord(null);
@@ -292,11 +317,10 @@ const ContractchangeStatus = () => {
 
   const handleGetContracts = async () => {
     try {
-      const rows = await searchDrawerContracts({}).unwrap();
       const sellerLabel = businessProfileOptions.find((option) => option.value === drawerSeller)?.label;
       const buyerLabel = businessProfileOptions.find((option) => option.value === drawerBuyer)?.label;
       setDrawerRows(
-        rows.filter(
+        contractRows.filter(
           (row) =>
             (!sellerLabel || row.sellerName === sellerLabel) &&
             (!buyerLabel || row.buyerName === buyerLabel),
@@ -307,16 +331,14 @@ const ContractchangeStatus = () => {
     }
   };
 
-  const handleAddFromDrawer = async (row: PendingContractApiResponse) => {
+  const handleAddFromDrawer = async (row: ContractStatusRow) => {
     setContractNumber(row.contractNumber);
     setDrawerOpen(false);
 
-    try {
-      await loadContract(row.contractId);
-    } catch {
-      setError(`No contract details found for number "${row.contractNumber}".`);
-      setRecord(null);
-    }
+    setError("");
+    setRecord(row);
+    setDetailsVisible(true);
+    setStatus(row.basicDetails?.calculatedStatus ?? "");
   };
 
   const handleChange = async () => {
@@ -337,7 +359,7 @@ const ContractchangeStatus = () => {
 
     try {
       await updateContractStatus({
-        contractId: record.id,
+        contractId: record.contractId,
         calculatedStatus: status,
         reviewRemarks: reviewRemarks.trim() || undefined,
         actionPerformedBy: currentUserId,
@@ -438,7 +460,7 @@ const ContractchangeStatus = () => {
 
           {!record ? (
             <p className="contract-change-status__placeholder">
-              {searching || loadingContract
+              {searching
                 ? "Loading contract details…"
                 : "Enter a contract number and search to view contract details."}
             </p>
@@ -467,11 +489,11 @@ const ContractchangeStatus = () => {
                 />
                 <DetailField
                   label="GST %"
-                  value={basicDetails?.gstPercentage != null ? `${basicDetails.gstPercentage}%` : ""}
+                  value=""
                 />
                 <DetailField
                   label="Invoice Net Rate per MT"
-                  value={basicDetails?.netRate != null ? formatINR(basicDetails.netRate) : ""}
+                  value=""
                 />
                 <DetailField label="Contract Value" value={contractValue} />
               </div>
@@ -530,7 +552,7 @@ const ContractchangeStatus = () => {
         sellerOptions={businessProfileOptions}
         buyerOptions={businessProfileOptions}
         rows={drawerRows}
-        loading={drawerLoading}
+        loading={searching}
         onSellerChange={setDrawerSeller}
         onBuyerChange={setDrawerBuyer}
         onGetContracts={handleGetContracts}
