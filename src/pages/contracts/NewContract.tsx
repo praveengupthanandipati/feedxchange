@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FiArrowLeft, FiEye, FiEyeOff } from "react-icons/fi";
 import SearchableSelect from "../../components/dropdown/SearchableSelect";
 import ToggleSwitch from "../../components/toggle/ToggleSwitch";
 import type { Contract } from "./contracts.data";
-import { useSaveContractMutation, useUpdateContractMutation ,   useLazyGetContractByContractIdQuery, } from "../../store/contractsApi";
+import {
+  useGetContractByContractNumberQuery,
+  useSaveContractMutation,
+  useUpdateContractMutation,
+} from "../../store/contractsApi";
 
 import {
   quantityMeasureOptions,
@@ -14,12 +18,15 @@ import {
   gstDetailsOptions,
   deliveryScheduleOptions,
   qualitySpecSourceOptions,
-  addressOptions,
   paymentTermsOptions,
 } from "./newContract.data";
 import "./NewContract.scss";
 import { useGetProductsQuery } from "../../store/productsApi";
-import {useGetBusinessProfileSummaryQuery} from "../../store/businessProfilesApi";
+import {
+  useGetBusinessProfileSummaryQuery,
+} from "../../store/businessProfilesApi";
+import { useGetProfileAddressQuery } from "../../store/userProfilesCommonApi";
+
 
 interface ConditionState {
   commission: string;
@@ -42,6 +49,67 @@ const emptyCondition: ConditionState = {
   address: "",
   remarks: "",
 };
+
+const asRecord = (value: unknown): Record<string, unknown> =>
+  value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+
+const asNumber = (value: unknown, fallback?: number) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+};
+
+const toUpdateQualitySpecifications = (
+  specifications: Contract["sellerQualitySpecifications"] | undefined,
+) =>
+  (specifications ?? [])
+    .map((specification) => ({
+      profileId: Number(specification.profileId),
+      parameterId: Number(specification.parameterId),
+      minValue: Number(specification.minValue) || 0,
+      maxValue: Number(specification.maxValue) || 0,
+      unit: specification.unit ?? "",
+    }))
+    .filter(
+      (specification) =>
+        Number.isInteger(specification.profileId) &&
+        specification.profileId > 0 &&
+        Number.isInteger(specification.parameterId) &&
+        specification.parameterId > 0,
+    );
+
+const optionKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const formatProfileAddress = (address: {
+  officeName?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  district?: string;
+  stateName?: string;
+  pincode?: string;
+}) =>
+  [
+    address.officeName,
+    address.addressLine1,
+    address.addressLine2,
+    address.city,
+    address.district,
+    address.stateName,
+    address.pincode,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+// const normalizeQualitySpecifications = (
+//   specifications: Contract["sellerQualitySpecifications"],
+// ) =>
+//   (specifications ?? []).map((specification) => ({
+//     profileId: specification.profileId ?? 0,
+//     parameterId: specification.parameterId ?? 0,
+//     minValue: specification.minValue ?? 0,
+//     maxValue: specification.maxValue ?? 0,
+//     unit: specification.unit ?? "",
+//   }));
 
 const REQUIRED_FIELD_LABELS: Record<string, string> = {
   contractDate: "Date of Contract",
@@ -79,13 +147,21 @@ const REQUIRED_FIELD_LABELS: Record<string, string> = {
 };
 
 const NewContract = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const navState = (location.state as null | { contract?: Contract; isEdit?: boolean }) || null;
-
-  const [getContractByContractId] = useLazyGetContractByContractIdQuery();
-
+  const editContractNumber = navState?.isEdit
+    ? navState.contract?.contractNumber || navState.contract?.id || ""
+    : "";
+  const {
+    data: contractDetails,
+    isLoading: isContractDetailsLoading,
+    isFetching: isContractDetailsFetching,
+  } = useGetContractByContractNumberQuery(editContractNumber, {
+    skip: !editContractNumber,
+  });
+ 
   const [summaryVisible, setSummaryVisible] = useState(true);
+  const [contractNumber, setContractNumber] = useState("");
 
   const [contractDate, setContractDate] = useState("");
   const [sellerId, setSellerId] = useState("");
@@ -116,13 +192,157 @@ const NewContract = () => {
   const [status, setStatus] = useState(false);
   const [formError, setFormError] = useState("");
 
+  const editContract = useMemo<Contract | null>(() => {
+    if (!navState?.isEdit || !navState.contract) return null;
+    if (!contractDetails) return navState.contract;
+
+    const response = asRecord(contractDetails);
+    const source = asRecord(response.data ?? response.result ?? response.contract ?? contractDetails);
+    const basicDetails = asRecord(source.basicDetails);
+    const sellerDetails = asRecord(source.sellerConditions ?? source.sellerCondition);
+    const buyerDetails = asRecord(source.buyerConditions ?? source.buyerCondition);
+    const paymentDetails = asRecord(
+      source.paymentTerms ?? source.paymentsInvoices ?? source.paymentInvoices ?? source.paymentDetails,
+    );
+    const fallback = navState.contract;
+
+    return {
+      ...fallback,
+      contractId: asNumber(source.contractId, fallback.contractId) ?? fallback.contractId,
+      id: String(source.contractNumber ?? fallback.id),
+      contractNumber: String(source.contractNumber ?? fallback.contractNumber),
+      date: String(source.contractDate ?? fallback.date),
+      dateValue: source.contractDate
+        ? new Date(String(source.contractDate)).getTime()
+        : fallback.dateValue,
+      seller: String(source.sellerName ?? fallback.seller),
+      buyer: String(source.buyerName ?? fallback.buyer),
+      product: String(source.productName ?? fallback.product),
+      sellerId: asNumber(source.sellerId, fallback.sellerId),
+      buyerId: asNumber(source.buyerId, fallback.buyerId),
+      productId: asNumber(source.productId, fallback.productId),
+      quantityMeasure: String(basicDetails.quantityMeasure ?? fallback.quantityMeasure),
+      qtyValue: asNumber(basicDetails.quantity ?? source.totalQuantityMT, fallback.qtyValue) ?? 0,
+      qty: `${basicDetails.quantity ?? source.totalQuantityMT ?? fallback.qtyValue} ${basicDetails.quantityMeasure ?? fallback.quantityMeasure}`,
+      poTolerance: String(basicDetails.poTolerancePercentage ?? source.tolerancePercentage ?? fallback.poTolerance),
+      deliveryType: String(basicDetails.deliveryType ?? source.deliveryType ?? fallback.deliveryType),
+      cRateValue: asNumber(basicDetails.contractRate ?? source.pricePerKg, fallback.cRateValue) ?? 0,
+      gst:
+        basicDetails.gstPercentage ?? source.gstPercentage ?? source.gstPercent
+          ? `${basicDetails.gstPercentage ?? source.gstPercentage ?? source.gstPercent}%`
+          : fallback.gst,
+      gstDetails: String(basicDetails.gstDetails ?? source.gstDetails ?? fallback.gstDetails ?? ""),
+      indicativeFreight: String(basicDetails.indicativeFreight ?? fallback.indicativeFreight),
+      rateRemarks: String(basicDetails.rateRemarks ?? fallback.rateRemarks),
+      minQuantityMT: asNumber(basicDetails.minQuantity ?? source.minQuantityMT, fallback.minQuantityMT),
+      maxQuantityMT: asNumber(basicDetails.maxQuantity ?? source.maxQuantityMT, fallback.maxQuantityMT),
+      dispatchedQuantityMT: asNumber(source.dispatchedQuantityMT, fallback.dispatchedQuantityMT),
+      pendingQuantityMT: asNumber(source.pendingQuantityMT, fallback.pendingQuantityMT),
+      currencyId: asNumber(source.currencyId, fallback.currencyId),
+      contractStatusId: asNumber(source.contractStatusId, fallback.contractStatusId),
+      approvalRequired: Boolean(source.approvalRequired ?? fallback.approvalRequired),
+      createdById: asNumber(source.createdBy ?? source.createdById, fallback.createdById),
+      sellerCommission: asNumber(sellerDetails.commission ?? source.sellerCommission, fallback.sellerCommission),
+      sellerDeliverySchedule: String(sellerDetails.deliverySchedule ?? source.sellerDeliverySchedule ?? fallback.sellerDeliverySchedule ?? ""),
+      sellerSpecificDays: asNumber(sellerDetails.sellerSpecificDays ?? sellerDetails.specificDays ?? source.sellerSpecificDays, fallback.sellerSpecificDays),
+      sellerFromDate: String(sellerDetails.sellerFromDate ?? sellerDetails.fromDate ?? source.sellerFromDate ?? fallback.sellerFromDate ?? ""),
+      sellerToDate: String(sellerDetails.sellerToDate ?? sellerDetails.toDate ?? source.sellerToDate ?? fallback.sellerToDate ?? ""),
+      loadingAddressId: asNumber(sellerDetails.loadingAddressId ?? source.loadingAddressId, fallback.loadingAddressId),
+      sellerRemarksSpecialConditions: String(sellerDetails.remarksSpecialConditions ?? sellerDetails.remarks ?? source.sellerRemarksSpecialConditions ?? fallback.sellerRemarksSpecialConditions ?? ""),
+      sellerQualitySpecifications: (sellerDetails.qualitySpecifications ?? source.sellerQualitySpecifications ?? fallback.sellerQualitySpecifications) as Contract["sellerQualitySpecifications"],
+      sellerConditions: {
+        ...fallback.sellerConditions,
+        commission: String(sellerDetails.commission ?? source.sellerCommission ?? fallback.sellerConditions.commission),
+        deliverySchedule: String(sellerDetails.deliverySchedule ?? source.sellerDeliverySchedule ?? fallback.sellerConditions.deliverySchedule),
+        fromDate: String(sellerDetails.sellerFromDate ?? sellerDetails.fromDate ?? source.sellerFromDate ?? fallback.sellerConditions.fromDate),
+        toDate: String(sellerDetails.sellerToDate ?? sellerDetails.toDate ?? source.sellerToDate ?? fallback.sellerConditions.toDate),
+        specificDays: String(sellerDetails.sellerSpecificDays ?? sellerDetails.specificDays ?? source.sellerSpecificDays ?? fallback.sellerConditions.specificDays),
+        qualitySpecSource: String(
+          sellerDetails.qualitySpecSource ??
+            sellerDetails.qualitySpecificationSource ??
+            source.sellerQualitySpecSource ??
+            fallback.sellerConditions.qualitySpecSource,
+        ),
+        address: String(
+          sellerDetails.loadingAddressAt ??
+            sellerDetails.loadingAddress ??
+            sellerDetails.address ??
+            source.loadingAddressAt ??
+            fallback.sellerConditions.address,
+        ),
+        remarks: String(sellerDetails.remarksSpecialConditions ?? sellerDetails.remarks ?? fallback.sellerConditions.remarks),
+      },
+      buyerCommission: asNumber(buyerDetails.commission ?? source.buyerCommission, fallback.buyerCommission),
+      buyerDeliverySchedule: String(buyerDetails.deliverySchedule ?? source.buyerDeliverySchedule ?? fallback.buyerDeliverySchedule ?? ""),
+      buyerSpecificDays: asNumber(buyerDetails.buyerSpecificDays ?? buyerDetails.specificDays ?? source.buyerSpecificDays, fallback.buyerSpecificDays),
+      buyerFromDate: String(buyerDetails.buyerFromDate ?? buyerDetails.fromDate ?? source.buyerFromDate ?? fallback.buyerFromDate ?? ""),
+      buyerToDate: String(buyerDetails.buyerToDate ?? buyerDetails.toDate ?? source.buyerToDate ?? fallback.buyerToDate ?? ""),
+      deliveryAddressId: asNumber(buyerDetails.deliveryAddressId ?? source.deliveryAddressId, fallback.deliveryAddressId),
+      buyerRemarksSpecialConditions: String(buyerDetails.remarksSpecialConditions ?? buyerDetails.remarks ?? source.buyerRemarksSpecialConditions ?? fallback.buyerRemarksSpecialConditions ?? ""),
+      buyerQualitySpecifications: (buyerDetails.qualitySpecifications ?? source.buyerQualitySpecifications ?? fallback.buyerQualitySpecifications) as Contract["buyerQualitySpecifications"],
+      buyerConditions: {
+        ...fallback.buyerConditions,
+        commission: String(buyerDetails.commission ?? source.buyerCommission ?? fallback.buyerConditions.commission),
+        deliverySchedule: String(buyerDetails.deliverySchedule ?? source.buyerDeliverySchedule ?? fallback.buyerConditions.deliverySchedule),
+        fromDate: String(buyerDetails.buyerFromDate ?? buyerDetails.fromDate ?? source.buyerFromDate ?? fallback.buyerConditions.fromDate),
+        toDate: String(buyerDetails.buyerToDate ?? buyerDetails.toDate ?? source.buyerToDate ?? fallback.buyerConditions.toDate),
+        specificDays: String(buyerDetails.buyerSpecificDays ?? buyerDetails.specificDays ?? source.buyerSpecificDays ?? fallback.buyerConditions.specificDays),
+        qualitySpecSource: String(
+          buyerDetails.qualitySpecSource ??
+            buyerDetails.qualitySpecificationSource ??
+            source.buyerQualitySpecSource ??
+            fallback.buyerConditions.qualitySpecSource,
+        ),
+        address: String(
+          buyerDetails.deliveryAddressAt ??
+            buyerDetails.deliveryAddress ??
+            buyerDetails.loadingAddressAt ??
+            buyerDetails.address ??
+            source.deliveryAddressAt ??
+            fallback.buyerConditions.address,
+        ),
+        remarks: String(buyerDetails.remarksSpecialConditions ?? buyerDetails.remarks ?? fallback.buyerConditions.remarks),
+      },
+      paymentTerms: String(
+        paymentDetails.paymentTermName ??
+          paymentDetails.paymentTerms ??
+          source.paymentTermName ??
+          source.paymentTerms ??
+          fallback.paymentTerms,
+      ),
+      paymentTermName: String(
+        paymentDetails.paymentTermName ??
+          paymentDetails.paymentTerms ??
+          source.paymentTermName ??
+          source.paymentTerms ??
+          fallback.paymentTermName ??
+          "",
+      ),
+      paymentBeforeDate: String(paymentDetails.paymentBeforeDate ?? fallback.paymentBeforeDate),
+      immediateAdvancePercent: String(paymentDetails.immediateAdvancePercentage ?? fallback.immediateAdvancePercent),
+      immediateAdvanceDate: String(paymentDetails.immediateAdvanceDate ?? fallback.immediateAdvanceDate),
+      balanceAdvancePercent: String(paymentDetails.balanceAdvancePercentage ?? fallback.balanceAdvancePercent),
+      balanceAdvanceDate: String(paymentDetails.balanceAdvanceDate ?? fallback.balanceAdvanceDate),
+      sellerPaymentDueDays: String(paymentDetails.sellerPaymentDueDays ?? fallback.sellerPaymentDueDays),
+      buyerPaymentDueDays: String(paymentDetails.buyerPaymentDueDays ?? fallback.buyerPaymentDueDays),
+      paymentRemarks: String(paymentDetails.remarks ?? fallback.paymentRemarks),
+    };
+  }, [contractDetails, navState]);
+
+   const [saveContract, { isLoading: isSaving }] = useSaveContractMutation();
+   const [updateContract, { isLoading: isUpdating }] =
+  useUpdateContractMutation();
+  const isSubmitting = isSaving || isUpdating;
+
   const resolveOptionValue = (
     options: { value: string; label: string }[],
     contractValue: string | undefined,
   ) => {
     if (!contractValue) return "";
     const match = options.find(
-      (option) => option.value === contractValue || option.label === contractValue,
+      (option) =>
+        optionKey(option.value) === optionKey(contractValue) ||
+        optionKey(option.label) === optionKey(contractValue),
     );
     if (match) return match.value;
     return contractValue;
@@ -141,6 +361,27 @@ const NewContract = () => {
     const parsed = Date.parse(value);
     return Number.isNaN(parsed) ? "" : new Date(parsed).toISOString().slice(0, 10);
   };
+  const toApiDate = (value: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return "";
+    // Date inputs represent a calendar day. Do not convert local midnight to
+    // UTC, as that can move the date back one day in timezones ahead of UTC.
+    return `${value}T00:00:00.000Z`;
+  };
+
+  const toInputDate = (value: string | undefined) => {
+    if (!value) return "";
+
+    const isoDate = value.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (isoDate) return isoDate[1];
+
+    const parts = value.split("/");
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      return `${year.padStart(4, "0")}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    }
+
+    return "";
+  };
 const { data: products } = useGetProductsQuery();
     const productOptions = useMemo(
       () =>
@@ -150,14 +391,49 @@ const { data: products } = useGetProductsQuery();
         })),
       [products],
     );
-    const { data: businessProfiles } = useGetBusinessProfileSummaryQuery();
+    const { data: businessProfiles } = useGetBusinessProfileSummaryQuery(undefined, {
+      refetchOnMountOrArgChange: true,
+    });
     const businessProfileOptions = useMemo(
-      () =>
-        (businessProfiles ?? []).map((profile) => ({
-          value: String(profile.profileId),
-          label: profile.legalName ?? "",
-        })),
+      () => {
+        const uniqueProfiles = new Map<number, { value: string; label: string }>();
+
+        for (const profile of businessProfiles ?? []) {
+          if (profile.status?.toLowerCase() !== "active") continue;
+
+          if (!uniqueProfiles.has(profile.profileId)) {
+            uniqueProfiles.set(profile.profileId, {
+              value: String(profile.profileId),
+              label: profile.legalName ?? "",
+            });
+          }
+        }
+
+        return Array.from(uniqueProfiles.values());
+      },
       [businessProfiles],
+    );
+    const { data: sellerAddresses = [] } = useGetProfileAddressQuery(sellerId, {
+      skip: !sellerId,
+    });
+    const { data: buyerAddresses = [] } = useGetProfileAddressQuery(buyerId, {
+      skip: !buyerId,
+    });
+    const sellerAddressOptions = useMemo(
+      () =>
+        sellerAddresses.map((address) => ({
+          value: String(address.addressId),
+          label: formatProfileAddress(address) || `Address ${address.addressId}`,
+        })),
+      [sellerAddresses],
+    );
+    const buyerAddressOptions = useMemo(
+      () =>
+        buyerAddresses.map((address) => ({
+          value: String(address.addressId),
+          label: formatProfileAddress(address) || `Address ${address.addressId}`,
+        })),
+      [buyerAddresses],
     );
   
   const baseRate = parseFloat(contractRate) || 0;
@@ -255,405 +531,601 @@ const { data: products } = useGetProductsQuery();
       setter(event.target.value);
     };
 
-  const [updateContract] = useUpdateContractMutation();
-  const [saveContract] = useSaveContractMutation();
-
-  const toIsoDateTime = (value: string) => {
-    if (!value) return "";
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString();
-  };
-
   const handleSubmit = async () => {
-    const actionType = navState?.isEdit ? "Update" : "Create";
-    console.log(`${actionType} Contract button clicked`, {
-      isEdit: navState?.isEdit,
-      contractNumber: navState?.contract?.id,
-      contractDate,
-      sellerId,
-      buyerId,
-      productId,
-    });
+  console.log("navState:", navState);
+  console.log("contract:", navState?.contract);
+  console.log("contractNumber:", contractNumber);
+  console.log("isEdit:", navState?.isEdit);
 
-    const missing = Object.entries(requiredValues)
-      .filter(([, value]) => !value)
-      .map(([key]) => REQUIRED_FIELD_LABELS[key]);
+  const missing = Object.entries(requiredValues)
+    .filter(([, value]) => !value)
+    .map(([key]) => REQUIRED_FIELD_LABELS[key])
+    .filter(Boolean);
 
-    if (missing.length > 0) {
-      setFormError(`Please fill in the required fields: ${missing.join(", ")}.`);
+  if (missing.length > 0) {
+    setFormError(
+      `Please fill in the required fields: ${missing.join(", ")}.`
+    );
+    return;
+  }
+
+  setFormError("");
+
+  if (
+    navState?.isEdit &&
+    (isContractDetailsLoading || isContractDetailsFetching || !contractDetails)
+  ) {
+    setFormError("Contract details are still loading. Please try again.");
+    return;
+  }
+
+  try {
+    const currentUserId = Number(
+      localStorage.getItem("userId") || 0
+    );
+
+    const quantity = Number(qty) || 0;
+    const tolerance = Number(poTolerance) || 0;
+    const rate = Number(contractRate) || 0;
+
+    const immediateAdvance =
+      Number(immediateAdvancePercent) || 0;
+
+    const balanceAdvance = Math.max(
+      0,
+      100 - immediateAdvance
+    );
+
+    const now = toApiDate(contractDate);
+
+    if (!now) {
+      setFormError("Invalid contract date.");
       return;
     }
 
-    const currentUserId = Number(localStorage.getItem("userId")) || 0;
+    // The contracts list only contains summary values. In edit mode, retain
+    // the complete record fetched for this contract when building the update.
+    const existingContract = editContract ?? navState?.contract;
 
-    const requestBody = {
-      contractDate: toIsoDateTime(contractDate),
-      contractTypeId: null,
-      businessUnitId: null,
-      effectiveFrom: toIsoDateTime(contractDate),
-      effectiveTo: toIsoDateTime(contractDate),
-      currencyId: null,
-      statusId: null,
-      versionNo: null,
-      parentContractId: null,
-      referenceNo: "",
-      remarks: "",
-      approvalRequired: true,
-      isActive: true,
-      sellerId: Number(sellerId) || 0,
-      buyerId: Number(buyerId) || 0,
-      productId: Number(productId) || 0,
-      basicDetails: {
-        quantity: Number(qty) || 0,
-        quantityMeasure,
-        minQuantity: 10,
-        maxQuantity: 100,
-        poTolerancePercentage: 100,
-        deliveryType,
-        contractRate: Number(contractRate) || 0,
-        gstPercentage: Number(gstPercent) || 0,
-        gstDetails,
-        baseRate,
-        gstAmount,
-        netRate,
-        indicativeFreight: Number(indicativeFreight) || 0,
-        rateRemarks,
-      },
-      sellerConditions: {
-        commission: Number(sellerConditions.commission) || 0,
-        deliverySchedule: sellerConditions.deliverySchedule,
-        sellerSpecificDays:
-          sellerConditions.deliverySchedule === "specific-days"
-            ? sellerConditions.specificDays
-            : "",
-        sellerFromDate:
-          sellerConditions.deliverySchedule === "forward-contract"
-            ? toIsoDateTime(sellerConditions.fromDate)
-            : null,
-        sellerToDate:
-          sellerConditions.deliverySchedule === "forward-contract"
-            ? toIsoDateTime(sellerConditions.toDate)
-            : null,
-        qualitySpecifications: [],
-        customQualitySpecifications: "",
-        loadingAddressAt: sellerConditions.address,
-        remarksSpecialConditions: sellerConditions.remarks,
-      },
-      buyerConditions: {
-        commission: Number(buyerConditions.commission) || 0,
-        deliverySchedule: buyerConditions.deliverySchedule,
-        buyerFromDate:
-          buyerConditions.deliverySchedule === "forward-contract"
-            ? toIsoDateTime(buyerConditions.fromDate)
-            : null,
-        buyerToDate:
-          buyerConditions.deliverySchedule === "forward-contract"
-            ? toIsoDateTime(buyerConditions.toDate)
-            : null,
-        buyerSpecificDays:
-          buyerConditions.deliverySchedule === "specific-days"
-            ? buyerConditions.specificDays
-            : null,
-        qualitySpecifications: [],
-        customQualitySpecifications: "",
-        loadingAddressAt: buyerConditions.address,
-        remarksSpecialConditions: buyerConditions.remarks,
-      },
-      paymentsInvoices: {
-        paymentBeforeDate: paymentBeforeDate ? toIsoDateTime(paymentBeforeDate) : null,
-        sellerPaymentDueDays: Number(sellerPaymentDueDays) || 0,
-        buyerPaymentDueDays: Number(buyerPaymentDueDays) || 0,
-        immediateAdvancePercentage: Number(immediateAdvancePercent) || 0,
-        immediateAdvanceDate: immediateAdvanceDate ? toIsoDateTime(immediateAdvanceDate) : null,
-        balanceAdvancePercentage: Number(balanceAdvancePercent) || 0,
-        balanceAdvanceDate: balanceAdvanceDate ? toIsoDateTime(balanceAdvanceDate) : null,
-        remarks: paymentRemarks,
-      },
-      actionPerformedBy: currentUserId,
-    };
+    const currentContractNumber =
+      existingContract?.contractNumber ||
+      existingContract?.id ||
+      contractNumber ||
+      "";
 
-    try {
-      if (navState?.isEdit && navState.contract) {
-        const payload = {
-          contractId: navState.contract.contractId,
-          updateContract: requestBody,
-        };
-        await updateContract(payload).unwrap();
-      } else {
-        const payload = requestBody;
-        await saveContract(payload).unwrap();
+    /*
+     * ==========================================
+     * UPDATE
+     * ==========================================
+     */
+
+    if (navState?.isEdit) {
+      if (!currentContractNumber) {
+        setFormError(
+          "Contract number is missing. Cannot update this contract."
+        );
+        return;
       }
 
-      setFormError("");
-      const nextMessage = navState?.isEdit
-        ? "Contract updated successfully"
-        : "contract created successfully";
-      localStorage.setItem("successMessage", nextMessage);
-      navigate("/contracts");
-    } catch (error) {
-      setFormError("Unable to save contract. Please try again.");
-    }
-  };
+      if (!existingContract?.contractId) {
+        setFormError("Contract ID is missing. Cannot update this contract.");
+        return;
+      }
 
- useEffect(() => {
-  const loadContractDetails = async () => {
-    if (!navState?.isEdit || !navState.contract?.contractId) {
-      return;
-    }
+      const updateContractData = {
+        contractNumber: currentContractNumber,
 
-    try {
-      const contract = await getContractByContractId(
-        Number(navState.contract.contractId)
-      ).unwrap();
+        sellerId: Number(sellerId),
+        buyerId: Number(buyerId),
 
-      // console.log("FULL CONTRACT DETAILS:", contract);
-
-      setContractDate(toIsoDate(contract.contractDate));
-
-      setSellerId(
-        contract.sellerId != null
-          ? String(contract.sellerId)
-          : ""
-      );
-
-      setBuyerId(
-        contract.buyerId != null
-          ? String(contract.buyerId)
-          : ""
-      );
-
-      setProductId(
-        contract.productId != null
-          ? String(contract.productId)
-          : ""
-      );
-
-      // =========================
-      // BASIC DETAILS
-      // =========================
-
-      setQuantityMeasure(
-        resolveOptionValue(
-          quantityMeasureOptions,
-          contract.basicDetails?.quantityMeasure ?? ""
-        ) || "mt"
-      );
-
-      setQty(
-        contract.basicDetails?.quantity != null
-          ? String(contract.basicDetails.quantity)
-          : ""
-      );
-
-      setPoTolerance(
-        contract.basicDetails?.poTolerancePercentage != null
-          ? String(contract.basicDetails.poTolerancePercentage)
-          : ""
-      );
-
-      setDeliveryType(
-        resolveOptionValue(
-          deliveryTypeOptions,
-          contract.basicDetails?.deliveryType ?? ""
-        )
-      );
-
-      setContractRate(
-        contract.basicDetails?.contractRate != null
-          ? String(contract.basicDetails.contractRate)
-          : ""
-      );
-
-      setGstPercent(
-        contract.basicDetails?.gstPercentage != null
-          ? String(contract.basicDetails.gstPercentage)
-          : "5"
-      );
-
-      setGstDetails(
-        resolveOptionValue(
-          gstDetailsOptions,
-          contract.basicDetails?.gstDetails ?? ""
-        )
-      );
-
-      setIndicativeFreight(
-        contract.basicDetails?.indicativeFreight != null
-          ? String(contract.basicDetails.indicativeFreight)
-          : ""
-      );
-
-      setRateRemarks(
-        contract.basicDetails?.rateRemarks ?? ""
-      );
-
-      // =========================
-      // SELLER CONDITIONS
-      // =========================
-
-      const seller = contract.sellerConditions;
-
-      setSellerConditions({
-        commission:
-          seller?.commission != null
-            ? String(seller.commission)
-            : "",
-
-        deliverySchedule: resolveOptionValue(
-          deliveryScheduleOptions,
-          seller?.deliverySchedule ?? ""
+        contractDate: now,
+        effectiveFrom: now,
+        effectiveTo: now,
+        totalQuantityMT: quantity,
+        productId: Number(productId),
+        tolerancePercentage: tolerance,
+        minQuantityMT: existingContract?.minQuantityMT ?? quantity,
+        maxQuantityMT: existingContract?.maxQuantityMT ?? quantity,
+        dispatchedQuantityMT: existingContract?.dispatchedQuantityMT ?? 0,
+        pendingQuantityMT: Math.max(0, quantity - (existingContract?.dispatchedQuantityMT ?? 0)),
+        pricePerKg: rate,
+        currencyId: existingContract?.currencyId ?? 1,
+        contractStatusId: existingContract?.contractStatusId ?? (status ? 2 : 1),
+        sellerCommission: Number(sellerConditions.commission) || 0,
+        sellerDeliverySchedule: sellerConditions.deliverySchedule || "ready-loading",
+        sellerSpecificDays: Number(sellerConditions.specificDays) || 0,
+        sellerFromDate: sellerConditions.fromDate ? toApiDate(sellerConditions.fromDate) : now,
+        sellerToDate: sellerConditions.toDate ? toApiDate(sellerConditions.toDate) : now,
+        loadingAddressId: Number(sellerConditions.address) || 0,
+        sellerRemarksSpecialConditions: sellerConditions.remarks || "",
+        sellerQualitySpecifications: toUpdateQualitySpecifications(
+          existingContract?.sellerQualitySpecifications,
         ),
-
-        fromDate: toIsoDate(
-          seller?.sellerFromDate ?? ""
+        buyerCommission: Number(buyerConditions.commission) || 0,
+        buyerDeliverySchedule: buyerConditions.deliverySchedule || "ready-loading",
+        buyerSpecificDays: Number(buyerConditions.specificDays) || 0,
+        buyerFromDate: buyerConditions.fromDate ? toApiDate(buyerConditions.fromDate) : now,
+        buyerToDate: buyerConditions.toDate ? toApiDate(buyerConditions.toDate) : now,
+        deliveryAddressId: Number(buyerConditions.address) || 0,
+        buyerRemarksSpecialConditions: buyerConditions.remarks || "",
+        buyerQualitySpecifications: toUpdateQualitySpecifications(
+          existingContract?.buyerQualitySpecifications,
         ),
+        remarks: paymentRemarks || existingContract?.paymentRemarks || "",
+        approvalRequired: existingContract?.approvalRequired ?? true,
+        createdBy: existingContract?.createdById ?? currentUserId,
+        paymentTerms: {
+          paymentTermName: paymentTermsOptions.find((option) => option.value === paymentTerms)?.label || paymentTerms,
+          paymentBeforeDate: paymentBeforeDate ? toApiDate(paymentBeforeDate) : now,
+          sellerPaymentDueDays: Number(sellerPaymentDueDays) || 0,
+          buyerPaymentDueDays: Number(buyerPaymentDueDays) || 0,
+          immediateAdvancePercentage: immediateAdvance,
+          immediateAdvanceDate: immediateAdvanceDate ? toApiDate(immediateAdvanceDate) : now,
+          balanceAdvancePercentage: balanceAdvance,
+          balanceAdvanceDate: balanceAdvanceDate ? toApiDate(balanceAdvanceDate) : now,
+          remarks: paymentRemarks || "",
+        },
+      };
 
-        toDate: toIsoDate(
-          seller?.sellerToDate ?? ""
-        ),
+      const updatePayload = {
+        contractNumber: currentContractNumber,
+        updateContract: updateContractData,
+      };
 
-        specificDays:
-          seller?.specificDays ?? "",
-
-        qualitySpecSource: resolveOptionValue(
-          qualitySpecSourceOptions,
-          seller?.qualitySpecificationSource ?? ""
-        ),
-
-        address: resolveOptionValue(
-          addressOptions,
-          seller?.loadingAddressAt ?? ""
-        ),
-
-        remarks:
-          seller?.remarksSpecialConditions ?? "",
-      });
-
-      // =========================
-      // BUYER CONDITIONS
-      // =========================
-
-      const buyer = contract.buyerConditions;
-
-      setBuyerConditions({
-        commission:
-          buyer?.commission != null
-            ? String(buyer.commission)
-            : "",
-
-        deliverySchedule: resolveOptionValue(
-          deliveryScheduleOptions,
-          buyer?.deliverySchedule ?? ""
-        ),
-
-        fromDate: toIsoDate(
-          buyer?.buyerFromDate ?? ""
-        ),
-
-        toDate: toIsoDate(
-          buyer?.buyerToDate ?? ""
-        ),
-
-        specificDays:
-          buyer?.specificDays ?? "",
-
-        qualitySpecSource: resolveOptionValue(
-          qualitySpecSourceOptions,
-          buyer?.qualitySpecificationSource ?? ""
-        ),
-
-        address: resolveOptionValue(
-          addressOptions,
-          buyer?.loadingAddressAt ?? ""
-        ),
-
-        remarks:
-          buyer?.remarksSpecialConditions ?? "",
-      });
-
-      // =========================
-      // PAYMENTS
-      // =========================
-
-      const payments = contract.paymentsInvoices;
-
-      setPaymentTerms(
-        resolveOptionValue(
-          paymentTermsOptions,
-          payments?.paymentTerms ?? ""
-        )
+      console.log(
+        "UPDATE CONTRACT PAYLOAD:",
+        JSON.stringify(updatePayload, null, 2)
       );
 
-      setPaymentBeforeDate(
-        toIsoDate(
-          payments?.paymentBeforeDate ?? ""
-        )
-      );
+      await updateContract(updatePayload).unwrap();
 
-      setImmediateAdvancePercent(
-        payments?.immediateAdvancePercentage != null
-          ? String(payments.immediateAdvancePercentage)
-          : ""
-      );
-
-      setImmediateAdvanceDate(
-        toIsoDate(
-          payments?.immediateAdvanceDate ?? ""
-        )
-      );
-
-      setBalanceAdvanceDate(
-        toIsoDate(
-          payments?.balanceAdvanceDate ?? ""
-        )
-      );
-
-      setSellerPaymentDueDays(
-        payments?.sellerPaymentDueDays != null
-          ? String(payments.sellerPaymentDueDays)
-          : ""
-      );
-
-      setBuyerPaymentDueDays(
-        payments?.buyerPaymentDueDays != null
-          ? String(payments.buyerPaymentDueDays)
-          : ""
-      );
-
-      setPaymentRemarks(
-        payments?.remarks ?? ""
-      );
-
-      // =========================
-      // SETTINGS
-      // =========================
-
-      setStatus(
-        Boolean(
-          contract.contractSettings?.approvalStatus
-        )
-      );
-
-      setFormError("");
-    } catch (error) {
-      console.error(
-        "Failed to load contract details:",
-        error
-      );
-
-      setFormError(
-        "Unable to load contract details. Please try again."
+      localStorage.setItem(
+        "successMessage",
+        "Contract updated successfully."
       );
     }
-  };
 
-  loadContractDetails();
+    /*
+     * ==========================================
+     * CREATE
+     * ==========================================
+     */
+
+    else {
+      const createPayload = {
+        contractNumber: "",
+
+        sellerId: Number(sellerId),
+        buyerId: Number(buyerId),
+
+        contractDate: now,
+        effectiveFrom: now,
+        effectiveTo: now,
+
+        totalQuantityMT: quantity,
+
+        productId: Number(productId),
+
+        tolerancePercentage: tolerance,
+
+        minQuantityMT: quantity,
+        maxQuantityMT: quantity,
+
+        dispatchedQuantityMT: 0,
+        pendingQuantityMT: quantity,
+
+        pricePerKg: rate,
+
+        currencyId: 1,
+
+        contractStatusId: status ? 2 : 1,
+
+        sellerCommission:
+          Number(sellerConditions.commission) || 0,
+
+        sellerDeliverySchedule:
+          sellerConditions.deliverySchedule,
+
+        sellerSpecificDays:
+          Number(sellerConditions.specificDays) || 0,
+
+        sellerFromDate:
+          sellerConditions.fromDate
+            ? toApiDate(sellerConditions.fromDate)
+            : now,
+
+        sellerToDate:
+          sellerConditions.toDate
+            ? toApiDate(sellerConditions.toDate)
+            : now,
+
+        loadingAddressId:
+          Number(sellerConditions.address) || 0,
+
+        sellerRemarksSpecialConditions:
+          sellerConditions.remarks || "",
+
+        // sellerQualitySpecifications: [
+        //   {
+        //     profileId: Number(sellerId),
+        //     parameterId: 1,
+        //     minValue: 0,
+        //     maxValue: 0,
+        //     unit: "",
+        //   },
+        // ],
+        sellerQualitySpecifications: [],
+
+        buyerCommission:
+          Number(buyerConditions.commission) || 0,
+
+        buyerDeliverySchedule:
+          buyerConditions.deliverySchedule,
+
+        buyerSpecificDays:
+          Number(buyerConditions.specificDays) || 0,
+
+        buyerFromDate:
+          buyerConditions.fromDate
+            ? toApiDate(buyerConditions.fromDate)
+            : now,
+
+        buyerToDate:
+          buyerConditions.toDate
+            ? toApiDate(buyerConditions.toDate)
+            : now,
+
+        deliveryAddressId:
+          Number(buyerConditions.address) || 0,
+
+        buyerRemarksSpecialConditions:
+          buyerConditions.remarks || "",
+
+        // buyerQualitySpecifications: [
+        //   {
+        //     profileId: Number(buyerId),
+        //     parameterId: 1,
+        //     minValue: 0,
+        //     maxValue: 0,
+        //     unit: "",
+        //   },
+        // ],
+        buyerQualitySpecifications: [],
+
+        remarks: paymentRemarks || "",
+
+        approvalRequired: true,
+
+        createdBy: currentUserId,
+
+        paymentTerms: {
+          paymentTermName:
+            paymentTermsOptions.find(
+              (option) =>
+                option.value === paymentTerms
+            )?.label || paymentTerms,
+
+          paymentBeforeDate:
+            paymentBeforeDate
+              ? toApiDate(paymentBeforeDate)
+              : now,
+
+          sellerPaymentDueDays:
+            Number(sellerPaymentDueDays) || 0,
+
+          buyerPaymentDueDays:
+            Number(buyerPaymentDueDays) || 0,
+
+          immediateAdvancePercentage:
+            immediateAdvance,
+
+          immediateAdvanceDate:
+            immediateAdvanceDate
+              ? toApiDate(immediateAdvanceDate)
+              : now,
+
+          balanceAdvancePercentage:
+            balanceAdvance,
+
+          balanceAdvanceDate:
+            balanceAdvanceDate
+              ? toApiDate(balanceAdvanceDate)
+              : now,
+
+          remarks: paymentRemarks || "",
+        },
+      };
+
+      console.log(
+        "CREATE CONTRACT PAYLOAD:",
+        JSON.stringify(createPayload, null, 2)
+      );
+
+      await saveContract(createPayload).unwrap();
+
+      localStorage.setItem(
+        "successMessage",
+        "Contract created successfully."
+      );
+    }
+
+    window.location.href = "/contracts";
+
+  } catch (error) {
+    console.error(
+      navState?.isEdit
+        ? "Update contract failed:"
+        : "Save contract failed:",
+      error
+    );
+
+    const err = error as {
+      status?: number;
+      data?: unknown;
+    };
+
+    console.error("API Status:", err.status);
+    console.error("API Response:", err.data);
+
+    setFormError(
+      navState?.isEdit
+        ? "Failed to update contract. Please check the API response."
+        : "Failed to create contract. Please check the API response."
+    );
+  }
+};
+  useEffect(() => {
+  if (!editContract) {
+    return;
+  }
+
+  const contract = editContract;
+
+  console.log("EDIT CONTRACT DATA:", contract);
+   setContractNumber(
+    contract.contractNumber || contract.id || ""
+  );
+
+  // --------------------------------------------------
+  // Basic details
+  // --------------------------------------------------
+
+  setContractDate(
+    toInputDate(contract.date) || toIsoDate(contract.dateValue)
+  );
+
+  // IMPORTANT:
+  // Use actual API IDs if they exist.
+  // Do NOT find the ID from the display name.
+  setSellerId(
+    contract.sellerId !== undefined
+      ? String(contract.sellerId)
+      : resolveOptionValue(
+          businessProfileOptions,
+          contract.seller
+        )
+  );
+
+  setBuyerId(
+    contract.buyerId !== undefined
+      ? String(contract.buyerId)
+      : resolveOptionValue(
+          businessProfileOptions,
+          contract.buyer
+        )
+  );
+
+  setProductId(
+    contract.productId !== undefined
+      ? String(contract.productId)
+      : resolveOptionValue(
+          productOptions,
+          contract.product
+        )
+  );
+
+  setQuantityMeasure(
+    resolveOptionValue(
+      quantityMeasureOptions,
+      contract.quantityMeasure
+    ) || "mt"
+  );
+
+  setQty(
+    contract.qtyValue !== undefined
+      ? String(contract.qtyValue)
+      : contract.qty?.split(" ")[0] || ""
+  );
+
+  setPoTolerance(
+    contract.poTolerance !== undefined
+      ? String(contract.poTolerance).replace("%", "")
+      : ""
+  );
+
+  setDeliveryType(
+    resolveOptionValue(
+      deliveryTypeOptions,
+      contract.deliveryType
+    )
+  );
+
+  setContractRate(
+    contract.cRateValue !== undefined
+      ? String(contract.cRateValue)
+      : ""
+  );
+
+  setGstPercent(
+    contract.gst
+      ? String(contract.gst).replace("%", "")
+      : "5"
+  );
+
+  setGstDetails(contract.gstDetails || "");
+
+  setIndicativeFreight(
+    contract.indicativeFreight !== undefined
+      ? String(contract.indicativeFreight)
+      : ""
+  );
+
+  setRateRemarks(
+    contract.rateRemarks || ""
+  );
+
+  // --------------------------------------------------
+  // Seller conditions
+  // --------------------------------------------------
+
+  setSellerConditions({
+    commission:
+      contract.sellerCommission !== undefined
+        ? String(contract.sellerCommission)
+        : contract.sellerConditions?.commission || "",
+
+    deliverySchedule:
+      resolveOptionValue(
+        deliveryScheduleOptions,
+        contract.sellerDeliverySchedule ||
+          contract.sellerConditions?.deliverySchedule
+      ),
+
+    fromDate: toInputDate(
+      contract.sellerFromDate ||
+        contract.sellerConditions?.fromDate
+    ),
+
+    toDate: toInputDate(
+      contract.sellerToDate ||
+        contract.sellerConditions?.toDate
+    ),
+
+    specificDays:
+      contract.sellerSpecificDays !== undefined
+        ? String(contract.sellerSpecificDays)
+        : contract.sellerConditions?.specificDays || "",
+
+    qualitySpecSource:
+      resolveOptionValue(
+        qualitySpecSourceOptions,
+        contract.sellerConditions?.qualitySpecSource
+      ),
+
+    address:
+      contract.loadingAddressId !== undefined
+        ? String(contract.loadingAddressId)
+        : contract.sellerConditions?.address || "",
+
+    remarks:
+      contract.sellerRemarksSpecialConditions ||
+      contract.sellerConditions?.remarks ||
+      "",
+  });
+
+  // --------------------------------------------------
+  // Buyer conditions
+  // --------------------------------------------------
+
+  setBuyerConditions({
+    commission:
+      contract.buyerCommission !== undefined
+        ? String(contract.buyerCommission)
+        : contract.buyerConditions?.commission || "",
+
+    deliverySchedule:
+      resolveOptionValue(
+        deliveryScheduleOptions,
+        contract.buyerDeliverySchedule ||
+          contract.buyerConditions?.deliverySchedule
+      ),
+
+    fromDate: toInputDate(
+      contract.buyerFromDate ||
+        contract.buyerConditions?.fromDate
+    ),
+
+    toDate: toInputDate(
+      contract.buyerToDate ||
+        contract.buyerConditions?.toDate
+    ),
+
+    specificDays:
+      contract.buyerSpecificDays !== undefined
+        ? String(contract.buyerSpecificDays)
+        : contract.buyerConditions?.specificDays || "",
+
+    qualitySpecSource:
+      resolveOptionValue(
+        qualitySpecSourceOptions,
+        contract.buyerConditions?.qualitySpecSource
+      ),
+
+    address:
+      contract.deliveryAddressId !== undefined
+        ? String(contract.deliveryAddressId)
+        : contract.buyerConditions?.address || "",
+
+    remarks:
+      contract.buyerRemarksSpecialConditions ||
+      contract.buyerConditions?.remarks ||
+      "",
+  });
+
+  // --------------------------------------------------
+  // Payment details
+  // --------------------------------------------------
+
+  setPaymentTerms(
+    resolveOptionValue(
+      paymentTermsOptions,
+      contract.paymentTerms ||
+        contract.paymentTermName
+    )
+  );
+
+  setPaymentBeforeDate(
+    toInputDate(contract.paymentBeforeDate)
+  );
+
+  setImmediateAdvancePercent(
+    contract.immediateAdvancePercent || ""
+  );
+
+  setImmediateAdvanceDate(
+    toInputDate(contract.immediateAdvanceDate)
+  );
+
+  setBalanceAdvanceDate(
+    toInputDate(contract.balanceAdvanceDate)
+  );
+
+  setSellerPaymentDueDays(
+    contract.sellerPaymentDueDays || ""
+  );
+
+  setBuyerPaymentDueDays(
+    contract.buyerPaymentDueDays || ""
+  );
+
+  setPaymentRemarks(
+    contract.paymentRemarks || ""
+  );
+
+  // --------------------------------------------------
+  // Status
+  // --------------------------------------------------
+
+  setStatus(
+    contract.contractStatusId === 2 ||
+    contract.status === "Pending"
+  );
+
 }, [
-  navState?.isEdit,
-  navState?.contract?.contractId,
-  getContractByContractId,
+  editContract,
+  businessProfileOptions,
+  productOptions,
 ]);
-
 
   return (
     <div className="new-contract">
@@ -1039,7 +1511,7 @@ const { data: products } = useGetProductsQuery();
                   Loading Address At <span className="form-field__required">*</span>
                 </span>
                 <SearchableSelect
-                  options={addressOptions}
+                  options={sellerAddressOptions}
                   value={sellerConditions.address}
                   onChange={(value) => handleSellerConditionChange({ address: value })}
                   allowCustom
@@ -1165,7 +1637,7 @@ const { data: products } = useGetProductsQuery();
                   Delivery Address At <span className="form-field__required">*</span>
                 </span>
                 <SearchableSelect
-                  options={addressOptions}
+                  options={buyerAddressOptions}
                   value={buyerConditions.address}
                   onChange={(value) => handleBuyerConditionChange({ address: value })}
                   allowCustom
@@ -1370,8 +1842,17 @@ const { data: products } = useGetProductsQuery();
         <Link to="/contracts" className="new-contract__cancel">
           Cancel
         </Link>
-        <button type="button" className="new-contract__submit" onClick={handleSubmit}>
-          {navState?.isEdit ? "Update Contract" : "Create Contract"}
+        <button
+          type="button"
+          className="new-contract__submit"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? "Saving..."
+            : navState?.isEdit
+              ? "Update Contract"
+              : "Create Contract"}
         </button>
       </div>
     </div>

@@ -53,219 +53,6 @@ export interface GetAllContractsResponse {
   contracts: GetAllContractsRow[];
 }
 
-/* =========================
-   CONTRACT STATUS CHANGE
-========================= */
-
-export interface ContractStatusOption {
-  id: number;
-  name: string;
-  displayName: string;
-  isActive: boolean;
-  sortOrder: number;
-}
-
-export interface GetContractBasicDetails {
-  quantity: number | null;
-  quantityMeasure: string | null;
-  minQuantity: number | null;
-  maxQuantity: number | null;
-  poTolerance: string | null;
-  poTolerancePercentage: number | null;
-  deliveryType: string | null;
-  contractRate: number | null;
-  gstPercentage: number | null;
-  gstDetails: string | null;
-  baseRate: number | null;
-  gstAmount: number | null;
-  netRate: number | null;
-  indicativeFreight: number | null;
-  rateRemarks: string | null;
-  calculatedStatus: string | null;
-  reviewRemarks: string | null;
-}
-
-export interface QualitySpecificationDetail {
-  parameter: string | null;
-  minValue: number | null;
-  maxValue: number | null;
-  unit: string | null;
-}
-
-export interface GetSellerConditionsDetail {
-  commission: number | null;
-  deliverySchedule: string | null;
-  specificDays: string | null;
-  sellerFromDate: string | null;
-  sellerToDate: string | null;
-  qualitySpecificationSource: string | null;
-  qualitySpecifications: QualitySpecificationDetail[] | null;
-  customQualitySpecifications: string | null;
-  loadingAddressAt: string | null;
-  remarksSpecialConditions: string | null;
-}
-
-export interface GetBuyerConditionsDetail {
-  commission: number | null;
-  deliverySchedule: string | null;
-  specificDays: string | null;
-  buyerFromDate: string | null;
-  buyerToDate: string | null;
-  qualitySpecificationSource: string | null;
-  qualitySpecifications: QualitySpecificationDetail[] | null;
-  customQualitySpecifications: string | null;
-  loadingAddressAt: string | null;
-  remarksSpecialConditions: string | null;
-}
-
-export interface GetPaymentsInvoicesDetail {
-  paymentTerms: string | null;
-  paymentBeforeDate: string | null;
-  sellerPaymentDueDays: number | null;
-  buyerPaymentDueDays: number | null;
-  immediateAdvancePercentage: number | null;
-  immediateAdvanceAmount: number | null;
-  immediateAdvanceDate: string | null;
-  balanceAdvancePercentage: number | null;
-  balanceAdvanceAmount: number | null;
-  balanceAdvanceDate: string | null;
-  remarks: string | null;
-}
-
-export interface GetContractSettingsDetail {
-  showContractStatus: boolean | null;
-  approvalStatus: boolean | null;
-  sendNotificationsToBuyer: boolean | null;
-  sendNotificationsToSeller: boolean | null;
-  sendNotificationsToTransporter: boolean | null;
-  editContractUserPermissions: boolean | null;
-}
-
-export interface GetContractDto {
-  id: number;
-  contractNumber: string | null;
-  contractDate: string;
-  sellerId: number | null;
-  sellerName: string | null;
-  buyerId: number | null;
-  buyerName: string | null;
-  productId: number | null;
-  productName: string | null;
-  statusId: number | null;
-  basicDetails: GetContractBasicDetails;
-  sellerConditions: GetSellerConditionsDetail;
-  buyerConditions: GetBuyerConditionsDetail;
-  paymentsInvoices: GetPaymentsInvoicesDetail;
-  contractSettings: GetContractSettingsDetail;
-  createdOn: string;
-  modifiedOn: string | null;
-}
-
-export interface UpdateContractStatusRequest {
-  contractId: number;
-  calculatedStatus: string;
-  reviewRemarks?: string | null;
-  actionPerformedBy: number;
-}
-
-/* =========================
-   SAVE / UPDATE CONTRACT
-========================= */
-
-export interface BasicDetailsPayload {
-  quantity: number;
-  quantityMeasure: string;
-  minQuantity: number;
-  maxQuantity: number;
-  poTolerancePercentage: number;
-  deliveryType: string;
-  contractRate: number;
-  gstPercentage: number;
-  gstDetails: string;
-  baseRate: number;
-  gstAmount: number;
-  netRate: number;
-  indicativeFreight: number;
-  rateRemarks: string;
-}
-
-export interface QualitySpecificationPayload {
-  parameter: string;
-  minValue: number;
-  maxValue: number;
-  unit: string;
-}
-
-export interface ConditionPayload {
-  commission: number;
-  deliverySchedule: string;
-  sellerSpecificDays: string | null;
-  sellerFromDate: string | null;
-  sellerToDate: string | null;
-  qualitySpecifications: QualitySpecificationPayload[];
-  customQualitySpecifications: string;
-  loadingAddressAt: string;
-  remarksSpecialConditions: string;
-}
-
-export interface BuyerConditionPayload {
-  commission: number;
-  deliverySchedule: string;
-  buyerFromDate: string | null;
-  buyerToDate: string | null;
-  buyerSpecificDays: string | null;
-  qualitySpecifications: QualitySpecificationPayload[];
-  customQualitySpecifications: string;
-  loadingAddressAt: string;
-  remarksSpecialConditions: string;
-}
-
-export interface PaymentsInvoicesPayload {
-  paymentBeforeDate: string | null;
-  sellerPaymentDueDays: number;
-  buyerPaymentDueDays: number;
-  immediateAdvancePercentage: number;
-  immediateAdvanceDate: string | null;
-  balanceAdvancePercentage: number;
-  balanceAdvanceDate: string | null;
-  remarks: string;
-}
-
-export interface UpdateContractPayload {
-  contractDate: string;
-  contractTypeId: number | null;
-  businessUnitId: number | null;
-  effectiveFrom: string;
-  effectiveTo: string;
-  currencyId: number | null;
-  statusId: number | null;
-  versionNo: number | null;
-  parentContractId: number | null;
-  referenceNo: string;
-  remarks: string;
-  approvalRequired: boolean;
-  isActive: boolean;
-  sellerId: number;
-  buyerId: number;
-  productId: number;
-  basicDetails: BasicDetailsPayload;
-  sellerConditions: ConditionPayload;
-  buyerConditions: BuyerConditionPayload;
-  paymentsInvoices: PaymentsInvoicesPayload;
-  actionPerformedBy: number;
-}
-
-export interface UpdateContractRequest {
-  contractId: number;
-  updateContract: UpdateContractPayload;
-}
-
-export type SaveContractRequest = UpdateContractPayload;
-
-/* =========================
-   PENDING CONTRACTS / FILTERS
-========================= */
-
 export interface PendingContractApiResponse {
   contractId: number;
   contractNumber: string;
@@ -280,20 +67,154 @@ export interface PendingContractApiResponse {
   createdAt: string;
   updatedBy: string | null;
   updatedAt: string | null;
-
   basicDetails: {
     contractRate: number;
     quantity: number;
     quantityMeasure: string;
     minQuantity: number;
     maxQuantity: number;
-    deliverySchedule: string;
-    deliveryType: string;
+    deliverySchedule: string | null;
+    deliveryType: string | null;
     deliveryFromDate: string | null;
     deliveryToDate: string | null;
     calculatedStatus: string;
   };
 }
+/*save contract request interface*/
+export interface SaveContractRequest {
+  contractNumber: string;
+  sellerId: number;
+  buyerId: number;
+  contractDate: string;
+  effectiveFrom: string;
+  effectiveTo: string;
+  totalQuantityMT: number;
+  productId: number;
+  tolerancePercentage: number;
+  minQuantityMT: number;
+  maxQuantityMT: number;
+  dispatchedQuantityMT: number;
+  pendingQuantityMT: number;
+  pricePerKg: number;
+  currencyId: number;
+  contractStatusId: number;
+
+  sellerCommission: number;
+  sellerDeliverySchedule: string;
+  sellerSpecificDays: number;
+  sellerFromDate: string;
+  sellerToDate: string;
+  loadingAddressId: number;
+  sellerRemarksSpecialConditions: string;
+
+  sellerQualitySpecifications: {
+    profileId: number;
+    parameterId: number;
+    minValue: number;
+    maxValue: number;
+    unit: string;
+  }[];
+
+  buyerCommission: number;
+  buyerDeliverySchedule: string;
+  buyerSpecificDays: number;
+  buyerFromDate: string;
+  buyerToDate: string;
+  deliveryAddressId: number;
+  buyerRemarksSpecialConditions: string;
+
+  buyerQualitySpecifications: {
+    profileId: number;
+    parameterId: number;
+    minValue: number;
+    maxValue: number;
+    unit: string;
+  }[];
+
+  remarks: string;
+  approvalRequired: boolean;
+  createdBy: number;
+
+  paymentTerms: {
+    paymentTermName: string;
+    paymentBeforeDate: string;
+    sellerPaymentDueDays: number;
+    buyerPaymentDueDays: number;
+    immediateAdvancePercentage: number;
+    immediateAdvanceDate: string;
+    balanceAdvancePercentage: number;
+    balanceAdvanceDate: string;
+    remarks: string;
+  };
+}
+
+/* UpdateContract expects the existing contract number and a flat update DTO. */
+export interface UpdateContractRequest {
+  contractNumber: string;
+  updateContract: {
+    contractNumber: string;
+    sellerId: number;
+    buyerId: number;
+    contractDate: string;
+    effectiveFrom: string;
+    effectiveTo: string;
+    totalQuantityMT: number;
+    productId: number;
+    tolerancePercentage: number;
+    minQuantityMT: number;
+    maxQuantityMT: number;
+    dispatchedQuantityMT: number;
+    pendingQuantityMT: number;
+    pricePerKg: number;
+    currencyId: number;
+    contractStatusId: number;
+    sellerCommission: number;
+    sellerDeliverySchedule: string;
+    sellerSpecificDays: number;
+    sellerFromDate: string;
+    sellerToDate: string;
+    loadingAddressId: number;
+    sellerRemarksSpecialConditions: string;
+    sellerQualitySpecifications: SaveContractRequest["sellerQualitySpecifications"];
+    buyerCommission: number;
+    buyerDeliverySchedule: string;
+    buyerSpecificDays: number;
+    buyerFromDate: string;
+    buyerToDate: string;
+    deliveryAddressId: number;
+    buyerRemarksSpecialConditions: string;
+    buyerQualitySpecifications: SaveContractRequest["buyerQualitySpecifications"];
+    remarks: string;
+    approvalRequired: boolean;
+    createdBy: number;
+    paymentTerms: SaveContractRequest["paymentTerms"];
+  };
+}
+
+
+/* =========================
+   CONTRACT STATUS CHANGE
+========================= */
+
+export interface ContractStatusOption {
+  contractStatusId: number;
+  statusName: string;
+  displayName: string;
+  description: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export interface UpdateContractStatusRequest {
+  contractId: number;
+  calculatedStatus: string;
+  reviewRemarks?: string | null;
+  actionPerformedBy: number;
+}
+
+/* =========================
+   PENDING CONTRACTS / FILTERS
+========================= */
 
 export interface GetAllContractsParams {
   DateFilter?: string;
@@ -327,12 +248,6 @@ export interface TransporterContract {
   paymentType: string;
   createdAt: string;
   updatedAt: string;
-}
-
-// Backend only accepts Status + SearchText for this endpoint (confirmed via Swagger).
-export interface GetAllContractsByFiltersRequest {
-  Status?: string;
-  SearchText?: string;
 }
 
 export interface GetAllContractsForTransporterParams {
@@ -370,6 +285,27 @@ export const contractsApi = createApi({
       providesTags: ["PendingContracts"],
     }),
 
+    saveContract: builder.mutation<unknown, SaveContractRequest>({
+  query: (body) => ({
+    url: "/api/Contracts/SaveContract",
+    method: "POST",
+    body,
+  }),
+  invalidatesTags: ["Contract", "PendingContracts"],
+}),
+
+updateContract: builder.mutation<unknown, UpdateContractRequest>({
+  query: (body) => ({
+    url: "/api/Contracts/UpdateContract",
+    method: "PUT",
+    body,
+    // The endpoint may return 200 with an empty or plain-text response.
+    // Treat either as a successful mutation instead of attempting JSON parsing.
+    responseHandler: "text",
+  }),
+  invalidatesTags: ["Contract", "PendingContracts"],
+}),
+
     /* =========================
        DELETE CONTRACT
     ========================= */
@@ -391,16 +327,8 @@ export const contractsApi = createApi({
 
     getAllContractStatuses: builder.query<ContractStatusOption[], void>({
       query: () => ({
-        url: "/api/Contracts/GetAllContractStatuses",
+        url: "/api/Contracts/GetContractStatuses",
         method: "GET",
-      }),
-    }),
-
-    getContractByContractId: builder.query<GetContractDto, number>({
-      query: (contractId) => ({
-        url: "/api/Contracts/GetContractByContractId",
-        method: "GET",
-        params: { contractId },
       }),
     }),
 
@@ -413,39 +341,20 @@ export const contractsApi = createApi({
       invalidatesTags: ["PendingContracts"],
     }),
 
-    /* =========================
-       SAVE / UPDATE CONTRACT
-    ========================= */
-
-    updateContract: builder.mutation<void, UpdateContractRequest>({
-      query: (body) => ({
-        url: "/api/Contracts/UpdateContract",
-        method: "PUT",
-        body,
-      }),
-      invalidatesTags: ["PendingContracts"],
-    }),
-
-    saveContract: builder.mutation<void, SaveContractRequest>({
-      query: (body) => ({
-        url: "/api/Contracts/SaveContract",
-        method: "POST",
-        body,
-      }),
-      invalidatesTags: ["PendingContracts"],
-    }),
-
-    /* =========================
-       PENDING CONTRACTS / FILTERS
-    ========================= */
-
-    getAllContractsByFilters: builder.query<PendingContractApiResponse[], GetAllContractsByFiltersRequest>({
-      query: (params) => ({
+    getAllContractsByFilters: builder.query<PendingContractApiResponse[], void>({
+      query: () => ({
         url: "/api/Contracts/GetAllContractsByFilters",
         method: "GET",
-        params,
       }),
       providesTags: ["PendingContracts"],
+    }),
+
+    getContractByContractNumber: builder.query<unknown, string>({
+      query: (contractNo) => ({
+        url: "/api/Contracts/GetContractByContractNumber",
+        method: "GET",
+        params: { contractNo },
+      }),
     }),
 
     getAllContractsForExcel: builder.query<Blob, void>({
@@ -460,13 +369,14 @@ export const contractsApi = createApi({
 
 export const {
   useGetAllContractsQuery,
+  useSaveContractMutation,
+  useUpdateContractMutation,
   useDeleteContractMutation,
   useGetAllContractStatusesQuery,
-  useLazyGetContractByContractIdQuery,
   useUpdateContractStatusMutation,
-  useUpdateContractMutation,
-  useSaveContractMutation,
   useGetAllContractsByFiltersQuery,
   useLazyGetAllContractsByFiltersQuery,
+  useGetContractByContractNumberQuery,
+  useLazyGetContractByContractNumberQuery,
   useLazyGetAllContractsForExcelQuery,
 } = contractsApi;

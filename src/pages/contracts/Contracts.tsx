@@ -16,9 +16,9 @@ import SearchableSelect from "../../components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../components/dialog/ConfirmDialog";
 import {
   useDeleteContractMutation,
-  useGetAllContractsQuery,
+  useGetAllContractsByFiltersQuery,
     useGetAllContractStatusesQuery,
-  type GetAllContractsRow,
+  type PendingContractApiResponse,
 
 } from "../../store/contractsApi";
 import { buildContractColumns } from "./contracts.columns";
@@ -39,35 +39,40 @@ function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function mapApiContract(row: GetAllContractsRow): Contract {
-  const qtyMeasure = row.quantityMeasure || "mt";
+function normalizeStatus(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function mapApiContract(row: PendingContractApiResponse): Contract {
+  const qtyMeasure = row.basicDetails.quantityMeasure || "mt";
+  const quantity = row.basicDetails.quantity ?? 0;
+  const contractRate = row.basicDetails.contractRate ?? 0;
   return {
     id: row.contractNumber,
-    contractId: row.id,
+    contractId: row.contractId,
+    contractNumber: row.contractNumber,
     date: row.contractDate ? new Date(row.contractDate).toLocaleDateString("en-IN") : "",
     dateValue: row.contractDate ? new Date(row.contractDate).getTime() : 0,
-    //status: row.status as Contract["status"],
-    status: (row.status ?? "Pending") as Contract["status"],
+    status: row.basicDetails.calculatedStatus as Contract["status"],
     seller: row.sellerName ?? "",
     buyer: row.buyerName ?? "",
     product: row.productName ?? "",
     quantityMeasure: qtyMeasure,
-    qty: `${row.quantity} ${qtyMeasure}`,
-    qtyValue: row.quantity,
+    qty: `${quantity} ${qtyMeasure}`,
+    qtyValue: quantity,
     poTolerance: "",
-    aQty: `${row.arrangedQuantity ?? 0} ${qtyMeasure}`,
-    pQty: `${row.pendingQuantity ?? 0} ${qtyMeasure}`,
-    dQty: `${row.dispatchedQuantity ?? 0} ${qtyMeasure}`,
-    cRate: `₹${row.contractRate}`,
-    cRateValue: row.contractRate,
-    gst: `${row.gstPercentage ?? 0}%`,
-    netRate: `₹${row.netRate ?? 0}`,
-    netRateValue: row.netRate ?? 0,
-    // Not returned by the GetAllContracts summary endpoint — populated when the
-    // full contract is loaded (e.g. via GetContractByContractId on edit).
+    aQty: `0 ${qtyMeasure}`,
+    pQty: `${quantity} ${qtyMeasure}`,
+    dQty: `0 ${qtyMeasure}`,
+    cRate: `₹${contractRate}`,
+    cRateValue: contractRate,
+    gst: "0%",
+    netRate: `₹${contractRate}`,
+    netRateValue: contractRate,
+    // Not returned by the GetAllContracts summary endpoint.
     indicativeFreight: "",
     rateRemarks: "",
-    deliveryType: row.deliveryType ?? "",
+    deliveryType: row.basicDetails.deliveryType ?? "",
     paymentTerms: "",
     paymentBeforeDate: "",
     immediateAdvancePercent: "",
@@ -99,7 +104,7 @@ function mapApiContract(row: GetAllContractsRow): Contract {
       address: "",
       remarks: "",
     },
-    approved: row.approvalStatus,
+    approved: false,
   };
 }
 
@@ -119,10 +124,7 @@ const Contracts = () => {
   const [rows, setRows] = useState<Contract[]>([]);
   //const [successMessage, setSuccessMessage] = useState("");
   const { message: successMessage, showSuccessMessage } = useSuccessToast();
-  const { data, isLoading, isFetching } = useGetAllContractsQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-    refetchOnReconnect: true,
-  });
+  const { data, isLoading, isFetching } = useGetAllContractsByFiltersQuery();
   
   const { data: contractStatuses = [] } = useGetAllContractStatusesQuery();
 
@@ -131,8 +133,8 @@ const Contracts = () => {
     contractStatuses
       .filter((status) => status.isActive)
       .map((status) => ({
-        value: status.name,
-        label: status.displayName || status.name,
+        value: status.statusName,
+        label: status.displayName || status.statusName,
       })),
   [contractStatuses],
 );
@@ -167,15 +169,12 @@ const Contracts = () => {
   // }, [data]);
 
   useEffect(() => {
-  if (!data?.contracts) return;
+  if (!data) return;
 
     setRows(
-      data.contracts
-        .filter((contract) => contract.isActive)
-        .filter((contract) => !statusFilter || contract.status === statusFilter)
-        .map(mapApiContract),
+      data.map(mapApiContract),
     );
-}, [data, statusFilter]);
+}, [data]);
 
   //   useEffect(() => {
   //   const incomingMessage =
@@ -240,9 +239,25 @@ const Contracts = () => {
 
 const filteredRows = useMemo(() => {
   const searchText = keyword.trim().toLowerCase();
+  const selectedStatus = normalizeStatus(statusFilter.trim());
 
   return rows.filter((row) => {
     if (row.status.toLowerCase() === "deleted") return false;
+
+    if (selectedStatus) {
+      const matchedStatus = contractStatuses.find(
+        (status) =>
+          normalizeStatus(status.statusName) === selectedStatus ||
+          normalizeStatus(status.displayName) === selectedStatus,
+      );
+      const rowStatus = normalizeStatus(row.status);
+      const matchesStatus = matchedStatus
+        ? rowStatus === normalizeStatus(matchedStatus.statusName) ||
+          rowStatus === normalizeStatus(matchedStatus.displayName)
+        : rowStatus === selectedStatus;
+
+      if (!matchesStatus) return false;
+    }
     
 
     // Date filters
@@ -327,7 +342,9 @@ const filteredRows = useMemo(() => {
   });
 }, [
   rows,
+  contractStatuses,
   keyword,
+  statusFilter,
   dateRangeFilter,
   customFrom,
   customTo,
@@ -380,7 +397,8 @@ const filteredRows = useMemo(() => {
     link.remove();
     URL.revokeObjectURL(url);
   };
-
+  
+  
   const totalContractsValue = rows.length;
 
   return (
