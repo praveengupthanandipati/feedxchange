@@ -230,6 +230,25 @@ export const userProfilesCommonApi = createApi({
       }),
       invalidatesTags: ["UserProfile"],
     }),
+    // One-time dispatch addresses from the "Add New Address" popup on the truck screens.
+    // Separate from createProfileAddress: these are not added to the profile's address book.
+    createBusinessProfileAddress: builder.mutation<unknown, CreateProfileAddressEntry[]>({
+      query: (body) => ({
+        url: "/api/BusinessProfiles/CreateProfileAddress",
+        method: "POST",
+        body,
+        // The body may be the saved address, its id, or a plain status message — keep whatever comes back.
+        responseHandler: async (response) => {
+          const text = await response.text();
+          try {
+            return JSON.parse(text);
+          } catch {
+            return text;
+          }
+        },
+      }),
+      invalidatesTags: ["UserProfile"],
+    }),
     getProfileAddress: builder.query<ProfileAddressDetail[], string>({
       query: (profileId) => `/api/Profile/GetProfileAddress/${profileId}`,
       transformResponse: unwrapArray<ProfileAddressDetail>,
@@ -309,7 +328,9 @@ export const userProfilesCommonApi = createApi({
 export const {
   useGetProfileTypesQuery,
   useCreateProfileAddressMutation,
+  useCreateBusinessProfileAddressMutation,
   useGetProfileAddressQuery,
+  useLazyGetProfileAddressQuery,
   useUpdateProfileAddressMutation,
   useCreateProfileDocumentMutation,
   useGetProfileDocumentQuery,

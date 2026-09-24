@@ -1,11 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiChevronLeft, FiLogOut, FiX } from "react-icons/fi";
 import logo from "../../assets/img/logo.png";
 import favIcon from "../../assets/img/fav.png";
 import { asideNavSections } from "./aside.data";
 import AsideMenuItem from "./AsideMenuItem";
+import { useSelectedContract } from "../../context/SelectedContractContext";
 import "./aside.scss";
+
+// The Contract Dispatch Management children all act on one specific contract.
+// Once a contract has been picked they carry it along automatically; before that
+// they still open, and each screen asks for a contract itself.
+const CONTRACT_SCOPED_ITEM_ID = "contract-dispatch-management";
 
 const SCROLL_INDICATOR_TIMEOUT = 800;
 
@@ -20,8 +26,28 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [openItemId, setOpenItemId] = useState<string | null>(null);
   const scrollTimer = useRef<number | undefined>(undefined);
+  const { selectedContract } = useSelectedContract();
 
   useEffect(() => () => window.clearTimeout(scrollTimer.current), []);
+
+  const navSections = useMemo(
+    () =>
+      asideNavSections.map((section) => ({
+        ...section,
+        items: section.items.map((item) => {
+          if (item.id !== CONTRACT_SCOPED_ITEM_ID || !selectedContract) return item;
+
+          return {
+            ...item,
+            children: item.children?.map((child) => ({
+              ...child,
+              path: `${child.path}?contract=${encodeURIComponent(selectedContract)}`,
+            })),
+          };
+        }),
+      })),
+    [selectedContract],
+  );
 
   const handleItemToggle = (id: string) => {
     setOpenItemId((prev) => (prev === id ? null : id));
@@ -69,7 +95,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
         className={`aside__nav ${isScrolling ? "is-scrolling" : ""}`}
         onScroll={handleNavScroll}
       >
-        {asideNavSections.map((section) => (
+        {navSections.map((section) => (
           <div key={section.id} className="aside__section">
             {section.title && (
               <p className="aside__section-title">{section.title}</p>

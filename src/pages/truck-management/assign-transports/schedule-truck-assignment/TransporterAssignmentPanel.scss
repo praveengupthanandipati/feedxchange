@@ -173,6 +173,52 @@
     }
   }
 
+  &__responses {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    padding: v.$spacing-3 v.$spacing-4;
+    border-radius: v.$radius-md;
+    border: 1px solid v.$color-border;
+    background-color: v.$color-bg;
+  }
+
+  &__responses-title {
+    @include m.font-heading(v.$font-weight-semibold);
+    margin: 0;
+    font-size: v.$font-size-sm;
+    color: v.$color-primary;
+  }
+
+  &__response-row {
+    @include m.flex(row, flex-start, center, v.$spacing-4);
+    flex-wrap: wrap;
+    padding: v.$spacing-2 0;
+    border-top: 1px solid v.$color-border;
+    font-size: v.$font-size-sm;
+
+    &:first-of-type {
+      border-top: none;
+    }
+  }
+
+  &__response-name {
+    @include m.font-base(v.$font-weight-semibold);
+    min-width: 10rem;
+    color: v.$color-text;
+  }
+
+  &__response-status {
+    @include m.font-base(v.$font-weight-semibold);
+    color: v.$color-primary;
+  }
+
+  &__response-details {
+    @include m.flex(row, flex-start, center, v.$spacing-4);
+    flex-wrap: wrap;
+    color: v.$color-text-muted;
+  }
+
   &__footer {
     @include m.flex(row, flex-end, center);
   }

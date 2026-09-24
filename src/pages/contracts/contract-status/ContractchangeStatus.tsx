@@ -10,7 +10,7 @@ import { useGetBusinessProfileSummaryQuery } from "../../../store/businessProfil
 import {
   useLazyGetAllContractsByFiltersQuery,
   useGetAllContractStatusesQuery,
-  useLazyGetContractByContractIdQuery,
+  useLazyGetContractByContractNumberQuery,
   useUpdateContractStatusMutation,
   type PendingContractApiResponse,
   type GetContractDto,
@@ -239,17 +239,17 @@ const ContractchangeStatus = () => {
         .filter((option) => option.isActive)
         .slice()
         .sort((a, b) => a.sortOrder - b.sortOrder)
-        .map((option) => ({ value: option.name, label: option.displayName })),
+        .map((option) => ({ value: option.statusName, label: option.displayName })),
     [contractStatusOptions],
   );
 
   const [searchContracts, { isFetching: searching }] = useLazyGetAllContractsByFiltersQuery();
   const [searchDrawerContracts, { isFetching: drawerLoading }] = useLazyGetAllContractsByFiltersQuery();
-  const [fetchContract, { isFetching: loadingContract }] = useLazyGetContractByContractIdQuery();
+  const [fetchContract, { isFetching: loadingContract }] = useLazyGetContractByContractNumberQuery();
   const [updateContractStatus, { isLoading: updating }] = useUpdateContractStatusMutation();
 
-  const loadContract = async (contractId: number) => {
-    const contract = await fetchContract(contractId).unwrap();
+  const loadContract = async (contractNumber: string) => {
+    const contract = await fetchContract(contractNumber).unwrap();
     setError("");
     setRecord(contract);
     setDetailsVisible(true);
@@ -276,7 +276,7 @@ const ContractchangeStatus = () => {
         return;
       }
 
-      await loadContract(match.contractId);
+      await loadContract(match.contractNumber);
     } catch {
       setError("Failed to search for the contract.");
       setRecord(null);
@@ -312,7 +312,7 @@ const ContractchangeStatus = () => {
     setDrawerOpen(false);
 
     try {
-      await loadContract(row.contractId);
+      await loadContract(row.contractNumber);
     } catch {
       setError(`No contract details found for number "${row.contractNumber}".`);
       setRecord(null);
@@ -334,11 +334,17 @@ const ContractchangeStatus = () => {
     }
 
     const currentUserId = Number(localStorage.getItem("userId")) || 0;
+    const selectedStatus = contractStatusOptions?.find((option) => option.statusName === status);
+
+    if (!selectedStatus) {
+      setError("Please select a valid status.");
+      return;
+    }
 
     try {
       await updateContractStatus({
-        contractId: record.id,
-        calculatedStatus: status,
+        contractNumber: [record.contractNumber ?? contractNumber],
+        contractStatusId: selectedStatus.contractStatusId,
         reviewRemarks: reviewRemarks.trim() || undefined,
         actionPerformedBy: currentUserId,
       }).unwrap();

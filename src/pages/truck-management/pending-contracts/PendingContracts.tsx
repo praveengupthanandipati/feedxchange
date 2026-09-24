@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import {
-  useGetAllContractsByFiltersQuery,
-  useLazyGetAllContractsForExcelQuery,
+  useGetAllOpenAndPendingContractsQuery,
+  type OpenAndPendingContract,
 } from "../../../store/contractsApi";
 import {
   FiEye,
@@ -13,31 +13,59 @@ import {
   FiX,
   FiChevronLeft,
   FiChevronRight,
-  FiChevronDown,
-  FiChevronUp,
   FiHome,
   FiUser,
   FiTruck,
   FiPlus,
-  FiShare2,
-  FiPhone,
-  FiMapPin,
 } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
 import type { TableColumn } from "../../../components/table/table.types";
 import { buildPendingContractColumns } from "./pendingContracts.columns";
-import {
-  pendingContracts,
-  sellerOptions,
-  buyerOptions,
-  deliveryScheduleOptions,
-  type PendingContractRow,
-  type TruckAssignment,
-} from "./pendingContracts.data";
+import { type PendingContractRow } from "./pendingContracts.data";
+import { useContractTruckDetails } from "../contract-trucks/useContractTruckDetails";
+import TruckList from "../contract-trucks/TruckList";
 import "./PendingContracts.scss";
 
 const PAGE_SIZE = 10;
+const ALL_OPTION = { value: "All", label: "All" };
+
+const formatShortDate = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+};
+
+function mapOpenAndPendingContract(row: OpenAndPendingContract): PendingContractRow {
+  const dispatched = row.dispatchedQuantityMT ?? 0;
+  const pending = row.pendingQuantityMT ?? 0;
+  const total = row.totalQuantityMT ?? 0;
+  const arranged = Math.max(total - dispatched - pending, 0);
+  const dateValue = new Date(row.contractDate).getTime();
+
+  return {
+    id: row.contractNumber,
+    date: formatShortDate(row.contractDate),
+    dateValue: Number.isNaN(dateValue) ? 0 : dateValue,
+    seller: row.seller ?? "-",
+    buyer: row.buyer ?? "-",
+    cRate: `₹${row.pricePerKg.toLocaleString("en-IN")}`,
+    cRateValue: row.pricePerKg,
+    cQty: `${total} MT`,
+    cQtyValue: total,
+    dQty: `${dispatched} MT`,
+    dQtyValue: dispatched,
+    aQty: `${arranged} MT`,
+    aQtyValue: arranged,
+    pQty: `${pending} MT`,
+    pQtyValue: pending,
+    product: row.productName,
+    fromDate: formatShortDate(row.effectiveFrom),
+    toDate: formatShortDate(row.effectiveTo),
+    deliverySchedule: row.deliverySchedule,
+    paymentType: row.paymentTermName,
+  };
+}
 
 interface TruckTrackingDrawerProps {
   open: boolean;
@@ -46,13 +74,7 @@ interface TruckTrackingDrawerProps {
 }
 
 const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) => {
-  const [expandedTrucks, setExpandedTrucks] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (!open || !row) return;
-    const last = row.trucks[row.trucks.length - 1];
-    setExpandedTrucks(last ? new Set([last.truckNumber]) : new Set());
-  }, [open, row]);
+  const { trucks, isLoading: trucksLoading } = useContractTruckDetails(row?.id ?? "", open && Boolean(row));
 
   useEffect(() => {
     if (!open) return;
@@ -62,21 +84,6 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
-
-  const toggleTruck = (truckNumber: string) => {
-    setExpandedTrucks((prev) => {
-      const next = new Set(prev);
-      if (next.has(truckNumber)) next.delete(truckNumber);
-      else next.add(truckNumber);
-      return next;
-    });
-  };
-
-  const handleShare = (truck: TruckAssignment) => {
-    navigator.clipboard
-      .writeText(`${truck.truckNumber} — Final Qty: ${truck.finalQty}`)
-      .catch(() => undefined);
-  };
 
   return createPortal(
     <>
@@ -144,110 +151,7 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
                 </div>
               </div>
 
-              {row.trucks.length === 0 ? (
-                <p className="truck-tracking-drawer__empty">
-                  No trucks arranged yet for this contract.
-                </p>
-              ) : (
-                <div className="truck-tracking-drawer__truck-list">
-                  {row.trucks.map((truck) => {
-                    const expanded = expandedTrucks.has(truck.truckNumber);
-                    return (
-                      <div className="truck-tracking-drawer__truck-card" key={truck.truckNumber}>
-                        <button
-                          type="button"
-                          className="truck-tracking-drawer__truck-header"
-                          onClick={() => toggleTruck(truck.truckNumber)}
-                          aria-expanded={expanded}
-                        >
-                          <span className="truck-tracking-drawer__truck-title">
-                            <FiTruck aria-hidden />
-                            <strong>{truck.truckNumber}</strong>
-                            <span>(Final Qty: {truck.finalQty})</span>
-                          </span>
-                          <span className="truck-tracking-drawer__truck-meta">
-                            <span
-                              className="truck-tracking-drawer__share-btn"
-                              role="button"
-                              tabIndex={0}
-                              aria-label={`Share ${truck.truckNumber} details`}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleShare(truck);
-                              }}
-                              onKeyDown={(event) => {
-                                if (event.key === "Enter") {
-                                  event.stopPropagation();
-                                  handleShare(truck);
-                                }
-                              }}
-                            >
-                              <FiShare2 aria-hidden />
-                            </span>
-                            <span className="truck-tracking-drawer__status-badge">
-                              {truck.status}
-                            </span>
-                            {expanded ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
-                          </span>
-                        </button>
-
-                        {expanded && (
-                          <div className="truck-tracking-drawer__truck-details">
-                            <div>
-                              <span>Transporter Name:</span>
-                              <p>{truck.transporterName}</p>
-                            </div>
-                            <div>
-                              <span>
-                                <FiMapPin aria-hidden /> Transporter Location:
-                              </span>
-                              <p>{truck.transporterLocation}</p>
-                            </div>
-                            <div>
-                              <span>Assignment Type:</span>
-                              <p className="truck-tracking-drawer__assignment-badge">
-                                {truck.assignmentType}
-                              </p>
-                            </div>
-
-                            <div>
-                              <span>Driver Name:</span>
-                              <p>{truck.driverName}</p>
-                            </div>
-                            <div>
-                              <span>
-                                <FiPhone aria-hidden /> Driver Phone:
-                              </span>
-                              <p>{truck.driverPhone}</p>
-                            </div>
-                            <div>
-                              <span>Maximum Capacity:</span>
-                              <p>{truck.maxCapacity}</p>
-                            </div>
-
-                            <div>
-                              <span>Start Date &amp; Time:</span>
-                              <p>{truck.startDateTime}</p>
-                            </div>
-                            <div>
-                              <span>
-                                <FiMapPin aria-hidden /> Start Location:
-                              </span>
-                              <p>{truck.startLocation}</p>
-                            </div>
-                            <div>
-                              <span>
-                                <FiMapPin aria-hidden /> Destination:
-                              </span>
-                              <p>{truck.destination}</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <TruckList trucks={trucks} isLoading={trucksLoading} />
             </div>
           </>
         )}
@@ -268,58 +172,44 @@ function escapeHtml(value: string) {
 }
 
 const PendingContracts = () => {
-
-
-  const [downloadExcel] = useLazyGetAllContractsForExcelQuery();
-
   const [sellerFilter, setSellerFilter] = useState("All");
   const [buyerFilter, setBuyerFilter] = useState("All");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [scheduleFilter, setScheduleFilter] = useState("Pending");
+  const [scheduleFilter, setScheduleFilter] = useState("All");
   const [keyword, setKeyword] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [truckDrawerOpen, setTruckDrawerOpen] = useState(false);
   const [truckDrawerRow, setTruckDrawerRow] = useState<PendingContractRow | null>(null);
 
-  const searchKeyword = keyword.trim();
+  const { data: openAndPendingContracts, isLoading, isFetching } = useGetAllOpenAndPendingContractsQuery();
 
-  // Single source of truth for the filters query — backend only accepts
-  // Status and SearchText (confirmed via Swagger). Fires whenever there's
-  // a search keyword; skipped when the search box is empty.
-  const {
-    data: filteredContracts,
-    isLoading, 
-    error,
-  } = useGetAllContractsByFiltersQuery(
-    {
-      Status: scheduleFilter,
-      SearchText: keyword.trim(),
-    });
+  const pendingContracts = useMemo(
+    () => (openAndPendingContracts ?? []).map(mapOpenAndPendingContract),
+    [openAndPendingContracts],
+  );
 
-  useEffect(() => {
-    console.log("Filtered Data:", filteredContracts);
-    console.log("Filter Loading:", isLoading);
-    console.log("Filter Error:", error);
-  }, [filteredContracts, isLoading, error]);
+  const sellerOptions = useMemo(() => {
+    const names = Array.from(new Set(pendingContracts.map((row) => row.seller))).filter(
+      (name) => name && name !== "-",
+    );
+    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: name }))];
+  }, [pendingContracts]);
 
-  const handleDownloadExcel = async () => {
-    try {
-      const result = await downloadExcel().unwrap();
-      const url = window.URL.createObjectURL(result);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "Contracts.xlsx";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Excel Download Failed", err);
-    }
-  };
+  const buyerOptions = useMemo(() => {
+    const names = Array.from(new Set(pendingContracts.map((row) => row.buyer))).filter(
+      (name) => name && name !== "-",
+    );
+    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: name }))];
+  }, [pendingContracts]);
 
+  const deliveryScheduleOptions = useMemo(() => {
+    const schedules = Array.from(new Set(pendingContracts.map((row) => row.deliverySchedule))).filter(
+      Boolean,
+    );
+    return [ALL_OPTION, ...schedules.map((schedule) => ({ value: schedule, label: schedule }))];
+  }, [pendingContracts]);
 
   const handleOpenTruckDetails = (row: PendingContractRow) => {
     setTruckDrawerRow(row);
@@ -353,7 +243,7 @@ const PendingContracts = () => {
 
       return true;
     });
-  }, [sellerFilter, buyerFilter, scheduleFilter, dateFrom, dateTo, keyword]);
+  }, [pendingContracts, sellerFilter, buyerFilter, scheduleFilter, dateFrom, dateTo, keyword]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -413,7 +303,7 @@ const PendingContracts = () => {
             <button
               type="button"
               className="pending-contracts-btn pending-contracts-btn--warning"
-              onClick={handleDownloadExcel}
+              onClick={handleExportToExcel}
             >
               <FiDownload aria-hidden /> Export
             </button>
@@ -488,7 +378,11 @@ const PendingContracts = () => {
           columns={pendingContractColumns}
           data={pagedRows}
           rowKey={(row) => row.id}
-          emptyMessage="No pending contracts match the current filters."
+          emptyMessage={
+            isLoading || isFetching
+              ? "Loading pending contracts…"
+              : "No pending contracts match the current filters."
+          }
           minHeight
         />
 

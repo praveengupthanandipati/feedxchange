@@ -1,0 +1,181 @@
+@use "../../../../../assets/styles/variables" as v;
+@use "../../../../../assets/styles/mixins" as m;
+
+// Reuses .assign-transports-card / .review-assign-trucks-panel / .review-assign-trucks-details /
+// .review-assign-trucks-btn / .review-assign-trucks-field__edit styles from the existing
+// Freight Approval screen (transporter-review-assign-trucks); this file only adds what's new.
+.manage-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+}
+
+.manage-schedule-section {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+
+  &__title {
+    color: v.$color-primary;
+    font-size: v.$font-size-base;
+    margin: 0;
+  }
+}
+
+// Freight Approval only ever needed accepted/rejected; schedule responses have four more states.
+.review-assign-trucks-panel__status {
+  &--pending {
+    background-color: rgba(v.$color-orange, 0.18);
+    color: v.$color-orange-dark;
+  }
+
+  &--partially-accepted {
+    background-color: rgba(v.$color-info, 0.15);
+    color: v.$color-info;
+  }
+
+  &--expired,
+  &--cancelled {
+    background-color: v.$color-gray-100;
+    color: v.$color-text-muted;
+  }
+}
+
+// Schedule requests are listed as one compact table; the per-request cards took up the whole screen.
+.manage-schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: v.$font-size-sm;
+
+  &__wrapper {
+    overflow-x: auto;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-white;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  th {
+    background-color: v.$color-gray-100;
+    color: v.$color-text-muted;
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  // The quantity, freight and buttons wrap onto their own lines rather than
+  // forcing the column wide enough to squeeze the remarks beside it.
+  &__action-cell {
+    white-space: normal;
+    min-width: 13rem;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-2;
+  }
+
+  // Accept and Reject stay side by side; only the inputs above them wrap away.
+  &__buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: v.$spacing-2;
+  }
+
+  // Accepted quantity and freight are edited inline, each with its unit beside it.
+  &__input {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-1;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+
+    input {
+      @include m.font-base;
+      width: 4.5rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      font-size: v.$font-size-sm;
+      color: v.$color-text;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-primary;
+        box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      }
+    }
+  }
+
+  // "Negotiated" marker, on its own line under the accepted quantity.
+  &__tag {
+    display: block;
+    width: fit-content;
+    margin-top: v.$spacing-1;
+    padding: 0 v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$color-info, 0.15);
+    color: v.$color-info;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  // Sits on its own line above the action controls.
+  &__remaining {
+    display: block;
+    flex: 1 1 100%;
+    color: v.$color-text-muted;
+    font-size: 0.7rem;
+  }
+
+  &__timestamps {
+    display: block;
+    margin-top: v.$spacing-1;
+    color: v.$color-text-muted;
+    font-size: 0.7rem;
+  }
+
+  &__error,
+  &__muted {
+    display: block;
+    font-size: v.$font-size-sm;
+    white-space: normal;
+  }
+
+  // Remarks run long, so the column keeps a readable width and wraps instead of clipping.
+  &__remarks {
+    min-width: 14rem;
+    max-width: 22rem;
+    color: v.$color-text-muted;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    vertical-align: top;
+  }
+
+  &__error {
+    color: v.$color-danger;
+    margin-top: v.$spacing-1;
+  }
+
+  &__muted {
+    color: v.$color-text-muted;
+  }
+}

@@ -4,6 +4,8 @@ export interface AsideNavChild {
   id: string;
   label: string;
   path: string;
+  /** Screens reached from this item that live outside its path, so it stays highlighted there. */
+  relatedPaths?: string[];
 }
 
 export interface AsideNavItem {

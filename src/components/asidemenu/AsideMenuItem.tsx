@@ -29,10 +29,18 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onNavigate }: AsideM
   const hasPath = Boolean(item.path);
   const Icon = item.icon;
 
-  const isChildActive = (child: AsideNavChild) => location.pathname === child.path;
+  // Deeper screens (an edit or detail page under a submenu item) still belong to the
+  // section, so anything below a path counts as being inside it.
+  const isInsidePath = (path: string) => {
+    const base = path.split("?")[0];
+    return location.pathname === base || location.pathname.startsWith(`${base}/`);
+  };
+
+  const isChildActive = (child: AsideNavChild) =>
+    isInsidePath(child.path) || Boolean(child.relatedPaths?.some(isInsidePath));
 
   const isSectionActive =
-    (hasPath && location.pathname === item.path) || Boolean(item.children?.some(isChildActive));
+    (hasPath && isInsidePath(item.path!)) || Boolean(item.children?.some(isChildActive));
 
   const autoExpanded = isOpen || isSectionActive;
   const expanded = manualState !== null ? manualState === "open" : autoExpanded;

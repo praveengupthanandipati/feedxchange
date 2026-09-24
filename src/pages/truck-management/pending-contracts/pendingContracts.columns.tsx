@@ -116,12 +116,6 @@ export function buildPendingContractColumns({
     header: "To Date",
   },
   {
-    key: "deliveryType",
-    header: "D. Type",
-    headerTooltip: "Delivery Type",
-    sortable: true,
-  },
-  {
     key: "deliverySchedule",
     header: "D. Schedule",
     headerTooltip: "Delivery Schedule",

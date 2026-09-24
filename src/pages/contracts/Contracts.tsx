@@ -59,7 +59,7 @@ function mapApiContract(row: GetAllContractsRow): Contract {
     netRate: `₹${row.netRate ?? 0}`,
     netRateValue: row.netRate ?? 0,
     // Not returned by the GetAllContracts summary endpoint — populated when the
-    // full contract is loaded (e.g. via GetContractByContractId on edit).
+    // full contract is loaded (e.g. via GetContractByContractNumber on edit).
     indicativeFreight: "",
     rateRemarks: "",
     deliveryType: row.deliveryType ?? "",

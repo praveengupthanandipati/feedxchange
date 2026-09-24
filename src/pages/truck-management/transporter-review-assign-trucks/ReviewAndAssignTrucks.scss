@@ -36,8 +36,17 @@
   color: v.$color-white;
   font-size: v.$font-size-sm;
   cursor: pointer;
+  text-decoration: none;
   transition: background-color v.$transition-fast;
   white-space: nowrap;
+
+  // Some variants of this class render as <Link>/<a>, and the global `a:hover`
+  // rule (App.scss) out-specifies a plain class, overriding this to navy-dark —
+  // which then matches the navy-dark hover background below and disappears.
+  &:hover,
+  &:focus-visible {
+    color: v.$color-white;
+  }
 
   &--info {
     background-color: v.$color-info;

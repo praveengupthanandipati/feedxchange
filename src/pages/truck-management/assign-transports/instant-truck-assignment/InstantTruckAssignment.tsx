@@ -3,12 +3,24 @@ import { FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import { buildInstantTruckColumns } from "./instantTruckAssignment.columns";
-import { instantTruckRows as seedRows, type InstantTruckRow } from "./instantTruckAssignment.data";
+import type { InstantTruckRow } from "./instantTruckAssignment.data";
 import AssignNewTruckDrawer from "./AssignNewTruckDrawer";
 import "./InstantTruckAssignment.scss";
 
-const InstantTruckAssignment = () => {
-  const [rows, setRows] = useState<InstantTruckRow[]>(seedRows);
+interface InstantTruckAssignmentProps {
+  contractId: number;
+  sellerId: number;
+  buyerId: number;
+  truckAssignmentTypeId: number;
+}
+
+const InstantTruckAssignment = ({
+  contractId,
+  sellerId,
+  buyerId,
+  truckAssignmentTypeId,
+}: InstantTruckAssignmentProps) => {
+  const [rows, setRows] = useState<InstantTruckRow[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<InstantTruckRow | null>(null);
   const [rowPendingDelete, setRowPendingDelete] = useState<InstantTruckRow | null>(null);
@@ -67,6 +79,10 @@ const InstantTruckAssignment = () => {
       <AssignNewTruckDrawer
         open={drawerOpen}
         editingRow={editingRow}
+        contractId={contractId}
+        sellerId={sellerId}
+        buyerId={buyerId}
+        truckAssignmentTypeId={truckAssignmentTypeId}
         onClose={() => setDrawerOpen(false)}
         onSave={handleSave}
       />

@@ -3,8 +3,6 @@ import {
   FiFileText,
   FiActivity,
   FiGrid,
-  FiUser,
-  FiSettings,
   FiBell,
   FiMessageSquare,
   FiBriefcase,
@@ -41,15 +39,55 @@ export const asideNavSections: AsideNavSection[] = [
       // { id: "projects", label: "Projects", icon: FiFolder, path: "/projects" },
     ],
   },
-   {
+  {
     id: "truck-management",
     title: "Truck Management",
     items: [
+      //{
+      //      id: "pending-contracts",
+      //  label: "Pending Contracts",
+      // icon: FiFileText,
+      //  path: "/truck-management/pending-contracts",
+      //  },
       {
-        id: "pending-contracts",
+        id: "contract-dispatch-management",
         label: "Pending Contracts",
-        icon: FiFileText,
-        path: "/truck-management/pending-contracts",
+        icon: FiSend,
+        path: "/truck-management/open-pending-contracts",
+        children: [
+          {
+            id: "contract-dispatch-add-instant-truck",
+            label: "Add Instant Truck",
+            path: "/truck-management/open-pending-contracts/instant-truck",
+          },
+          {
+            id: "contract-dispatch-schedule-dispatch",
+            label: "Schedule Dispatch",
+            path: "/truck-management/open-pending-contracts/schedule-dispatch",
+          },
+          {
+            id: "contract-dispatch-manage-schedule",
+            label: "Manage Schedule",
+            path: "/truck-management/open-pending-contracts/manage-schedule",
+            // "Add Truck" on an accepted request opens its own screen.
+            relatedPaths: ["/truck-management/open-pending-contracts/add-truck-to-schedule"],
+          },
+          {
+            id: "contract-dispatch-update-truck-status",
+            label: "Update Truck Status",
+            path: "/truck-management/open-pending-contracts/update-truck-status",
+          },
+          {
+            id: "contract-dispatch-view-all-trucks",
+            label: "View All Trucks By Contract",
+            path: "/truck-management/open-pending-contracts/view-trucks",
+            // Re-assign and the contract chain are both opened from a truck card here.
+            relatedPaths: [
+              "/truck-management/open-pending-contracts/reassign-truck",
+              "/truck-management/open-pending-contracts/truck-chain",
+            ],
+          },
+        ],
       },
       {
         id: "bulk-freight-approval",
@@ -89,7 +127,7 @@ export const asideNavSections: AsideNavSection[] = [
             label: "Truck Master",
             path: "/truck-management/transporters/truck-master",
           },
-           {
+          {
             id: "driver-master",
             label: "Drivers Master",
             path: "/truck-management/transporters/driver-master",
@@ -100,7 +138,7 @@ export const asideNavSections: AsideNavSection[] = [
             path: "/truck-management/transporters/driver-truck-mapping",
           },
           {
-             id: "truck-trips",
+            id: "truck-trips",
             label: "Truck Trips",
             path: "/truck-management/transporters/truck-trips",
           },
@@ -114,7 +152,7 @@ export const asideNavSections: AsideNavSection[] = [
       },
     ],
   },
-   {
+  {
     id: "user-management",
     title: "User Management",
     items: [
@@ -190,15 +228,15 @@ export const asideNavSections: AsideNavSection[] = [
           },
         ],
       },
-     
+
       { id: "notifications", label: "Notifications", icon: FiBell, path: "/notifications" },
 
     ],
   },
-   {
+  {
     id: "reports-statements",
     title: "Reports & Statements",
-    items: [     
+    items: [
       {
         id: "reports",
         label: "Reports",
@@ -214,7 +252,7 @@ export const asideNavSections: AsideNavSection[] = [
           { id: "reports-monthly-reports", label: "Monthly Reports", path: "/reports/monthly-reports" },
           { id: "reports-do-truck-history", label: "DO Truck History", path: "/reports/do-truck-history" },
         ],
-      },    
+      },
 
     ],
   },

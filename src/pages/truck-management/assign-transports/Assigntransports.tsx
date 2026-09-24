@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   FiArrowLeft,
@@ -9,19 +9,80 @@ import {
   FiCheckCircle,
   FiClock,
 } from "react-icons/fi";
-import { getContractSummary } from "./assignTransports.data";
+import { defaultContractSummary, type ContractSummary } from "./assignTransports.data";
 import InstantTruckAssignment from "./instant-truck-assignment/InstantTruckAssignment";
 import ScheduleTruckAssignment from "./schedule-truck-assignment/ScheduleTruckAssignment";
+import {
+  useGetContractByContractNumberQuery,
+  useGetTruckAssignmentTypesQuery,
+  useGetAllOpenAndPendingContractsQuery,
+} from "../../../store/contractsApi";
 import "./Assigntransports.scss";
 
-type ActiveTab = "instant" | "schedule";
+function formatDisplayDate(value: string | undefined) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${day}/${month}/${date.getFullYear()}`;
+}
 
 const Assigntransports = () => {
   const [searchParams] = useSearchParams();
-  const summary = getContractSummary(searchParams.get("contract"));
+  const contractNumber = searchParams.get("contract") ?? "";
+
+  const { data: contract } = useGetContractByContractNumberQuery(contractNumber, {
+    skip: !contractNumber,
+  });
+  const { data: assignmentTypes } = useGetTruckAssignmentTypesQuery();
+  const { data: openAndPendingContracts } = useGetAllOpenAndPendingContractsQuery();
+
+  const matchingOpenContract = useMemo(
+    () => openAndPendingContracts?.find((row) => row.contractNumber === contractNumber),
+    [openAndPendingContracts, contractNumber],
+  );
+
+  const summary: ContractSummary = useMemo(() => {
+    if (!contract) return { ...defaultContractSummary, contractNumber: contractNumber || defaultContractSummary.contractNumber };
+
+    const basic = contract.basicDetails;
+    const quantityLabel =
+      basic?.quantity != null ? `${basic.quantity} ${basic.quantityMeasure ?? ""}`.trim() : "-";
+    const dispatched = matchingOpenContract?.dispatchedQuantityMT ?? 0;
+    const pending = matchingOpenContract?.pendingQuantityMT ?? basic?.quantity ?? 0;
+    const arranged = Math.max((basic?.quantity ?? 0) - dispatched - pending, 0);
+
+    return {
+      contractNumber: contract.contractNumber ?? contractNumber,
+      contractQty: quantityLabel,
+      dispatchedQty: `${dispatched} MT`,
+      vehicleArrangedQty: `${arranged} MT`,
+      pendingQty: `${pending} MT`,
+      totalTrucksAssigned: 0,
+      sellerName: contract.sellerName ?? "-",
+      buyerName: contract.buyerName ?? "-",
+      contractDate: formatDisplayDate(contract.contractDate),
+      productName: contract.productName ?? "-",
+      contractRate: basic?.contractRate != null ? `₹${basic.contractRate.toLocaleString("en-IN")}` : "-",
+      indicativeFreight:
+        basic?.indicativeFreight != null ? `₹${basic.indicativeFreight.toLocaleString("en-IN")}` : "-",
+      loadingAddress: contract.sellerConditions?.loadingAddressAt ?? "-",
+      deliveryAddress: contract.buyerConditions?.loadingAddressAt ?? "-",
+    };
+  }, [contract, contractNumber, matchingOpenContract]);
 
   const [detailsVisible, setDetailsVisible] = useState(true);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("instant");
+  const [activeTypeId, setActiveTypeId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (activeTypeId === null && assignmentTypes && assignmentTypes.length > 0) {
+      setActiveTypeId(assignmentTypes[0].truckAssignmentTypeId);
+    }
+  }, [assignmentTypes, activeTypeId]);
+
+  const activeType = assignmentTypes?.find((type) => type.truckAssignmentTypeId === activeTypeId);
+  const isScheduleTab = activeType?.truckAssignmentTypeName.toLowerCase().includes("sched") ?? false;
 
   return (
     <div className="assign-transports-page">
@@ -140,27 +201,36 @@ const Assigntransports = () => {
           <h2 className="assign-transports-tabs-section__title">Contract Trucks Details</h2>
 
           <div className="assign-transports-tabs">
-            <button
-              type="button"
-              className={`assign-transports-tabs__tab ${activeTab === "instant" ? "is-active" : ""}`}
-              onClick={() => setActiveTab("instant")}
-            >
-              Instant Truck Assignment
-            </button>
-            <button
-              type="button"
-              className={`assign-transports-tabs__tab ${activeTab === "schedule" ? "is-active" : ""}`}
-              onClick={() => setActiveTab("schedule")}
-            >
-              Schedule Trucks Assignment
-            </button>
+            {(assignmentTypes ?? []).map((type) => (
+              <button
+                key={type.truckAssignmentTypeId}
+                type="button"
+                className={`assign-transports-tabs__tab ${
+                  activeTypeId === type.truckAssignmentTypeId ? "is-active" : ""
+                }`}
+                onClick={() => setActiveTypeId(type.truckAssignmentTypeId)}
+              >
+                {type.truckAssignmentTypeName}
+              </button>
+            ))}
           </div>
 
-          {activeTab === "instant" ? (
-            <InstantTruckAssignment />
-          ) : (
-            <ScheduleTruckAssignment summary={summary} />
-          )}
+          {activeType &&
+            (isScheduleTab ? (
+              <ScheduleTruckAssignment
+                summary={summary}
+                contractId={contract?.id ?? 0}
+                sellerId={contract?.sellerId ?? 0}
+                buyerId={contract?.buyerId ?? 0}
+              />
+            ) : (
+              <InstantTruckAssignment
+                contractId={contract?.id ?? 0}
+                sellerId={contract?.sellerId ?? 0}
+                buyerId={contract?.buyerId ?? 0}
+                truckAssignmentTypeId={activeType.truckAssignmentTypeId}
+              />
+            ))}
         </div>
       </div>
     </div>

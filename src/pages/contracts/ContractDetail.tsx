@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 import {
   useLazyGetAllContractsByFiltersQuery,
-  useLazyGetContractByContractIdQuery,
+  useLazyGetContractByContractNumberQuery,
   useGetAllContractStatusesQuery,
   type GetContractDto,
 } from "../../store/contractsApi";
@@ -62,7 +62,7 @@ const ContractDetail = () => {
   const [notFound, setNotFound] = useState(false);
 
   const [searchContracts] = useLazyGetAllContractsByFiltersQuery();
-  const [fetchContract] = useLazyGetContractByContractIdQuery();
+  const [fetchContract] = useLazyGetContractByContractNumberQuery();
   const { data: statusOptions } = useGetAllContractStatusesQuery();
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const ContractDetail = () => {
           return;
         }
 
-        const detail = await fetchContract(match.contractId).unwrap();
+        const detail = await fetchContract(match.contractNumber).unwrap();
         if (!cancelled) setContract(detail);
       } catch {
         if (!cancelled) setNotFound(true);
@@ -104,7 +104,7 @@ const ContractDetail = () => {
 
   const calculatedStatus = basicDetails?.calculatedStatus ?? "";
   const statusLabel =
-    statusOptions?.find((option) => option.name === calculatedStatus)?.displayName || calculatedStatus;
+    statusOptions?.find((option) => option.statusName === calculatedStatus)?.displayName || calculatedStatus;
   const statusModifier = calculatedStatus.toLowerCase();
 
   const poTolerance =

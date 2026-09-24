@@ -1,0 +1,103 @@
+@use "../../../../../assets/styles/variables" as v;
+@use "../../../../../assets/styles/mixins" as m;
+
+.truck-chain {
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: v.$spacing-4;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__summary {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: v.$spacing-4;
+    margin-bottom: v.$spacing-4;
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-white;
+
+    @include m.respond-below(lg) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @include m.respond-below(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    span {
+      display: block;
+      margin-bottom: v.$spacing-1;
+      color: v.$color-text-muted;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    strong {
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__viewer-note {
+    margin: 0;
+    color: v.$color-text-muted;
+    font-size: 0.75rem;
+  }
+
+  &__table-wrapper {
+    overflow-x: auto;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: v.$font-size-sm;
+
+    th,
+    td {
+      padding: v.$spacing-3;
+      text-align: left;
+      border-bottom: 1px solid v.$color-border;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: v.$color-gray-100;
+      color: v.$color-text-muted;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    td span {
+      display: block;
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr.is-transporter {
+      background-color: rgba(v.$color-success, 0.08);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: v.$spacing-4;
+
+    a {
+      text-decoration: none;
+    }
+  }
+}

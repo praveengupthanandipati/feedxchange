@@ -15,6 +15,8 @@ interface SearchableSelectProps {
   ariaLabel?: string;
   /** When true, shows a "+" button beside the search box that saves the typed text as a new option, appended to the end of the list. */
   allowCustom?: boolean;
+  /** When set, the "+" button hands the typed text to this callback (e.g. to open a "create new" screen) instead of saving it as a plain option. */
+  onAddNew?: (query: string) => void;
   disabled?: boolean;
   /** When true, shows an "x" button in the trigger to clear the current value once one is selected. */
   clearable?: boolean;
@@ -27,6 +29,7 @@ const SearchableSelect = ({
   placeholder = "Select...",
   ariaLabel,
   allowCustom = false,
+  onAddNew,
   disabled = false,
   clearable = false,
 }: SearchableSelectProps) => {
@@ -38,6 +41,8 @@ const SearchableSelect = ({
 
   // Custom items are saved here and always rendered at the end of the list.
   const allOptions = useMemo(() => [...options, ...customOptions], [options, customOptions]);
+
+  const canAddNew = allowCustom || Boolean(onAddNew);
 
   const knownLabel = allOptions.find((option) => option.value === value)?.label;
   const selectedLabel = knownLabel ?? (allowCustom && value ? value : undefined);
@@ -82,9 +87,18 @@ const SearchableSelect = ({
     setQuery("");
   };
 
-  // Saves the typed query as a new option (or selects it if it already exists).
+  // Hands the typed query to onAddNew, or saves it as a new option (selecting it if it already exists).
   const handleAddCustom = () => {
     const label = query.trim();
+
+    // onAddNew opens its own screen, so it runs even with an empty search box.
+    if (onAddNew) {
+      onAddNew(label);
+      setOpen(false);
+      setQuery("");
+      return;
+    }
+
     if (!label) return;
 
     const existing = allOptions.find(
@@ -142,21 +156,21 @@ const SearchableSelect = ({
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={allowCustom ? "Search or add new..." : "Search..."}
+              placeholder={canAddNew ? "Search or add new..." : "Search..."}
               onKeyDown={(event) => {
-                if (allowCustom && event.key === "Enter") {
+                if (canAddNew && event.key === "Enter") {
                   event.preventDefault();
                   handleAddCustom();
                 }
               }}
             />
-            {allowCustom && (
+            {canAddNew && (
               <button
                 type="button"
                 className="searchable-select__add"
                 onClick={handleAddCustom}
-                aria-label="Add custom item"
-                title="Save as new option"
+                aria-label="Add new item"
+                title={onAddNew ? "Add new" : "Save as new option"}
               >
                 <FiPlus aria-hidden />
               </button>

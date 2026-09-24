@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_URL } from "../api/api";
+import { unwrapArray, unwrapObject } from "./userProfilesCommonApi";
 
 /* =========================
    GET ALL CONTRACTS
@@ -58,8 +59,17 @@ export interface GetAllContractsResponse {
 ========================= */
 
 export interface ContractStatusOption {
-  id: number;
-  name: string;
+  contractStatusId: number;
+  statusName: string;
+  displayName: string;
+  description: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export interface ScheduleStatusOption {
+  scheduleStatusId: number;
+  statusName: string;
   displayName: string;
   isActive: boolean;
   sortOrder: number;
@@ -151,19 +161,33 @@ export interface GetContractDto {
   buyerName: string | null;
   productId: number | null;
   productName: string | null;
+  category: string | null;
+  contractTypeId: number | null;
+  businessUnitId: number | null;
+  currencyId: number | null;
   statusId: number | null;
+  versionNo: number | null;
+  parentContractId: number | null;
+  referenceNo: string | null;
+  remarks: string | null;
+  approvalRequired: boolean;
+  isActive: boolean;
   basicDetails: GetContractBasicDetails;
   sellerConditions: GetSellerConditionsDetail;
   buyerConditions: GetBuyerConditionsDetail;
   paymentsInvoices: GetPaymentsInvoicesDetail;
   contractSettings: GetContractSettingsDetail;
   createdOn: string;
+  createdById: number | null;
+  createdBy: string | null;
   modifiedOn: string | null;
+  modifiedById: number | null;
+  updatedBy: string | null;
 }
 
 export interface UpdateContractStatusRequest {
-  contractId: number;
-  calculatedStatus: string;
+  contractNumber: string[];
+  contractStatusId: number;
   reviewRemarks?: string | null;
   actionPerformedBy: number;
 }
@@ -335,6 +359,27 @@ export interface GetAllContractsByFiltersRequest {
   SearchText?: string;
 }
 
+export interface TruckAssignmentType {
+  truckAssignmentTypeId: number;
+  truckAssignmentTypeName: string;
+}
+
+export interface OpenAndPendingContract {
+  contractNumber: string;
+  contractDate: string;
+  seller: string | null;
+  buyer: string | null;
+  pricePerKg: number;
+  totalQuantityMT: number;
+  dispatchedQuantityMT: number;
+  pendingQuantityMT: number;
+  productName: string;
+  effectiveFrom: string;
+  effectiveTo: string;
+  deliverySchedule: string;
+  paymentTermName: string;
+}
+
 export interface GetAllContractsForTransporterParams {
   SellerName?: string;
   BuyerName?: string;
@@ -366,7 +411,7 @@ export const contractsApi = createApi({
         url: "/api/Contracts/GetAllContracts",
         method: "GET",
       }),
-
+      transformResponse: (payload: unknown) => unwrapObject<GetAllContractsResponse>(payload) as GetAllContractsResponse,
       providesTags: ["PendingContracts"],
     }),
 
@@ -391,17 +436,19 @@ export const contractsApi = createApi({
 
     getAllContractStatuses: builder.query<ContractStatusOption[], void>({
       query: () => ({
-        url: "/api/Contracts/GetAllContractStatuses",
+        url: "/api/Contracts/GetContractStatuses",
         method: "GET",
       }),
+      transformResponse: unwrapArray<ContractStatusOption>,
     }),
 
-    getContractByContractId: builder.query<GetContractDto, number>({
-      query: (contractId) => ({
-        url: "/api/Contracts/GetContractByContractId",
+    getContractByContractNumber: builder.query<GetContractDto, string>({
+      query: (contractNumber) => ({
+        url: "/api/Contracts/GetContractByContractNumber",
         method: "GET",
-        params: { contractId },
+        params: { contractNo: contractNumber },
       }),
+      transformResponse: (payload: unknown) => unwrapObject<GetContractDto>(payload) as GetContractDto,
     }),
 
     updateContractStatus: builder.mutation<void, UpdateContractStatusRequest>({
@@ -445,15 +492,43 @@ export const contractsApi = createApi({
         method: "GET",
         params,
       }),
+      transformResponse: unwrapArray<PendingContractApiResponse>,
       providesTags: ["PendingContracts"],
     }),
 
-    getAllContractsForExcel: builder.query<Blob, void>({
+    getAllOpenAndPendingContracts: builder.query<OpenAndPendingContract[], void>({
       query: () => ({
-        url: "/api/Contracts/GetAllContractsForExcel",
+        url: "/api/Contracts/GetAllOpenAndPendingContracts",
         method: "GET",
-        responseHandler: (response) => response.blob(),
       }),
+      transformResponse: unwrapArray<OpenAndPendingContract>,
+      providesTags: ["PendingContracts"],
+    }),
+
+    getTruckAssignmentTypes: builder.query<TruckAssignmentType[], void>({
+      query: () => ({
+        url: "/api/Contracts/GetTruckAssignmentTypes",
+        method: "GET",
+      }),
+      transformResponse: unwrapArray<TruckAssignmentType>,
+    }),
+
+    getScheduleStatuses: builder.query<ScheduleStatusOption[], void>({
+      query: () => ({
+        url: "/api/Contracts/GetScheduleStatuses",
+        method: "GET",
+      }),
+      transformResponse: unwrapArray<ScheduleStatusOption>,
+    }),
+
+    getAllContractsForTransporter: builder.query<TransporterContract[], GetAllContractsForTransporterParams>({
+      query: (params) => ({
+        url: "/api/Contracts/GetAllContractsForTransporter",
+        method: "GET",
+        params,
+      }),
+      transformResponse: unwrapArray<TransporterContract>,
+      providesTags: ["PendingContracts"],
     }),
   }),
 });
@@ -462,11 +537,17 @@ export const {
   useGetAllContractsQuery,
   useDeleteContractMutation,
   useGetAllContractStatusesQuery,
-  useLazyGetContractByContractIdQuery,
+  useGetContractByContractNumberQuery,
+  useLazyGetContractByContractNumberQuery,
   useUpdateContractStatusMutation,
   useUpdateContractMutation,
   useSaveContractMutation,
   useGetAllContractsByFiltersQuery,
   useLazyGetAllContractsByFiltersQuery,
-  useLazyGetAllContractsForExcelQuery,
+  useGetAllOpenAndPendingContractsQuery,
+  useLazyGetAllOpenAndPendingContractsQuery,
+  useGetTruckAssignmentTypesQuery,
+  useGetScheduleStatusesQuery,
+  useGetAllContractsForTransporterQuery,
+  useLazyGetAllContractsForTransporterQuery,
 } = contractsApi;

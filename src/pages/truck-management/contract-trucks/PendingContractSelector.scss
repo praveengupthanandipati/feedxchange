@@ -1,0 +1,15 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.pending-contract-selector {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-1;
+  max-width: 28rem;
+
+  &__label {
+    @include m.font-base(v.$font-weight-semibold);
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+}
