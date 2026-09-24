@@ -85,12 +85,6 @@ function transformCategories(payload: unknown): Category[] {
   return (payload as CategoryApiResponse[]).map(transformCategory);
 }
 
-function transformSingleCategory(payload: unknown): Category | null {
-  if (!payload) return null;
-
-  return transformCategory(payload as CategoryApiResponse);
-}
-
 export const categoryApi = createApi({
   reducerPath: "categoryApi",
 

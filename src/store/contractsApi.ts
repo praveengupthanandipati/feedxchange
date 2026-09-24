@@ -182,13 +182,6 @@ export interface GetContractDto {
   updatedBy: string | null;
 }
 
-export interface UpdateContractStatusRequest {
-  contractNumber: string[];
-  contractStatusId: number;
-  reviewRemarks?: string | null;
-  actionPerformedBy: number;
-}
-
 /* =========================
    SAVE / UPDATE CONTRACT
 
@@ -613,12 +606,13 @@ updateContract: builder.mutation<unknown, UpdateContractRequest>({
       providesTags: ["PendingContracts"],
     }),
 
-    getContractByContractNumber: builder.query<unknown, string>({
+    getContractByContractNumber: builder.query<GetContractDto, string>({
       query: (contractNo) => ({
         url: "/api/Contracts/GetContractByContractNumber",
         method: "GET",
         params: { contractNo },
       }),
+      transformResponse: (payload: unknown) => unwrapObject<GetContractDto>(payload) as GetContractDto,
     }),
 
     getAllOpenAndPendingContracts: builder.query<OpenAndPendingContract[], void>({
