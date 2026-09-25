@@ -1,0 +1,214 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.refund-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: v.$spacing-4;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  @include m.respond-to(md) {
+    align-items: center;
+    padding: v.$spacing-6;
+  }
+}
+
+.refund-dialog {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  width: 100%;
+  max-width: 36rem;
+  margin: auto;
+
+  &__header {
+    @include m.flex(row, space-between, center);
+
+    h2 {
+      @include m.font-heading(v.$font-weight-semibold);
+      color: v.$color-primary;
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      width: 2rem;
+      height: 2rem;
+      border: none;
+      border-radius: v.$radius-md;
+      background: transparent;
+      color: v.$color-text-muted;
+      cursor: pointer;
+
+      &:hover {
+        background-color: v.$color-bg-muted;
+        color: v.$color-text;
+      }
+    }
+  }
+
+  &__parties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1 v.$spacing-5;
+    margin: 0;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-info, 0.08);
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+
+    &--wide {
+      @include m.respond-to(sm) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    label,
+    legend {
+      @include m.font-base(v.$font-weight-semibold);
+      padding: 0;
+      font-size: v.$font-size-sm;
+      color: v.$color-text;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+      @include m.font-base;
+      @include m.focus-ring(v.$color-orange);
+      width: 100%;
+      height: 2.75rem;
+      padding: 0 v.$spacing-3;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-primary;
+        box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      }
+
+      &:disabled {
+        background-color: v.$color-gray-50;
+        color: v.$color-text;
+        opacity: 1;
+        cursor: default;
+      }
+
+      &.has-error {
+        border-color: v.$color-danger;
+      }
+    }
+  }
+
+  &__pay-types > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-4;
+    padding-top: v.$spacing-2;
+
+    label {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      @include m.font-base(v.$font-weight-medium);
+      cursor: pointer;
+    }
+
+    input {
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: v.$color-primary;
+      cursor: pointer;
+
+      &:disabled {
+        cursor: default;
+      }
+    }
+  }
+
+  &__error {
+    color: v.$color-danger;
+    font-size: 0.8rem;
+  }
+
+  &__hint {
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      justify-content: flex-end;
+    }
+  }
+
+  &__cancel,
+  &__save {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    @include m.font-base(v.$font-weight-semibold);
+    flex: 1;
+    height: 2.75rem;
+    padding: 0 v.$spacing-5;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    @include m.respond-to(sm) {
+      flex: 0 0 auto;
+    }
+  }
+
+  &__cancel {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+  &__save {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+}

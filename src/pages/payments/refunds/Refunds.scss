@@ -1,0 +1,342 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.refunds-page {
+  padding-bottom: v.$spacing-6;
+
+  &__toast {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    position: fixed;
+    top: v.$spacing-5;
+    right: v.$spacing-5;
+    left: v.$spacing-5;
+    z-index: v.$z-index-tooltip;
+    padding: v.$spacing-3 v.$spacing-5;
+    border-radius: v.$radius-md;
+    background-color: v.$color-success;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    box-shadow: v.$shadow-lg;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    @include m.respond-to(sm) {
+      left: auto;
+    }
+  }
+}
+
+// ============================================================
+// Card shell + header
+// ============================================================
+.refunds-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    h1 {
+      @include m.font-heading(v.$font-weight-semibold);
+      color: v.$color-primary;
+      font-size: v.$font-size-xl;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+  }
+
+  &__notice {
+    padding: v.$spacing-3 v.$spacing-4;
+    border: 1px solid rgba(v.$color-orange, 0.5);
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-orange, 0.12);
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+}
+
+.refunds-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.focus-ring(v.$color-orange);
+  @include m.font-base(v.$font-weight-semibold);
+  height: 2.5rem;
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+
+  &--info {
+    background-color: v.$color-info;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: #1f6fae;
+    }
+  }
+
+  &--primary {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: v.$color-primary-dark;
+    }
+  }
+
+  &--danger {
+    background-color: v.$color-danger;
+    color: v.$color-white;
+
+    &:hover {
+      background-color: #c73a30;
+    }
+  }
+}
+
+// ============================================================
+// Filters — 1 column on phones, 2 on tablets, one row on laptops
+// ============================================================
+.refunds-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+  align-items: center;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include m.respond-to(xl) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) auto;
+  }
+
+  &__field {
+    min-width: 0;
+  }
+
+  // Two native date inputs styled as a single "range" field.
+  &__dates {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    min-width: 0;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+
+    &:focus-within {
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+
+    input {
+      @include m.font-base;
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+
+    span {
+      flex-shrink: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    gap: v.$spacing-2;
+
+    .refunds-btn {
+      flex: 1;
+
+      @include m.respond-to(sm) {
+        flex: 0 0 auto;
+      }
+    }
+  }
+
+  &__error {
+    grid-column: 1 / -1;
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+}
+
+// ============================================================
+// Seller: / Buyer: strip
+// ============================================================
+.refunds-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-1 v.$spacing-6;
+  margin: 0;
+  padding: v.$spacing-3 v.$spacing-4;
+  border: 1px solid rgba(v.$color-info, 0.3);
+  border-radius: v.$radius-md;
+  background-color: rgba(v.$color-info, 0.1);
+  font-size: v.$font-size-sm;
+
+  > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+    min-width: 0;
+  }
+
+  dt {
+    @include m.font-base(v.$font-weight-medium);
+    color: v.$color-text-muted;
+  }
+
+  dd {
+    @include m.font-base(v.$font-weight-semibold);
+    margin: 0;
+    color: v.$color-text;
+    overflow-wrap: anywhere;
+  }
+}
+
+// ============================================================
+// Table cells (rendered via Table's column.render)
+// ============================================================
+.refunds-table {
+  // Only seven narrow columns — relax the shared 1200px minimum so tablets
+  // scroll less; phones still scroll inside the wrapper.
+  .table {
+    min-width: 56rem;
+  }
+
+  th,
+  td {
+    vertical-align: middle;
+  }
+
+  &__actions {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+  }
+
+  &__icon-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border: none;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: filter v.$transition-fast;
+
+    &:hover {
+      filter: brightness(0.92);
+    }
+
+    &--view {
+      background-color: v.$color-info;
+    }
+
+    &--edit {
+      background-color: v.$color-orange;
+      color: v.$color-navy-dark;
+    }
+
+    &--delete {
+      background-color: v.$color-danger;
+    }
+  }
+
+  &__amount {
+    color: v.$color-success;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__difference {
+    // Contains the absolutely-positioned screen-reader text so it can't
+    // escape the table's scroll wrapper and widen the whole page.
+    position: relative;
+    font-weight: v.$font-weight-semibold;
+
+    &--due {
+      color: v.$color-success;
+    }
+
+    &--excess {
+      color: v.$color-danger;
+    }
+  }
+
+  &__sr-only {
+    @include m.visually-hidden;
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.refunds-pagination {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-bg-muted;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
