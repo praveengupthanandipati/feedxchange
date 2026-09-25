@@ -169,9 +169,12 @@ const AddTruckToScheduleForm = ({
       nextErrors.qty = "Truck quantity is required.";
     } else if (!/^\d+(\.\d+)?$/.test(form.qty.trim()) || Number(form.qty) <= 0) {
       nextErrors.qty = "Enter a valid quantity greater than 0.";
-    } else if (remainingQty > 0 && Number(form.qty) > remainingQty) {
+    } else if (Number(form.qty) > remainingQty) {
       // The API does not report what is left on a schedule, so it is checked here.
-      nextErrors.qty = `Only ${remainingQty} MT of this accepted request is still unassigned.`;
+      // A fully assigned request leaves 0, which must still block rather than skip.
+      nextErrors.qty = remainingQty
+        ? `Only ${remainingQty} MT of this accepted request is still unassigned.`
+        : "This accepted request is already fully assigned.";
     }
 
     if (!form.freight.trim()) {

@@ -7,6 +7,7 @@ import { useGetProfileAddressQuery } from "../../../../../store/userProfilesComm
 import {
   useGetAllOpenAndPendingContractsQuery,
   useGetContractByContractNumberQuery,
+  type OpenAndPendingContract,
 } from "../../../../../store/contractsApi";
 import {
   useGetContractTruckChainOverviewQuery,
@@ -48,6 +49,21 @@ function samePartyName(listName: string | null | undefined, partyName: string): 
   return bare(listName) === bare(partyName);
 }
 
+/**
+ * Whether a listed contract carries the same product as the one being re-assigned.
+ * Matched on product id when the list carries one, falling back to the name — the
+ * list endpoint only guarantees productName.
+ */
+function sameProduct(
+  row: OpenAndPendingContract,
+  sourceProductId: number | null,
+  sourceProductName: string | null,
+): boolean {
+  if (sourceProductId != null && row.productId != null) return row.productId === sourceProductId;
+  if (!sourceProductName || !row.productName) return false;
+  return row.productName.trim().toLowerCase() === sourceProductName.trim().toLowerCase();
+}
+
 /** The roles the acting party holds across the chain, e.g. "Buyer on X · Seller on Y". */
 function rolesOf(profileId: number, legs: ContractTruckChainLeg[]): string {
   return legs
@@ -77,7 +93,8 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
   const actingPartyId = sourceLeg?.sellerProfileId ?? 0;
   const actingPartyName = sourceLeg?.sellerName ?? "You";
 
-  const { data: sourceContract } = useGetContractByContractNumberQuery(contractNumber);
+  const { data: sourceContract, isFetching: loadingSource } =
+    useGetContractByContractNumberQuery(contractNumber);
   const { data: openContracts } = useGetAllOpenAndPendingContractsQuery();
   const { data: drivers } = useGetAllActiveDriversQuery();
   const [reassignContractTruck, { isLoading: saving }] = useReassignContractTruckMutation();
@@ -103,28 +120,28 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
     skip: !targetContract?.sellerId,
   });
 
-  // Only this party's own contracts are ever offered — never anyone else's.
-  const myContracts = useMemo(
-    () =>
-      (openContracts ?? []).filter(
-        (row) =>
-          row.contractNumber !== contractNumber &&
-          (samePartyName(row.buyer, actingPartyName) || samePartyName(row.seller, actingPartyName)),
-      ),
-    [openContracts, contractNumber, actingPartyName],
-  );
+  // Only this party's own contracts for the product on the truck are ever offered. A
+  // truck carries one product, so a contract for anything else can never be a valid
+  // target — this rule is never relaxed, unlike the role and quantity rules below.
+  const myContracts = useMemo(() => {
+    if (!sourceContract) return [];
 
-  // Of those, the ones that meet all three rules: you buy on them, same product,
-  // enough still pending.
+    return (openContracts ?? []).filter(
+      (row) =>
+        row.contractNumber !== contractNumber &&
+        (samePartyName(row.buyer, actingPartyName) || samePartyName(row.seller, actingPartyName)) &&
+        sameProduct(row, sourceContract.productId, sourceContract.productName),
+    );
+  }, [openContracts, contractNumber, actingPartyName, sourceContract]);
+
+  // Of those, the ones where you buy and enough is still pending.
   const preferredContracts = useMemo(
     () =>
       myContracts.filter(
         (row) =>
-          samePartyName(row.buyer, actingPartyName) &&
-          (!sourceContract?.productName || row.productName === sourceContract.productName) &&
-          row.pendingQuantityMT >= truck.quantityMT,
+          samePartyName(row.buyer, actingPartyName) && row.pendingQuantityMT >= truck.quantityMT,
       ),
-    [myContracts, actingPartyName, sourceContract, truck.quantityMT],
+    [myContracts, actingPartyName, truck.quantityMT],
   );
 
   const usingFallback = preferredContracts.length === 0 && myContracts.length > 0;
@@ -273,10 +290,10 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
                   setLoadingAddressId("");
                 }}
               >
-                <option value="">Select a contract</option>
-                {targetOptions.length === 0 && (
+                <option value="">{loadingSource ? "Loading contracts…" : "Select a contract"}</option>
+                {!loadingSource && targetOptions.length === 0 && (
                   <option value="" disabled>
-                    No other open contract for {actingPartyName}
+                    No other open {sourceContract?.productName ?? ""} contract for {actingPartyName}
                   </option>
                 )}
                 {targetOptions.map((row) => (

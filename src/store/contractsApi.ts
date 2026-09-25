@@ -437,10 +437,10 @@ export interface ContractStatusOption {
 }
 
 export interface UpdateContractStatusRequest {
-  contractId: number;
-  contractNumber: string;
-  calculatedStatus: string;
-  reviewRemarks?: string | null;
+  // single contract is sent as a one-element array.
+  contractNumber: string[];
+  contractStatusId: number;
+  reviewRemarks: string;
   actionPerformedBy: number;
 }
 
@@ -496,6 +496,8 @@ export interface OpenAndPendingContract {
   totalQuantityMT: number;
   dispatchedQuantityMT: number;
   pendingQuantityMT: number;
+  // Present only if the endpoint returns it; consumers fall back to productName.
+  productId?: number | null;
   productName: string;
   effectiveFrom: string;
   effectiveTo: string;

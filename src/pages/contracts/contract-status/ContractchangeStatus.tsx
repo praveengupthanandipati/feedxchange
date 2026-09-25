@@ -30,6 +30,23 @@ const DetailField = ({ label, value, full }: DetailFieldProps) => (
   </div>
 );
 
+/**
+ * Pulls the message out of an RFC 9110 problem response so a rejected save names the
+ * field the server objected to, rather than showing a generic failure.
+ */
+const describeApiError = (error: unknown, fallback: string): string => {
+  const body = (error as { data?: unknown } | null)?.data;
+  if (!body || typeof body !== "object") return fallback;
+
+  const problem = body as { title?: string; detail?: string; errors?: Record<string, string[]> };
+  const fieldErrors = Object.values(problem.errors ?? {})
+    .flat()
+    .filter(Boolean);
+
+  if (fieldErrors.length > 0) return fieldErrors.join(" ");
+  return problem.detail || problem.title || fallback;
+};
+
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const formatINR = (value: number) => `₹${value.toLocaleString("en-IN")}`;
@@ -370,17 +387,16 @@ const ContractchangeStatus = () => {
 
     try {
       await updateContractStatus({
-        contractId: record.contractId,
-        contractNumber: record.contractNumber,
-        calculatedStatus: status,
-        reviewRemarks: reviewRemarks.trim() || undefined,
+        contractNumber: [record.contractNumber],
+        contractStatusId: selectedStatus.contractStatusId,
+        reviewRemarks: reviewRemarks.trim(),
         actionPerformedBy: currentUserId,
       }).unwrap();
 
       setError("");
       navigate("/contracts");
-    } catch {
-      setError("Failed to update contract status.");
+    } catch (error) {
+      setError(describeApiError(error, "Failed to update contract status."));
     }
   };
 

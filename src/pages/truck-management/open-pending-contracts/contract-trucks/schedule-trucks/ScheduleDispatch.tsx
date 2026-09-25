@@ -7,6 +7,7 @@ import InfoPanel from "../InfoPanel";
 import ContractSummaryPanel from "../../../contract-trucks/ContractSummaryPanel";
 import PendingContractSelector from "../../../contract-trucks/PendingContractSelector";
 import AddressSelectField from "../../../contract-trucks/AddressSelectField";
+import { useContractQuantitySummary } from "../../../contract-trucks/useContractQuantitySummary";
 import { timeOptions } from "../contractDispatch.options";
 import { useSelectedContract } from "../../../../../context/SelectedContractContext";
 import {
@@ -82,6 +83,12 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  const autoApproveDisabled = form.transporters.length > 1;
+
+  // What is left to schedule, counting accepted schedules and instant trucks.
+  const quantity = useContractQuantitySummary(contractNumber);
+  const { availableQty } = quantity;
+
   // Give the success note a moment, then go back to Manage Schedule.
   useEffect(() => {
     if (!saved) return;
@@ -115,6 +122,10 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
       nextErrors.qty = "Truck quantity is required.";
     } else if (!/^\d+(\.\d+)?$/.test(form.qty.trim()) || Number(form.qty) <= 0) {
       nextErrors.qty = "Enter a valid quantity greater than 0.";
+    } else if (!quantity.isLoading && Number(form.qty) > availableQty) {
+      nextErrors.qty = availableQty
+        ? `Only ${availableQty} MT of this contract is still to be scheduled.`
+        : "This contract's full quantity is already scheduled or assigned.";
     }
 
     if (!form.freight.trim()) {
@@ -233,7 +244,15 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
           <MultiSelect
             options={transporterOptions}
             value={form.transporters}
-            onChange={(value) => setField("transporters", value)}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                transporters: value,
+                // Auto approve covers a single transporter only, so a second one
+                // clears it rather than leaving a ticked box that cannot be unticked.
+                autoApprove: value.length > 1 ? false : prev.autoApprove,
+              }))
+            }
             placeholder="Select Transporter(s)"
             ariaLabel="Select Transporter"
           />
@@ -314,6 +333,11 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
             value={form.qty}
             onChange={(event) => setField("qty", event.target.value)}
           />
+          <p className="schedule-request-drawer__hint">
+            {quantity.isLoading
+              ? "Checking available quantity…"
+              : `${availableQty} MT of ${quantity.totalQty} MT still to be scheduled.`}
+          </p>
           {errors.qty && <p className="schedule-request-drawer__error">{errors.qty}</p>}
         </div>
 
@@ -351,10 +375,16 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
             <input
               type="checkbox"
               checked={form.autoApprove}
+              disabled={autoApproveDisabled}
               onChange={(event) => setField("autoApprove", event.target.checked)}
             />
             Auto Approve
           </label>
+          {autoApproveDisabled && (
+            <p className="schedule-request-drawer__hint">
+              Auto approve is available only when a single transporter is selected.
+            </p>
+          )}
         </div>
       </div>
       {submitError && <p className="schedule-request-drawer__error">{submitError}</p>}

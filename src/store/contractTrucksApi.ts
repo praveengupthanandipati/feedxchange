@@ -5,7 +5,11 @@ import { unwrapArray } from "./userProfilesCommonApi";
 export interface AddContractTruckPayload {
   contractId: number;
   truckAssignmentTypeId: number;
-  dispatchScheduleTransporterId: number;
+  /**
+   * Only for a truck added against a schedule. The endpoint rejects the property
+   * being present at all for an Instant Truck, so it is left off otherwise.
+   */
+  dispatchScheduleTransporterId?: number;
   transporterProfileId: number;
   truckId: number;
   driverId: number;
@@ -357,10 +361,15 @@ export const contractTrucksApi = createApi({
 
   endpoints: (builder) => ({
     addContractTrucks: builder.mutation<boolean, AddContractTruckPayload>({
-      query: (body) => ({
+      query: ({ dispatchScheduleTransporterId, ...truck }) => ({
         url: "/api/ContractTrucks/AddContractTrucks",
         method: "POST",
-        body,
+        // "DispatchScheduleTransporterId must not be set when TruckAssignmentTypeId
+        // is Instant Truck" — a 0 placeholder still counts as set, so the key is
+        // omitted entirely unless there is a real schedule to link the truck to.
+        body: dispatchScheduleTransporterId
+          ? { ...truck, dispatchScheduleTransporterId }
+          : truck,
       }),
       invalidatesTags: ["ContractTruck"],
     }),

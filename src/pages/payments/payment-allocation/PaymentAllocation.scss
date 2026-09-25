@@ -1,0 +1,428 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.payment-allocation-page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+
+  // Leaves room for the pinned Cancel / Save bar on phones and tablets.
+  @include m.respond-below(md) {
+    padding-bottom: 6rem;
+  }
+
+  &__toast {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    position: fixed;
+    top: v.$spacing-5;
+    right: v.$spacing-5;
+    left: v.$spacing-5;
+    z-index: v.$z-index-tooltip;
+    padding: v.$spacing-3 v.$spacing-5;
+    border-radius: v.$radius-md;
+    background-color: v.$color-success;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    box-shadow: v.$shadow-lg;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    @include m.respond-to(sm) {
+      left: auto;
+    }
+  }
+}
+
+// ============================================================
+// Card shell
+// ============================================================
+.payment-allocation-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__title {
+    @include m.font-heading(v.$font-weight-semibold);
+    padding-bottom: v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    color: v.$color-primary;
+    font-size: v.$font-size-xl;
+    margin: 0;
+  }
+
+  &__hint {
+    @include m.flex(row, flex-start, flex-start, v.$spacing-2);
+    padding: v.$spacing-3 v.$spacing-4;
+    border: 1px solid rgba(v.$color-info, 0.3);
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-info, 0.08);
+    color: v.$color-info;
+    font-size: v.$font-size-sm;
+    margin: 0;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+    }
+  }
+
+  &__error {
+    padding: v.$spacing-3 v.$spacing-4;
+    border: 1px solid rgba(v.$color-danger, 0.3);
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-danger, 0.08);
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+}
+
+// ============================================================
+// Seller / buyer selects
+// ============================================================
+.payment-allocation-parties {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$spacing-4;
+  }
+
+  @include m.respond-to(xl) {
+    max-width: 62rem;
+  }
+}
+
+// ============================================================
+// Payment Advice For — segmented radio pills (native radios stay in the
+// DOM for keyboard + screen-reader support, only visually hidden)
+// ============================================================
+.payment-allocation-mode {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+
+  &__legend {
+    @include m.font-base(v.$font-weight-semibold);
+    float: left;
+    width: 100%;
+    margin-bottom: v.$spacing-3;
+    padding: 0;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    + * {
+      clear: both;
+    }
+  }
+
+  &__options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
+    gap: v.$spacing-2;
+    max-width: 36rem;
+  }
+
+  &__option {
+    position: relative;
+    display: block;
+    cursor: pointer;
+
+    input {
+      @include m.visually-hidden;
+    }
+  }
+
+  &__pill {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-semibold);
+    min-height: 2.75rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+    transition: background-color v.$transition-fast, border-color v.$transition-fast, color v.$transition-fast,
+      box-shadow v.$transition-fast;
+
+    svg {
+      flex-shrink: 0;
+      font-size: 1rem;
+      color: v.$color-text-muted;
+      transition: color v.$transition-fast;
+    }
+  }
+
+  &__option:hover &__pill {
+    border-color: v.$color-primary;
+    background-color: v.$color-bg-muted;
+  }
+
+  &__option input:checked + &__pill {
+    border-color: v.$color-primary;
+    background-color: v.$color-primary;
+    color: v.$color-white;
+    box-shadow: v.$shadow-sm;
+
+    svg {
+      color: v.$color-orange;
+    }
+  }
+
+  &__option input:focus-visible + &__pill {
+    outline: 2px solid v.$color-orange;
+    outline-offset: 2px;
+  }
+}
+
+// ============================================================
+// Seller: / Buyer: summary strip
+// ============================================================
+.payment-allocation-parties-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-2 v.$spacing-6;
+  margin: 0;
+  padding: v.$spacing-3 v.$spacing-4;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg-muted;
+  font-size: v.$font-size-sm;
+
+  > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+    min-width: 0;
+  }
+
+  dt {
+    @include m.font-base(v.$font-weight-semibold);
+    color: v.$color-text-muted;
+  }
+
+  dd {
+    margin: 0;
+    color: v.$color-text;
+    overflow-wrap: anywhere;
+  }
+}
+
+// ============================================================
+// Editable cells inside the pending lists (rendered via column.render)
+// ============================================================
+.payment-allocation-table {
+  // The receipt dropdown opens downward from the row, and the table wrapper
+  // clips overflow — reserve room so the last rows' panels aren't cut off.
+  min-height: 34rem;
+
+  th,
+  td {
+    vertical-align: middle;
+  }
+}
+
+.payment-allocation-cell {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-1;
+  min-width: 0;
+
+  &__input {
+    @include m.font-base;
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    min-width: 11rem;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &::placeholder {
+      color: v.$color-gray-400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-primary;
+      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+    }
+
+    &.has-error {
+      border-color: v.$color-danger;
+    }
+  }
+
+  &__receipt {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+  }
+
+  &__select {
+    flex: 1;
+    min-width: 11rem;
+
+    &.has-error .searchable-select__trigger {
+      border-color: v.$color-danger;
+    }
+
+    // Lift the open dropdown above the rows below it.
+    .searchable-select:focus-within {
+      position: relative;
+      z-index: 2;
+    }
+  }
+
+  &__more {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-primary;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, border-color v.$transition-fast;
+
+    &:hover:not(:disabled) {
+      border-color: v.$color-primary;
+      background-color: v.$color-bg-muted;
+    }
+
+    &:disabled {
+      color: v.$color-gray-400;
+      cursor: not-allowed;
+    }
+  }
+
+  &__error {
+    color: v.$color-danger;
+    font-size: 0.8rem;
+  }
+}
+
+// ============================================================
+// Pagination
+// ============================================================
+.payment-allocation-pagination {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  p {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-wrap: wrap;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-bg-muted;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
+
+// ============================================================
+// Cancel / Save — inline on laptops, pinned to the bottom on phones and
+// tablets where scrolling back down to find them is poor UX.
+// ============================================================
+.payment-allocation-actions {
+  @include m.flex(row, flex-end, center, v.$spacing-3);
+
+  @include m.respond-below(md) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: v.$z-index-sticky;
+    padding: v.$spacing-3 v.$spacing-4;
+    background-color: v.$color-bg;
+    border-top: 1px solid v.$color-border;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
+
+    .payment-allocation-actions__cancel,
+    .payment-allocation-actions__save {
+      flex: 1;
+    }
+  }
+
+  &__cancel,
+  &__save {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2.75rem;
+    padding: 0 v.$spacing-6;
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, opacity v.$transition-fast;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__cancel {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+  &__save {
+    background-color: v.$color-primary;
+    color: v.$color-white;
+
+    &:hover:not(:disabled) {
+      background-color: v.$color-primary-dark;
+    }
+  }
+}
