@@ -363,9 +363,15 @@ const ContractchangeStatus = () => {
       return;
     }
 
+    if (!record.contractNumber) {
+      setError("Contract number is missing on the selected record.");
+      return;
+    }
+
     try {
       await updateContractStatus({
         contractId: record.contractId,
+        contractNumber: record.contractNumber,
         calculatedStatus: status,
         reviewRemarks: reviewRemarks.trim() || undefined,
         actionPerformedBy: currentUserId,

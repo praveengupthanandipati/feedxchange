@@ -271,12 +271,20 @@ const filteredRows = useMemo(() => {
     }
 
     if (dateRangeFilter === "Last 7 Days") {
+       const endOfToday = new Date().setHours(23, 59, 59, 999);
+       if (row.dateValue < Date.now() - 7 * DAY_MS || row.dateValue > endOfToday) {
+         return false;
+       }
       if (row.dateValue < Date.now() - 7 * DAY_MS) {
         return false;
       }
     }
 
     if (dateRangeFilter === "Last 30 Days") {
+      // const endOfToday = new Date().setHours(23, 59, 59, 999);
+      // if (row.dateValue < Date.now() - 30 * DAY_MS || row.dateValue > endOfToday) {
+      //   return false;
+      // }
       if (row.dateValue < Date.now() - 30 * DAY_MS) {
         return false;
       }

@@ -438,6 +438,7 @@ export interface ContractStatusOption {
 
 export interface UpdateContractStatusRequest {
   contractId: number;
+  contractNumber: string;
   calculatedStatus: string;
   reviewRemarks?: string | null;
   actionPerformedBy: number;
