@@ -19,10 +19,41 @@ function formatText(value: string | null | undefined): string {
   return value?.trim() ? value : "-";
 }
 
+interface DetailEntry {
+  label: string;
+  value: string;
+}
+
+/** "" for anything the contract has not filled in, so the field can be left out. */
+function asText(value: string | null | undefined): string {
+  return value?.trim() ?? "";
+}
+
+function asNumberText(value: number | null | undefined, suffix = ""): string {
+  return value == null ? "" : `${value.toLocaleString("en-IN")}${suffix}`;
+}
+
+function asDate(value: string | null | undefined): string {
+  if (!value) return "";
+  const formatted = formatDisplayDate(value);
+  return formatted === "-" ? "" : formatted;
+}
+
+function asDateRange(from: string | null | undefined, to: string | null | undefined): string {
+  const start = asDate(from);
+  const end = asDate(to);
+  if (start && end) return start === end ? start : `${start} to ${end}`;
+  return start || end;
+}
+
 interface ContractSummaryPanelProps {
   contractNumber: string;
-  /** Extra detail fields shown after Product Name, e.g. the contract's loading and delivery addresses. */
-  extraFields?: { label: string; value: string }[];
+  /**
+   * Detail fields to show alongside the ones read off the contract. A field here
+   * replaces the contract's own when the labels match, so a screen can show its own
+   * addresses — a schedule's, say — in place of the contract's.
+   */
+  extraFields?: DetailEntry[];
 }
 
 const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSummaryPanelProps) => {
@@ -41,6 +72,44 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
     useContractQuantitySummary(contractNumber);
   const pendingQty = availableQty;
   const arrangedQty = Math.max(committedQty - dispatchedQty, 0);
+
+  // Everything the contract actually carries. Fields the contract has not filled in
+  // are dropped rather than shown as "-", so the grid only ever holds real data.
+  const detailFields = useMemo(() => {
+    const basic = contract?.basicDetails;
+    const seller = contract?.sellerConditions;
+    const buyer = contract?.buyerConditions;
+    const payments = contract?.paymentsInvoices;
+
+    const fromContract: DetailEntry[] = [
+      { label: "Loading Address", value: asText(seller?.loadingAddressAt) },
+      { label: "Delivery Address", value: asText(buyer?.loadingAddressAt) },
+      { label: "Delivery Type", value: asText(basic?.deliveryType) },
+      { label: "Delivery Schedule", value: asText(seller?.deliverySchedule) },
+      {
+        label: "Seller Delivery Window",
+        value: asDateRange(seller?.sellerFromDate, seller?.sellerToDate),
+      },
+      {
+        label: "Buyer Delivery Window",
+        value: asDateRange(buyer?.buyerFromDate, buyer?.buyerToDate),
+      },
+      { label: "Contract Rate", value: basic?.contractRate == null ? "" : `₹${asNumberText(basic.contractRate)}` },
+      { label: "Net Rate", value: basic?.netRate == null ? "" : `₹${asNumberText(basic.netRate)}` },
+      { label: "GST", value: asNumberText(basic?.gstPercentage, "%") },
+      { label: "PO Tolerance", value: asNumberText(basic?.poTolerancePercentage, "%") },
+      { label: "Indicative Freight", value: basic?.indicativeFreight == null ? "" : `₹${asNumberText(basic.indicativeFreight)}` },
+      { label: "Payment Terms", value: asText(payments?.paymentTerms) },
+      { label: "Contract Status", value: asText(basic?.calculatedStatus) },
+    ].filter((field) => field.value);
+
+    // A caller's field wins over the contract's when both use the same label.
+    const overridden = new Set(extraFields.map((field) => field.label));
+    return [
+      ...fromContract.filter((field) => !overridden.has(field.label)),
+      ...extraFields.filter((field) => field.value),
+    ];
+  }, [contract, extraFields]);
 
   return (
     <>
@@ -113,10 +182,10 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
             <span>Product Name</span>
             <strong>{formatText(contract?.productName)}</strong>
           </div>
-          {extraFields.map((field) => (
+          {detailFields.map((field) => (
             <div className="assign-transports-details__field" key={field.label}>
               <span>{field.label}</span>
-              <strong>{field.value || "-"}</strong>
+              <strong>{field.value}</strong>
             </div>
           ))}
         </div>
