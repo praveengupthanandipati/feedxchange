@@ -10,12 +10,11 @@ import {
   type OpenAndPendingContract,
 } from "../../../../../store/contractsApi";
 import {
+  getApiErrorMessage,
   useGetContractTruckChainOverviewQuery,
   useReassignContractTruckMutation,
-  type ContractTruckChainLeg,
   type ContractTruckChainOverview,
 } from "../../../../../store/contractTrucksApi";
-// ContractTruckChainLeg is still used for the acting party roles below.
 import { useSelectedContract } from "../../../../../context/SelectedContractContext";
 import { splitApiDateTimeForForm } from "../../../../../utils/apiDateTime";
 import "./ReassignTruck.scss";
@@ -64,17 +63,6 @@ function sameProduct(
   return row.productName.trim().toLowerCase() === sourceProductName.trim().toLowerCase();
 }
 
-/** The roles the acting party holds across the chain, e.g. "Buyer on X · Seller on Y". */
-function rolesOf(profileId: number, legs: ContractTruckChainLeg[]): string {
-  return legs
-    .flatMap((leg) => [
-      leg.buyerProfileId === profileId ? `Buyer on ${leg.contractNumber}` : "",
-      leg.sellerProfileId === profileId ? `Seller on ${leg.contractNumber}` : "",
-    ])
-    .filter(Boolean)
-    .join(" · ");
-}
-
 interface ReassignFormProps {
   contractNumber: string;
   contractTruckId: number;
@@ -86,12 +74,29 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
   const { truck, legs } = overview;
 
   const sourceLeg = legs.find((leg) => leg.contractDispatchId === contractTruckId) ?? legs[0];
-  const orderedLegs = useMemo(() => [...legs].sort((a, b) => a.chainPosition - b.chainPosition), [legs]);
 
-  // The party re-assigning is the seller on the source leg, pushing the truck onto the
-  // contract that supplies them — the one where they are the buyer.
-  const actingPartyId = sourceLeg?.sellerProfileId ?? 0;
-  const actingPartyName = sourceLeg?.sellerName ?? "You";
+  // Either party on the source leg can re-assign the truck. Each has a yard on it: the
+  // seller's is where the leg loads, the buyer's is where it delivers.
+  const parties = useMemo(
+    () =>
+      sourceLeg
+        ? [
+            {
+              id: sourceLeg.sellerProfileId,
+              name: sourceLeg.sellerName,
+              yardAddressId: sourceLeg.fromAddressId,
+              yardAddress: sourceLeg.loadingAddress,
+            },
+            {
+              id: sourceLeg.buyerProfileId,
+              name: sourceLeg.buyerName,
+              yardAddressId: sourceLeg.toAddressId,
+              yardAddress: sourceLeg.deliveryAddress,
+            },
+          ]
+        : [],
+    [sourceLeg],
+  );
 
   const { data: sourceContract, isFetching: loadingSource } =
     useGetContractByContractNumberQuery(contractNumber);
@@ -115,37 +120,46 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
     { skip: !targetContractNumber },
   );
 
-  // The new leg loads at an address registered by the seller on the contract above.
-  const { data: targetSellerAddresses } = useGetProfileAddressQuery(String(targetContract?.sellerId ?? 0), {
-    skip: !targetContract?.sellerId,
-  });
-
-  // Only this party's own contracts for the product on the truck are ever offered. A
-  // truck carries one product, so a contract for anything else can never be a valid
-  // target — this rule is never relaxed, unlike the role and quantity rules below.
-  const myContracts = useMemo(() => {
+  // Every open contract either party is on — as buyer or seller — for the product on the
+  // truck. A truck carries one product, so a contract for anything else can never be a
+  // valid target.
+  const targetOptions = useMemo(() => {
     if (!sourceContract) return [];
 
     return (openContracts ?? []).filter(
       (row) =>
         row.contractNumber !== contractNumber &&
-        (samePartyName(row.buyer, actingPartyName) || samePartyName(row.seller, actingPartyName)) &&
+        parties.some((party) => samePartyName(row.buyer, party.name) || samePartyName(row.seller, party.name)) &&
         sameProduct(row, sourceContract.productId, sourceContract.productName),
     );
-  }, [openContracts, contractNumber, actingPartyName, sourceContract]);
+  }, [openContracts, contractNumber, parties, sourceContract]);
 
-  // Of those, the ones where you buy and enough is still pending.
-  const preferredContracts = useMemo(
-    () =>
-      myContracts.filter(
-        (row) =>
-          samePartyName(row.buyer, actingPartyName) && row.pendingQuantityMT >= truck.quantityMT,
-      ),
-    [myContracts, actingPartyName, truck.quantityMT],
-  );
+  // The role a party holds on the chosen target, matched on profile id once the contract
+  // has loaded and on the listed name until then.
+  const targetRow = targetOptions.find((row) => row.contractNumber === targetContractNumber);
+  const roleOnTarget = (party: (typeof parties)[number]): "seller" | "buyer" | null => {
+    if (targetContract?.sellerId || targetContract?.buyerId) {
+      if (targetContract.sellerId === party.id) return "seller";
+      if (targetContract.buyerId === party.id) return "buyer";
+      return null;
+    }
+    if (samePartyName(targetRow?.seller, party.name)) return "seller";
+    if (samePartyName(targetRow?.buyer, party.name)) return "buyer";
+    return null;
+  };
 
-  const usingFallback = preferredContracts.length === 0 && myContracts.length > 0;
-  const targetOptions = usingFallback ? myContracts : preferredContracts;
+  // The party on the target re-assigns it. Selling on the target sends the truck
+  // downstream: it loads at their yard and is delivered to the target's buyer. Buying on
+  // it sends the truck upstream: it loads at the target's seller and is delivered to their yard.
+  const actingParty = parties.find((party) => roleOnTarget(party) !== null);
+  const isDownstream = actingParty ? roleOnTarget(actingParty) === "seller" : false;
+
+  // The end of the new leg away from the acting party's yard is picked from the other
+  // party's addresses on the target contract.
+  const counterpartyId = (isDownstream ? targetContract?.buyerId : targetContract?.sellerId) ?? 0;
+  const { data: counterpartyAddresses } = useGetProfileAddressQuery(String(counterpartyId), {
+    skip: !counterpartyId,
+  });
 
   useEffect(() => {
     if (!sourceLeg || assignedOn) return;
@@ -170,7 +184,8 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
   const validate = () => {
     const nextErrors: Record<string, string> = {};
     if (!targetContractNumber) nextErrors.targetContract = "Select the contract to re-assign onto.";
-    if (!loadingAddressId) nextErrors.loadingAddress = "Select the loading address for this leg.";
+    if (!loadingAddressId)
+      nextErrors.loadingAddress = `Select the ${isDownstream ? "delivery" : "loading"} address for this leg.`;
     if (!lrNumber.trim()) nextErrors.lrNumber = "LR number is required for this leg.";
     if (!assignedOn) nextErrors.assignedOn = "Assigned on is required.";
     if (freightMode === "override") {
@@ -186,7 +201,7 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    if (!targetContract?.id) {
+    if (!targetContract?.id || !actingParty) {
       setSubmitError("That contract could not be loaded. Pick it again.");
       return;
     }
@@ -194,13 +209,13 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
     setSubmitError("");
 
     try {
-      const succeeded = await reassignContractTruck({
+      const { succeeded, errorMessage } = await reassignContractTruck({
         sourceContractDispatchId: sourceLeg.contractDispatchId,
         targetContractId: targetContract.id,
-        reassignedByProfileId: actingPartyId,
-        loadingAddressId: Number(loadingAddressId),
-        // This leg delivers where the source leg loads — your own yard on your contract.
-        deliveryAddressId: sourceLeg.fromAddressId,
+        reassignedByProfileId: actingParty.id,
+        // One end is the acting party's yard on the source leg; the other was picked above.
+        loadingAddressId: isDownstream ? actingParty.yardAddressId : Number(loadingAddressId),
+        deliveryAddressId: isDownstream ? Number(loadingAddressId) : actingParty.yardAddressId,
         lrNumber: lrNumber.trim(),
         assignedOn: new Date(assignedOn).toISOString(),
         freightPerMT: freightMode === "same" ? sourceLeg.freightPerMT : Number(freightOverride),
@@ -208,26 +223,22 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
       }).unwrap();
 
       if (!succeeded) {
-        setSubmitError("The server rejected this re-assignment. Please try again.");
+        setSubmitError(errorMessage || "The server rejected this re-assignment. Please try again.");
         return;
       }
 
       navigate(
         `/truck-management/open-pending-contracts/view-trucks?contract=${encodeURIComponent(contractNumber)}`,
       );
-    } catch {
-      setSubmitError("Failed to re-assign this truck. Please try again.");
+    } catch (error) {
+      // A refusal sent with an error status carries its reason in the body.
+      const data = error && typeof error === "object" ? (error as { data?: unknown }).data : undefined;
+      setSubmitError(getApiErrorMessage(data) || "Failed to re-assign this truck. Please try again.");
     }
   };
 
   return (
     <>
-      <div className="reassign-truck__acting">
-        <span className="reassign-truck__acting-dot" aria-hidden />
-        <strong>{actingPartyName}</strong>
-        <span>{rolesOf(actingPartyId, orderedLegs) || `Seller on ${sourceLeg.contractNumber}`}</span>
-      </div>
-
       <div className="reassign-truck__layout reassign-truck__layout--single">
         <div className="reassign-truck__main">
           <section className="reassign-truck__panel reassign-truck__source">
@@ -293,7 +304,8 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
                 <option value="">{loadingSource ? "Loading contracts…" : "Select a contract"}</option>
                 {!loadingSource && targetOptions.length === 0 && (
                   <option value="" disabled>
-                    No other open {sourceContract?.productName ?? ""} contract for {actingPartyName}
+                    No other open {sourceContract?.productName ?? ""} contract for {sourceLeg.sellerName} or{" "}
+                    {sourceLeg.buyerName}
                   </option>
                 )}
                 {targetOptions.map((row) => (
@@ -308,7 +320,8 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
 
             <div className="reassign-truck__field">
               <label htmlFor="reassign-loading">
-                Loading address <span className="reassign-truck__required">*</span>
+                {isDownstream ? "Delivery address" : "Loading address"}{" "}
+                <span className="reassign-truck__required">*</span>
               </label>
               <select
                 id="reassign-loading"
@@ -317,15 +330,21 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
                 onChange={(event) => setLoadingAddressId(event.target.value)}
                 disabled={!targetContractNumber || loadingTarget}
               >
-                <option value="">{loadingTarget ? "Loading contract…" : "Select a loading address"}</option>
-                {(targetSellerAddresses ?? []).map((address) => (
+                <option value="">
+                  {loadingTarget
+                    ? "Loading contract…"
+                    : `Select a ${isDownstream ? "delivery" : "loading"} address`}
+                </option>
+                {(counterpartyAddresses ?? []).map((address) => (
                   <option key={address.addressId} value={String(address.addressId)}>
                     {formatAddress(address)}
                   </option>
                 ))}
               </select>
               <p className="reassign-truck__hint">
-                Delivers to {sourceLeg.loadingAddress} · {sourceLeg.contractNumber}
+                {actingParty
+                  ? `${isDownstream ? "Loads at" : "Delivers to"} ${actingParty.yardAddress} · ${sourceLeg.contractNumber}`
+                  : "Select a contract first."}
               </p>
               {errors.loadingAddress && <p className="reassign-truck__error">{errors.loadingAddress}</p>}
             </div>

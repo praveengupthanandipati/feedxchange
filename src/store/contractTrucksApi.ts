@@ -344,6 +344,38 @@ export interface ReassignContractTruckPayload {
   createdBy: number;
 }
 
+export interface ReassignContractTruckResult {
+  succeeded: boolean;
+  /** The server's reason when it refuses, e.g. the truck was already re-assigned. */
+  errorMessage: string;
+}
+
+function toMessages(raw: unknown): string[] {
+  const messages = Array.isArray(raw) ? raw : [raw];
+  return messages.filter((message): message is string => typeof message === "string" && message.trim() !== "");
+}
+
+/**
+ * Reads the server's error text from a response body. It arrives either at the top level,
+ * as in { "ErrorMessage": ["…"] }, or inside a validation problem, as in
+ * { "title": "One or more validation errors occurred.", "errors": { "ErrorMessage": ["…"] } }.
+ */
+export function getApiErrorMessage(body: unknown): string {
+  if (!body || typeof body !== "object") return "";
+  const record = body as Record<string, unknown>;
+
+  const topLevel = toMessages(record.ErrorMessage ?? record.errorMessage);
+  if (topLevel.length > 0) return topLevel.join(" ");
+
+  // Validation problems key each message by field; every field's messages are shown.
+  if (record.errors && typeof record.errors === "object") {
+    const nested = Object.values(record.errors as Record<string, unknown>).flatMap(toMessages);
+    if (nested.length > 0) return nested.join(" ");
+  }
+
+  return "";
+}
+
 export interface UpdateContractTruckStatusPayload {
   contractDispatchId: number;
   dispatchStatusId: number;
@@ -458,16 +490,21 @@ export const contractTrucksApi = createApi({
       providesTags: ["ContractTruck"],
     }),
 
-    reassignContractTruck: builder.mutation<boolean, ReassignContractTruckPayload>({
+    reassignContractTruck: builder.mutation<ReassignContractTruckResult, ReassignContractTruckPayload>({
       query: (body) => ({
         url: "/api/ContractTrucks/ReassignContractTruck",
         method: "POST",
         body,
       }),
-      // The endpoint documents no response body, so anything but an explicit false counts
-      // as done — a 2xx with no body must not read as a rejection.
-      transformResponse: (payload: unknown) => payload !== false,
-      invalidatesTags: ["ContractTruck"],
+      // The endpoint documents no response body, so anything but an explicit false or an
+      // ErrorMessage counts as done — a 2xx with no body must not read as a rejection.
+      transformResponse: (payload: unknown): ReassignContractTruckResult => {
+        const errorMessage = getApiErrorMessage(payload);
+        return { succeeded: payload !== false && !errorMessage, errorMessage };
+      },
+      // Only a done re-assignment refreshes the trucks. A plain tag list is invalidated on
+      // failure too, which refetches the chain, remounts the form and wipes its error.
+      invalidatesTags: (result) => (result?.succeeded ? ["ContractTruck"] : []),
     }),
 
     // Same DispatchScheduleTransporterDto body as UpdateScheduleDispatchAsync.

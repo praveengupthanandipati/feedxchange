@@ -352,32 +352,8 @@
   }
 }
 
-// Acting party card, chain legs and disclosure list.
+// Chain legs and disclosure list.
 .reassign-truck {
-  &__acting {
-    @include m.flex(row, flex-start, center, v.$spacing-2);
-    flex-wrap: wrap;
-    width: fit-content;
-    margin-bottom: v.$spacing-4;
-    padding: v.$spacing-3 v.$spacing-4;
-    border: 1px solid v.$color-border;
-    border-radius: v.$radius-md;
-    background-color: v.$color-white;
-    font-size: v.$font-size-sm;
-
-    span:not(.reassign-truck__acting-dot) {
-      color: v.$color-text-muted;
-      font-size: 0.75rem;
-    }
-  }
-
-  &__acting-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: v.$radius-pill;
-    background-color: v.$color-success;
-  }
-
   &__panel-lede {
     margin: calc(-1 * v.$spacing-3) 0 0;
     color: v.$color-text-muted;
