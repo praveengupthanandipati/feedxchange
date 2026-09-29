@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { API_URL } from "../api/api";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { apiBaseQuery } from "../api/baseQuery";
 import { unwrapArray, unwrapObject } from "./userProfilesCommonApi";
 
 export interface Driver {
@@ -56,7 +56,7 @@ export interface DeleteDriverPayload {
 
 export const driversApi = createApi({
   reducerPath: "driversApi",
-  baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
+  baseQuery: apiBaseQuery,
   tagTypes: ["Driver"],
   endpoints: (builder) => ({
     getAllActiveDrivers: builder.query<Driver[], void>({

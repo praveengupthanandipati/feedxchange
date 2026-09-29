@@ -5,7 +5,8 @@ import { FiArrowLeft, FiEdit3, FiCheckCircle } from "react-icons/fi";
 import { useGetTripByIdQuery, useCompleteTripMutation } from "../../../../store/truckTripApi";
 import CompleteTripModal, { type CompleteTripValues } from "./CompleteTripModal";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
-import "../truck-trip-list/TruckTrip.scss";
+import "../truck-trip-list/TruckTrip.scss";
+import Can from "../../../../auth/Can";
 
 interface DetailFieldProps {
   label: string;
@@ -92,24 +93,28 @@ const TruckTripView = () => {
           </div>
           <div className="business-owner-detail__header-actions">
             {!trip.tripStatus?.toLowerCase().includes("complete") && (
+              <Can any={["truck-trips.manage"]}>
+                <button
+                  type="button"
+                  className="truck-trip-btn truck-trip-btn--primary"
+                  onClick={() => {
+                    setCompleteError(null);
+                    setCompleteModalOpen(true);
+                  }}
+                >
+                  <FiCheckCircle aria-hidden /> Complete Trip
+                </button>
+              </Can>
+            )}
+            <Can any={["truck-trips.manage"]}>
               <button
                 type="button"
-                className="truck-trip-btn truck-trip-btn--primary"
-                onClick={() => {
-                  setCompleteError(null);
-                  setCompleteModalOpen(true);
-                }}
+                className="truck-trip-btn truck-trip-btn--outline"
+                onClick={() => navigate(`/truck-management/transporters/truck-trips/new?id=${trip.tripId}`)}
               >
-                <FiCheckCircle aria-hidden /> Complete Trip
+                <FiEdit3 aria-hidden /> Edit
               </button>
-            )}
-            <button
-              type="button"
-              className="truck-trip-btn truck-trip-btn--outline"
-              onClick={() => navigate(`/truck-management/transporters/truck-trips/new?id=${trip.tripId}`)}
-            >
-              <FiEdit3 aria-hidden /> Edit
-            </button>
+            </Can>
           </div>
         </div>
 

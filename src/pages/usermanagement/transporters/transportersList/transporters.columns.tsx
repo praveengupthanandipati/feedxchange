@@ -37,7 +37,7 @@ export function buildTransporterColumns({
       header: "",
       align: "center",
       render: (row) => (
-        <RowActionsMenu onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+        <RowActionsMenu manageKeys={["profiles.transporter.manage"]} onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
       ),
     },
     {

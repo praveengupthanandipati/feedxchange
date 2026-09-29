@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { API_URL } from "../api/api";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { apiBaseQuery } from "../api/baseQuery";
 import {
   unwrapArray,
   unwrapObject,
@@ -164,7 +164,7 @@ export interface PromoterProfileDetail {
 
 export const promotersApi = createApi({
   reducerPath: "promotersApi",
-  baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
+  baseQuery: apiBaseQuery,
   tagTypes: ["PromoterProfile"],
   endpoints: (builder) => ({
     getPromoterProfileSummary: builder.query<Promoter[], void>({

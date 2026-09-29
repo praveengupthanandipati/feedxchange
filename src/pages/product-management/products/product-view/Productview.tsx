@@ -118,6 +118,7 @@ const Productview = () => {
         <div className="product-view-card product-view-profile">
           <div className="product-view-profile__menu">
             <RowActionsMenu
+              manageKeys={["products.manage"]}
               onEdit={() => navigate(`/products/new?id=${product.id}`)}
               onDelete={() => {
                 setDeleteError(null);

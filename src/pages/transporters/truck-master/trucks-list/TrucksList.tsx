@@ -14,7 +14,8 @@ import {
   useDeleteTruckDetailsMutation,
   type Truck,
 } from "../../../../store/trucksApi";
-import "./Trucks.scss";
+import "./Trucks.scss";
+import Can from "../../../../auth/Can";
 
 const PAGE_SIZE = 10;
 
@@ -208,13 +209,15 @@ const TrucksList = () => {
             <button type="button" className="trucks-btn trucks-btn--warning" onClick={handleExport}>
               <FiDownload aria-hidden /> Export
             </button>
-            <button
-              type="button"
-              className="trucks-btn trucks-btn--primary"
-              onClick={() => navigate("/truck-management/transporters/truck-master/new")}
-            >
-              <FiPlus aria-hidden /> New
-            </button>
+            <Can any={["truck-master.manage"]}>
+              <button
+                type="button"
+                className="trucks-btn trucks-btn--primary"
+                onClick={() => navigate("/truck-management/transporters/truck-master/new")}
+              >
+                <FiPlus aria-hidden /> New
+              </button>
+            </Can>
           </div>
         </div>
 

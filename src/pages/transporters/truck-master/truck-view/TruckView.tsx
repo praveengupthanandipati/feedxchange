@@ -3,7 +3,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiEdit3 } from "react-icons/fi";
 import { useGetTruckDetailsByIdQuery } from "../../../../store/trucksApi";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
-import "../trucks-list/Trucks.scss";
+import "../trucks-list/Trucks.scss";
+import Can from "../../../../auth/Can";
 
 interface DetailFieldProps {
   label: string;
@@ -59,13 +60,15 @@ const TruckView = () => {
             <h1>{truck.truckNumber}</h1>
           </div>
           <div className="business-owner-detail__header-actions">
-            <button
-              type="button"
-              className="trucks-btn trucks-btn--outline"
-              onClick={() => navigate(`/truck-management/transporters/truck-master/new?id=${truck.truckId}`)}
-            >
-              <FiEdit3 aria-hidden /> Edit
-            </button>
+            <Can any={["truck-master.manage"]}>
+              <button
+                type="button"
+                className="trucks-btn trucks-btn--outline"
+                onClick={() => navigate(`/truck-management/transporters/truck-master/new?id=${truck.truckId}`)}
+              >
+                <FiEdit3 aria-hidden /> Edit
+              </button>
+            </Can>
           </div>
         </div>
 

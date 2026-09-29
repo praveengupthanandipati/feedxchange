@@ -10,7 +10,8 @@ import ContactsTab from "./ContactsTab";
 import BankDetailsTab from "./BankDetailsTab";
 import "../transportersList/Transporters.scss";
 import "../../businessowners/BusinessList/Businessowners.scss";
-import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
+import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
+import Can from "../../../../auth/Can";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: FiUser },
@@ -80,13 +81,15 @@ const Transportview = () => {
             </span>
           </div>
           <div className="business-owner-detail__header-actions">
-            <button
-              type="button"
-              className="transporters-btn transporters-btn--outline"
-              onClick={() => navigate(`/transporters/profile?id=${id}`)}
-            >
-              <FiEdit3 aria-hidden /> Edit
-            </button>
+            <Can any={["profiles.transporter.manage"]}>
+              <button
+                type="button"
+                className="transporters-btn transporters-btn--outline"
+                onClick={() => navigate(`/transporters/profile?id=${id}`)}
+              >
+                <FiEdit3 aria-hidden /> Edit
+              </button>
+            </Can>
             <button
               type="button"
               className="transporters-btn transporters-btn--primary"

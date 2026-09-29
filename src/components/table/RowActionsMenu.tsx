@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FiMoreVertical, FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
 import type { IconType } from "react-icons";
+import { useAuth } from "../../auth/AuthContext";
 import "./RowActionsMenu.scss";
 
 export interface RowAction {
@@ -29,19 +30,26 @@ interface RowActionsMenuProps {
   deleteLabel?: string;
   /** Non-interactive label rendered above the actions list (e.g. "Interest of Payments"), for grouping menu items under a heading. Only used with `actions`. */
   menuHeader?: string;
+  /** When set, Edit and Delete only appear for users holding ANY of these permission keys (View is unaffected). */
+  manageKeys?: string[];
 }
 
 const RowActionsMenu = ({
-  onEdit,
+  onEdit: editHandler,
   onView,
-  onDelete,
+  onDelete: deleteHandler,
   actions,
   variant = "menu",
   menuAlign = "right",
   deleteIcon: DeleteIcon = FiTrash2,
   deleteLabel = "Delete",
   menuHeader,
+  manageKeys,
 }: RowActionsMenuProps) => {
+  const { can } = useAuth();
+  const canManage = !manageKeys || can(...manageKeys);
+  const onEdit = canManage ? editHandler : undefined;
+  const onDelete = canManage ? deleteHandler : undefined;
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -62,6 +70,9 @@ const RowActionsMenu = ({
       document.removeEventListener("keydown", handleEscape);
     };
   }, [open]);
+
+  // Nothing left to offer this user (e.g. a view-only role on an edit/delete-only menu).
+  if (!actions && !onEdit && !onView && !onDelete) return null;
 
   if (variant === "inline") {
   return (

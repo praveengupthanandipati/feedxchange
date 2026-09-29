@@ -10,7 +10,8 @@ import ProductsFilters from "./ProductsFilters";
 import Pagination from "./Pagination";
 import { buildProductColumns, getProductStatus } from "./products.columns";
 import { useGetProductsQuery, useDeleteProductMutation, type Product } from "../../../../store/productsApi";
-import "./Products.scss";
+import "./Products.scss";
+import Can from "../../../../auth/Can";
 
 const PAGE_SIZE = 10;
 const DEFAULT_STATUS_FILTER = "Active";
@@ -173,13 +174,15 @@ const Products = () => {
             >
               <FiDownload aria-hidden /> Export
             </button>
-            <button
-              type="button"
-              className="products-list-btn products-list-btn--primary"
-              onClick={() => navigate("new")}
-            >
-              <FiPlus aria-hidden /> New
-            </button>
+            <Can any={["products.manage"]}>
+              <button
+                type="button"
+                className="products-list-btn products-list-btn--primary"
+                onClick={() => navigate("new")}
+              >
+                <FiPlus aria-hidden /> New
+              </button>
+            </Can>
           </div>
         </div>
 

@@ -35,7 +35,7 @@ export function buildPromoterColumns({ onEdit, onView, onDelete }: ColumnHandler
       header: "",
       align: "center",
       render: (row) => (
-        <RowActionsMenu onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+        <RowActionsMenu manageKeys={["profiles.promoter.manage"]} onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
       ),
     },
     {

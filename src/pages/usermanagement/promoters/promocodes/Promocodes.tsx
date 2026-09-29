@@ -12,7 +12,8 @@ import {
   type PromoCodeRow,
 } from "./promocodes.data";
 import "../promoterslist/Promoters.scss";
-import "./Promocodes.scss";
+import "./Promocodes.scss";
+import Can from "../../../../auth/Can";
 
 const PAGE_SIZE = 10;
 const CODE_PATTERN = /^[A-Za-z0-9_-]+$/;
@@ -251,13 +252,15 @@ const Promocodes = () => {
       <div className="promocodes-card">
         <div className="promocodes-card__header">
           <h1>Promo Codes</h1>
-          <button
-            type="button"
-            className="promocodes-btn promocodes-btn--primary"
-            onClick={handleOpenDrawer}
-          >
-            <FiPlus aria-hidden /> New Promo Code
-          </button>
+          <Can any={["promocodes.manage"]}>
+            <button
+              type="button"
+              className="promocodes-btn promocodes-btn--primary"
+              onClick={handleOpenDrawer}
+            >
+              <FiPlus aria-hidden /> New Promo Code
+            </button>
+          </Can>
         </div>
 
         <input

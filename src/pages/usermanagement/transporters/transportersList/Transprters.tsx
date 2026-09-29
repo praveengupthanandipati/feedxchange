@@ -16,7 +16,8 @@ import {
   type Transporter,
   type TransporterProfileStatus,
 } from "../../../../store/transportersApi";
-import "./Transporters.scss";
+import "./Transporters.scss";
+import Can from "../../../../auth/Can";
 
 const PAGE_SIZE = 10;
 const DEFAULT_STATUS_FILTER: TransporterProfileStatus = "Active";
@@ -173,13 +174,15 @@ const Transprters = () => {
             >
               <FiDownload aria-hidden /> Export
             </button>
-            <button
-              type="button"
-              className="transporters-btn transporters-btn--primary"
-              onClick={() => navigate("/transporters/profile")}
-            >
-              <FiPlus aria-hidden /> New
-            </button>
+            <Can any={["profiles.transporter.manage"]}>
+              <button
+                type="button"
+                className="transporters-btn transporters-btn--primary"
+                onClick={() => navigate("/transporters/profile")}
+              >
+                <FiPlus aria-hidden /> New
+              </button>
+            </Can>
           </div>
         </div>
 

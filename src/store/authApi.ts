@@ -11,12 +11,19 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
+  /** The access token (short-lived JWT). */
   token?: string;
+  /** Single-use token that renews the access token; every refresh returns a new one. */
+  refreshToken?: string;
+  /** ISO time the access token expires. */
+  accessTokenExpiresAt?: string;
   accessToken?: string;
   message?: string;
   result?: { token?: string };
   user?: Record<string, unknown>;
-  userPermissions?: unknown[];
+  /** Stable permission keys, e.g. "contracts.manage". Absent on older API builds. */
+  permissionKeys?: string[];
+  roleKey?: string | null;
 }
 
 export const authApi = createApi({

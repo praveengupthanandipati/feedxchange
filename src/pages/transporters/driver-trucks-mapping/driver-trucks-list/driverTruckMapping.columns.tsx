@@ -42,6 +42,7 @@ export function buildDriverTruckMappingColumns({
       align: "center",
       render: (row) => (
         <RowActionsMenu
+          manageKeys={["driver-truck-mapping.manage"]}
           onView={() => onView(row)}
           onDelete={() => onDelete(row)}
           deleteIcon={FiUnlock}

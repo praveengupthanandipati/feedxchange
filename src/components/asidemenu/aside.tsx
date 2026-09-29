@@ -4,6 +4,9 @@ import { FiChevronLeft, FiLogOut, FiX } from "react-icons/fi";
 import logo from "../../assets/img/logo.png";
 import favIcon from "../../assets/img/fav.png";
 import { asideNavSections } from "./aside.data";
+import { filterNavSections } from "./filterNav";
+import { toNavSections } from "../../auth/menu";
+import { useAuth } from "../../auth/AuthContext";
 import AsideMenuItem from "./AsideMenuItem";
 import { useSelectedContract } from "../../context/SelectedContractContext";
 import "./aside.scss";
@@ -11,7 +14,8 @@ import "./aside.scss";
 // The Contract Dispatch Management children all act on one specific contract.
 // Once a contract has been picked they carry it along automatically; before that
 // they still open, and each screen asks for a contract itself.
-const CONTRACT_SCOPED_ITEM_ID = "contract-dispatch-management";
+// (the built-in menu calls it "contract-dispatch-management", the Pages table "pending-contracts")
+const CONTRACT_SCOPED_ITEM_IDS = ["contract-dispatch-management", "pending-contracts"];
 
 const SCROLL_INDICATOR_TIMEOUT = 800;
 
@@ -27,15 +31,16 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
   const [openItemId, setOpenItemId] = useState<string | null>(null);
   const scrollTimer = useRef<number | undefined>(undefined);
   const { selectedContract } = useSelectedContract();
+  const { can, logout, menu } = useAuth();
 
   useEffect(() => () => window.clearTimeout(scrollTimer.current), []);
 
   const navSections = useMemo(
     () =>
-      asideNavSections.map((section) => ({
+      (menu ? toNavSections(menu) : filterNavSections(asideNavSections, can)).map((section) => ({
         ...section,
         items: section.items.map((item) => {
-          if (item.id !== CONTRACT_SCOPED_ITEM_ID || !selectedContract) return item;
+          if (!CONTRACT_SCOPED_ITEM_IDS.includes(item.id) || !selectedContract) return item;
 
           return {
             ...item,
@@ -46,7 +51,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           };
         }),
       })),
-    [selectedContract],
+    [selectedContract, can, menu],
   );
 
   const handleItemToggle = (id: string) => {
@@ -123,6 +128,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           title="Logout"
           onClick={() => {
             onCloseMobile?.();
+            logout();
             navigate("/login");
           }}
         >

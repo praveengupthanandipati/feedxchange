@@ -4,7 +4,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiEdit3, FiSend } from "react-icons/fi";
 import { useGetDriverByIdQuery } from "../../../../store/driversApi";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
-import "../drivers-list/Drivers.scss";
+import "../drivers-list/Drivers.scss";
+import Can from "../../../../auth/Can";
 
 interface DetailFieldProps {
   label: string;
@@ -72,15 +73,17 @@ const DriverView = () => {
             <span className="drivers__bloodgroup">{driver.bloodGroup}</span>
           </div>
           <div className="business-owner-detail__header-actions">
-            <button
-              type="button"
-              className="drivers-btn drivers-btn--outline"
-              onClick={() =>
-                navigate(`/truck-management/transporters/driver-master/new?id=${driver.driverId}`)
-              }
-            >
-              <FiEdit3 aria-hidden /> Edit
-            </button>
+            <Can any={["drivers-master.manage"]}>
+              <button
+                type="button"
+                className="drivers-btn drivers-btn--outline"
+                onClick={() =>
+                  navigate(`/truck-management/transporters/driver-master/new?id=${driver.driverId}`)
+                }
+              >
+                <FiEdit3 aria-hidden /> Edit
+              </button>
+            </Can>
             <button
               type="button"
               className="drivers-btn drivers-btn--primary"

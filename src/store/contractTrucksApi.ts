@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { API_URL } from "../api/api";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { apiBaseQuery } from "../api/baseQuery";
 import { unwrapArray } from "./userProfilesCommonApi";
 
 export interface AddContractTruckPayload {
@@ -353,9 +353,7 @@ export interface UpdateContractTruckStatusPayload {
 export const contractTrucksApi = createApi({
   reducerPath: "contractTrucksApi",
 
-  baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
-  }),
+  baseQuery: apiBaseQuery,
 
   tagTypes: ["ContractTruck"],
 

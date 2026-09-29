@@ -9,7 +9,8 @@ import TruckTripFilters from "./TruckTripFilters";
 import Pagination from "./Pagination";
 import { buildTruckTripColumns } from "./truckTrip.columns";
 import { useGetAllTripsQuery, type TruckTrip } from "../../../../store/truckTripApi";
-import "./TruckTrip.scss";
+import "./TruckTrip.scss";
+import Can from "../../../../auth/Can";
 
 const PAGE_SIZE = 10;
 
@@ -144,13 +145,15 @@ const TruckTripPage = () => {
             <button type="button" className="truck-trip-btn truck-trip-btn--warning" onClick={handleExport}>
               <FiDownload aria-hidden /> Export
             </button>
-            <button
-              type="button"
-              className="truck-trip-btn truck-trip-btn--primary"
-              onClick={() => navigate("/truck-management/transporters/truck-trips/new")}
-            >
-              <FiPlus aria-hidden /> New Trip
-            </button>
+            <Can any={["truck-trips.manage"]}>
+              <button
+                type="button"
+                className="truck-trip-btn truck-trip-btn--primary"
+                onClick={() => navigate("/truck-management/transporters/truck-trips/new")}
+              >
+                <FiPlus aria-hidden /> New Trip
+              </button>
+            </Can>
           </div>
         </div>
 

@@ -11,7 +11,8 @@ import SuccessToast from "../../../../components/toast/SuccessToast";
 import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
 
 
-import "./Businessowners.scss";
+import "./Businessowners.scss";
+import Can from "../../../../auth/Can";
 import {
   useGetBusinessProfileSummaryQuery,
   useDeleteBusinessProfileMutation,
@@ -94,7 +95,7 @@ function buildBusinessOwnerColumns({ onView, onEdit, onDelete }: ColumnHandlers)
       header: "",
       align: "center",
       render: (row) => (
-        <RowActionsMenu onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+        <RowActionsMenu manageKeys={["profiles.business.manage"]} onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
       ),
     },
     {
@@ -370,13 +371,15 @@ const Businessowners = () => {
             >
               <FiDownload aria-hidden /> Export
             </button>
-            <button
-              type="button"
-              className="business-owners-btn business-owners-btn--primary"
-              onClick={() => navigate("/business-owners/profile")}
-            >
-              <FiPlus aria-hidden /> New
-            </button>
+            <Can any={["profiles.business.manage"]}>
+              <button
+                type="button"
+                className="business-owners-btn business-owners-btn--primary"
+                onClick={() => navigate("/business-owners/profile")}
+              >
+                <FiPlus aria-hidden /> New
+              </button>
+            </Can>
           </div>
         </div>
 

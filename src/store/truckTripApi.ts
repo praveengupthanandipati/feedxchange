@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { API_URL } from "../api/api";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { apiBaseQuery } from "../api/baseQuery";
 import { unwrapArray, unwrapObject } from "./userProfilesCommonApi";
 
 export interface TruckTrip {
@@ -73,7 +73,7 @@ export interface CompleteTripPayload {
 
 export const truckTripApi = createApi({
   reducerPath: "truckTripApi",
-  baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
+  baseQuery: apiBaseQuery,
   tagTypes: ["TruckTrip"],
   endpoints: (builder) => ({
     getAllTrips: builder.query<TruckTrip[], void>({

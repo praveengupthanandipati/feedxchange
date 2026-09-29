@@ -14,7 +14,8 @@ import {
   useDeleteDriverMutation,
   type Driver,
 } from "../../../../store/driversApi";
-import "./Drivers.scss";
+import "./Drivers.scss";
+import Can from "../../../../auth/Can";
 
 const PAGE_SIZE = 10;
 
@@ -165,13 +166,15 @@ const DriversList = () => {
             <button type="button" className="drivers-btn drivers-btn--warning" onClick={handleExport}>
               <FiDownload aria-hidden /> Export
             </button>
-            <button
-              type="button"
-              className="drivers-btn drivers-btn--primary"
-              onClick={() => navigate("/truck-management/transporters/driver-master/new")}
-            >
-              <FiPlus aria-hidden /> New
-            </button>
+            <Can any={["drivers-master.manage"]}>
+              <button
+                type="button"
+                className="drivers-btn drivers-btn--primary"
+                onClick={() => navigate("/truck-management/transporters/driver-master/new")}
+              >
+                <FiPlus aria-hidden /> New
+              </button>
+            </Can>
           </div>
         </div>
 

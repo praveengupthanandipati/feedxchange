@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import logo from "../../assets/img/logo.png";
 import { useLoginMutation } from "../../store/authApi";
+import { useAuth } from "../../auth/AuthContext";
+import { clearSession, saveTokens, savePermissionKeys } from "../../auth/session";
 import "./Login.scss";
 
 const FEATURES = [
@@ -20,19 +22,25 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [login, { isLoading }] = useLoginMutation();
+  const { reload } = useAuth();
 
   const persistSession = (data: {
     token?: string;
     accessToken?: string;
     result?: { token?: string };
     user?: Record<string, unknown>;
-    userPermissions?: unknown[];
+    refreshToken?: string;
+    accessTokenExpiresAt?: string;
+    permissionKeys?: string[];
+    roleKey?: string | null;
   }) => {
+    clearSession(); // never carry a previous user's session or permissions over
     const token = data?.token || data?.accessToken || data?.result?.token || "";
     const user = data?.user || {};
-    const permissions = data?.userPermissions || [];
 
     localStorage.setItem("authUser", JSON.stringify({ email, token }));
+    // Refresh token + expiry: the app renews the access token silently before it expires (see api/tokenRefresh.ts).
+    saveTokens({ token, refreshToken: data?.refreshToken, accessTokenExpiresAt: data?.accessTokenExpiresAt });
 
     try {
       localStorage.setItem("userId", String(user?.id ?? ""));
@@ -45,9 +53,10 @@ const Login = () => {
       localStorage.setItem("roleName", String(user?.roleName ?? ""));
       localStorage.setItem("businessName", String(user?.businessName ?? ""));
       localStorage.setItem("lastLoginDate", String(user?.lastLoginDate ?? ""));
-      localStorage.setItem("permissions", JSON.stringify(permissions));
       localStorage.setItem("businessUnitType", String(user?.businessUnitType ?? ""));
       localStorage.setItem("user", JSON.stringify(user));
+      // Undefined (older API without permission keys) leaves the UI ungated, exactly as before.
+      savePermissionKeys(data?.permissionKeys, data?.roleKey);
     } catch (err) {
       console.warn("Could not persist user data:", err);
     }
@@ -73,6 +82,7 @@ const Login = () => {
       }).unwrap();
 
       persistSession(data);
+      reload();
       navigate("/dashboard");
     } catch (err) {
       const message =

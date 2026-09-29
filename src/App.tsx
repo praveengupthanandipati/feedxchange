@@ -1,6 +1,7 @@
 import './assets/styles/App.scss'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { SelectedContractProvider } from './context/SelectedContractContext'
+import { AuthProvider } from './auth/AuthContext'
 import AppLayout from './components/layout/AppLayout'
 import Login from './pages/login/Login'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -83,6 +84,7 @@ import Refunds from './pages/payments/refunds/Refunds'
 
 function App() {
   return (
+    <AuthProvider>
     <SelectedContractProvider>
     <Router>
       <Routes>
@@ -175,6 +177,7 @@ function App() {
       </Routes>
     </Router>
     </SelectedContractProvider>
+    </AuthProvider>
   )
 }
 

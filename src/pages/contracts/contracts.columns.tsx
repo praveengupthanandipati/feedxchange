@@ -86,7 +86,7 @@ export function buildContractColumns({ onEdit, onDelete }: ColumnHandlers): Tabl
       key: "actions",
       header: "",
       render: (row) => (
-        <RowActionsMenu onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+        <RowActionsMenu manageKeys={["contracts.manage"]} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
       ),
     },
     {

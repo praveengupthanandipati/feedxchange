@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Aside from "../asidemenu/aside";
 import Header from "../header/Header";
+import { RequireSession, RoutePermissionGate } from "../../auth/RouteGuard";
 
 const AppLayout = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
+    <RequireSession>
     <div className="app-layout">
       <Aside mobileOpen={mobileNavOpen} onCloseMobile={() => setMobileNavOpen(false)} />
 
@@ -25,10 +27,13 @@ const AppLayout = () => {
           onToggleMobileNav={() => setMobileNavOpen((prev) => !prev)}
         />
         <main className="app-layout__body">
-          <Outlet />
+          <RoutePermissionGate>
+            <Outlet />
+          </RoutePermissionGate>
         </main>
       </div>
     </div>
+    </RequireSession>
   );
 };
 

@@ -1,0 +1,47 @@
+import type { IconType } from "react-icons";
+import {
+  FiActivity,
+  FiBell,
+  FiBriefcase,
+  FiCheckSquare,
+  FiClipboard,
+  FiFileText,
+  FiFolder,
+  FiGrid,
+  FiHome,
+  FiMessageSquare,
+  FiPackage,
+  FiPieChart,
+  FiSend,
+  FiSettings,
+  FiShield,
+  FiTag,
+  FiTruck,
+  FiUserPlus,
+  FiUsers,
+} from "react-icons/fi";
+
+/** Icon names stored in the Pages / Modules tables -> the icon component. Add a name here to use a new icon in the menu. */
+const icons: Record<string, IconType> = {
+  FiActivity,
+  FiBell,
+  FiBriefcase,
+  FiCheckSquare,
+  FiClipboard,
+  FiFileText,
+  FiFolder,
+  FiGrid,
+  FiHome,
+  FiMessageSquare,
+  FiPackage,
+  FiPieChart,
+  FiSend,
+  FiSettings,
+  FiShield,
+  FiTag,
+  FiTruck,
+  FiUserPlus,
+  FiUsers,
+};
+
+export const iconFor = (name: string | null | undefined): IconType => (name && icons[name]) || FiFolder;

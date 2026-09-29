@@ -14,7 +14,8 @@ import {
   type Promoter,
   type PromoterProfileStatus,
 } from "../../../../store/promotersApi";
-import "./Promoters.scss";
+import "./Promoters.scss";
+import Can from "../../../../auth/Can";
 
 const PAGE_SIZE = 10;
 const DEFAULT_STATUS_FILTER: PromoterProfileStatus = "Active";
@@ -164,13 +165,15 @@ const Promoterlist = () => {
             >
               <FiDownload aria-hidden /> Export
             </button>
-            <button
-              type="button"
-              className="promoters-btn promoters-btn--primary"
-              onClick={() => navigate("/promoters/profile")}
-            >
-              <FiPlus aria-hidden /> New
-            </button>
+            <Can any={["profiles.promoter.manage"]}>
+              <button
+                type="button"
+                className="promoters-btn promoters-btn--primary"
+                onClick={() => navigate("/promoters/profile")}
+              >
+                <FiPlus aria-hidden /> New
+              </button>
+            </Can>
           </div>
         </div>
 

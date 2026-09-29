@@ -38,7 +38,7 @@ export function buildTruckTripColumns({ onView, onEdit }: ColumnHandlers): Table
       key: "actions",
       header: "",
       align: "center",
-      render: (row) => <RowActionsMenu onView={() => onView(row)} onEdit={() => onEdit(row)} />,
+      render: (row) => <RowActionsMenu manageKeys={["truck-trips.manage"]} onView={() => onView(row)} onEdit={() => onEdit(row)} />,
     },
     {
       key: "driverName",

@@ -11,7 +11,8 @@ import { mapPromoterProfileDetail, toRecipientOptions } from "./promoterDetail.d
 import type { DocumentRow, RegionRow } from "./promoterDetail.data";
 import "../promoterslist/Promoters.scss";
 import "../../businessowners/BusinessList/Businessowners.scss";
-import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
+import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
+import Can from "../../../../auth/Can";
 
 interface DetailFieldProps {
   label: string;
@@ -114,13 +115,15 @@ const Promoterview = () => {
             </span>
           </div>
           <div className="business-owner-detail__header-actions">
-            <button
-              type="button"
-              className="promoters-btn promoters-btn--outline"
-              onClick={() => navigate(`/promoters/profile?id=${id}`)}
-            >
-              <FiEdit3 aria-hidden /> Edit
-            </button>
+            <Can any={["profiles.promoter.manage"]}>
+              <button
+                type="button"
+                className="promoters-btn promoters-btn--outline"
+                onClick={() => navigate(`/promoters/profile?id=${id}`)}
+              >
+                <FiEdit3 aria-hidden /> Edit
+              </button>
+            </Can>
             <button type="button" className="promoters-btn promoters-btn--primary" onClick={() => setShareProfileOpen(true)}>
               <FiShare2 aria-hidden /> Share Profile
             </button>

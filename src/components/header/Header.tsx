@@ -11,6 +11,7 @@ import {
   FiMenu,
 } from "react-icons/fi";
 import { notifications } from "./header.data";
+import { useAuth } from "../../auth/AuthContext";
 import "./Header.scss";
 
 interface HeaderProps {
@@ -18,13 +19,21 @@ interface HeaderProps {
   onToggleMobileNav?: () => void;
 }
 
-const USER_NAME = "Admin User";
-const USER_INITIALS = "AU";
+const initialsOf = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "U";
 
 type OpenMenu = "notifications" | "user" | null;
 
 const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
   const navigate = useNavigate();
+  const { displayName, roleName, logout } = useAuth();
+  const USER_NAME = displayName;
+  const USER_INITIALS = initialsOf(displayName);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
@@ -76,6 +85,7 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
 
   const handleLogout = () => {
     setOpenMenu(null);
+    logout();
     navigate("/login");
   };
 
@@ -169,7 +179,10 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
 
           {openMenu === "user" && (
             <ul className="header__dropdown">
-              <li className="header__dropdown-heading">{USER_NAME}</li>
+              <li className="header__dropdown-heading">
+                {USER_NAME}
+                {roleName && <small className="d-block text-secondary fw-normal">{roleName}</small>}
+              </li>
               <li>
                 <button type="button" className="header__dropdown-item">
                   <FiUser aria-hidden />

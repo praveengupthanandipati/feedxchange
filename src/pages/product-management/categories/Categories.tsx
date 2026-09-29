@@ -17,7 +17,8 @@ import SuccessToast from "../../../components/toast/SuccessToast";
 import type { Category } from "../../../store/categoryApi";
 import "../../contracts/NewContract.scss";
 import "./Categories.scss";
-import RowActionsMenu from "../../../components/table/RowActionsMenu";
+import RowActionsMenu from "../../../components/table/RowActionsMenu";
+import Can from "../../../auth/Can";
 
 const PAGE_SIZE = 10;
 const ALLOWED_CATEGORY_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -256,6 +257,7 @@ const handleSave = async () => {
   width: "15%",
   render: (row) => (
     <RowActionsMenu
+      manageKeys={["categories.manage"]}
       variant="menu"
       onEdit={() => handleEdit(row)}
       onDelete={() => handleDelete(row)}
@@ -312,6 +314,7 @@ if (error) {
 }
   return (
     <div className="categories-page">
+      <Can any={["categories.manage"]}>
       <div className="categories-form-card">
         <h2 className="categories-form-card__title">
           {editingId ? "Edit Category" : "Add New Category"}
@@ -403,6 +406,7 @@ if (error) {
           </button>
         </div>
       </div>
+      </Can>
 
       <div className="categories-table-card">
         <Table

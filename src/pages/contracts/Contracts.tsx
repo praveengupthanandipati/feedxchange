@@ -25,7 +25,8 @@ import { buildContractColumns } from "./contracts.columns";
 import { useSuccessToast } from "../../components/toast/useSuccessToast";
 import SuccessToast from "../../components/toast/SuccessToast";
 import { dateRangeOptions, type Contract } from "./contracts.data";
-import "./Contracts.scss";
+import "./Contracts.scss";
+import Can from "../../auth/Can";
 
 const PAGE_SIZE = 10;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -444,13 +445,15 @@ const filteredRows = useMemo(() => {
             >
               <FiDownload aria-hidden /> Export
             </button>
-            <button
-              type="button"
-              className="contracts-btn contracts-btn--primary"
-              onClick={() => navigate("new")}
-            >
-              <FiPlus aria-hidden /> New
-            </button>
+            <Can any={["contracts.manage"]}>
+              <button
+                type="button"
+                className="contracts-btn contracts-btn--primary"
+                onClick={() => navigate("new")}
+              >
+                <FiPlus aria-hidden /> New
+              </button>
+            </Can>
           </div>
         </div>
 

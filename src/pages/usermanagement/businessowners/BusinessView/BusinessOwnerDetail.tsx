@@ -16,7 +16,8 @@ import ContactsTab from "./ContactsTab";
 import BankDetailsTab from "./BankDetailsTab";
 import LinkedBusinessTab from "./LinkedBusinessTab";
 import "../BusinessList/Businessowners.scss";
-import "./BusinessOwnerDetail.scss";
+import "./BusinessOwnerDetail.scss";
+import Can from "../../../../auth/Can";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: FiUser },
@@ -123,13 +124,15 @@ const BusinessOwnerDetail = () => {
             </span>
           </div>
           <div className="business-owner-detail__header-actions">
-            <button
-              type="button"
-              className="business-owners-btn business-owners-btn--outline"
-              onClick={() => navigate(`/business-owners/profile?id=${profile.profileId}`)}
-            >
-              <FiEdit3 aria-hidden /> Edit
-            </button>
+            <Can any={["profiles.business.manage"]}>
+              <button
+                type="button"
+                className="business-owners-btn business-owners-btn--outline"
+                onClick={() => navigate(`/business-owners/profile?id=${profile.profileId}`)}
+              >
+                <FiEdit3 aria-hidden /> Edit
+              </button>
+            </Can>
             <button
               type="button"
               className="business-owners-btn business-owners-btn--primary"

@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { API_URL } from "../api/api";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { apiBaseQuery } from "../api/baseQuery";
 
 
 export function unwrapArray<T>(payload: unknown): T[] {
@@ -17,7 +17,7 @@ export function unwrapObject<T>(payload: unknown): T | null {
   return (payload as T) ?? null;
 }
 
-export const profilesBaseQuery = () => fetchBaseQuery({ baseUrl: API_URL });
+export const profilesBaseQuery = () => apiBaseQuery;
 
 
 export interface ProfileType {

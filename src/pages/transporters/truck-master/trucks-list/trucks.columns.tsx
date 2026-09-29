@@ -27,7 +27,7 @@ export function buildTruckColumns({ onEdit, onView, onDelete }: ColumnHandlers):
       header: "",
       align: "center",
       render: (row) => (
-        <RowActionsMenu onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+        <RowActionsMenu manageKeys={["truck-master.manage"]} onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
       ),
     },
     {
