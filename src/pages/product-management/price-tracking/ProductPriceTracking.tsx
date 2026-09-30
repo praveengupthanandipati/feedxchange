@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
@@ -471,11 +472,11 @@ const ProductPriceTracking = () => {
               <span className="price-tracking-filters__label">Select Date Range</span>
               <div className="price-tracking-filters__input-group">
                 <FiCalendar aria-hidden />
-                <input
-                  type="date"
+                <DatePickerInput
                   value={dateRange}
-                  onChange={(event) => setDateRange(event.target.value)}
-                  aria-label="Select date range"
+                  onChange={(value) => setDateRange(value)}
+                  ariaLabel="Select date range"
+                  clearable
                 />
               </div>
             </div>

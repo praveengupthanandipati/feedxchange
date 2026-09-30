@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import DatePickerInput from "../../../../components/dropdown/DatePickerInput";
 import type { ChangeEvent } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
@@ -140,11 +141,10 @@ const DocumentsSection = ({ entries, onEntriesChange }: DocumentsSectionProps) =
 
                   <div className="form-field">
                     <label className="form-field__label">Date of Issue</label>
-                    <input
-                      type="date"
-                      className="form-field__control"
+                    <DatePickerInput
                       value={entry.dateOfIssue}
-                      onChange={(event) => updateEntry(entry.id, { dateOfIssue: event.target.value })}
+                      onChange={(value) => updateEntry(entry.id, { dateOfIssue: value })}
+                      clearable
                     />
                   </div>
 

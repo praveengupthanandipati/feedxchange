@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { FiMoreVertical, FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
 import type { IconType } from "react-icons";
 import { useAuth } from "../../auth/AuthContext";
+import { useAnchoredPanel } from "../dropdown/useAnchoredPanel";
 import "./RowActionsMenu.scss";
 
 export interface RowAction {
@@ -52,12 +54,22 @@ const RowActionsMenu = ({
   const onDelete = canManage ? deleteHandler : undefined;
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLUListElement>(null);
+  // The menu is drawn in a portal against the viewport, so it is never clipped by the table wrapper
+  // and never runs off-screen — on the last rows it opens upward instead.
+  const { panelStyle } = useAnchoredPanel(open, triggerRef, {
+    minWidth: 160,
+    chromeHeight: 0,
+    fitContent: menuAlign === "left" ? "left" : "right",
+  });
 
   useEffect(() => {
     if (!open) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (!menuRef.current?.contains(event.target as Node)) setOpen(false);
+      const target = event.target as Node;
+      if (!menuRef.current?.contains(target) && !panelRef.current?.contains(target)) setOpen(false);
     };
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
@@ -119,6 +131,7 @@ const RowActionsMenu = ({
   return (
     <div className="row-actions" ref={menuRef}>
       <button
+        ref={triggerRef}
         type="button"
         className="row-actions__trigger"
         onClick={() => setOpen((prev) => !prev)}
@@ -129,8 +142,9 @@ const RowActionsMenu = ({
         <FiMoreVertical aria-hidden />
       </button>
 
-      {open && (
-        <ul className={`row-actions__menu ${menuAlign === "left" ? "row-actions__menu--align-left" : ""}`}>
+      {open &&
+        createPortal(
+        <ul className="row-actions__menu" ref={panelRef} style={panelStyle}>
           {actions && menuHeader && <li className="row-actions__header">{menuHeader}</li>}
           {actions ? (
             actions.map((action) => (
@@ -196,7 +210,8 @@ const RowActionsMenu = ({
               )}
             </>
           )}
-        </ul>
+        </ul>,
+        document.body,
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import DatePickerInput from "../../../../components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
 import { FiUserPlus, FiX } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
@@ -155,12 +156,11 @@ const NewDriverModal = ({
                 <label htmlFor="new-driver-dob">
                   Date of Birth <span className="new-driver-modal__required">*</span>
                 </label>
-                <input
+                <DatePickerInput
                   id="new-driver-dob"
-                  type="date"
-                  className="form-field__control"
                   value={form.dateOfBirth}
-                  onChange={(event) => setField("dateOfBirth", event.target.value)}
+                  onChange={(value) => setField("dateOfBirth", value)}
+                  clearable
                 />
                 {errors.dateOfBirth && <p className="new-driver-modal__error">{errors.dateOfBirth}</p>}
               </div>
@@ -248,12 +248,11 @@ const NewDriverModal = ({
                 <label htmlFor="new-driver-license-issued">
                   License Issued Date <span className="new-driver-modal__required">*</span>
                 </label>
-                <input
+                <DatePickerInput
                   id="new-driver-license-issued"
-                  type="date"
-                  className="form-field__control"
                   value={form.licenseIssuedDate}
-                  onChange={(event) => setField("licenseIssuedDate", event.target.value)}
+                  onChange={(value) => setField("licenseIssuedDate", value)}
+                  clearable
                 />
                 {errors.licenseIssuedDate && (
                   <p className="new-driver-modal__error">{errors.licenseIssuedDate}</p>
@@ -264,12 +263,11 @@ const NewDriverModal = ({
                 <label htmlFor="new-driver-license-expiry">
                   License Expiry Date <span className="new-driver-modal__required">*</span>
                 </label>
-                <input
+                <DatePickerInput
                   id="new-driver-license-expiry"
-                  type="date"
-                  className="form-field__control"
                   value={form.licenseExpiryDate}
-                  onChange={(event) => setField("licenseExpiryDate", event.target.value)}
+                  onChange={(value) => setField("licenseExpiryDate", value)}
+                  clearable
                 />
                 {errors.licenseExpiryDate && (
                   <p className="new-driver-modal__error">{errors.licenseExpiryDate}</p>

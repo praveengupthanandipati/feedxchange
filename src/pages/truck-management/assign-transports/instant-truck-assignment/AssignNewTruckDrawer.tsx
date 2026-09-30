@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FiX, FiSave } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import DatePickerInput from "../../../../components/dropdown/DatePickerInput";
 import { timeOptions } from "../assignTransportsOptions.data";
 import { useGetTransporterProfileSummaryQuery } from "../../../../store/transportersApi";
 import { useGetAllActiveTruckDetailsQuery } from "../../../../store/trucksApi";
@@ -475,12 +476,11 @@ const AssignNewTruckDrawer = ({
               <label className="assign-truck-drawer__label" htmlFor="schedule-date">
                 Date <span className="assign-truck-drawer__required">*</span>
               </label>
-              <input
+              <DatePickerInput
                 id="schedule-date"
-                type="date"
-                className="assign-truck-drawer__control"
                 value={form.date}
-                onChange={(event) => setField("date", event.target.value)}
+                onChange={(value) => setField("date", value)}
+                ariaLabel="Date"
               />
               {errors.date && <p className="assign-truck-drawer__error">{errors.date}</p>}
             </div>

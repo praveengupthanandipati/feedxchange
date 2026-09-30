@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { FiChevronDown, FiSearch, FiX } from "react-icons/fi";
 import type { SearchableSelectOption } from "./SearchableSelect";
+import { useAnchoredPanel } from "./useAnchoredPanel";
 import "./MultiSelect.scss";
 
 interface MultiSelectProps {
@@ -24,6 +26,9 @@ const MultiSelect = ({
   const [query, setQuery] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const { panelStyle, listMaxHeight } = useAnchoredPanel(open, triggerRef);
 
   const selectedOptions = useMemo(
     () => options.filter((option) => value.includes(option.value)),
@@ -40,7 +45,8 @@ const MultiSelect = ({
     if (!open) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (!rootRef.current?.contains(target) && !panelRef.current?.contains(target)) {
         setOpen(false);
         setQuery("");
       }
@@ -80,6 +86,7 @@ const MultiSelect = ({
   return (
     <div className="multi-select" ref={rootRef}>
       <button
+        ref={triggerRef}
         type="button"
         className="multi-select__trigger"
         onClick={() => !disabled && setOpen((prev) => !prev)}
@@ -111,8 +118,9 @@ const MultiSelect = ({
         <FiChevronDown className={open ? "is-open" : ""} aria-hidden />
       </button>
 
-      {open && (
-        <div className="multi-select__panel">
+      {open &&
+        createPortal(
+        <div className="multi-select__panel" ref={panelRef} style={panelStyle}>
           <div className="multi-select__search">
             <FiSearch aria-hidden />
             <input
@@ -123,7 +131,12 @@ const MultiSelect = ({
               placeholder="Search..."
             />
           </div>
-          <ul className="multi-select__options" role="listbox" aria-multiselectable="true">
+          <ul
+            className="multi-select__options"
+            role="listbox"
+            aria-multiselectable="true"
+            style={{ maxHeight: listMaxHeight }}
+          >
             {filteredOptions.length === 0 ? (
               <li className="multi-select__empty">No matches</li>
             ) : (
@@ -146,7 +159,8 @@ const MultiSelect = ({
               })
             )}
           </ul>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

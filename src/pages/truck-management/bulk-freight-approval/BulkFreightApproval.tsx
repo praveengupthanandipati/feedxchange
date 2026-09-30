@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
 import {
   FiEye,
@@ -270,18 +271,18 @@ const BulkFreightApproval = () => {
                 ariaLabel="Select Buyer"
               />
               <div className="bulk-freight-approval-filters__date-range">
-                <input
-                  type="date"
+                <DatePickerInput
                   value={dateFrom}
-                  onChange={(event) => setDateFrom(event.target.value)}
-                  aria-label="Assigned date range from"
+                  onChange={(value) => setDateFrom(value)}
+                  ariaLabel="Assigned date range from"
+                  clearable
                 />
                 <span>to</span>
-                <input
-                  type="date"
+                <DatePickerInput
                   value={dateTo}
-                  onChange={(event) => setDateTo(event.target.value)}
-                  aria-label="Assigned date range to"
+                  onChange={(value) => setDateTo(value)}
+                  ariaLabel="Assigned date range to"
+                  clearable
                 />
               </div>
               <SearchableSelect

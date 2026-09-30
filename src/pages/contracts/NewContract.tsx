@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../components/dropdown/DatePickerInput";
 import type { ChangeEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FiArrowLeft, FiEye, FiEyeOff } from "react-icons/fi";
@@ -1240,12 +1241,11 @@ const { data: products } = useGetProductsQuery();
             <label className="form-field__label" htmlFor="contractDate">
               Date of Contract <span className="form-field__required">*</span>
             </label>
-            <input
+            <DatePickerInput
               id="contractDate"
-              type="date"
-              className="form-field__control"
               value={contractDate}
-              onChange={(event) => setContractDate(event.target.value)}
+              onChange={(value) => setContractDate(value)}
+              clearable
             />
           </div>
 
@@ -1495,28 +1495,22 @@ const { data: products } = useGetProductsQuery();
                     <label className="form-field__label" htmlFor="sellerFromDate">
                       From Date <span className="form-field__required">*</span>
                     </label>
-                    <input
+                    <DatePickerInput
                       id="sellerFromDate"
-                      type="date"
-                      className="form-field__control"
                       value={sellerConditions.fromDate}
-                      onChange={(event) =>
-                        handleSellerConditionChange({ fromDate: event.target.value })
-                      }
+                      onChange={(value) => handleSellerConditionChange({ fromDate: value })}
+                      clearable
                     />
                   </div>
                   <div className="form-field">
                     <label className="form-field__label" htmlFor="sellerToDate">
                       To Date <span className="form-field__required">*</span>
                     </label>
-                    <input
+                    <DatePickerInput
                       id="sellerToDate"
-                      type="date"
-                      className="form-field__control"
                       value={sellerConditions.toDate}
-                      onChange={(event) =>
-                        handleSellerConditionChange({ toDate: event.target.value })
-                      }
+                      onChange={(value) => handleSellerConditionChange({ toDate: value })}
+                      clearable
                     />
                   </div>
                 </>
@@ -1621,28 +1615,22 @@ const { data: products } = useGetProductsQuery();
                     <label className="form-field__label" htmlFor="buyerFromDate">
                       From Date <span className="form-field__required">*</span>
                     </label>
-                    <input
+                    <DatePickerInput
                       id="buyerFromDate"
-                      type="date"
-                      className="form-field__control"
                       value={buyerConditions.fromDate}
-                      onChange={(event) =>
-                        handleBuyerConditionChange({ fromDate: event.target.value })
-                      }
+                      onChange={(value) => handleBuyerConditionChange({ fromDate: value })}
+                      clearable
                     />
                   </div>
                   <div className="form-field">
                     <label className="form-field__label" htmlFor="buyerToDate">
                       To Date <span className="form-field__required">*</span>
                     </label>
-                    <input
+                    <DatePickerInput
                       id="buyerToDate"
-                      type="date"
-                      className="form-field__control"
                       value={buyerConditions.toDate}
-                      onChange={(event) =>
-                        handleBuyerConditionChange({ toDate: event.target.value })
-                      }
+                      onChange={(value) => handleBuyerConditionChange({ toDate: value })}
+                      clearable
                     />
                   </div>
                 </>
@@ -1733,12 +1721,11 @@ const { data: products } = useGetProductsQuery();
               <label className="form-field__label" htmlFor="paymentBeforeDate">
                 Payment Before Date <span className="form-field__required">*</span>
               </label>
-              <input
+              <DatePickerInput
                 id="paymentBeforeDate"
-                type="date"
-                className="form-field__control"
                 value={paymentBeforeDate}
-                onChange={(event) => setPaymentBeforeDate(event.target.value)}
+                onChange={(value) => setPaymentBeforeDate(value)}
+                clearable
               />
             </div>
           )}
@@ -1765,12 +1752,11 @@ const { data: products } = useGetProductsQuery();
                 <label className="form-field__label" htmlFor="immediateAdvanceDate">
                   Immediate Advance Date <span className="form-field__required">*</span>
                 </label>
-                <input
+                <DatePickerInput
                   id="immediateAdvanceDate"
-                  type="date"
-                  className="form-field__control"
                   value={immediateAdvanceDate}
-                  onChange={(event) => setImmediateAdvanceDate(event.target.value)}
+                  onChange={(value) => setImmediateAdvanceDate(value)}
+                  clearable
                 />
               </div>
 
@@ -1792,12 +1778,11 @@ const { data: products } = useGetProductsQuery();
                 <label className="form-field__label" htmlFor="balanceAdvanceDate">
                   Balance Advance Date <span className="form-field__required">*</span>
                 </label>
-                <input
+                <DatePickerInput
                   id="balanceAdvanceDate"
-                  type="date"
-                  className="form-field__control"
                   value={balanceAdvanceDate}
-                  onChange={(event) => setBalanceAdvanceDate(event.target.value)}
+                  onChange={(value) => setBalanceAdvanceDate(value)}
+                  clearable
                 />
               </div>
             </>

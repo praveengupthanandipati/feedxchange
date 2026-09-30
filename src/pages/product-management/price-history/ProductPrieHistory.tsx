@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { useSearchParams } from "react-router-dom";
 import {
   Area,
@@ -96,12 +97,11 @@ const ProductPrieHistory = () => {
             onChange={setSelectedProduct}
             ariaLabel="Select product"
           />
-          <input
-            type="date"
-            className="price-history-filters__date"
+          <DatePickerInput
             value={dateValue}
-            onChange={(event) => setDateValue(event.target.value)}
-            aria-label="Select date"
+            onChange={(value) => setDateValue(value)}
+            ariaLabel="Select date"
+            clearable
           />
           <button type="button" className="price-history-filters__apply" onClick={handleApply}>
             Apply

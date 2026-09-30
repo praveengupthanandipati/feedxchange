@@ -1,0 +1,102 @@
+@use "../../../../../assets/styles/variables" as v;
+@use "../../../../../assets/styles/mixins" as m;
+
+// Truck rows, in the style of the repeatable rows on the business owner screens:
+// one row per truck, with the add button on the last one.
+//
+// The fields wrap by the width they actually have (auto-fit) instead of a fixed column count, so
+// they never get squeezed narrower than a readable input whatever the screen or sidebar state.
+.add-truck-rows {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+    padding: v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+
+    @include m.respond-to(md) {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+
+  &__fields {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: v.$spacing-3;
+    align-items: start;
+
+    // Every input starts at the same height whether or not a label runs long.
+    .assign-truck-drawer__label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .searchable-select {
+      min-width: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    flex-shrink: 0;
+    align-self: flex-end;
+
+    @include m.respond-to(md) {
+      align-self: flex-start;
+    }
+  }
+
+  // Keeps the spacer as tall as a label but out of sight on the stacked (mobile) layout.
+  &__actions-spacer {
+    display: none;
+
+    @include m.respond-to(md) {
+      display: block;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    align-items: center;
+    // Same height as an input, so the buttons sit level with them.
+    min-height: 2.5rem;
+    gap: v.$spacing-2;
+  }
+
+  &__delete,
+  &__add {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: v.$radius-pill;
+    cursor: pointer;
+    transition: filter v.$transition-fast;
+
+    &:hover {
+      filter: brightness(0.92);
+    }
+  }
+
+  &__delete {
+    background-color: rgba(v.$color-danger, 0.12);
+    color: v.$color-danger;
+  }
+
+  &__add {
+    background-color: v.$color-orange;
+    color: v.$color-navy-dark;
+  }
+}

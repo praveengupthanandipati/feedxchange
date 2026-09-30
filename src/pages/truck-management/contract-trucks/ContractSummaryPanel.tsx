@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { FiFileText, FiTruck, FiCheckCircle, FiClock } from "react-icons/fi";
+import { useMemo, useState } from "react";
+import { FiFileText, FiTruck, FiCheckCircle, FiClock, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import {
   useGetContractByContractNumberQuery,
   useGetAllOpenAndPendingContractsQuery,
@@ -57,6 +57,8 @@ interface ContractSummaryPanelProps {
 }
 
 const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSummaryPanelProps) => {
+  // Collapsed by default; the quantity cards above stay visible.
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const { data: contract } = useGetContractByContractNumberQuery(contractNumber, { skip: !contractNumber });
   const { data: openAndPendingContracts } = useGetAllOpenAndPendingContractsQuery();
   const { trucks } = useContractTruckDetails(contractNumber, Boolean(contractNumber));
@@ -162,9 +164,18 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
       </div>
 
       <div className="assign-transports-details">
-        <div className="assign-transports-details__header">
-          <h2>Contract Details</h2>
+        <div className="assign-transports-details__header" style={detailsOpen ? undefined : { marginBottom: 0 }}>
+          <button
+            type="button"
+            className="assign-transports-details__toggle"
+            onClick={() => setDetailsOpen((open) => !open)}
+            aria-expanded={detailsOpen}
+          >
+            <h2>Contract Details</h2>
+            {detailsOpen ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
+          </button>
         </div>
+        {detailsOpen && (
         <div className="assign-transports-details__grid">
           <div className="assign-transports-details__field">
             <span>Seller Name</span>
@@ -189,6 +200,7 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
             </div>
           ))}
         </div>
+        )}
       </div>
     </>
   );

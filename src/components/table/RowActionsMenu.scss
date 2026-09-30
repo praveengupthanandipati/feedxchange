@@ -24,15 +24,9 @@
   }
 
   &__menu {
-    position: absolute;
-    top: calc(100% + #{v.$spacing-1});
-    right: 0;
-    min-width: 160px;
-
-    &--align-left {
-      right: auto;
-      left: 0;
-    }
+    // Placed by the component (fixed, against the viewport) — see useAnchoredPanel.
+    position: fixed;
+    overflow-y: auto;
     list-style: none;
     margin: 0;
     padding: v.$spacing-2;
@@ -40,7 +34,7 @@
     border: 1px solid v.$color-border;
     border-radius: v.$radius-md;
     box-shadow: v.$shadow-lg;
-    z-index: v.$z-index-popover;
+    z-index: v.$z-index-modal-top;
 
     button {
       @include m.flex(row, flex-start, center, v.$spacing-2);

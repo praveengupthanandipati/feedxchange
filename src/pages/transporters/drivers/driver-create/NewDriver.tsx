@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import DatePickerInput from "../../../../components/dropdown/DatePickerInput";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
@@ -168,12 +169,11 @@ const NewDriver = () => {
             <label className="form-field__label" htmlFor="dateOfBirth">
               Date of Birth <span className="form-field__required">*</span>
             </label>
-            <input
+            <DatePickerInput
               id="dateOfBirth"
-              type="date"
-              className="form-field__control"
               value={dateOfBirth}
-              onChange={(event) => setDateOfBirth(event.target.value)}
+              onChange={(value) => setDateOfBirth(value)}
+              clearable
             />
             {errors.dateOfBirth && <p className="form-field__error">{errors.dateOfBirth}</p>}
           </div>
@@ -261,12 +261,11 @@ const NewDriver = () => {
             <label className="form-field__label" htmlFor="licenseIssuedDate">
               License Issued Date <span className="form-field__required">*</span>
             </label>
-            <input
+            <DatePickerInput
               id="licenseIssuedDate"
-              type="date"
-              className="form-field__control"
               value={licenseIssuedDate}
-              onChange={(event) => setLicenseIssuedDate(event.target.value)}
+              onChange={(value) => setLicenseIssuedDate(value)}
+              clearable
             />
             {errors.licenseIssuedDate && <p className="form-field__error">{errors.licenseIssuedDate}</p>}
           </div>
@@ -275,12 +274,11 @@ const NewDriver = () => {
             <label className="form-field__label" htmlFor="licenseExpiryDate">
               License Expiry Date <span className="form-field__required">*</span>
             </label>
-            <input
+            <DatePickerInput
               id="licenseExpiryDate"
-              type="date"
-              className="form-field__control"
               value={licenseExpiryDate}
-              onChange={(event) => setLicenseExpiryDate(event.target.value)}
+              onChange={(value) => setLicenseExpiryDate(value)}
+              clearable
             />
             {errors.licenseExpiryDate && <p className="form-field__error">{errors.licenseExpiryDate}</p>}
           </div>
