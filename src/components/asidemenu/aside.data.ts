@@ -15,6 +15,7 @@ import {
   FiPackage,
   FiSend,
   FiFolder,
+  FiSettings,
 } from "react-icons/fi";
 import type { AsideNavSection } from "./aside.types";
 
@@ -112,6 +113,7 @@ export const asideNavSections: AsideNavSection[] = [
         id: "truck-transporters",
         label: "Transporters",
         icon: FiTruck,
+        path: "/truck-management/transporters/overview",
         children: [
           {
             id: "truck-transporters-freight-approval", permissions: ["freight-approval"],
@@ -272,6 +274,23 @@ export const asideNavSections: AsideNavSection[] = [
         ],
       },
 
+    ],
+  },
+  {
+    id: "settings",
+    title: "Settings",
+    items: [
+      {
+        id: "menu-management",
+        label: "Menu Management",
+        icon: FiSettings,
+        path: "/menu-management/overview",
+        permissions: ["roles-permissions"],
+        children: [
+          { id: "assign-menu-role", label: "Assign Menu Item to Role", path: "/menu-management/assign-role" },
+          { id: "assign-menu-user", label: "Assign Menu Item to User", path: "/menu-management/assign-user" },
+        ],
+      },
     ],
   },
 ];

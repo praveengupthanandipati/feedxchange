@@ -12,6 +12,8 @@ import { trucksApi } from "./trucksApi";
 import { driversApi } from "./driversApi";
 import { truckTripApi } from "./truckTripApi";
 import { driverTruckMappingApi } from "./driverTruckMappingApi";
+import { roleAccessApi } from "./roleAccessApi";
+import { userAccessApi } from "./userAccessApi";
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +30,8 @@ export const store = configureStore({
     [driversApi.reducerPath]: driversApi.reducer,
     [truckTripApi.reducerPath]: truckTripApi.reducer,
     [driverTruckMappingApi.reducerPath]: driverTruckMappingApi.reducer,
+    [roleAccessApi.reducerPath]: roleAccessApi.reducer,
+    [userAccessApi.reducerPath]: userAccessApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -44,6 +48,8 @@ export const store = configureStore({
       driversApi.middleware,
       truckTripApi.middleware,
       driverTruckMappingApi.middleware,
+      roleAccessApi.middleware,
+      userAccessApi.middleware,
     ),
 });
 

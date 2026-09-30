@@ -1,5 +1,5 @@
 import './assets/styles/App.scss'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { SelectedContractProvider } from './context/SelectedContractContext'
 import { AuthProvider } from './auth/AuthContext'
 import AppLayout from './components/layout/AppLayout'
@@ -82,6 +82,11 @@ import PaymentAllocation from './pages/payments/payment-allocation/PaymentAlloca
 import Refunds from './pages/payments/refunds/Refunds'
 
 
+import SubModuleOverview from './pages/overview/SubModuleOverview'
+import RoleAccess from './pages/roles/RoleAccess'
+import UserAccess from './pages/roles/UserAccess'
+
+
 function App() {
   return (
     <AuthProvider>
@@ -122,6 +127,16 @@ function App() {
             <Route path="/promoters/profile-settings" element={<PromoterProfileSettingsStep />} />
           </Route>
           <Route path="/categories" element={<Categories />} />
+          <Route path="/payments/overview" element={<SubModuleOverview />} />
+          <Route path="/reports/overview" element={<SubModuleOverview />} />
+          <Route path="/product-management/overview" element={<SubModuleOverview />} />
+          <Route path="/truck-management/transporters/overview" element={<SubModuleOverview />} />
+          <Route path="/menu-management/overview" element={<SubModuleOverview />} />
+          <Route path="/menu-management/assign-role" element={<RoleAccess />} />
+          <Route path="/menu-management/assign-user" element={<UserAccess />} />
+          {/* the earlier addresses of these two screens */}
+          <Route path="/roles-permissions" element={<Navigate to="/menu-management/assign-role" replace />} />
+          <Route path="/user-access" element={<Navigate to="/menu-management/assign-user" replace />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/new" element={<NewProduct />} />
           <Route path="/products/:id" element={<Productview />} />
