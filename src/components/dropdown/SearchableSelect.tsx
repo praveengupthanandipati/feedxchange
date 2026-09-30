@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { FiChevronDown, FiPlus, FiSearch, FiX } from "react-icons/fi";
+import { useAnchoredPanel } from "./useAnchoredPanel";
 import "./SearchableSelect.scss";
 
 export interface SearchableSelectOption {
@@ -38,6 +40,9 @@ const SearchableSelect = ({
   const [customOptions, setCustomOptions] = useState<SearchableSelectOption[]>([]);
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const { panelStyle, listMaxHeight } = useAnchoredPanel(open, triggerRef);
 
   // Custom items are saved here and always rendered at the end of the list.
   const allOptions = useMemo(() => [...options, ...customOptions], [options, customOptions]);
@@ -57,7 +62,8 @@ const SearchableSelect = ({
     if (!open) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (!rootRef.current?.contains(target) && !panelRef.current?.contains(target)) {
         setOpen(false);
         setQuery("");
       }
@@ -117,6 +123,7 @@ const SearchableSelect = ({
   return (
     <div className="searchable-select" ref={rootRef}>
       <button
+        ref={triggerRef}
         type="button"
         className="searchable-select__trigger"
         onClick={() => setOpen((prev) => !prev)}
@@ -149,8 +156,9 @@ const SearchableSelect = ({
         </span>
       </button>
 
-      {open && (
-        <div className="searchable-select__panel">
+      {open &&
+        createPortal(
+        <div className="searchable-select__panel" ref={panelRef} style={panelStyle}>
           <div className="searchable-select__search">
             <FiSearch aria-hidden />
             <input
@@ -178,7 +186,7 @@ const SearchableSelect = ({
               </button>
             )}
           </div>
-          <ul className="searchable-select__options" role="listbox">
+          <ul className="searchable-select__options" role="listbox" style={{ maxHeight: listMaxHeight }}>
             {filteredOptions.length === 0 ? (
               <li className="searchable-select__empty">No matches</li>
             ) : (
@@ -197,7 +205,8 @@ const SearchableSelect = ({
               ))
             )}
           </ul>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

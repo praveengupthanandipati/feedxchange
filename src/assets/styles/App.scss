@@ -17,6 +17,14 @@ body {
   color: v.$color-text;
   background-color: v.$color-bg;
   margin: 0;
+  // Nothing should ever make the page scroll sideways; wide content scrolls inside its own box.
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
 }
 
 h1,
@@ -41,6 +49,7 @@ a {
 .app-layout {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
   // gap: v.$spacing-3;
   // padding: v.$spacing-3;
   background-color: v.$color-navy-dark;

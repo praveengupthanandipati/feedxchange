@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import DatePickerInput from "../../../../components/dropdown/DatePickerInput";
 import type { ChangeEvent } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
@@ -142,21 +143,19 @@ const DocumentsSection = ({ entries, onEntriesChange }: DocumentsSectionProps) =
 
                   <div className="form-field">
                     <label className="form-field__label">Date of Issue</label>
-                    <input
-                      type="date"
-                      className="form-field__control"
+                    <DatePickerInput
                       value={entry.issuedDate}
-                      onChange={(event) => updateEntry(entry.id, { issuedDate: event.target.value })}
+                      onChange={(value) => updateEntry(entry.id, { issuedDate: value })}
+                      clearable
                     />
                   </div>
 
                   <div className="form-field">
                     <label className="form-field__label">Expiry Date</label>
-                    <input
-                      type="date"
-                      className="form-field__control"
+                    <DatePickerInput
                       value={entry.expiryDate}
-                      onChange={(event) => updateEntry(entry.id, { expiryDate: event.target.value })}
+                      onChange={(value) => updateEntry(entry.id, { expiryDate: value })}
+                      clearable
                     />
                   </div>
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
 import { deductionsTotal, formatTodayInput, nextDeductionId, type DeductionEntry } from "./sellerInvoice.data";
 import "./SellerInvoiceDeductionsPanel.scss";
@@ -67,11 +68,11 @@ const SellerInvoiceDeductionsPanel = ({ deductions, onSubmit, onCancel }: Seller
       <div className="seller-invoice-deductions-panel__fields">
         <div className="seller-invoice-deductions-panel__field">
           <label htmlFor="deduction-date">Date of Deduction</label>
-          <input
+          <DatePickerInput
             id="deduction-date"
-            type="date"
             value={draft.date}
-            onChange={(event) => setDraft((prev) => ({ ...prev, date: event.target.value }))}
+            onChange={(value) => setDraft((prev) => ({ ...prev, date: value }))}
+            clearable
           />
         </div>
 

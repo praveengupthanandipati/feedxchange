@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
@@ -442,12 +443,11 @@ const ContractchangeStatus = () => {
             <label className="form-field__label" htmlFor="contractCloseDate">
               Contract Close Date <span className="form-field__required">*</span>
             </label>
-            <input
+            <DatePickerInput
               id="contractCloseDate"
-              type="date"
-              className="form-field__control"
               value={contractCloseDate}
-              onChange={(event) => setContractCloseDate(event.target.value)}
+              onChange={(value) => setContractCloseDate(value)}
+              clearable
             />
           </div>
         </div>

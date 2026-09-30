@@ -4,6 +4,7 @@
 .login {
   @include m.flex(row, flex-start, stretch);
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: v.$color-bg-muted;
 
   // ============================================================

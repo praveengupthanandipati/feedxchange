@@ -209,29 +209,6 @@ const ScheduleRequestRow = ({
   return (
     <tr>
       <td>{transporterName}</td>
-      <td>{formatApiDateTime(detail.scheduleDateTime)}</td>
-      <td>
-        {detail.offeredQuantityMT} MT @ ₹{detail.offeredFreightPerMT}/MT
-      </td>
-      <td>
-        {detail.acceptedQuantityMT != null
-          ? `${detail.acceptedQuantityMT} MT @ ₹${detail.acceptedFreightPerMT ?? "-"}/MT`
-          : "-"}
-        {detail.negotiated && <span className="manage-schedule-table__tag">Negotiated</span>}
-      </td>
-      <td>{detail.cancelledQuantityMT != null ? `${detail.cancelledQuantityMT} MT` : "-"}</td>
-      <td>
-        <span
-          className={`review-assign-trucks-panel__status review-assign-trucks-panel__status--${statusModifier(statusLabel)}`}
-        >
-          {statusLabel}
-        </span>
-        <span className="manage-schedule-table__timestamps">
-          Notified {formatApiDateTime(detail.notifiedDateTime)}
-          {detail.responseDateTime && <> · Responded {formatApiDateTime(detail.responseDateTime)}</>}
-        </span>
-      </td>
-      <td className="manage-schedule-table__remarks">{detail.responseRemarks || "-"}</td>
       <td className="manage-schedule-table__action-cell">
         <div className="manage-schedule-table__actions">
           {isPending && (
@@ -324,6 +301,29 @@ const ScheduleRequestRow = ({
         </div>
         {actionError && <span className="manage-schedule-table__error">{actionError}</span>}
       </td>
+      <td>{formatApiDateTime(detail.scheduleDateTime)}</td>
+      <td>
+        {detail.offeredQuantityMT} MT @ ₹{detail.offeredFreightPerMT}/MT
+      </td>
+      <td>
+        {detail.acceptedQuantityMT != null
+          ? `${detail.acceptedQuantityMT} MT @ ₹${detail.acceptedFreightPerMT ?? "-"}/MT`
+          : "-"}
+        {detail.negotiated && <span className="manage-schedule-table__tag">Negotiated</span>}
+      </td>
+      <td>{detail.cancelledQuantityMT != null ? `${detail.cancelledQuantityMT} MT` : "-"}</td>
+      <td>
+        <span
+          className={`review-assign-trucks-panel__status review-assign-trucks-panel__status--${statusModifier(statusLabel)}`}
+        >
+          {statusLabel}
+        </span>
+        <span className="manage-schedule-table__timestamps">
+          Notified {formatApiDateTime(detail.notifiedDateTime)}
+          {detail.responseDateTime && <> · Responded {formatApiDateTime(detail.responseDateTime)}</>}
+        </span>
+      </td>
+      <td className="manage-schedule-table__remarks">{detail.responseRemarks || "-"}</td>
     </tr>
   );
 };
@@ -464,13 +464,13 @@ const ManageScheduleContent = ({ contractNumber }: { contractNumber: string }) =
         <thead>
           <tr>
             <th>Transporter</th>
+            <th>Action</th>
             <th>Scheduled For</th>
             <th>Offered</th>
             <th>Accepted</th>
             <th>Cancelled</th>
             <th>Status</th>
             <th>Remarks</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>

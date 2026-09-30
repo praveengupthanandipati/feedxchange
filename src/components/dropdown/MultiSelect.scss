@@ -77,17 +77,14 @@
     }
   }
 
+  // Placed by the component (fixed, against the viewport) — see useAnchoredPanel.
   &__panel {
-    position: absolute;
-    top: calc(100% + #{v.$spacing-2});
-    left: 0;
-    width: 100%;
-    min-width: 14rem;
+    position: fixed;
     background-color: v.$color-bg;
     border: 1px solid v.$color-border;
     border-radius: v.$radius-md;
     box-shadow: v.$shadow-lg;
-    z-index: v.$z-index-popover;
+    z-index: v.$z-index-modal-top;
     overflow: hidden;
   }
 
@@ -99,6 +96,7 @@
 
     input {
       flex: 1;
+      min-width: 0;
       border: none;
       outline: none;
       background: transparent;
@@ -113,7 +111,7 @@
     padding: v.$spacing-2;
     max-height: 14rem;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     button {
       @include m.flex(row, flex-start, center, v.$spacing-2);

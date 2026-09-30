@@ -23,6 +23,29 @@ export interface AddContractTruckPayload {
   createdBy: number;
 }
 
+export interface AddMultipleTrucksItem {
+  truckId: number;
+  driverId: number;
+  assignedOn: string;
+  lrNumber: string;
+  quantityMT: number;
+}
+
+/** Trucks that share one transporter, freight and route go up together. */
+export interface AddMultipleTrucksPayload {
+  contractId: number;
+  truckAssignmentTypeId: number;
+  dispatchScheduleTransporterId: number;
+  transporterProfileId: number;
+  freightPerMT: number;
+  fromAddressId: number;
+  toAddressId: number;
+  dispatchStatusId: number;
+  createdBy: number;
+  createdOn: string;
+  trucks: AddMultipleTrucksItem[];
+}
+
 export interface UpdateContractTruckPayload {
   contractDispatchId: number;
   contractId: number;
@@ -404,6 +427,15 @@ export const contractTrucksApi = createApi({
       invalidatesTags: ["ContractTruck"],
     }),
 
+    addMultipleTrucks: builder.mutation<boolean, AddMultipleTrucksPayload>({
+      query: (body) => ({
+        url: "/api/ContractTrucks/AddMultipleTrucks",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["ContractTruck"],
+    }),
+
     updateContractTrucks: builder.mutation<boolean, UpdateContractTruckRequest>({
       query: ({ contractTruckId, updateContractTruck }) => ({
         url: "/api/ContractTrucks/UpdateContractTrucks",
@@ -552,6 +584,7 @@ export const contractTrucksApi = createApi({
 
 export const {
   useAddContractTrucksMutation,
+  useAddMultipleTrucksMutation,
   useUpdateContractTrucksMutation,
   useUpdateContractTruckStatusMutation,
   useScheduleContractTrucksMutation,

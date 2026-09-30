@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FiArrowLeft, FiFileText, FiTruck } from "react-icons/fi";
 import InfoPanel from "../InfoPanel";
+import SearchableSelect from "../../../../../components/dropdown/SearchableSelect";
 import { useGetAllActiveDriversQuery } from "../../../../../store/driversApi";
 import { useGetProfileAddressQuery } from "../../../../../store/userProfilesCommonApi";
 import {
@@ -289,58 +290,51 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
             <h2 className="reassign-truck__panel-title">Re-assignment Details</h2>
 
             <div className="reassign-truck__field">
-              <label htmlFor="reassign-target">
+              <label>
                 Re-assign onto contract <span className="reassign-truck__required">*</span>
               </label>
-              <select
-                id="reassign-target"
-                className="reassign-truck__control"
+              <SearchableSelect
+                options={targetOptions.map((row) => ({
+                  value: row.contractNumber,
+                  label: `${row.contractNumber} · ${row.seller ?? "-"} → ${row.buyer ?? "-"} · ${row.productName} · ${formatQty(row.pendingQuantityMT)} pending`,
+                }))}
                 value={targetContractNumber}
-                onChange={(event) => {
-                  setTargetContractNumber(event.target.value);
+                onChange={(value) => {
+                  setTargetContractNumber(value);
                   setLoadingAddressId("");
                 }}
-              >
-                <option value="">{loadingSource ? "Loading contracts…" : "Select a contract"}</option>
-                {!loadingSource && targetOptions.length === 0 && (
-                  <option value="" disabled>
-                    No other open {sourceContract?.productName ?? ""} contract for {sourceLeg.sellerName} or{" "}
-                    {sourceLeg.buyerName}
-                  </option>
-                )}
-                {targetOptions.map((row) => (
-                  <option key={row.contractNumber} value={row.contractNumber}>
-                    {row.contractNumber} · {row.seller ?? "-"} → {row.buyer ?? "-"} · {row.productName} ·{" "}
-                    {formatQty(row.pendingQuantityMT)} pending
-                  </option>
-                ))}
-              </select>
+                placeholder={loadingSource ? "Loading contracts…" : "Select a contract"}
+                ariaLabel="Re-assign onto contract"
+              />
+              {!loadingSource && targetOptions.length === 0 && (
+                <p className="reassign-truck__hint">
+                  No other open {sourceContract?.productName ?? ""} contract for {sourceLeg.sellerName} or{" "}
+                  {sourceLeg.buyerName}
+                </p>
+              )}
               {errors.targetContract && <p className="reassign-truck__error">{errors.targetContract}</p>}
             </div>
 
             <div className="reassign-truck__field">
-              <label htmlFor="reassign-loading">
+              <label>
                 {isDownstream ? "Delivery address" : "Loading address"}{" "}
                 <span className="reassign-truck__required">*</span>
               </label>
-              <select
-                id="reassign-loading"
-                className="reassign-truck__control"
+              <SearchableSelect
+                options={(counterpartyAddresses ?? []).map((address) => ({
+                  value: String(address.addressId),
+                  label: formatAddress(address),
+                }))}
                 value={loadingAddressId}
-                onChange={(event) => setLoadingAddressId(event.target.value)}
+                onChange={setLoadingAddressId}
                 disabled={!targetContractNumber || loadingTarget}
-              >
-                <option value="">
-                  {loadingTarget
+                placeholder={
+                  loadingTarget
                     ? "Loading contract…"
-                    : `Select a ${isDownstream ? "delivery" : "loading"} address`}
-                </option>
-                {(counterpartyAddresses ?? []).map((address) => (
-                  <option key={address.addressId} value={String(address.addressId)}>
-                    {formatAddress(address)}
-                  </option>
-                ))}
-              </select>
+                    : `Select a ${isDownstream ? "delivery" : "loading"} address`
+                }
+                ariaLabel={isDownstream ? "Delivery address" : "Loading address"}
+              />
               <p className="reassign-truck__hint">
                 {actingParty
                   ? `${isDownstream ? "Loads at" : "Delivers to"} ${actingParty.yardAddress} · ${sourceLeg.contractNumber}`

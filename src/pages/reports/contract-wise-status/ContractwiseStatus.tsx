@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { FiEye, FiEyeOff, FiDownload, FiCheck, FiRefreshCw, FiMaximize2, FiMinimize2 } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
@@ -178,18 +179,18 @@ const ContractwiseStatus = () => {
 
             <div className="contract-wise-status-filters__field">
               <div className="contract-wise-status-filters__date-range">
-                <input
-                  type="date"
+                <DatePickerInput
                   value={dateFrom}
-                  onChange={(event) => setDateFrom(event.target.value)}
-                  aria-label="Contract date range from"
+                  onChange={(value) => setDateFrom(value)}
+                  ariaLabel="Contract date range from"
+                  clearable
                 />
                 <span>to</span>
-                <input
-                  type="date"
+                <DatePickerInput
                   value={dateTo}
-                  onChange={(event) => setDateTo(event.target.value)}
-                  aria-label="Contract date range to"
+                  onChange={(value) => setDateTo(value)}
+                  ariaLabel="Contract date range to"
+                  clearable
                 />
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import {
   FiCheck,
   FiCheckCircle,
@@ -207,18 +208,18 @@ const Refunds = () => {
               />
             </div>
             <div className="refunds-filters__dates" role="group" aria-label="Payment date range">
-              <input
-                type="date"
+              <DatePickerInput
                 value={draft.dateFrom}
-                onChange={(event) => setDraftField("dateFrom", event.target.value)}
-                aria-label="From date"
+                onChange={(value) => setDraftField("dateFrom", value)}
+                ariaLabel="From date"
+                clearable
               />
               <span aria-hidden>to</span>
-              <input
-                type="date"
+              <DatePickerInput
                 value={draft.dateTo}
-                onChange={(event) => setDraftField("dateTo", event.target.value)}
-                aria-label="To date"
+                onChange={(value) => setDraftField("dateTo", value)}
+                ariaLabel="To date"
+                clearable
               />
             </div>
             <div className="refunds-filters__buttons">

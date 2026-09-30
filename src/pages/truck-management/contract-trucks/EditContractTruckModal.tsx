@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { FiEdit2, FiX } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import DriverSelectFields from "./DriverSelectFields";
 import AddressSelectField from "./AddressSelectField";
 import { timeOptions } from "../open-pending-contracts/contract-trucks/contractDispatch.options";
@@ -280,12 +281,11 @@ const EditContractTruckModal = ({
                 <label className="assign-truck-drawer__label" htmlFor="edit-truck-date">
                   Date <span className="assign-truck-drawer__required">*</span>
                 </label>
-                <input
+                <DatePickerInput
                   id="edit-truck-date"
-                  type="date"
-                  className="assign-truck-drawer__control"
                   value={form.date}
-                  onChange={(event) => setField("date", event.target.value)}
+                  onChange={(value) => setField("date", value)}
+                  ariaLabel="Date"
                 />
                 {errors.date && <p className="assign-truck-drawer__error">{errors.date}</p>}
               </div>

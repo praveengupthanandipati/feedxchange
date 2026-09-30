@@ -56,15 +56,14 @@
   }
 
   &__panel {
-    position: absolute;
-    top: calc(100% + #{v.$spacing-2});
-    left: 0;
-    z-index: v.$z-index-popover;
+    // Placed by the component (fixed, against the viewport) — see useAnchoredPanel.
+    position: fixed;
+    overflow-y: auto;
+    z-index: v.$z-index-modal-top;
+    width: 18rem;
     display: flex;
     flex-direction: column;
     gap: v.$spacing-3;
-    width: 100%;
-    min-width: 16rem;
     padding: v.$spacing-3;
     border: 1px solid v.$color-border;
     border-radius: v.$radius-md;
@@ -72,22 +71,91 @@
     box-shadow: v.$shadow-lg;
   }
 
-  &__field {
-    display: flex;
-    flex-direction: column;
-    gap: v.$spacing-1;
-    font-size: v.$font-size-sm;
-    color: v.$color-text-muted;
+  // Our own calendar rather than the browser's native date picker, whose popup is drawn by the
+  // browser and cannot be kept inside the screen (least of all in device emulation).
+  &__month {
+    @include m.flex(row, space-between, center, v.$spacing-2);
 
-    input {
-      @include m.font-base;
-      height: 2.25rem;
-      padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
-      border-radius: v.$radius-md;
-      background-color: v.$color-bg;
+    strong {
       color: v.$color-text;
       font-size: v.$font-size-sm;
     }
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      width: 2rem;
+      height: 2rem;
+      border: none;
+      border-radius: v.$radius-pill;
+      background: transparent;
+      color: v.$color-text-muted;
+      cursor: pointer;
+
+      &:hover {
+        background-color: v.$color-gray-100;
+        color: v.$color-primary;
+      }
+    }
+  }
+
+  &__days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px;
+    text-align: center;
+  }
+
+  &__weekday {
+    padding: v.$spacing-1 0;
+    color: v.$color-text-muted;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+  }
+
+  &__day {
+    @include m.font-base(v.$font-weight-medium);
+    @include m.focus-ring(v.$color-orange);
+    aspect-ratio: 1;
+    min-height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: v.$radius-md;
+    background: transparent;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background-color: v.$color-gray-100;
+    }
+
+    &:disabled {
+      color: v.$color-gray-400;
+      cursor: not-allowed;
+    }
+
+    &.is-today {
+      box-shadow: inset 0 0 0 1px v.$color-primary;
+    }
+
+    &.is-in-range {
+      border-radius: 0;
+      background-color: rgba(v.$color-orange, 0.14);
+    }
+
+    &.is-edge {
+      background-color: v.$color-orange;
+      color: v.$color-navy-dark;
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    color: v.$color-text-muted;
+    font-size: 0.75rem;
+    text-align: center;
   }
 }

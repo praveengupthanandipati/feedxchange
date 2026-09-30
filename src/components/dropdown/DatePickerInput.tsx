@@ -1,24 +1,48 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type Ref } from "react";
 import { createPortal } from "react-dom";
 import { FiCalendar, FiX } from "react-icons/fi";
 import Calendar, { formatDisplayDate } from "./Calendar";
 import { useAnchoredPanel } from "./useAnchoredPanel";
 import "./DateRangeInput.scss";
 
-interface DateRangeInputProps {
-  from: string;
-  to: string;
-  onChange: (from: string, to: string) => void;
+interface DatePickerInputProps {
+  /** yyyy-mm-dd, or "" for no date. */
+  value: string;
+  onChange: (value: string) => void;
   placeholder?: string;
   ariaLabel?: string;
+  /** Id for the trigger, so a <label htmlFor> can point at it. */
+  id?: string;
+  /** Ref to the trigger button, e.g. to focus it when a dialog opens. */
+  buttonRef?: Ref<HTMLButtonElement>;
+  min?: string;
+  max?: string;
+  disabled?: boolean;
+  /** Shows an "x" to clear the date once one is chosen. */
+  clearable?: boolean;
 }
 
-const DateRangeInput = ({ from, to, onChange, placeholder = "Select Date Range", ariaLabel }: DateRangeInputProps) => {
+/**
+ * Single-date field with its own calendar dropdown, in place of <input type="date">. The native
+ * picker's popup is drawn by the browser and overflows small screens; this one is kept inside the
+ * viewport like the other dropdowns.
+ */
+const DatePickerInput = ({
+  value,
+  onChange,
+  placeholder = "dd-mm-yyyy",
+  ariaLabel,
+  id,
+  buttonRef,
+  min,
+  max,
+  disabled = false,
+  clearable = false,
+}: DatePickerInputProps) => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  // A calendar is a fixed size, so it hangs from the trigger's edge rather than matching its width.
   const { panelStyle } = useAnchoredPanel(open, triggerRef, { minWidth: 288, chromeHeight: 0, fitContent: "left" });
 
   useEffect(() => {
@@ -40,49 +64,39 @@ const DateRangeInput = ({ from, to, onChange, placeholder = "Select Date Range",
     };
   }, [open]);
 
-  // First click starts a range, second click ends it (whichever order the dates were picked in).
-  const pickDay = (iso: string) => {
-    if (!from || to) {
-      onChange(iso, "");
-      return;
-    }
-    if (iso < from) onChange(iso, from);
-    else onChange(from, iso);
-    setOpen(false);
-  };
-
-  const hasValue = Boolean(from || to);
-  const displayValue = hasValue
-    ? `${from ? formatDisplayDate(from) : "dd-mm-yyyy"} to ${to ? formatDisplayDate(to) : "dd-mm-yyyy"}`
-    : "";
-
   return (
     <div className="date-range-input" ref={rootRef}>
       <button
-        ref={triggerRef}
+        ref={(node) => {
+          triggerRef.current = node;
+          if (typeof buttonRef === "function") buttonRef(node);
+          else if (buttonRef) buttonRef.current = node;
+        }}
+        id={id}
         type="button"
         className="date-range-input__trigger"
         onClick={() => setOpen((prev) => !prev)}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={ariaLabel}
+        disabled={disabled}
       >
-        <span className={hasValue ? "" : "is-placeholder"}>{displayValue || placeholder}</span>
+        <span className={value ? "" : "is-placeholder"}>{value ? formatDisplayDate(value) : placeholder}</span>
         <span className="date-range-input__trigger-icons">
-          {hasValue && (
+          {clearable && value && (
             <FiX
               className="date-range-input__clear"
-              aria-label="Clear date range"
+              aria-label="Clear date"
               role="button"
               tabIndex={0}
               onClick={(event) => {
                 event.stopPropagation();
-                onChange("", "");
+                onChange("");
               }}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   event.stopPropagation();
-                  onChange("", "");
+                  onChange("");
                 }
               }}
             />
@@ -93,18 +107,16 @@ const DateRangeInput = ({ from, to, onChange, placeholder = "Select Date Range",
 
       {open &&
         createPortal(
-          <div
-            className="date-range-input__panel"
-            role="dialog"
-            aria-label="Select date range"
-            ref={panelRef}
-            style={panelStyle}
-          >
-            <Calendar from={from} to={to} onPick={pickDay} />
-            <p className="date-range-input__hint">
-              {!from || to ? "Pick the first date" : "Now pick the last date"}
-              {hasValue && <span> · {displayValue}</span>}
-            </p>
+          <div className="date-range-input__panel" role="dialog" aria-label="Select date" ref={panelRef} style={panelStyle}>
+            <Calendar
+              from={value}
+              min={min}
+              max={max}
+              onPick={(iso) => {
+                onChange(iso);
+                setOpen(false);
+              }}
+            />
           </div>,
           document.body,
         )}
@@ -112,4 +124,4 @@ const DateRangeInput = ({ from, to, onChange, placeholder = "Select Date Range",
   );
 };
 
-export default DateRangeInput;
+export default DatePickerInput;

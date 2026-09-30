@@ -261,6 +261,7 @@
     top: calc(100% + #{v.$spacing-2});
     right: 0;
     min-width: 200px;
+    max-width: calc(100vw - 1.5rem);
     list-style: none;
     margin: 0;
     padding: v.$spacing-2;

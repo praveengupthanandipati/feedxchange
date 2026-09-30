@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FiX, FiSave } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
+import DatePickerInput from "../../../../components/dropdown/DatePickerInput";
 import MultiSelect from "../../../../components/dropdown/MultiSelect";
 import { timeOptions } from "../assignTransportsOptions.data";
 import { useGetTransporterProfileSummaryQuery } from "../../../../store/transportersApi";
@@ -357,12 +358,11 @@ const ScheduleRequestDrawer = ({
               <label className="schedule-request-drawer__label" htmlFor="schedule-date">
                 Date <span className="schedule-request-drawer__required">*</span>
               </label>
-              <input
+              <DatePickerInput
                 id="schedule-date"
-                type="date"
-                className="schedule-request-drawer__control"
                 value={form.date}
-                onChange={(event) => setField("date", event.target.value)}
+                onChange={(value) => setField("date", value)}
+                ariaLabel="Date"
               />
               {errors.date && <p className="schedule-request-drawer__error">{errors.date}</p>}
             </div>

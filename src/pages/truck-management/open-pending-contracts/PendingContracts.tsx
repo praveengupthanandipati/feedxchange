@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import {
@@ -349,18 +350,18 @@ const PendingContracts = () => {
                 ariaLabel="Select Buyers"
               />
               <div className="pending-contracts-filters__date-range">
-                <input
-                  type="date"
+                <DatePickerInput
                   value={dateFrom}
-                  onChange={(event) => setDateFrom(event.target.value)}
-                  aria-label="Contract date range from"
+                  onChange={(value) => setDateFrom(value)}
+                  ariaLabel="Contract date range from"
+                  clearable
                 />
                 <span>to</span>
-                <input
-                  type="date"
+                <DatePickerInput
                   value={dateTo}
-                  onChange={(event) => setDateTo(event.target.value)}
-                  aria-label="Contract date range to"
+                  onChange={(value) => setDateTo(value)}
+                  ariaLabel="Contract date range to"
+                  clearable
                 />
               </div>
               <SearchableSelect

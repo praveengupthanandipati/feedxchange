@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../components/dropdown/DatePickerInput";
 import { useNavigate } from "react-router-dom";
 import {
   FiSearch,
@@ -478,18 +479,18 @@ const filteredRows = useMemo(() => {
 
             {dateRangeFilter === "Custom Date Range" && (
               <div className="contracts-filters__date-range">
-                <input
-                  type="date"
+                <DatePickerInput
                   value={customFrom}
-                  onChange={(event) => setCustomFrom(event.target.value)}
-                  aria-label="From date"
+                  onChange={(value) => setCustomFrom(value)}
+                  ariaLabel="From date"
+                  clearable
                 />
                 <span>to</span>
-                <input
-                  type="date"
+                <DatePickerInput
                   value={customTo}
-                  onChange={(event) => setCustomTo(event.target.value)}
-                  aria-label="To date"
+                  onChange={(value) => setCustomTo(value)}
+                  ariaLabel="To date"
+                  clearable
                 />
               </div>
             )}

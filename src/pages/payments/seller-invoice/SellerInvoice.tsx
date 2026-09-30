@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { FiCheck, FiCheckCircle, FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
@@ -173,12 +174,11 @@ const SellerInvoice = () => {
             {/* <label className="form-field__label" htmlFor="seller-invoice-date">
               Invoice Date
             </label> */}
-            <input
+            <DatePickerInput
               id="seller-invoice-date"
-              type="date"
-              className="form-field__control"
               value={invoiceDate}
-              onChange={(event) => setInvoiceDate(event.target.value)}
+              onChange={(value) => setInvoiceDate(value)}
+              clearable
             />
           </div>
 

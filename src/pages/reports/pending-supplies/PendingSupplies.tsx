@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import {
   FiEye,
   FiEyeOff,
@@ -145,22 +146,20 @@ const PendingSupplies = () => {
             </div>
 
             <div className="pending-supplies-filters__field">
-              <input
-                type="date"
-                className="pending-supplies-filters__date"
+              <DatePickerInput
                 value={dateFrom}
-                onChange={(event) => setDateFrom(event.target.value)}
-                aria-label="From Date"
+                onChange={(value) => setDateFrom(value)}
+                ariaLabel="From Date"
+                clearable
               />
             </div>
 
             <div className="pending-supplies-filters__field">
-              <input
-                type="date"
-                className="pending-supplies-filters__date"
+              <DatePickerInput
                 value={dateTo}
-                onChange={(event) => setDateTo(event.target.value)}
-                aria-label="To Date"
+                onChange={(value) => setDateTo(value)}
+                ariaLabel="To Date"
+                clearable
               />
             </div>
 

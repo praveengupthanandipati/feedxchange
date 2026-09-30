@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import DatePickerInput from "../../../../components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
 import { FiX, FiTruck } from "react-icons/fi";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
@@ -147,12 +148,10 @@ const DriverTruckMappingOffcanvas = ({
 
             <div className="driver-truck-mapping-offcanvas__field">
               <label htmlFor="dtm-assigned-from">Assigned From</label>
-              <input
+              <DatePickerInput
                 id="dtm-assigned-from"
-                type="date"
                 value={assignedFrom}
-                onChange={(event) => setAssignedFrom(event.target.value)}
-                required
+                onChange={(value) => setAssignedFrom(value)}
                 disabled={readOnly}
               />
             </div>

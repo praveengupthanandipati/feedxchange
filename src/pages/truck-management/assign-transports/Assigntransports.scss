@@ -141,6 +141,29 @@
   }
 
   &__toggle {
+    @include m.flex(row, space-between, center);
+    width: 100%;
+    gap: v.$spacing-3;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: v.$color-primary;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+
+    h2 {
+      color: inherit;
+      font-size: v.$font-size-base;
+      margin: 0;
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  &__toggle {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
     border: none;

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
 import { FiCheck, FiX } from "react-icons/fi";
 import {
@@ -31,7 +32,7 @@ interface RefundDialogProps {
 const RefundDialog = ({ open, mode, initialValues, seller, buyer, onSubmit, onClose }: RefundDialogProps) => {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<RefundFormErrors>({});
-  const firstFieldRef = useRef<HTMLInputElement>(null);
+  const firstFieldRef = useRef<HTMLButtonElement>(null);
   const readOnly = mode === "view";
 
   useEffect(() => {
@@ -97,15 +98,12 @@ const RefundDialog = ({ open, mode, initialValues, seller, buyer, onSubmit, onCl
         <div className="refund-dialog__grid">
           <div className="refund-dialog__field">
             <label htmlFor="refund-date">Payment Date</label>
-            <input
+            <DatePickerInput
               id="refund-date"
-              ref={firstFieldRef}
-              type="date"
-              className={fieldClass("date")}
+              buttonRef={firstFieldRef}
               value={values.date}
+              onChange={(value) => setField("date", value)}
               disabled={readOnly}
-              onChange={(event) => setField("date", event.target.value)}
-              aria-invalid={errors.date ? true : undefined}
             />
             {errors.date && <span className="refund-dialog__error">{errors.date}</span>}
           </div>

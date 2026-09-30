@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { FiEye, FiEyeOff, FiDownload, FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
@@ -169,18 +170,18 @@ const SellerInvoiceReports = () => {
                 ariaLabel="Select Contract"
               />
               <div className="seller-invoice-report-filters__date-range">
-                <input
-                  type="date"
+                <DatePickerInput
                   value={dateFrom}
-                  onChange={(event) => setDateFrom(event.target.value)}
-                  aria-label="Invoice date range from"
+                  onChange={(value) => setDateFrom(value)}
+                  ariaLabel="Invoice date range from"
+                  clearable
                 />
                 <span>to</span>
-                <input
-                  type="date"
+                <DatePickerInput
                   value={dateTo}
-                  onChange={(event) => setDateTo(event.target.value)}
-                  aria-label="Invoice date range to"
+                  onChange={(value) => setDateTo(value)}
+                  ariaLabel="Invoice date range to"
+                  clearable
                 />
               </div>
             </div>

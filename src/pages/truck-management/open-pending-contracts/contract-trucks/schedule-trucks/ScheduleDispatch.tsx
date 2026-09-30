@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FiArrowLeft, FiSave, FiX, FiCheckCircle, FiFileText } from "react-icons/fi";
 import SearchableSelect from "../../../../../components/dropdown/SearchableSelect";
+import DatePickerInput from "../../../../../components/dropdown/DatePickerInput";
 import MultiSelect from "../../../../../components/dropdown/MultiSelect";
 import InfoPanel from "../InfoPanel";
 import ContractSummaryPanel from "../../../contract-trucks/ContractSummaryPanel";
@@ -296,12 +297,11 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
           <label className="schedule-request-drawer__label" htmlFor="schedule-date">
             Date <span className="schedule-request-drawer__required">*</span>
           </label>
-          <input
+          <DatePickerInput
             id="schedule-date"
-            type="date"
-            className="schedule-request-drawer__control"
             value={form.date}
-            onChange={(event) => setField("date", event.target.value)}
+            onChange={(value) => setField("date", value)}
+            ariaLabel="Date"
           />
           {errors.date && <p className="schedule-request-drawer__error">{errors.date}</p>}
         </div>

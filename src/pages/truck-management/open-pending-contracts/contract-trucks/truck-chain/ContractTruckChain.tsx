@@ -196,7 +196,7 @@ const ChainContent = ({ contractNumber, contractDispatchId }: ChainContentProps)
                               <strong>{participant.name}</strong>
                               <span>{participant.role}</span>
                             </td>
-                            <td>{participant.legCount}</td>
+                            <td>{participant.contracts.join(", ") || "-"}</td>
                             <td>{participant.loadingShown.join(", then ") || "-"}</td>
                             <td>{participant.deliveryShown.join(", then ") || "-"}</td>
                           </tr>
