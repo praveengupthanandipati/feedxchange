@@ -11,7 +11,6 @@ import {
   FiUsers,
   FiTag,
   FiUserPlus,
-  FiCheckSquare,
   FiPackage,
   FiSend,
   FiFolder,
@@ -92,12 +91,6 @@ export const asideNavSections: AsideNavSection[] = [
         ],
       },
       {
-        id: "bulk-freight-approval", permissions: ["bulk-freight-approval"],
-        label: "Bulk Freight Approval",
-        icon: FiCheckSquare,
-        path: "/truck-management/bulk-freight-approval",
-      },
-      {
         id: "pending-delivery-orders", permissions: ["pending-delivery-orders"],
         label: "Pending Delivery Orders",
         icon: FiPackage,
@@ -115,11 +108,6 @@ export const asideNavSections: AsideNavSection[] = [
         icon: FiTruck,
         path: "/truck-management/transporters/overview",
         children: [
-          {
-            id: "truck-transporters-freight-approval", permissions: ["freight-approval"],
-            label: "Freight Approval",
-            path: "/truck-management/transporters/freight-approval",
-          },
           {
             id: "truck-transporters-dashboard", permissions: ["transport-dashboard"],
             label: "Transport Dashboard",

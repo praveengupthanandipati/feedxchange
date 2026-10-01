@@ -91,7 +91,7 @@ const Assigntransports = () => {
           <h1>
             Contract No: <span className="assign-transports-card__contract-no">{summary.contractNumber}</span>
           </h1>
-          <Link to="/truck-management/bulk-freight-approval" className="assign-transports-card__back">
+          <Link to="/truck-management/open-pending-contracts" className="assign-transports-card__back">
             <FiArrowLeft aria-hidden /> Back to Contract Trucks
           </Link>
         </div>

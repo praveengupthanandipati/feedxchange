@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
@@ -23,7 +22,6 @@ const ScheduleTruckAssignment = ({
   sellerId,
   buyerId,
 }: ScheduleTruckAssignmentProps) => {
-  const navigate = useNavigate();
   const [rows, setRows] = useState<ScheduleTruckRow[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<ScheduleTruckRow | null>(null);
@@ -56,20 +54,11 @@ const ScheduleTruckAssignment = ({
     setRowPendingDelete(null);
   };
 
-  const handleUpdate = (row: ScheduleTruckRow) => {
-    navigate(
-      `/truck-management/transporters/freight-approval?contract=${encodeURIComponent(
-        summary.contractNumber,
-      )}&schedule=${encodeURIComponent(row.id)}`,
-    );
-  };
-
   const columns = useMemo(
     () =>
       buildScheduleTruckColumns({
         onEdit: handleOpenEdit,
         onDelete: (row) => setRowPendingDelete(row),
-        onUpdate: handleUpdate,
         expandedRowId,
         onToggleTrucks: handleToggleTrucks,
       }),

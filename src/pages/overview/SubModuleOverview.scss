@@ -5,6 +5,18 @@
 
   &__title {
     margin: 0 0 v.$spacing-4;
+
+    &--products {
+      font-size: 1.5rem;
+    }
+
+    &--reports {
+      font-size: 1.5rem;
+    }
+
+    &--menu-management {
+      font-size: 1.5rem;
+    }
   }
 
   &__empty {

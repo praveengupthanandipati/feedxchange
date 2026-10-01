@@ -206,30 +206,6 @@ const RoleAccess = () => {
             ))}
           </div>
 
-          {tree.otherPermissions.length > 0 && (
-            <section className="role-access__others">
-              <h2 className="role-access__module">Other permissions</h2>
-              {tree.otherPermissions.map((p) => (
-                <label key={p.id} className="role-access__other">
-                  <input
-                    type="checkbox"
-                    checked={others.has(p.id)}
-                    onChange={(e) => {
-                      setMessage(null);
-                      setOthers((previous) => {
-                        const next = new Set(previous);
-                        if (e.target.checked) next.add(p.id);
-                        else next.delete(p.id);
-                        return next;
-                      });
-                    }}
-                  />
-                  <span>{p.name}</span>
-                  <code>{p.key}</code>
-                </label>
-              ))}
-            </section>
-          )}
         </>
       )}
     </div>

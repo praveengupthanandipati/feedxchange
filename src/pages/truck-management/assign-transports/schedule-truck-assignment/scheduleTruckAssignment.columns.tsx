@@ -1,4 +1,4 @@
-import { FiEdit2, FiCheckCircle, FiXCircle, FiTruck, FiChevronUp } from "react-icons/fi";
+import { FiCheckCircle, FiXCircle, FiTruck, FiChevronUp } from "react-icons/fi";
 import RowActionsMenu from "../../../../components/table/RowActionsMenu";
 import type { TableColumn } from "../../../../components/table/table.types";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
@@ -6,7 +6,6 @@ import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 interface ColumnHandlers {
   onEdit: (row: ScheduleTruckRow) => void;
   onDelete: (row: ScheduleTruckRow) => void;
-  onUpdate: (row: ScheduleTruckRow) => void;
   expandedRowId: string | null;
   onToggleTrucks: (row: ScheduleTruckRow) => void;
 }
@@ -14,7 +13,6 @@ interface ColumnHandlers {
 export function buildScheduleTruckColumns({
   onEdit,
   onDelete,
-  onUpdate,
   expandedRowId,
   onToggleTrucks,
 }: ColumnHandlers): TableColumn<ScheduleTruckRow>[] {
@@ -93,15 +91,6 @@ export function buildScheduleTruckColumns({
       key: "freight",
       header: "Freight",
       sortable: true,
-    },
-    {
-      key: "update",
-      header: "Update",
-      render: (row) => (
-        <button type="button" className="schedule-truck-table__update-btn" onClick={() => onUpdate(row)}>
-          <FiEdit2 aria-hidden /> Update
-        </button>
-      ),
     },
   ];
 }

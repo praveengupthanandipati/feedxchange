@@ -565,7 +565,7 @@ updateContract: builder.mutation<unknown, UpdateContractRequest>({
 
     deleteContract: builder.mutation<
       void,
-      { contractId: number }
+      { contractNumber: string }
     >({
       query: (body) => ({
         url: "/api/Contracts/DeleteContract",

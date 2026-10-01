@@ -47,9 +47,14 @@ a {
 }
 
 .app-layout {
+  position: fixed;
+  inset: 0;
   display: flex;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
   // gap: v.$spacing-3;
   // padding: v.$spacing-3;
   background-color: v.$color-navy-dark;
@@ -59,10 +64,16 @@ a {
     flex-direction: column;
     flex: 1;
     min-width: 0;
+    min-height: 0;
   }
 
   &__body {
     flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
     padding: v.$spacing-4 v.$spacing-4 0;
     background-color: v.$color-bg;
 

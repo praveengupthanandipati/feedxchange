@@ -56,7 +56,16 @@ export const canOnPage = (menu: AccessMenu | null, pageKey: string, action: Page
   return !!page && page.allowed && page.actions[action] === true;
 };
 
-const isVisible = (page: AccessPage) => page.showInMenu && page.allowed && typeOf(page) !== "Screen";
+const HIDDEN_MENU_PATHS = new Set([
+  "/truck-management/bulk-freight-approval",
+  "/truck-management/transporters/freight-approval",
+]);
+
+export const isVisibleInMenu = (page: AccessPage) =>
+  page.showInMenu &&
+  page.allowed &&
+  typeOf(page) !== "Screen" &&
+  (!page.routePath || !HIDDEN_MENU_PATHS.has(page.routePath));
 
 const typeOf = (page: AccessPage): PageType =>
   page.pageType ?? (!page.showInMenu ? "Screen" : page.children.some((child) => child.showInMenu) ? "SubModule" : "Page");
@@ -68,9 +77,9 @@ const typeOf = (page: AccessPage): PageType =>
 export const toNavSections = (menu: AccessMenu): AsideNavSection[] =>
   menu.modules
     .map((module): AsideNavSection => {
-      const items = module.pages.filter(isVisible).flatMap((page): AsideNavItem[] => {
+      const items = module.pages.filter(isVisibleInMenu).flatMap((page): AsideNavItem[] => {
         const children: AsideNavChild[] = page.children
-          .filter((child) => isVisible(child) && child.routePath)
+          .filter((child) => isVisibleInMenu(child) && child.routePath)
           .map((child) => ({
             id: child.pageKey,
             label: child.title,
