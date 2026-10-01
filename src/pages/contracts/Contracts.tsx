@@ -26,7 +26,8 @@ import { buildContractColumns } from "./contracts.columns";
 import { useSuccessToast } from "../../components/toast/useSuccessToast";
 import SuccessToast from "../../components/toast/SuccessToast";
 import { dateRangeOptions, type Contract } from "./contracts.data";
-import "./Contracts.scss";
+import "./Contracts.scss";
+
 import Can from "../../auth/Can";
 
 const PAGE_SIZE = 10;
@@ -200,9 +201,9 @@ const Contracts = () => {
     if (!pendingDeleteRow) return;
 
     try {
-      await deleteContract({ contractId: pendingDeleteRow.contractId }).unwrap();
-      setRows((prev) => prev.filter((row) => row.id !== pendingDeleteRow.id));
-      setSelectedRowIds((prev) => prev.filter((id) => id !== pendingDeleteRow.id));
+      await deleteContract({ contractNumber: pendingDeleteRow.contractNumber }).unwrap();
+      setRows((prev) => prev.filter((row) => row.contractNumber !== pendingDeleteRow.contractNumber));
+      setSelectedRowIds((prev) => prev.filter((id) => id !== pendingDeleteRow.contractNumber));
       setPendingDeleteRow(null);
       setDeleteError(null);
       showSuccessMessage("Contract deleted successfully");
@@ -221,7 +222,7 @@ const Contracts = () => {
   };
 
   const handleSelectAll = (checked: boolean) => {
-    const pageIds = pagedRows.map((row) => row.id);
+    const pageIds = pagedRows.map((row) => row.contractNumber);
     setSelectedRowIds((prev) =>
       checked
         ? Array.from(new Set([...prev, ...pageIds]))

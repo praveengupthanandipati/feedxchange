@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-import { findPageForPath } from "../../auth/menu";
-import type { AccessPage } from "../../auth/menu";
+import { findPageForPath, isVisibleInMenu } from "../../auth/menu";
 import { asideNavSections } from "../../components/asidemenu/aside.data";
 import { filterNavSections } from "../../components/asidemenu/filterNav";
 import "./SubModuleOverview.scss";
@@ -26,8 +25,9 @@ const SubModuleOverview = () => {
   const page = menu ? findPageForPath(menu, pathname) : null;
   if (menu && page) {
     title = page.title;
-    const visible = (p: AccessPage) => p.showInMenu && p.allowed && p.pageType !== "Screen" && !!p.routePath;
-    entries = page.children.filter(visible).map((p) => ({ id: p.pageKey, label: p.title, path: p.routePath! }));
+    entries = page.children
+      .filter((child) => isVisibleInMenu(child) && !!child.routePath)
+      .map((child) => ({ id: child.pageKey, label: child.title, path: child.routePath! }));
   } else {
     // built-in menu (API without a menu): the item whose path is this page
     const item = filterNavSections(asideNavSections, can)
@@ -41,7 +41,11 @@ const SubModuleOverview = () => {
 
   return (
     <div className="submodule-overview">
-      <h1 className="submodule-overview__title">{title}</h1>
+      <h1
+        className={`submodule-overview__title${pathname === "/product-management/overview" ? " submodule-overview__title--products" : pathname === "/reports/overview" ? " submodule-overview__title--reports" : pathname === "/menu-management/overview" ? " submodule-overview__title--menu-management" : pathname === "/payments/overview" ? " submodule-overview__title--payments" : ""}`}
+      >
+        {title}
+      </h1>
       {entries.length === 0 ? (
         <p className="submodule-overview__empty">Nothing here is available for your role.</p>
       ) : (

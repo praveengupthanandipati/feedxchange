@@ -51,7 +51,7 @@ import ManageSchedule from './pages/truck-management/open-pending-contracts/cont
 import UpdateTruckStatus from './pages/truck-management/open-pending-contracts/contract-trucks/update-truck-status/UpdateTruckStatus'
 import ReassignTruck from './pages/truck-management/open-pending-contracts/contract-trucks/reassign-truck/ReassignTruck'
 import ContractTruckChain from './pages/truck-management/open-pending-contracts/contract-trucks/truck-chain/ContractTruckChain'
-import BulkFreightApproval from './pages/truck-management/bulk-freight-approval/BulkFreightApproval'
+// import BulkFreightApproval from './pages/truck-management/bulk-freight-approval/BulkFreightApproval'
 import Assigntransports from './pages/truck-management/assign-transports/Assigntransports'
 import DriversList from './pages/transporters/drivers/drivers-list/DriversList'
 import DriverNew from './pages/transporters/drivers/driver-create/NewDriver'
@@ -63,7 +63,7 @@ import DriverTruckMapping from './pages/transporters/driver-trucks-mapping/drive
 import TruckTrips from './pages/transporters/truck-trip-management/truck-trip-list/TruckTrip'
 import TruckTripNew from './pages/transporters/truck-trip-management/truck-new-trip/TruckNewTrip'
 import TruckTripView from './pages/transporters/truck-trip-management/truck-trip-view/TruckTripView'
-import TransporReviewAssignTrucks from './pages/truck-management/transporter-review-assign-trucks/ReviewAndAssignTrucks'
+// import TransporReviewAssignTrucks from './pages/truck-management/transporter-review-assign-trucks/ReviewAndAssignTrucks'
 
 //reports
 import SellerInvoiceReports from './pages/reports/seller-invoice-reports/SellerInvoiceReports'
@@ -164,7 +164,7 @@ function App() {
             path="/truck-management/open-pending-contracts/update-truck-status"
             element={<UpdateTruckStatus />}
           />
-          <Route path="/truck-management/bulk-freight-approval" element={<BulkFreightApproval />} />
+          {/* <Route path="/truck-management/bulk-freight-approval" element={<BulkFreightApproval />} /> */}
           <Route path="/truck-management/assign-transports" element={<Assigntransports />} />
           <Route path="/truck-management/transporters/driver-master" element={<DriversList />} />
           <Route path="/truck-management/transporters/driver-master/new" element={<DriverNew />} />
@@ -176,7 +176,7 @@ function App() {
           <Route path="/truck-management/transporters/truck-trips" element={<TruckTrips />} />
           <Route path="/truck-management/transporters/truck-trips/new" element={<TruckTripNew />} />
           <Route path="/truck-management/transporters/truck-trips/:id" element={<TruckTripView />} />
-          <Route path="/truck-management/transporters/freight-approval" element={<TransporReviewAssignTrucks />} />
+          {/* <Route path="/truck-management/transporters/freight-approval" element={<TransporReviewAssignTrucks />} /> */}
           <Route path="/reports/seller-invoice-reports" element={<SellerInvoiceReports />} />
           <Route path="/reports/seller-buyer-accounts" element={<SellerBuyerAccounts />} />
           <Route path="/reports/contract-wise-status" element={<ContractWiseStatus />} />
