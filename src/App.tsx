@@ -77,6 +77,7 @@ import MonthlyReports from './pages/reports/monthly-reports/MonthlyReports'
 
 //payment
 import Sellerinvoice from './pages/payments/seller-invoice/SellerInvoice'
+import EditSellerInvoices from './pages/payments/edit-seller-invoices/EditSellerInvoices'
 import Paymentadvice from './pages/payments/payment-advice/Paymentadvice'
 import PaymentAllocation from './pages/payments/payment-allocation/PaymentAllocation'
 import Refunds from './pages/payments/refunds/Refunds'
@@ -185,6 +186,7 @@ function App() {
           <Route path="/reports/pending-supplies" element={<PendingSupplies />} />
           <Route path="/reports/monthly-reports" element={<MonthlyReports />} />
           <Route path="/payments/seller-invoice" element={<Sellerinvoice />} />
+          <Route path="/payments/seller-invoice-edit" element={<EditSellerInvoices />} />
           <Route path="/payments/payment-advice" element={<Paymentadvice />} />
           <Route path="/payments/payment-allocation" element={<PaymentAllocation />} />
           <Route path="/payments/refunds" element={<Refunds />} />

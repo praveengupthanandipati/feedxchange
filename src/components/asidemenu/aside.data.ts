@@ -165,6 +165,7 @@ export const asideNavSections: AsideNavSection[] = [
         icon: FiFolder,
         children: [
           { id: "payments-seller-invoice", permissions: ["seller-invoice.view"], label: "Seller Invoice", path: "/payments/seller-invoice" },
+          { id: "payments-seller-invoice-edit", permissions: ["seller-invoice.view"], label: "Edit Seller Invoices", path: "/payments/seller-invoice-edit" },
           { id: "payments-payment-advice", permissions: ["payment-advice"], label: "Payment Advice", path: "/payments/payment-advice" },
           { id: "payments-payment-allocation", permissions: ["payment-allocation"], label: "Payment Allocation", path: "/payments/payment-allocation" },
           { id: "payments-refunds", permissions: ["refunds.view"], label: "Refunds", path: "/payments/refunds" },

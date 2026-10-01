@@ -2,11 +2,17 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { FiFileText, FiX } from "react-icons/fi";
-import { contractLookupRows, contractNetRate, GST_PERCENT } from "./sellerInvoice.data";
+import { useGetInvoiceContractDetailsQuery } from "../../../store/sellerInvoiceApi";
 import "./ContractDetailsOffcanvas.scss";
 
 function money(value: number): string {
   return `₹${value.toLocaleString("en-IN")}`;
+}
+
+function formatDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
 }
 
 interface ContractDetailsOffcanvasProps {
@@ -25,9 +31,10 @@ const ContractDetailsOffcanvas = ({ open, contractNumber, onClose }: ContractDet
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
 
-  const contract = contractLookupRows.find((row) => row.contractNumber === contractNumber) ?? null;
-  const netRate = contract ? contractNetRate(contract.rate) : 0;
-  const totalValue = contract ? contract.qty * netRate : 0;
+  const { data: contract = null, isFetching } = useGetInvoiceContractDetailsQuery(contractNumber.trim(), {
+    skip: !open || !contractNumber.trim(),
+    refetchOnMountOrArgChange: true,
+  });
 
   return createPortal(
     <>
@@ -46,17 +53,17 @@ const ContractDetailsOffcanvas = ({ open, contractNumber, onClose }: ContractDet
         </div>
 
         <div className="contract-details-offcanvas__body">
-          {!contract ? (
-            <p className="contract-details-offcanvas__empty">
-              No details found for this contract number.
-            </p>
+          {isFetching ? (
+            <p className="contract-details-offcanvas__empty">Loading…</p>
+          ) : !contract ? (
+            <p className="contract-details-offcanvas__empty">No details found for this contract number.</p>
           ) : (
             <>
               <table className="contract-details-offcanvas__table">
                 <tbody>
                   <tr>
                     <td>Contract Date</td>
-                    <td>{contract.contractDate}</td>
+                    <td>{formatDate(contract.contractDate)}</td>
                   </tr>
                   <tr>
                     <td>Contract Number</td>
@@ -65,44 +72,51 @@ const ContractDetailsOffcanvas = ({ open, contractNumber, onClose }: ContractDet
                     </td>
                   </tr>
                   <tr>
+                    <td>Status</td>
+                    <td>{contract.statusName}</td>
+                  </tr>
+                  <tr>
                     <td>Buyer Name</td>
-                    <td className="contract-details-offcanvas__accent">{contract.buyer}</td>
+                    <td className="contract-details-offcanvas__accent">{contract.buyerName}</td>
                   </tr>
                   <tr>
                     <td>Seller Name</td>
-                    <td className="contract-details-offcanvas__accent">{contract.seller}</td>
+                    <td className="contract-details-offcanvas__accent">{contract.sellerName}</td>
                   </tr>
                   <tr>
                     <td>Product Name</td>
-                    <td className="contract-details-offcanvas__accent">{contract.commodity}</td>
+                    <td className="contract-details-offcanvas__accent">{contract.productName}</td>
                   </tr>
                   <tr>
                     <td>Total Quantity</td>
-                    <td>{contract.qty} MTs</td>
+                    <td>{contract.totalQtyMT} MTs</td>
+                  </tr>
+                  <tr>
+                    <td>Invoiced / Pending</td>
+                    <td>
+                      {contract.invoicedQtyMT} / {contract.pendingQtyMT} MTs
+                    </td>
                   </tr>
                   <tr>
                     <td>GST %</td>
-                    <td>{GST_PERCENT}%</td>
+                    <td>{contract.gstPercent}%</td>
                   </tr>
                   <tr>
                     <td>Rate per MT</td>
-                    <td>{money(contract.rate)}</td>
+                    <td>{money(contract.ratePerMT)}</td>
                   </tr>
                   <tr>
                     <td>Net Rate per MT</td>
-                    <td className="contract-details-offcanvas__success">{money(netRate)}</td>
+                    <td className="contract-details-offcanvas__success">{money(contract.netRatePerMT)}</td>
                   </tr>
                   <tr className="contract-details-offcanvas__total-row">
                     <td>Total Contract Value</td>
-                    <td className="contract-details-offcanvas__success">{money(totalValue)}</td>
+                    <td className="contract-details-offcanvas__success">{money(contract.totalContractValue)}</td>
                   </tr>
                 </tbody>
               </table>
 
-              <Link
-                to="/reports/seller-invoice-reports"
-                className="contract-details-offcanvas__invoices-btn"
-              >
+              <Link to="/reports/seller-invoice-reports" className="contract-details-offcanvas__invoices-btn">
                 <FiFileText aria-hidden /> View All Invoices
               </Link>
             </>

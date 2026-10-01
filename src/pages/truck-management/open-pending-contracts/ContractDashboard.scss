@@ -1,0 +1,451 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+// Dashboard blocks of the Open & Pending Contract page: summary tiles, progress, "where is the pending quantity" panels, contract cards.
+
+.cd-summary {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+}
+
+.cd-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: v.$spacing-3;
+
+  @include m.respond-to(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include m.respond-to(lg) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.cd-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: v.$spacing-3 v.$spacing-4;
+  border: 1px solid v.$color-border;
+  border-left-width: 4px;
+  border-radius: v.$radius-md;
+  background: v.$color-bg;
+
+  &__label {
+    color: v.$color-text-muted;
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  &__value {
+    color: v.$color-text;
+    font-size: v.$font-size-xl;
+    line-height: 1.2;
+  }
+
+  &__note {
+    color: v.$color-text-muted;
+    font-size: 0.75rem;
+  }
+
+  &--contracts { border-left-color: v.$color-navy; }
+  &--total { border-left-color: v.$color-primary; }
+  &--dispatched { border-left-color: v.$color-success; }
+  &--arranged { border-left-color: v.$color-info; }
+  &--pending { border-left-color: v.$color-orange; }
+}
+
+.cd-progress {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  padding: v.$spacing-3 v.$spacing-4;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background: v.$color-bg;
+
+  &__head {
+    @include m.flex(row, space-between, center);
+    font-size: v.$font-size-sm;
+
+    span {
+      color: v.$color-text-muted;
+    }
+  }
+}
+
+.cd-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-2 v.$spacing-4;
+  color: v.$color-text-muted;
+  font-size: 0.8rem;
+}
+
+.cd-dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-right: 0.3rem;
+  border-radius: 50%;
+
+  &--dispatched { background: v.$color-success; }
+  &--arranged { background: v.$color-info; }
+  &--pending { background: v.$color-orange; }
+}
+
+// stacked quantity bar: despatched | arranged | pending
+.cd-split {
+  display: flex;
+  width: 100%;
+  height: 0.55rem;
+  overflow: hidden;
+  border-radius: v.$radius-pill;
+  background: v.$color-border;
+
+  &--large {
+    height: 0.9rem;
+  }
+
+  &__seg {
+    display: block;
+    height: 100%;
+    transition: width v.$transition-fast;
+
+    &--dispatched { background: v.$color-success; }
+    &--arranged { background: v.$color-info; }
+    &--pending { background: v.$color-orange; }
+  }
+}
+
+.cd-insights {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+
+  @include m.respond-to(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.cd-panel {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  padding: v.$spacing-3 v.$spacing-4;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background: v.$color-bg;
+
+  &__head {
+    @include m.flex(row, space-between, baseline);
+
+    h3 {
+      margin: 0;
+      color: v.$color-primary;
+      font-size: v.$font-size-base;
+    }
+
+    span {
+      color: v.$color-text-muted;
+      font-size: 0.75rem;
+    }
+  }
+
+  &__empty {
+    margin: 0;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+}
+
+.cd-bars {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__label {
+    @include m.flex(row, space-between, baseline, v.$spacing-2);
+    font-size: v.$font-size-sm;
+
+    span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    strong {
+      flex-shrink: 0;
+    }
+  }
+
+  &__track {
+    height: 0.45rem;
+    margin-top: 0.25rem;
+    overflow: hidden;
+    border-radius: v.$radius-pill;
+    background: v.$color-border;
+
+    span {
+      display: block;
+      height: 100%;
+      border-radius: v.$radius-pill;
+      background: v.$color-orange;
+    }
+  }
+
+  small {
+    color: v.$color-text-muted;
+    font-size: 0.72rem;
+  }
+}
+
+// view switch and sort in the toolbar
+.cd-toolbar {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  &__title {
+    margin: 0;
+    color: v.$color-primary;
+    font-size: v.$font-size-base;
+  }
+
+  &__tools {
+    @include m.flex(row, flex-end, center, v.$spacing-3);
+    flex-wrap: wrap;
+  }
+}
+
+.cd-select {
+  height: 2.25rem;
+  padding: 0 v.$spacing-3;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background: v.$color-bg;
+  color: v.$color-text;
+  font-size: v.$font-size-sm;
+}
+
+.cd-switch {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+
+  button {
+    @include m.flex(row, center, center, v.$spacing-1);
+    height: 2.25rem;
+    padding: 0 v.$spacing-3;
+    border: none;
+    background: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    &.is-active {
+      background: v.$color-primary;
+      color: v.$color-white;
+    }
+  }
+}
+
+.cd-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-4;
+
+  @include m.respond-to(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include m.respond-to(xl) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.cd-empty {
+  margin: 0;
+  padding: v.$spacing-6 0;
+  text-align: center;
+  color: v.$color-text-muted;
+}
+
+.cd-card {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  padding: v.$spacing-4;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background: v.$color-bg;
+  transition: box-shadow v.$transition-fast, border-color v.$transition-fast;
+
+  &:hover {
+    border-color: v.$color-primary;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  }
+
+  &__head {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+  }
+
+  &__id {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    color: v.$color-primary;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__product {
+    margin: 0;
+    font-size: v.$font-size-base;
+    font-weight: v.$font-weight-semibold;
+    color: v.$color-text;
+  }
+
+  &__parties {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    svg {
+      margin-right: 0.35rem;
+      vertical-align: -0.12em;
+    }
+  }
+
+  &__qty {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background: v.$color-bg-muted;
+  }
+
+  &__qty-head {
+    @include m.flex(row, space-between, baseline);
+
+    strong {
+      font-size: v.$font-size-lg;
+    }
+
+    span {
+      color: v.$color-text-muted;
+      font-size: 0.78rem;
+    }
+  }
+
+  &__nums {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: v.$spacing-2;
+    margin: 0;
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.72rem;
+    }
+
+    dd {
+      margin: 0;
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-2 v.$spacing-3;
+    color: v.$color-text-muted;
+    font-size: 0.78rem;
+
+    svg {
+      margin-right: 0.3rem;
+      vertical-align: -0.12em;
+    }
+  }
+
+  &__rate {
+    margin-left: auto;
+    color: v.$color-text;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__foot {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    margin-top: auto;
+    padding-top: v.$spacing-3;
+    border-top: 1px dashed v.$color-border;
+  }
+
+  &__date {
+    color: v.$color-text-muted;
+    font-size: 0.75rem;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    height: 2.1rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-primary;
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    cursor: pointer;
+
+    &:hover {
+      background: v.$color-primary;
+      color: v.$color-white;
+    }
+  }
+}
+
+.cd-chip {
+  display: inline-block;
+  padding: 0.15rem 0.65rem;
+  border-radius: v.$radius-pill;
+  font-size: 0.7rem;
+  font-weight: v.$font-weight-semibold;
+  white-space: nowrap;
+
+  &--open {
+    background: v.$color-success;
+    color: v.$color-white;
+  }
+
+  &--pending {
+    background: v.$color-orange;
+    color: v.$color-navy-dark;
+  }
+
+  &--plain {
+    border: 1px solid v.$color-border;
+    color: v.$color-text;
+  }
+}

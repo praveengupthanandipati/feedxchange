@@ -18,6 +18,8 @@ import {
   FiUser,
   FiTruck,
   FiPlus,
+  FiGrid,
+  FiList,
 } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
@@ -27,10 +29,15 @@ import { type PendingContractRow } from "./pendingContracts.data";
 import { useContractTruckDetails } from "../contract-trucks/useContractTruckDetails";
 import TruckList from "../contract-trucks/TruckList";
 import { useSelectedContract } from "../../../context/SelectedContractContext";
+import { ContractCards, DashboardInsights, DashboardSummary } from "./ContractDashboard";
 import "../pending-contracts/PendingContracts.scss";
 import "./PendingContracts.scss";
 
 const PAGE_SIZE = 10;
+const CARD_PAGE_SIZE = 12;
+
+type ViewMode = "cards" | "table";
+type SortMode = "latest" | "pending" | "qty";
 const ALL_OPTION = { value: "All", label: "All" };
 
 const formatShortDate = (value: string) => {
@@ -197,6 +204,8 @@ const PendingContracts = () => {
   const [keyword, setKeyword] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [view, setView] = useState<ViewMode>("cards");
+  const [sortMode, setSortMode] = useState<SortMode>("latest");
   const [truckDrawerOpen, setTruckDrawerOpen] = useState(false);
   const [truckDrawerRow, setTruckDrawerRow] = useState<PendingContractRow | null>(null);
   const { setSelectedContract } = useSelectedContract();
@@ -242,7 +251,7 @@ const PendingContracts = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [sellerFilter, buyerFilter, dateFrom, dateTo, scheduleFilter, keyword]);
+  }, [sellerFilter, buyerFilter, dateFrom, dateTo, scheduleFilter, keyword, view, sortMode]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
@@ -264,12 +273,27 @@ const PendingContracts = () => {
     });
   }, [pendingContracts, sellerFilter, buyerFilter, scheduleFilter, dateFrom, dateTo, keyword]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  // the cards follow the chosen sort; the table keeps its own column sorting
+  const orderedRows = useMemo(() => {
+    if (view === "table") return filteredRows;
+    const rows = [...filteredRows];
+    if (sortMode === "pending") rows.sort((a, b) => b.pQtyValue - a.pQtyValue);
+    else if (sortMode === "qty") rows.sort((a, b) => b.cQtyValue - a.cQtyValue);
+    else rows.sort((a, b) => b.dateValue - a.dateValue);
+    return rows;
+  }, [filteredRows, view, sortMode]);
+
+  const pageSize = view === "cards" ? CARD_PAGE_SIZE : PAGE_SIZE;
+  const totalPages = Math.max(1, Math.ceil(orderedRows.length / pageSize));
   const currentPageClamped = Math.min(currentPage, totalPages);
-  const pagedRows = filteredRows.slice(
-    (currentPageClamped - 1) * PAGE_SIZE,
-    currentPageClamped * PAGE_SIZE,
+  const pagedRows = orderedRows.slice(
+    (currentPageClamped - 1) * pageSize,
+    currentPageClamped * pageSize,
   );
+  const emptyMessage =
+    isLoading || isFetching
+      ? "Loading open & pending contracts…"
+      : "No open or pending contracts match the current filters.";
 
   const handleClearFilters = () => {
     setSellerFilter("All");
@@ -396,24 +420,48 @@ const PendingContracts = () => {
           </div>
         )}
 
-        <Table
-          columns={pendingContractColumns}
-          data={pagedRows}
-          rowKey={(row) => row.id}
-          emptyMessage={
-            isLoading || isFetching
-              ? "Loading open & pending contracts…"
-              : "No open or pending contracts match the current filters."
-          }
-          minHeight
-        />
+        <DashboardSummary rows={filteredRows} />
+        <DashboardInsights rows={filteredRows} />
+
+        <div className="cd-toolbar">
+          <h2 className="cd-toolbar__title">Contracts ({filteredRows.length})</h2>
+          <div className="cd-toolbar__tools">
+            {view === "cards" && (
+              <select className="cd-select" value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} aria-label="Sort contracts">
+                <option value="latest">Latest first</option>
+                <option value="pending">Most pending first</option>
+                <option value="qty">Largest contract first</option>
+              </select>
+            )}
+            <div className="cd-switch" role="group" aria-label="View">
+              <button type="button" className={view === "cards" ? "is-active" : ""} onClick={() => setView("cards")} aria-pressed={view === "cards"}>
+                <FiGrid aria-hidden /> Cards
+              </button>
+              <button type="button" className={view === "table" ? "is-active" : ""} onClick={() => setView("table")} aria-pressed={view === "table"}>
+                <FiList aria-hidden /> Table
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {view === "cards" ? (
+          <ContractCards rows={pagedRows} onOpenTruckDetails={handleOpenTruckDetails} emptyMessage={emptyMessage} />
+        ) : (
+          <Table
+            columns={pendingContractColumns}
+            data={pagedRows}
+            rowKey={(row) => row.id}
+            emptyMessage={emptyMessage}
+            minHeight
+          />
+        )}
 
         <div className="pending-contracts-pagination">
           <p>
             {filteredRows.length === 0
               ? "Showing 0 Results"
-              : `Showing ${(currentPageClamped - 1) * PAGE_SIZE + 1}-${Math.min(
-                  currentPageClamped * PAGE_SIZE,
+              : `Showing ${(currentPageClamped - 1) * pageSize + 1}-${Math.min(
+                  currentPageClamped * pageSize,
                   filteredRows.length,
                 )} of ${filteredRows.length} Results`}
           </p>

@@ -1,0 +1,162 @@
+.edit-invoices {
+  padding: 1rem;
+
+  &__toast {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border-radius: 0.5rem;
+    background: #e7f6ec;
+    color: #146c2e;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    &--error {
+      background: #fdecee;
+      color: #a61e2d;
+    }
+  }
+
+  &__card {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+  }
+
+  &__header h1 {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.8rem;
+    }
+
+    select,
+    input {
+      min-width: 12rem;
+      padding: 0.45rem 0.6rem;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 0.4rem;
+    }
+
+    form {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+
+    form button {
+      padding: 0.5rem 0.9rem;
+      border: 0;
+      border-radius: 0.4rem;
+      background: #0f2744;
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+
+  &__error {
+    color: #a61e2d;
+  }
+
+  &__table {
+    overflow-x: auto;
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #eef1f4;
+
+    &--pending {
+      background: #fff4d6;
+      color: #8a6100;
+    }
+
+    &--partially-paid {
+      background: #e3f0ff;
+      color: #0b5cad;
+    }
+
+    &--paid {
+      background: #e7f6ec;
+      color: #146c2e;
+    }
+
+    &--cancelled {
+      background: #f1f1f1;
+      color: #666;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0.4rem;
+    background: #fff;
+    cursor: pointer;
+
+    &--danger {
+      color: #a61e2d;
+      border-color: rgba(166, 30, 45, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  &__pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+
+    div {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button {
+      padding: 0.3rem 0.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 0.4rem;
+      background: #fff;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

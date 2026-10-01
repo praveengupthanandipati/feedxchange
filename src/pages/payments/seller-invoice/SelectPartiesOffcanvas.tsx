@@ -4,14 +4,18 @@ import { FiFileText, FiPlus, FiX } from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../components/tooltip/InfoTooltip";
 import {
-  buyerPartyOptions,
-  contractLookupRows,
-  contractNetRate,
-  sellerPartyOptions,
-  GST_PERCENT,
-  type ContractLookupRow,
-} from "./sellerInvoice.data";
+  useGetInvoiceBuyersQuery,
+  useGetInvoiceSellersQuery,
+  useLazyGetInvoiceContractsQuery,
+  type InvoiceContract,
+} from "../../../store/sellerInvoiceApi";
 import "./SelectPartiesOffcanvas.scss";
+
+function formatDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
+}
 
 function money(value: number): string {
   return `₹${value.toLocaleString("en-IN")}`;
@@ -20,19 +24,28 @@ function money(value: number): string {
 interface SelectPartiesOffcanvasProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (contract: ContractLookupRow) => void;
+  onSelect: (contract: InvoiceContract) => void;
 }
 
 const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcanvasProps) => {
   const [seller, setSeller] = useState("");
   const [buyer, setBuyer] = useState("");
-  const [results, setResults] = useState<ContractLookupRow[] | null>(null);
+  const [results, setResults] = useState<InvoiceContract[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  // parties come from the contracts that can be invoiced (the caller's own contracts for business users)
+  const { data: sellers = [] } = useGetInvoiceSellersQuery(undefined, { skip: !open, refetchOnMountOrArgChange: true });
+  const { data: buyers = [] } = useGetInvoiceBuyersQuery(undefined, { skip: !open, refetchOnMountOrArgChange: true });
+  const sellerPartyOptions = sellers.map((p) => ({ value: String(p.id), label: p.name }));
+  const buyerPartyOptions = buyers.map((p) => ({ value: String(p.id), label: p.name }));
+  const [searchContracts, { isFetching }] = useLazyGetInvoiceContractsQuery();
 
   useEffect(() => {
     if (!open) return;
     setSeller("");
     setBuyer("");
     setResults(null);
+    setFailed(false);
   }, [open]);
 
   useEffect(() => {
@@ -44,15 +57,17 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
     return () => document.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
 
-  const handleGetContracts = () => {
-    setResults(
-      contractLookupRows.filter(
-        (row) => (!seller || row.seller === seller) && (!buyer || row.buyer === buyer),
-      ),
-    );
+  const handleGetContracts = async () => {
+    setFailed(false);
+    try {
+      setResults(await searchContracts({ sellerId: seller ? Number(seller) : undefined, buyerId: buyer ? Number(buyer) : undefined }, false).unwrap());
+    } catch {
+      setResults(null);
+      setFailed(true);
+    }
   };
 
-  const handleAdd = (row: ContractLookupRow) => {
+  const handleAdd = (row: InvoiceContract) => {
     onSelect(row);
     onClose();
   };
@@ -101,8 +116,8 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
             </div>
           </div>
 
-          <button type="button" className="select-parties-offcanvas__get-btn" onClick={handleGetContracts}>
-            Get Contracts
+          <button type="button" className="select-parties-offcanvas__get-btn" onClick={() => void handleGetContracts()} disabled={isFetching}>
+            {isFetching ? "Searching…" : "Get Contracts"}
           </button>
 
           <div className="select-parties-offcanvas__table-wrapper">
@@ -124,7 +139,13 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
                 </tr>
               </thead>
               <tbody>
-                {results === null ? (
+                {failed ? (
+                  <tr>
+                    <td colSpan={12} className="select-parties-offcanvas__empty">
+                      Could not load contracts. Try again.
+                    </td>
+                  </tr>
+                ) : results === null ? (
                   <tr>
                     <td colSpan={12} className="select-parties-offcanvas__empty">
                       Select a seller and/or buyer, then click "Get Contracts" to search.
@@ -140,7 +161,7 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
                   results.map((row, index) => (
                     <tr key={row.contractNumber}>
                       <td>{index + 1}</td>
-                      <td>{row.contractDate}</td>
+                      <td>{formatDate(row.contractDate)}</td>
                       <td className="select-parties-offcanvas__contract-no">{row.contractNumber}</td>
                       <td>
                         <button
@@ -153,22 +174,22 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
                       </td>
                       <td>
                         <div className="select-parties-offcanvas__party-cell">
-                          <span className="select-parties-offcanvas__party-name">{row.buyer}</span>
-                          <InfoTooltip text={row.buyer} />
+                          <span className="select-parties-offcanvas__party-name">{row.buyerName}</span>
+                          <InfoTooltip text={row.buyerName} />
                         </div>
                       </td>
                       <td>
                         <div className="select-parties-offcanvas__party-cell">
-                          <span className="select-parties-offcanvas__party-name">{row.seller}</span>
-                          <InfoTooltip text={row.seller} />
+                          <span className="select-parties-offcanvas__party-name">{row.sellerName}</span>
+                          <InfoTooltip text={row.sellerName} />
                         </div>
                       </td>
-                      <td>{row.commodity}</td>
-                      <td>{row.qty}</td>
-                      <td>{row.balanceQty}</td>
-                      <td>{money(row.rate)}</td>
-                      <td>{GST_PERCENT}%</td>
-                      <td>{money(contractNetRate(row.rate))}</td>
+                      <td>{row.productName}</td>
+                      <td>{row.totalQtyMT}</td>
+                      <td>{row.pendingQtyMT}</td>
+                      <td>{money(row.ratePerMT)}</td>
+                      <td>{row.gstPercent}%</td>
+                      <td>{money(row.netRatePerMT)}</td>
                     </tr>
                   ))
                 )}
