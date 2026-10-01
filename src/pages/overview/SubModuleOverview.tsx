@@ -42,7 +42,7 @@ const SubModuleOverview = () => {
   return (
     <div className="submodule-overview">
       <h1
-        className={`submodule-overview__title${pathname === "/product-management/overview" ? " submodule-overview__title--products" : pathname === "/reports/overview" ? " submodule-overview__title--reports" : pathname === "/menu-management/overview" ? " submodule-overview__title--menu-management" : ""}`}
+        className={`submodule-overview__title${pathname === "/product-management/overview" ? " submodule-overview__title--products" : pathname === "/reports/overview" ? " submodule-overview__title--reports" : pathname === "/menu-management/overview" ? " submodule-overview__title--menu-management" : pathname === "/payments/overview" ? " submodule-overview__title--payments" : ""}`}
       >
         {title}
       </h1>
