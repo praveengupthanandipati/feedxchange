@@ -64,6 +64,8 @@ import TruckTrips from './pages/transporters/truck-trip-management/truck-trip-li
 import TruckTripNew from './pages/transporters/truck-trip-management/truck-new-trip/TruckNewTrip'
 import TruckTripView from './pages/transporters/truck-trip-management/truck-trip-view/TruckTripView'
 // import TransporReviewAssignTrucks from './pages/truck-management/transporter-review-assign-trucks/ReviewAndAssignTrucks'
+import PendingDeliveryOrders from './pages/truck-management/pending-dos/PendingDeliveryOrders'
+import SellerTruckReview from './pages/truck-management/seller-truck-review/SellerTruckReview'
 
 //reports
 import SellerInvoiceReports from './pages/reports/seller-invoice-reports/SellerInvoiceReports'
@@ -149,6 +151,8 @@ function App() {
           <Route path="/products/price-history" element={<PriceHistory />} />
           <Route path="/products/formula-calculations" element={<FormulaCalculations />} />
           <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
+          <Route path="/truck-management/pending-delivery-orders" element={<PendingDeliveryOrders />} />
+          <Route path="/truck-management/pending-delivery-orders/seller-truck-review/:id" element={<SellerTruckReview />} />
           <Route path="/truck-management/open-pending-contracts" element={<OpenPendingContracts />} />
           <Route path="/truck-management/open-pending-contracts/instant-truck" element={<AddInstantTruck />} />
           <Route path="/truck-management/open-pending-contracts/schedule-dispatch" element={<ScheduleDispatch />} />
@@ -176,6 +180,8 @@ function App() {
           <Route path="/truck-management/transporters/truck-trips" element={<TruckTrips />} />
           <Route path="/truck-management/transporters/truck-trips/new" element={<TruckTripNew />} />
           <Route path="/truck-management/transporters/truck-trips/:id" element={<TruckTripView />} />
+          <Route path="/truck-management/pending-dos" element={<PendingDeliveryOrders />} />
+          <Route path="/truck-management/seller-truck-review" element={<SellerTruckReview />} />
           {/* <Route path="/truck-management/transporters/freight-approval" element={<TransporReviewAssignTrucks />} /> */}
           <Route path="/reports/seller-invoice-reports" element={<SellerInvoiceReports />} />
           <Route path="/reports/seller-buyer-accounts" element={<SellerBuyerAccounts />} />

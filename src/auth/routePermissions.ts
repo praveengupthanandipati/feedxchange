@@ -24,6 +24,8 @@ export const routePermissionRules: RoutePermissionRule[] = [
 
   // Truck management
   { path: "/truck-management/pending-contracts", any: ["pending-contracts"] },
+  { path: "/truck-management/pending-delivery-orders", any: ["pending-delivery-orders"] },
+  { path: "/truck-management/pending-delivery-orders/*", any: ["pending-delivery-orders"] },
   { path: OPEN_PENDING, any: ["pending-contracts"] },
   { path: `${OPEN_PENDING}/*`, any: ["pending-contracts"] },
   { path: "/truck-management/bulk-freight-approval", any: ["bulk-freight-approval"] },
