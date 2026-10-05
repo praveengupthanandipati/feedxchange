@@ -1,0 +1,550 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.seller-truck-review {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  padding-bottom: v.$spacing-6;
+
+  &__page-header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+
+    h1 {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__back {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__not-found {
+    @include m.card(v.$spacing-5);
+    @include m.flex(column, center, center, v.$spacing-2);
+    color: v.$color-text-muted;
+    text-align: center;
+
+    > svg {
+      font-size: 1.75rem;
+      color: v.$color-danger;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  // ============================================================
+  // Section cards
+  // ============================================================
+  &__section {
+    @include m.card(0);
+    overflow: visible;
+  }
+
+  &__section-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-2 v.$spacing-4;
+    padding: v.$spacing-4 v.$spacing-5;
+    border-bottom: 1px solid v.$color-border;
+
+    @include m.respond-below(sm) {
+      padding: v.$spacing-3;
+    }
+
+    h2 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-lg;
+    }
+  }
+
+  &__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1 v.$spacing-4;
+    flex: 1 1 auto;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    strong {
+      color: v.$color-navy;
+    }
+
+    // The full details sit directly below on small screens; the summary is just noise there.
+    @include m.respond-below(md) {
+      display: none;
+    }
+  }
+
+  &__toggle {
+    @include m.flex(row, center, center, v.$spacing-1);
+    @include m.focus-ring(v.$color-orange);
+    margin-left: auto;
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    color: v.$color-navy;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+  }
+
+  &__section-body {
+    padding: v.$spacing-4 v.$spacing-5 v.$spacing-5;
+
+    @include m.respond-below(sm) {
+      padding: v.$spacing-3;
+    }
+  }
+
+  // ============================================================
+  // Detail grids: 1 → 2 → 4 columns
+  // ============================================================
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4 v.$spacing-5;
+    margin: 0;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &__field {
+    min-width: 0;
+
+    dt {
+      @include m.flex(row, flex-start, center, v.$spacing-1);
+      color: v.$color-text-muted;
+      font-size: 0.8rem;
+      font-weight: v.$font-weight-regular;
+    }
+
+    dd {
+      margin: 0.25rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+
+      strong {
+        color: v.$color-navy;
+      }
+    }
+  }
+
+  &__empty {
+    color: v.$color-gray-400;
+  }
+
+  &__with-icon {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: v.$spacing-1;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 0.3em;
+    }
+  }
+
+  &__pin--loading {
+    color: v.$color-success;
+  }
+
+  &__pin--delivery {
+    color: v.$color-danger;
+  }
+
+  &__big {
+    font-size: v.$font-size-lg;
+    font-weight: v.$font-weight-semibold;
+
+    &--info {
+      color: v.$color-info;
+    }
+
+    &--success {
+      color: v.$color-success;
+    }
+  }
+
+  &__badge {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-orange;
+    color: v.$color-white;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-bold;
+    line-height: 1.5;
+  }
+
+  &__phone {
+    color: v.$color-navy;
+    font-weight: v.$font-weight-bold;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__amount {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+    white-space: nowrap;
+  }
+
+  &__rupee {
+    font-size: 0.75em;
+  }
+
+  // ============================================================
+  // Dispatch form
+  // ============================================================
+  &__dispatch {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+  }
+
+  &__form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) 2fr;
+    }
+  }
+
+  &__form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+
+    label {
+      color: v.$color-text;
+      font-size: 0.8rem;
+      font-weight: v.$font-weight-medium;
+    }
+  }
+
+  &__input {
+    @include m.font-base;
+    width: 100%;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+      box-shadow: 0 0 0 3px rgba(v.$color-navy, 0.12);
+    }
+  }
+
+  &__textarea {
+    height: auto;
+    min-height: 4rem;
+    padding: v.$spacing-2 v.$spacing-3;
+    resize: vertical;
+  }
+
+  &__checkbox {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    width: fit-content;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    cursor: pointer;
+
+    input {
+      width: 1rem;
+      height: 1rem;
+      accent-color: v.$color-navy;
+    }
+  }
+
+  &__contracts-header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-2 v.$spacing-4;
+
+    h3,
+    p {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-base;
+      font-weight: v.$font-weight-regular;
+    }
+
+    strong {
+      color: v.$color-navy;
+    }
+  }
+
+  &__name {
+    display: inline-flex;
+    align-items: center;
+    max-width: 11rem;
+  }
+
+  &__name-text {
+    @include m.truncate-text;
+  }
+
+  &__qty {
+    color: v.$color-navy;
+    font-weight: v.$font-weight-bold;
+    white-space: nowrap;
+  }
+
+  &__qty-input {
+    @include m.font-base;
+    width: 100%;
+    min-width: 7rem;
+    height: 2.4rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+  }
+
+  // Table on md+, cards below.
+  &__table-view {
+    @include m.respond-below(md) {
+      display: none;
+    }
+  }
+
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) {
+      display: none;
+    }
+  }
+
+  &__cards-empty {
+    @include m.flex(row, center, center, v.$spacing-2);
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__contract-card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+  }
+
+  &__contract-card-top {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    background-color: rgba(v.$color-navy, 0.06);
+    border-bottom: 1px solid v.$color-border;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    input {
+      width: 1rem;
+      height: 1rem;
+      accent-color: v.$color-navy;
+    }
+
+    strong {
+      color: v.$color-navy;
+    }
+
+    span {
+      margin-left: auto;
+      color: v.$color-text-muted;
+    }
+  }
+
+  &__contract-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$spacing-2 v.$spacing-3;
+    margin: 0;
+    padding: v.$spacing-3;
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      font-weight: v.$font-weight-medium;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    dd {
+      margin: 0.1rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__full {
+    grid-column: 1 / -1;
+  }
+
+  &__pagination {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    @include m.respond-below(sm) {
+      justify-content: center;
+    }
+
+    p {
+      margin: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__pagination-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2.25rem;
+      height: 2.25rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-gray-100;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+
+  &__errors {
+    margin: 0;
+    padding: v.$spacing-3 v.$spacing-3 v.$spacing-3 v.$spacing-6;
+    border: 1px solid rgba(v.$color-danger, 0.3);
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-danger, 0.06);
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+  }
+
+  &__footer {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    flex-wrap: wrap;
+    padding-top: v.$spacing-3;
+    border-top: 1px solid v.$color-border;
+
+    @include m.respond-below(sm) {
+      flex-direction: column-reverse;
+      align-items: stretch;
+    }
+  }
+
+  &__btn {
+    @include m.flex-center;
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-5;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &--primary {
+      border: none;
+      background-color: v.$color-navy;
+      color: v.$color-white;
+
+      &:hover {
+        background-color: v.$color-navy-light;
+      }
+    }
+
+    &--ghost {
+      border: 1px solid v.$color-border;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+
+      &:hover {
+        background-color: v.$color-gray-100;
+      }
+    }
+  }
+}
