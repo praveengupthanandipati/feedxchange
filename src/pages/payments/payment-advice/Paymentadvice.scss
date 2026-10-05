@@ -22,6 +22,10 @@
     font-weight: v.$font-weight-semibold;
     box-shadow: v.$shadow-lg;
 
+    &--error {
+      background-color: v.$color-danger;
+    }
+
     svg {
       flex-shrink: 0;
     }
@@ -72,9 +76,6 @@
     gap: v.$spacing-4;
   }
 
-  @include m.respond-to(xl) {
-    max-width: 62rem;
-  }
 }
 
 // ============================================================
@@ -84,9 +85,8 @@
 .payment-advice-mode {
   min-width: 0;
   margin: 0;
-  padding: v.$spacing-4 0 0;
+  padding: 0;
   border: none;
-  border-top: 1px solid v.$color-border;
 
   &__legend {
     @include m.font-base(v.$font-weight-semibold);
@@ -103,14 +103,9 @@
   }
 
   &__options {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: v.$spacing-2;
-
-    @include m.respond-to(md) {
-      grid-template-columns: repeat(4, minmax(0, 10rem));
-      gap: v.$spacing-3;
-    }
   }
 
   &__option {
@@ -126,8 +121,9 @@
   &__pill {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
+    min-width: 7.5rem;
     min-height: 2.75rem;
-    padding: 0 v.$spacing-3;
+    padding: 0 v.$spacing-4;
     border: 1px solid v.$color-border;
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
@@ -174,7 +170,7 @@
 // ============================================================
 .payment-advice-fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
   gap: v.$spacing-4;
 }
 
@@ -385,4 +381,289 @@
       }
     }
   }
+}
+
+// ============================================================
+// Unallocated receipts + uncleared invoices
+// ============================================================
+// Payment type and mode sit side by side; the advance row (contract + its terms) lines up with the seller / buyer columns above it.
+.pa-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-4 v.$spacing-6;
+  padding: v.$spacing-4 0;
+  border-top: 1px solid v.$color-border;
+  border-bottom: 1px solid v.$color-border;
+}
+
+.pa-advance-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-4;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+  }
+}
+
+.pa-advice-note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-height: 2.75rem;
+  justify-content: center;
+  padding: v.$spacing-2 v.$spacing-4;
+  border: 1px solid rgba(v.$color-info, 0.4);
+  border-left-width: 4px;
+  border-radius: v.$radius-md;
+  background: rgba(v.$color-info, 0.07);
+  color: v.$color-text-muted;
+  font-size: 0.8rem;
+
+  strong {
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+  }
+}
+
+.pa-head {
+  @include m.flex(row, space-between, center, v.$spacing-3);
+  flex-wrap: wrap;
+
+  &__title {
+    flex: 1;
+    min-width: 12rem;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.pa-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-2;
+}
+
+.pa-chip {
+  padding: 0.3rem 0.8rem;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-pill;
+  color: v.$color-text-muted;
+  font-size: v.$font-size-sm;
+
+  strong {
+    margin-left: 0.25rem;
+    color: v.$color-text;
+  }
+
+  &--advance {
+    border-color: v.$color-info;
+  }
+}
+
+.pa-switch {
+  @include m.flex(row, flex-start, center, v.$spacing-2);
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+}
+
+.pa-table-wrap {
+  overflow-x: auto;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+}
+
+.pa-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: v.$font-size-sm;
+
+  th,
+  td {
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  thead th {
+    background: v.$color-bg-muted;
+    color: v.$color-text-muted;
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr.is-muted td {
+    opacity: 0.55;
+  }
+
+  tfoot td {
+    background: v.$color-bg-muted;
+    border-top: 2px solid v.$color-border;
+    border-bottom: none;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  .pa-num {
+    text-align: right;
+  }
+
+  .pa-col-check {
+    width: 2.5rem;
+    text-align: center;
+  }
+
+  .pa-alloc-col {
+    min-width: 9rem;
+  }
+}
+
+.pa-strong {
+  font-weight: v.$font-weight-semibold;
+}
+
+.pa-muted {
+  color: v.$color-text-muted;
+}
+
+.pa-empty {
+  padding: v.$spacing-6 !important;
+  text-align: center !important;
+  color: v.$color-text-muted;
+  white-space: normal !important;
+}
+
+.pa-sub {
+  display: block;
+  color: v.$color-text-muted;
+  font-size: 0.72rem;
+
+  &--warn {
+    color: v.$color-danger;
+  }
+}
+
+.pa-auto {
+  color: v.$color-info;
+}
+
+.pa-tag {
+  display: inline-block;
+  padding: 0.12rem 0.6rem;
+  border-radius: v.$radius-pill;
+  background: v.$color-bg-muted;
+  font-size: 0.72rem;
+  font-weight: v.$font-weight-semibold;
+
+  &--advance {
+    background: rgba(v.$color-info, 0.14);
+    color: v.$color-info;
+  }
+}
+
+.pa-pool {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: v.$spacing-3;
+  padding: v.$spacing-3 v.$spacing-4;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background: v.$color-bg-muted;
+
+  @include m.respond-to(lg) {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    align-items: center;
+  }
+
+  > div:not(.pa-pool__buttons) {
+    display: flex;
+    flex-direction: column;
+
+    span {
+      color: v.$color-text-muted;
+      font-size: 0.75rem;
+    }
+
+    strong {
+      font-size: v.$font-size-lg;
+    }
+
+    &.is-bad strong {
+      color: v.$color-danger;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    gap: v.$spacing-2;
+  }
+}
+
+.pa-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  height: 2.25rem;
+  padding: 0 v.$spacing-4;
+  border: 1px solid v.$color-primary;
+  border-radius: v.$radius-md;
+  background: v.$color-primary;
+  color: v.$color-white;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--ghost {
+    background: v.$color-bg;
+    color: v.$color-primary;
+  }
+}
+
+.pa-input {
+  width: 100%;
+  height: 2.1rem;
+  padding: 0 v.$spacing-2;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  background: v.$color-bg;
+  color: v.$color-text;
+  font-size: v.$font-size-sm;
+  text-align: right;
+
+  &:focus {
+    outline: none;
+    border-color: v.$color-primary;
+    box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+  }
+
+  &.has-error {
+    border-color: v.$color-danger;
+  }
+}
+
+.pa-error {
+  display: block;
+  color: v.$color-danger;
+  font-size: 0.72rem;
+}
+
+.payment-advice-table__icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.payment-advice-actions__save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
