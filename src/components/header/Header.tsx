@@ -145,7 +145,14 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
                   );
                 })}
               </ul>
-              <button type="button" className="header__notifications-more">
+              <button
+                type="button"
+                className="header__notifications-more"
+                onClick={() => {
+                  setOpenMenu(null);
+                  navigate("/notifications");
+                }}
+              >
                 View More Notifications
               </button>
             </div>

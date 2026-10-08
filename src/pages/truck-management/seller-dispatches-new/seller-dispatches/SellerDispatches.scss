@@ -1,0 +1,248 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+.seller-dispatches {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__actions,
+  &__filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    cursor: pointer;
+
+    &:hover { filter: brightness(0.93); }
+
+    &--info { background-color: v.$color-info; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--navy { background-color: v.$color-navy; }
+  }
+
+  // ---------- Filters: 1 → 2 → 4 per row ----------
+  &__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &__search {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    min-width: 0;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+
+    input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  // ---------- Cells ----------
+  &__contract {
+    color: v.$color-navy;
+    white-space: nowrap;
+  }
+
+  &__update-btn {
+    @include m.flex(row, center, center, v.$spacing-1);
+    @include m.focus-ring(v.$color-orange);
+    padding: 0.35rem 0.6rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    background-color: #f1b44c;
+    color: v.$color-white;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover { background-color: v.$color-orange-dark; }
+  }
+
+  &__badge {
+    display: inline-block;
+    padding: 0.1rem 0.35rem;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.68rem;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+
+    &--for-loading,
+    &--ex-loading { background-color: #50a5f1; }
+    &--invoice-generated { background-color: #34c38f; }
+    &--do-generated,
+    &--pending { background-color: #f1b44c; }
+    &--dispatched { background-color: v.$color-navy; }
+  }
+
+  // ---------- Table on md+, cards below ----------
+  &__table-view {
+    @include m.respond-below(md) { display: none; }
+  }
+
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) { display: none; }
+  }
+
+  &__cards-empty {
+    @include m.flex(row, center, center, v.$spacing-2);
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.1rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__card-top {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+  }
+
+  &__card-action {
+    padding: 0 v.$spacing-3 v.$spacing-3;
+
+    .seller-dispatches__update-btn {
+      width: 100%;
+      padding: 0.55rem;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__full {
+    grid-column: 1 / -1;
+  }
+
+  // ---------- Pagination ----------
+  &__pagination {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    @include m.respond-below(sm) {
+      justify-content: center;
+    }
+
+    p {
+      margin: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
