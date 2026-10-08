@@ -132,7 +132,8 @@
         background-color: transparent;
       }
 
-      td {
+      // Only the row's own full-width cell: a table nested in the panel keeps its cell padding.
+      > td {
         padding: 0;
         white-space: normal;
       }

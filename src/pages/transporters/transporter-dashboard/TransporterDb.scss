@@ -1,0 +1,320 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.transport-db {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  padding-bottom: v.$spacing-6;
+
+  // ---------- Stat cards: 1 → 2 → 4 per row ----------
+  &__stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: v.$spacing-4;
+    }
+  }
+
+  &__stat {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-4;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-lg;
+
+    span {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      font-weight: v.$font-weight-semibold;
+    }
+
+    strong {
+      white-space: nowrap;
+    }
+
+    &--navy { background-color: v.$color-navy; }
+    &--green { background-color: #34c38f; }
+    &--blue { background-color: #50a5f1; }
+    &--orange { background-color: #f1b44c; color: v.$color-navy-dark; }
+  }
+
+  // ---------- Main card ----------
+  &__card {
+    @include m.card(v.$spacing-5);
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+
+    @include m.respond-below(sm) {
+      padding: v.$spacing-3;
+    }
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h1 {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__actions,
+  &__filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    cursor: pointer;
+
+    &:hover { filter: brightness(0.93); }
+
+    &--info { background-color: v.$color-info; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--success { background-color: v.$color-success; }
+    &--danger { background-color: v.$color-danger; }
+  }
+
+  // ---------- Filters ----------
+  &__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &__freight {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: v.$spacing-2;
+
+    input {
+      min-width: 0;
+      height: 2.5rem;
+      padding: 0 v.$spacing-3;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-navy;
+      }
+    }
+  }
+
+  // ---------- Cells ----------
+  &__party {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+
+    small {
+      color: v.$color-text-muted;
+      font-size: 0.75em;
+    }
+  }
+
+  &__bill--change {
+    color: #8b5e5e;
+    font-weight: v.$font-weight-bold;
+  }
+
+  &__view-btn {
+    @include m.focus-ring(v.$color-orange);
+    padding: 0.35rem 0.6rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-navy;
+    color: v.$color-white;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover { background-color: v.$color-navy-light; }
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    min-width: 6.5rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+
+    &--pending { background-color: #f1b44c; }
+    &--submitted { background-color: #50a5f1; }
+    &--approved { background-color: #34c38f; }
+  }
+
+  &__amount {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+  }
+
+  &__rupee {
+    font-size: 0.75em;
+  }
+
+  // ---------- Table on md+, cards below ----------
+  &__table-view {
+    @include m.respond-below(md) { display: none; }
+  }
+
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) { display: none; }
+  }
+
+  &__cards-empty {
+    @include m.flex(row, center, center, v.$spacing-2);
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__row-card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.1rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__row-card-top {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+    color: v.$color-navy;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__row-card-action {
+    padding: 0 v.$spacing-3 v.$spacing-3;
+
+    .transport-db__view-btn {
+      width: 100%;
+      padding: 0.55rem;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__full {
+    grid-column: 1 / -1;
+  }
+
+  // ---------- Pagination ----------
+  &__pagination {
+    @include m.flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    @include m.respond-below(sm) {
+      justify-content: center;
+    }
+
+    p {
+      margin: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}

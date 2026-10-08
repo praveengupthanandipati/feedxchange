@@ -4,7 +4,7 @@ import { FiChevronLeft, FiLogOut, FiX } from "react-icons/fi";
 import logo from "../../assets/img/logo.png";
 import favIcon from "../../assets/img/fav.png";
 import { asideNavSections } from "./aside.data";
-import { filterNavSections } from "./filterNav";
+import { filterNavSections, withLocalSections } from "./filterNav";
 import { toNavSections } from "../../auth/menu";
 import { useAuth } from "../../auth/AuthContext";
 import AsideMenuItem from "./AsideMenuItem";
@@ -37,7 +37,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
 
   const navSections = useMemo(
     () =>
-      (menu ? toNavSections(menu) : filterNavSections(asideNavSections, can)).map((section) => ({
+      withLocalSections(menu ? toNavSections(menu) : filterNavSections(asideNavSections, can)).map((section) => ({
         ...section,
         items: section.items.map((item) => {
           if (!CONTRACT_SCOPED_ITEM_IDS.includes(item.id) || !selectedContract) return item;

@@ -39,6 +39,12 @@ import PromoterDashboard from './pages/usermanagement/promoters/promoterdashboar
 import Promocodes from './pages/usermanagement/promoters/promocodes/Promocodes'
 import ReferredProfiles from './pages/usermanagement/promoters/referredprofiles/ReferredProfiles'
 import ProductPriceTracking from './pages/product-management/price-tracking/ProductPriceTracking'
+import Notifications from './pages/product-management/notifications/Notifications'
+import CreateInterest from './pages/interest-payments/create-interest/CreateInterest'
+import ViewInterest from './pages/interest-payments/view-interest/ViewInterest'
+import InterestDetail from './pages/interest-payments/interest-detail/InterestDetail'
+import GenerateInvoice from './pages/company-invoices/generate-invoice/GenerateInvoice'
+import ViewInvoices from './pages/company-invoices/view-invoices/ViewInvoices'
 import PriceHistory from './pages/product-management/price-history/ProductPrieHistory'
 import FormulaCalculations from './pages/product-management/formula-calculations/FormulaCalculations'
 import PendingContracts from './pages/truck-management/pending-contracts/PendingContracts'
@@ -63,9 +69,15 @@ import DriverTruckMapping from './pages/transporters/driver-trucks-mapping/drive
 import TruckTrips from './pages/transporters/truck-trip-management/truck-trip-list/TruckTrip'
 import TruckTripNew from './pages/transporters/truck-trip-management/truck-new-trip/TruckNewTrip'
 import TruckTripView from './pages/transporters/truck-trip-management/truck-trip-view/TruckTripView'
+import TransporterDashboard from './pages/transporters/transporter-dashboard/TransporterDb'
 // import TransporReviewAssignTrucks from './pages/truck-management/transporter-review-assign-trucks/ReviewAndAssignTrucks'
 import PendingDeliveryOrders from './pages/truck-management/pending-dos/PendingDeliveryOrders'
+import Sellerdispatch from './pages/truck-management/add-dispatch-byuser/Sellerdispatch'
+import SellerDispatches from './pages/truck-management/seller-dispatches-new/seller-dispatches/SellerDispatches'
+import UpdateSellerDispatch from './pages/truck-management/seller-dispatches-new/update-seller-dispatch/UpdateSellerDispatch'
 import SellerTruckReview from './pages/truck-management/seller-truck-review/SellerTruckReview'
+import Notifiations from './pages/product-management/notifications/Notifications'
+
 
 //reports
 import SellerInvoiceReports from './pages/reports/seller-invoice-reports/SellerInvoiceReports'
@@ -150,8 +162,19 @@ function App() {
           <Route path="/products/price-tracking" element={<ProductPriceTracking />} />
           <Route path="/products/price-history" element={<PriceHistory />} />
           <Route path="/products/formula-calculations" element={<FormulaCalculations />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/interest-payments/overview" element={<SubModuleOverview />} />
+          <Route path="/interest-payments/create" element={<CreateInterest />} />
+          <Route path="/interest-payments/view" element={<ViewInterest />} />
+          <Route path="/interest-payments/detail" element={<InterestDetail />} />
+          <Route path="/company-invoices/overview" element={<SubModuleOverview />} />
+          <Route path="/company-invoices/generate" element={<GenerateInvoice />} />
+          <Route path="/company-invoices/view" element={<ViewInvoices />} />
           <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
           <Route path="/truck-management/pending-delivery-orders" element={<PendingDeliveryOrders />} />
+          <Route path="/truck-management/add-dispatch-by-user" element={<Sellerdispatch />} />
+          <Route path="/truck-management/seller-dispatches-new" element={<SellerDispatches />} />
+          <Route path="/truck-management/seller-dispatches-new/update/:contractNo" element={<UpdateSellerDispatch />} />
           <Route path="/truck-management/pending-delivery-orders/seller-truck-review/:id" element={<SellerTruckReview />} />
           <Route path="/truck-management/open-pending-contracts" element={<OpenPendingContracts />} />
           <Route path="/truck-management/open-pending-contracts/instant-truck" element={<AddInstantTruck />} />
@@ -168,6 +191,7 @@ function App() {
             path="/truck-management/open-pending-contracts/update-truck-status"
             element={<UpdateTruckStatus />}
           />
+
           {/* <Route path="/truck-management/bulk-freight-approval" element={<BulkFreightApproval />} /> */}
           <Route path="/truck-management/assign-transports" element={<Assigntransports />} />
           <Route path="/truck-management/transporters/driver-master" element={<DriversList />} />
@@ -182,6 +206,8 @@ function App() {
           <Route path="/truck-management/transporters/truck-trips/:id" element={<TruckTripView />} />
           <Route path="/truck-management/pending-dos" element={<PendingDeliveryOrders />} />
           <Route path="/truck-management/seller-truck-review" element={<SellerTruckReview />} />
+          <Route path="/truck-management/transporters/dashboard" element={<TransporterDashboard />} />
+          <Route path="/truck-management/transporters/transport-dashboard" element={<TransporterDashboard />} />
           {/* <Route path="/truck-management/transporters/freight-approval" element={<TransporReviewAssignTrucks />} /> */}
           <Route path="/reports/seller-invoice-reports" element={<SellerInvoiceReports />} />
           <Route path="/reports/seller-buyer-accounts" element={<SellerBuyerAccounts />} />

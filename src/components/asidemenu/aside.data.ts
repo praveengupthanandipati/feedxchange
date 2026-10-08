@@ -15,8 +15,54 @@ import {
   FiSend,
   FiFolder,
   FiSettings,
+  FiPercent,
+  FiCopy,
 } from "react-icons/fi";
 import type { AsideNavSection } from "./aside.types";
+
+/**
+ * Interest of Payments is not in the backend Modules/Pages tables yet, so the sidebar adds it after
+ * User Management whichever menu source is in use (see withLocalSections in aside.tsx).
+ * TODO: add permission keys once the backend defines them; until then any signed-in user sees it.
+ */
+export const interestOfPaymentsSection: AsideNavSection = {
+  id: "interest-of-payments-module",
+   title: "Manage Interest of Payments",
+  items: [
+    {
+      id: "interest-of-payments",
+      label: "Interest of Payments",
+      icon: FiPercent,
+      path: "/interest-payments/overview",
+      children: [
+        { id: "interest-create", label: "Create Interest", path: "/interest-payments/create" },
+        { id: "interest-view", label: "View Interest", path: "/interest-payments/view" },
+        { id: "interest-detail", label: "View Interest Detail", path: "/interest-payments/detail" },
+      ],
+    },
+  ],
+};
+
+/** Company Invoices: also not in the backend menu yet; added right after Interest of Payments. TODO: permission keys. */
+export const companyInvoicesSection: AsideNavSection = {
+  id: "company-invoices-module",
+  title: "Manage Company Invoices",
+  items: [
+    {
+      id: "company-invoices",
+      label: "Company Invoices",
+      icon: FiCopy,
+      path: "/company-invoices/overview",
+      children: [
+        { id: "company-invoices-generate", label: "Generate Invoice", path: "/company-invoices/generate" },
+        { id: "company-invoices-view", label: "View Invoices", path: "/company-invoices/view" },
+      ],
+    },
+  ],
+};
+
+/** Sections the backend menu doesn't know yet, in the order they appear after User Management. */
+export const localNavSections: AsideNavSection[] = [interestOfPaymentsSection, companyInvoicesSection];
 
 // TODO: replace with real navigation items once routes/permissions are finalized.
 export const asideNavSections: AsideNavSection[] = [
@@ -217,6 +263,8 @@ export const asideNavSections: AsideNavSection[] = [
       },
     ],
   },
+  interestOfPaymentsSection,
+  companyInvoicesSection,
   {
     id: "our-features",
     title: "Product Management",
