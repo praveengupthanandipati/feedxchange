@@ -168,6 +168,7 @@ function App() {
           <Route path="/interest-payments/view" element={<ViewInterest />} />
           <Route path="/interest-payments/detail" element={<InterestDetail />} />
           <Route path="/company-invoices/overview" element={<SubModuleOverview />} />
+          <Route path="/estimations/overview" element={<SubModuleOverview />} />
           <Route path="/company-invoices/generate" element={<GenerateInvoice />} />
           <Route path="/company-invoices/view" element={<ViewInvoices />} />
           <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
