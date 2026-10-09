@@ -45,7 +45,7 @@ export const routePermissionRules: RoutePermissionRule[] = [
   // Overview page of each Sub Module: shown when any page inside it is
   { path: "/truck-management/transporters/overview", any: ["freight-approval", "transport-dashboard", "truck-master.view", "drivers-master.view", "driver-truck-mapping.view", "truck-trips.view"] },
   { path: "/payments/overview", any: ["payment-advice", "refunds.view", "seller-invoice.view", "payment-allocation"] },
-  { path: "/product-management/overview", any: ["products.view", "price.tracking", "price.history", "price.formula"] },
+  { path: "/product-management/overview", any: ["products.view", "products.manage", "categories.view", "price.tracking", "price.history", "price.formula"] },
   { path: "/reports/overview", any: ["reports"] },
 
   // Payments

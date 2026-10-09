@@ -7,6 +7,7 @@ import type { AccessMenu, PageAction } from "./menu";
 import {
   clearSession,
   getDisplayName,
+  getBusinessUnitType,
   getPermissionKeys,
   getRoleName,
   getToken,
@@ -22,6 +23,7 @@ interface AuthState {
   userId: string;
   displayName: string;
   roleName: string;
+  businessUnitType: string;
   /** null = the backend sent no permission list, so nothing is hidden. */
   permissionKeys: ReadonlySet<string> | null;
 }
@@ -47,6 +49,7 @@ const readState = (): AuthState => {
     userId: getUserId(),
     displayName: getDisplayName(),
     roleName: getRoleName(),
+    businessUnitType: getBusinessUnitType(),
     permissionKeys: keys === null ? null : new Set(keys),
   };
 };

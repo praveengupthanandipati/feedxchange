@@ -114,6 +114,8 @@ export const getDisplayName = (): string => {
 
 export const getRoleName = (): string => read("roleName") ?? "";
 
+export const getBusinessUnitType = (): string => read("businessUnitType") ?? "";
+
 export const clearSession = () => {
   try {
     [AUTH_USER_KEY, REFRESH_TOKEN_KEY, ACCESS_EXPIRES_KEY, PERMISSION_KEYS_KEY, ROLE_KEY_KEY, ...PROFILE_KEYS].forEach((key) =>

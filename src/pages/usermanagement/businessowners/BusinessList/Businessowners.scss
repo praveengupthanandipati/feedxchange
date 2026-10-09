@@ -120,6 +120,107 @@
   }
 }
 
+.business-owners-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: v.$spacing-4;
+
+  &__message {
+    margin: 0;
+    padding: v.$spacing-5;
+    border: 1px solid v.$color-gray-100;
+    border-radius: v.$radius-lg;
+    background: v.$color-white;
+    color: v.$color-text-muted;
+    text-align: center;
+  }
+}
+
+.business-owner-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 13rem;
+  padding: v.$spacing-4;
+  border: 1px solid v.$color-gray-100;
+  border-radius: v.$radius-lg;
+  background: v.$color-white;
+  box-shadow: v.$shadow-md;
+  transition: transform v.$transition-fast, box-shadow v.$transition-fast, border-color v.$transition-fast;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: v.$color-gray-300;
+    box-shadow: v.$shadow-lg;
+  }
+
+  &__topline {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
+    margin-bottom: v.$spacing-3;
+  }
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: v.$radius-md;
+    background: rgba(v.$color-orange, 0.14);
+    color: v.$color-orange-dark;
+  }
+
+  &__actions {
+    margin-left: auto;
+  }
+
+  &__name {
+    display: block;
+    color: v.$color-navy;
+    font-size: v.$font-size-base;
+    font-weight: v.$font-weight-semibold;
+    line-height: v.$line-height-tight;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      color: v.$color-primary-dark;
+      text-decoration: underline;
+    }
+  }
+
+  &__trading-name {
+    margin: v.$spacing-1 0 0;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__details {
+    display: grid;
+    gap: v.$spacing-2;
+    margin-top: auto;
+    padding-top: v.$spacing-4;
+
+    span {
+      display: flex;
+      align-items: flex-start;
+      gap: v.$spacing-2;
+      min-width: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+
+    svg {
+      flex: 0 0 1rem;
+      margin-top: 0.1rem;
+      color: v.$color-gray-500;
+    }
+  }
+}
+
 .business-owners-pagination {
   @include m.flex(row, space-between, center);
   flex-wrap: wrap;
