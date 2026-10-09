@@ -61,8 +61,27 @@ export const companyInvoicesSection: AsideNavSection = {
   ],
 };
 
+/** Estimations: also not in the backend menu yet; added right after Company Invoices. TODO: permission keys. */
+export const estimationsSection: AsideNavSection = {
+  id: "estimations-module",
+  title: "Manage Estimations",
+  items: [
+    {
+      id: "estimations",
+      label: "Estimations",
+      icon: FiPercent,
+      path: "/estimations/overview",
+      children: [
+        { id: "estimations-commission", label: "Commission Estimation", path: "/estimations/commission" },
+        { id: "estimations-view", label: "View Estimations", path: "/estimations/view" },
+        { id: "estimations-detail", label: "Estimations Detail", path: "/estimations/detail" },
+      ],
+    },
+  ],
+};
+
 /** Sections the backend menu doesn't know yet, in the order they appear after User Management. */
-export const localNavSections: AsideNavSection[] = [interestOfPaymentsSection, companyInvoicesSection];
+export const localNavSections: AsideNavSection[] = [interestOfPaymentsSection, companyInvoicesSection, estimationsSection];
 
 // TODO: replace with real navigation items once routes/permissions are finalized.
 export const asideNavSections: AsideNavSection[] = [
@@ -265,6 +284,7 @@ export const asideNavSections: AsideNavSection[] = [
   },
   interestOfPaymentsSection,
   companyInvoicesSection,
+  estimationsSection,
   {
     id: "our-features",
     title: "Product Management",
