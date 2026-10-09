@@ -1,0 +1,455 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.interest-calc {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  // ---------- Header ----------
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    h1 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__header-actions,
+  &__filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { filter: brightness(0.93); }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--info { background-color: v.$color-info; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--navy { background-color: v.$color-navy; }
+    &--danger { background-color: v.$color-danger; }
+  }
+
+  &__input {
+    @include m.font-base;
+    width: 100%;
+    min-width: 0;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+  }
+
+  // ---------- Filters: 1 → 2 → 4 per row ----------
+  &__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  // ---------- Party bar + total ----------
+  &__summary {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 3fr) minmax(14rem, 1fr);
+    }
+  }
+
+  &__parties {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-1 v.$spacing-5;
+    padding: v.$spacing-3 v.$spacing-4;
+    border: 1px solid rgba(v.$color-info, 0.35);
+    border-radius: v.$radius-md;
+    background-color: rgba(v.$color-info, 0.12);
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+
+    strong {
+      color: v.$color-text;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__total {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    padding: v.$spacing-3 v.$spacing-4;
+    border-radius: v.$radius-md;
+    box-shadow: 0 1px 6px rgba(v.$color-navy, 0.12);
+
+    span {
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-semibold;
+    }
+
+    strong {
+      color: v.$color-text;
+      font-size: v.$font-size-lg;
+    }
+  }
+
+  // ---------- Bulk grace ----------
+  &__bulk {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-2;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: 9rem 11rem auto;
+      justify-content: end;
+    }
+  }
+
+  &__message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    margin: 0;
+    color: v.$color-success;
+    font-size: v.$font-size-sm;
+  }
+
+  // ---------- Table cells ----------
+  &__grace {
+    @include m.font-base;
+    width: 4.5rem;
+    height: 2rem;
+    padding: 0 v.$spacing-2;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-sm;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-1;
+  }
+
+  &__icon-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 1.9rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover { filter: brightness(0.9); }
+
+    &--view { background-color: #50a5f1; }
+    &--print { background-color: v.$color-navy; }
+    &--delete { background-color: #f46a6a; }
+  }
+
+  // Round +/− toggle: outlined when closed, filled navy when the payments are open.
+  &__expand {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1.5px solid v.$color-navy;
+    border-radius: 50%;
+    background: v.$color-bg;
+    color: v.$color-navy;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color v.$transition-fast, color v.$transition-fast;
+
+    &:hover { background-color: rgba(v.$color-navy, 0.08); }
+
+    &[aria-expanded="true"] {
+      background-color: v.$color-navy;
+      color: v.$color-white;
+    }
+  }
+
+  // ---------- Table on md+, cards below ----------
+  &__table-view {
+    @include m.respond-below(md) { display: none; }
+  }
+
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) { display: none; }
+  }
+
+  &__cards-empty {
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+
+  &__card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.15rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__card-top {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+    font-size: v.$font-size-sm;
+
+    strong { color: v.$color-navy; }
+    span { color: v.$color-text-muted; }
+  }
+
+  &__card-full {
+    grid-column: 1 / -1;
+  }
+
+  &__card-interest {
+    color: v.$color-navy !important;
+    font-size: v.$font-size-lg !important;
+    font-weight: v.$font-weight-bold;
+  }
+
+  &__card-footer {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    flex-wrap: wrap;
+    padding: 0 v.$spacing-3 v.$spacing-3;
+
+    .interest-calc__icon-btn {
+      width: 2.5rem;
+      height: 2.25rem;
+    }
+  }
+
+  &__link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: v.$color-info;
+    font-family: inherit;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    cursor: pointer;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  &__payment-list {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid v.$color-border;
+    background-color: v.$color-gray-100;
+    list-style: none;
+
+    li {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.1rem v.$spacing-2;
+      padding: v.$spacing-2 v.$spacing-3;
+      font-size: 0.8rem;
+
+      & + li { border-top: 1px solid v.$color-border; }
+
+      span:nth-child(2) {
+        grid-column: 1;
+        color: v.$color-text-muted;
+      }
+
+      strong {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: center;
+        color: v.$color-navy;
+      }
+    }
+  }
+
+  // ---------- Save / Cancel: stays in view at the bottom while scrolling ----------
+  &__footer {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 0 calc(-1 * #{v.$spacing-5}) calc(-1 * #{v.$spacing-5});
+    padding: v.$spacing-3 v.$spacing-5;
+    border-top: 1px solid v.$color-border;
+    border-radius: 0 0 v.$radius-md v.$radius-md;
+    background-color: v.$color-bg;
+
+    @include m.respond-below(sm) {
+      margin: 0 calc(-1 * #{v.$spacing-3}) calc(-1 * #{v.$spacing-3});
+      padding: v.$spacing-3;
+
+      > * { flex: 1; }
+    }
+  }
+}
+
+// ---------- View modal ----------
+.interest-calc-modal {
+  @include m.flex-center;
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal;
+  padding: v.$spacing-3;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  &__dialog {
+    width: 100%;
+    max-width: 44rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: v.$spacing-4;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-lg;
+
+    header {
+      @include m.flex(row, space-between, center, v.$spacing-2);
+      margin-bottom: v.$spacing-3;
+
+      h2 {
+        margin: 0;
+        color: v.$color-navy;
+        font-size: v.$font-size-lg;
+      }
+
+      button {
+        @include m.flex-center;
+        width: 2rem;
+        height: 2rem;
+        border: none;
+        border-radius: v.$radius-sm;
+        background: transparent;
+        color: v.$color-text-muted;
+        font-size: 1.1rem;
+        cursor: pointer;
+
+        &:hover { background-color: v.$color-gray-100; }
+      }
+    }
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0 0 v.$spacing-3;
+
+      @include m.respond-below(sm) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.75rem;
+    }
+
+    dd {
+      margin: 0.1rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-semibold;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__formula {
+    margin: 0 0 v.$spacing-3;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background-color: v.$color-gray-100;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    line-height: 1.7;
+  }
+}

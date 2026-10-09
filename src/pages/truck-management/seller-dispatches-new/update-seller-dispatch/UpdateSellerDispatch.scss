@@ -1,0 +1,546 @@
+@use "../../../../assets/styles/variables" as v;
+@use "../../../../assets/styles/mixins" as m;
+
+$tones: (
+  navy: v.$color-navy,
+  blue: #50a5f1,
+  green: #34c38f,
+  orange: #f1b44c,
+  red: v.$color-danger,
+);
+
+.update-dispatch {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  padding-bottom: v.$spacing-6;
+
+  &__top {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__back {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    color: v.$color-navy;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__not-found {
+    @include m.card(v.$spacing-5);
+    @include m.flex(column, center, center, v.$spacing-2);
+    color: v.$color-text-muted;
+    text-align: center;
+
+    > svg {
+      font-size: 1.75rem;
+      color: v.$color-danger;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+// ---------- Section card ----------
+.dispatch-section {
+  @include m.card(v.$spacing-5);
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    margin-bottom: v.$spacing-4;
+
+    h2 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-lg;
+    }
+  }
+
+  &__toggle {
+    @include m.flex(row, center, center, v.$spacing-1);
+    @include m.focus-ring(v.$color-orange);
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    color: v.$color-navy;
+    font-size: 0.8rem;
+    font-weight: v.$font-weight-semibold;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+  }
+}
+
+// ---------- Tile grids: 1 → 2 → 3 → 6 (or 4) per row ----------
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-2;
+  margin: 0;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &--six {
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(xxl) {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  &--four {
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+}
+
+// ---------- Tile ----------
+.info-tile {
+  min-width: 0;
+  padding: v.$spacing-3;
+  border-left: 3px solid v.$color-navy;
+  border-radius: v.$radius-sm;
+  background-color: v.$color-gray-100;
+
+  dt {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+  }
+
+  dd {
+    margin: v.$spacing-2 0 0;
+    color: v.$color-text;
+    font-weight: v.$font-weight-semibold;
+    overflow-wrap: anywhere;
+  }
+
+  &__phone {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  @each $name, $color in $tones {
+    &--#{$name} {
+      border-left-color: $color;
+
+      .info-tile__icon,
+      .info-tile__phone {
+        color: $color;
+      }
+    }
+  }
+}
+
+// ---------- Default Delivery Order Information: 1 → 3 per row ----------
+.do-info {
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3 v.$spacing-4;
+    margin: 0;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__item {
+    min-width: 0;
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.8rem;
+    }
+
+    dd {
+      margin: v.$spacing-1 0 0;
+      color: v.$color-text;
+      font-weight: v.$font-weight-semibold;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+
+    label {
+      color: v.$color-text-muted;
+      font-size: 0.8rem;
+    }
+
+    input {
+      @include m.font-base;
+      width: 100%;
+      height: 2.5rem;
+      padding: 0 v.$spacing-3;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-navy;
+      }
+    }
+  }
+
+  &__error {
+    margin: 0;
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+
+    // Full-width buttons are easier to tap on phones.
+    @include m.respond-below(sm) {
+      > * {
+        flex: 1;
+      }
+    }
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &--primary {
+      border: none;
+      background-color: v.$color-navy;
+      color: v.$color-white;
+
+      &:hover {
+        background-color: v.$color-navy-light;
+      }
+    }
+
+    &--ghost {
+      border: none;
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+
+      &:hover {
+        background-color: v.$color-gray-200;
+      }
+    }
+  }
+}
+
+// ---------- Section subtitle ----------
+.dispatch-section__header:has(.dispatch-section__subtitle) {
+  align-items: flex-start;
+}
+
+.dispatch-section__titles {
+  min-width: 0;
+}
+
+.dispatch-section__subtitle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-1 v.$spacing-3;
+  margin-top: v.$spacing-2;
+  color: v.$color-text-muted;
+  font-size: 0.8rem;
+
+  strong {
+    color: v.$color-text;
+  }
+
+  // Divider between items on wider screens; on phones each item wraps to its own line.
+  @include m.respond-to(sm) {
+    > span + span {
+      padding-left: v.$spacing-3;
+      border-left: 1px solid v.$color-orange;
+    }
+  }
+}
+
+// ---------- Reassign Truck to Pending Contracts ----------
+.reassign {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+
+  &__toolbar {
+    @include m.flex(row, flex-end, center, v.$spacing-3);
+    flex-wrap: wrap;
+  }
+
+  &__save {
+    height: 2.25rem;
+
+    @include m.respond-below(sm) {
+      width: 100%;
+    }
+  }
+
+  &__message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex: 1 1 16rem;
+    margin: 0;
+    font-size: v.$font-size-sm;
+
+    &--error { color: v.$color-danger; }
+    &--success { color: v.$color-success; }
+  }
+
+  &__pending {
+    color: v.$color-danger;
+    font-weight: v.$font-weight-medium;
+    white-space: nowrap;
+  }
+
+  &__qty-input {
+    @include m.font-base;
+    width: 100%;
+    max-width: 6rem;
+    height: 2rem;
+    padding: 0 v.$spacing-2;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-sm;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+  }
+
+  // Table on md+, cards below.
+  &__table-view {
+    @include m.respond-below(md) { display: none; }
+  }
+
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) { display: none; }
+  }
+
+  &__card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.1rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+
+    .reassign__qty-input {
+      max-width: none;
+      height: 2.5rem;
+    }
+  }
+
+  &__card-top {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    input {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+      accent-color: v.$color-navy;
+    }
+
+    strong {
+      min-width: 0;
+      color: v.$color-navy;
+      overflow-wrap: anywhere;
+    }
+
+    span {
+      margin-left: auto;
+      color: v.$color-text-muted;
+      white-space: nowrap;
+    }
+  }
+
+  &__full {
+    grid-column: 1 / -1;
+  }
+}
+
+// ---------- Section header buttons ----------
+.dispatch-section__header-actions {
+  @include m.flex(row, flex-end, center, v.$spacing-2);
+  flex-shrink: 0;
+
+  .do-info__btn {
+    height: 2.25rem;
+    padding: 0 v.$spacing-3;
+  }
+}
+
+// ---------- Dispatch Invoice Details: 1 → 2 → 4 per row ----------
+.do-info__grid.invoice__grid {
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include m.respond-to(lg) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.invoice {
+  &__input-group {
+    display: flex;
+    align-items: stretch;
+    height: 2.5rem;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    &:focus-within {
+      border-color: v.$color-navy;
+    }
+
+    span {
+      @include m.flex-center;
+      padding: 0 v.$spacing-3;
+      background-color: v.$color-gray-100;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+
+    // The group draws the border, so the input inside it doesn't.
+    .do-info__field & input,
+    input {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      border: none;
+      border-radius: 0;
+    }
+
+    &--readonly input {
+      background-color: v.$color-gray-100;
+      color: v.$color-text-muted;
+    }
+  }
+
+  &__file {
+    @include m.font-base;
+    width: 100%;
+    height: 2.5rem;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &::file-selector-button {
+      height: 100%;
+      margin-right: v.$spacing-3;
+      padding: 0 v.$spacing-3;
+      border: none;
+      border-right: 1px solid v.$color-border;
+      background-color: v.$color-gray-100;
+      color: v.$color-text;
+      cursor: pointer;
+    }
+  }
+
+  &__file-note {
+    color: v.$color-text-muted;
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+
+  &__download {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-1;
+    color: v.$color-navy;
+    font-size: v.$font-size-sm;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    padding: 0;
+    border: none;
+    background: none;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Beat `.do-info__field input` so the "Choose File" button sits flush with the border.
+.do-info__field .invoice__file {
+  padding: 0;
+}

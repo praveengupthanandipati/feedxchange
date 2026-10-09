@@ -15,6 +15,7 @@ import { driverTruckMappingApi } from "./driverTruckMappingApi";
 import { roleAccessApi } from "./roleAccessApi";
 import { userAccessApi } from "./userAccessApi";
 import { sellerInvoiceApi } from "./sellerInvoiceApi";
+import { paymentAdviceApi } from "./paymentAdviceApi";
 
 export const store = configureStore({
   reducer: {
@@ -34,6 +35,7 @@ export const store = configureStore({
     [roleAccessApi.reducerPath]: roleAccessApi.reducer,
     [userAccessApi.reducerPath]: userAccessApi.reducer,
     [sellerInvoiceApi.reducerPath]: sellerInvoiceApi.reducer,
+    [paymentAdviceApi.reducerPath]: paymentAdviceApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -53,6 +55,7 @@ export const store = configureStore({
       roleAccessApi.middleware,
       userAccessApi.middleware,
       sellerInvoiceApi.middleware,
+      paymentAdviceApi.middleware,
     ),
 });
 
