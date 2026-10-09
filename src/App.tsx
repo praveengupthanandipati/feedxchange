@@ -44,6 +44,9 @@ import CreateInterest from './pages/interest-payments/create-interest/CreateInte
 import ViewInterest from './pages/interest-payments/view-interest/ViewInterest'
 import InterestDetail from './pages/interest-payments/interest-detail/InterestDetail'
 import GenerateInvoice from './pages/company-invoices/generate-invoice/GenerateInvoice'
+import CommissionEstimations from './pages/estimations/commission-estimations/CommissionEstimations'
+import ViewEstimations from './pages/estimations/view-estimations/ViewEstimations'
+import EstimationDetail from './pages/estimations/estimations-detail/EstimationDetail'
 import ViewInvoices from './pages/company-invoices/view-invoices/ViewInvoices'
 import PriceHistory from './pages/product-management/price-history/ProductPrieHistory'
 import FormulaCalculations from './pages/product-management/formula-calculations/FormulaCalculations'
@@ -76,7 +79,6 @@ import Sellerdispatch from './pages/truck-management/add-dispatch-byuser/Sellerd
 import SellerDispatches from './pages/truck-management/seller-dispatches-new/seller-dispatches/SellerDispatches'
 import UpdateSellerDispatch from './pages/truck-management/seller-dispatches-new/update-seller-dispatch/UpdateSellerDispatch'
 import SellerTruckReview from './pages/truck-management/seller-truck-review/SellerTruckReview'
-import Notifiations from './pages/product-management/notifications/Notifications'
 
 
 //reports
@@ -169,6 +171,9 @@ function App() {
           <Route path="/interest-payments/detail" element={<InterestDetail />} />
           <Route path="/company-invoices/overview" element={<SubModuleOverview />} />
           <Route path="/estimations/overview" element={<SubModuleOverview />} />
+          <Route path="/estimations/commission" element={<CommissionEstimations />} />
+          <Route path="/estimations/view" element={<ViewEstimations />} />
+          <Route path="/estimations/detail" element={<EstimationDetail />} />
           <Route path="/company-invoices/generate" element={<GenerateInvoice />} />
           <Route path="/company-invoices/view" element={<ViewInvoices />} />
           <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
