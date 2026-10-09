@@ -96,27 +96,55 @@
 
   &__row {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: v.$spacing-3;
     overflow: visible;
 
+    > * {
+      min-width: 0;
+    }
+
     @include m.respond-to(sm) {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      .pending-contracts-filters__date-range {
+        grid-column: span 2;
+      }
     }
 
     @include m.respond-to(lg) {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+
+      .pending-contracts-filters__date-range {
+        grid-column: span 2;
+      }
+    }
+
+    .searchable-select {
+      min-width: 0;
     }
   }
 
   &__date-range {
-    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.flex(row, flex-start, center, v.$spacing-1);
     height: 2.5rem;
     min-width: 0;
     padding: 0 v.$spacing-3;
     border: 1px solid v.$color-border;
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
+
+    > .date-range-input {
+      flex: 1 1 0;
+      width: 0;
+      min-width: 0;
+    }
+
+    .date-range-input__trigger {
+      min-width: 0;
+      padding-inline: v.$spacing-2;
+      font-size: 0.8125rem;
+    }
 
     input {
       @include m.font-base;
@@ -131,9 +159,14 @@
 
     span {
       flex-shrink: 0;
-      color: v.$color-text-muted;
+      color: v.$color-text;
       font-size: v.$font-size-sm;
     }
+
+  }
+
+  &__date-label {
+    font-weight: v.$font-weight-semibold;
   }
 
   &__search-row {

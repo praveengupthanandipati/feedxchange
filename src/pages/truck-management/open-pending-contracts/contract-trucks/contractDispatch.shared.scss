@@ -21,3 +21,22 @@
     cursor: pointer;
   }
 }
+
+// Light-ash selected and placeholder text for dropdown fields on these two dispatch forms only.
+.instant-truck-form,
+.schedule-dispatch-form {
+  .searchable-select__trigger,
+  .date-range-input__trigger {
+    color: v.$color-gray-400;
+  }
+
+  .searchable-select__trigger > span:first-child,
+  .date-range-input__trigger > span:first-child {
+    color: v.$color-gray-400;
+  }
+}
+
+.schedule-dispatch-form .multi-select__trigger,
+.schedule-dispatch-form .multi-select__chip {
+  color: v.$color-gray-400;
+}
