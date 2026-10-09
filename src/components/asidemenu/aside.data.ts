@@ -274,6 +274,7 @@ export const asideNavSections: AsideNavSection[] = [
         id: "apps",
         label: "Products",
         icon: FiGrid,
+        path: "/product-management/overview",
         children: [
           { id: "products-products", permissions: ["products.view"], label: "Products", path: "/products" },
           { id: "products-price-tracking", permissions: ["price.tracking"], label: "Price Tracking", path: "/products/price-tracking" },
@@ -298,6 +299,7 @@ export const asideNavSections: AsideNavSection[] = [
         id: "reports",
         label: "Reports",
         icon: FiFileText,
+        path: "/reports/overview",
         children: [
           { id: "reports-seller-invoice", permissions: ["reports"], label: "Seller Invoice Reports", path: "/reports/seller-invoice-reports" },
           { id: "reports-seller-buyer-account", permissions: ["reports"], label: "Seller Buyer Account", path: "/reports/seller-buyer-accounts" },

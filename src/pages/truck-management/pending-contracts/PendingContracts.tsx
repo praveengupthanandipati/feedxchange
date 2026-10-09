@@ -353,13 +353,14 @@ const PendingContracts = () => {
                 ariaLabel="Select Buyers"
               />
               <div className="pending-contracts-filters__date-range">
+                <span className="pending-contracts-filters__date-label">From</span>
                 <DatePickerInput
                   value={dateFrom}
                   onChange={(value) => setDateFrom(value)}
                   ariaLabel="Contract date range from"
                   clearable
                 />
-                <span>to</span>
+                <span className="pending-contracts-filters__date-label">To</span>
                 <DatePickerInput
                   value={dateTo}
                   onChange={(value) => setDateTo(value)}

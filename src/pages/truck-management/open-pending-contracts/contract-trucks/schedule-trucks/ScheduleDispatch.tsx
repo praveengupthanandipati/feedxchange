@@ -185,7 +185,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
   };
 
   return (
-    <div className="schedule-request-drawer__body">
+    <div className="schedule-request-drawer__body schedule-dispatch-form">
       {saved && (
         <div className="dispatch-form-success">
           <FiCheckCircle aria-hidden />
