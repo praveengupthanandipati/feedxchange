@@ -17,6 +17,7 @@ import {
   FiSettings,
   FiPercent,
   FiCopy,
+  FiLayers,
 } from "react-icons/fi";
 import type { AsideNavSection } from "./aside.types";
 
@@ -80,8 +81,35 @@ export const estimationsSection: AsideNavSection = {
   ],
 };
 
+/** Masters: also not in the backend menu yet; added right after Estimations. TODO: permission keys and pages. */
+export const mastersSection: AsideNavSection = {
+  id: "masters-module",
+  title: "Masters",
+  items: [
+    {
+      id: "masters",
+      label: "Masters",
+      icon: FiLayers,
+      path: "/masters/overview",
+      children: [
+        // { id: "masters-notify-subscriptions", label: "Notify Subscriptions", path: "/masters/notify-subscriptions" },
+        // { id: "masters-roles-permissions", label: "Roles & Permissions", path: "/masters/roles-permissions" },
+        // { id: "masters-templates", label: "Templates", path: "/masters/templates" },
+        { id: "masters-banners", label: "Banners", path: "/masters/banners" },
+        { id: "masters-subscriptions", label: "Subscriptions", path: "/masters/subscriptions" },
+        { id: "masters-product-enquiry", label: "Product Enquiry", path: "/masters/product-enquiry" },
+        { id: "masters-contact-enquiry", label: "Contact Enquiry", path: "/masters/contact-enquiry" },
+        { id: "masters-testimonials", label: "Testimonials", path: "/masters/testimonials" },
+        { id: "masters-blogs", label: "Blogs", path: "/masters/blogs" },
+        { id: "masters-users", label: "Users", path: "/masters/users" },
+        { id: "masters-registration-details", label: "Registration Details", path: "/masters/registration-details" },
+      ],
+    },
+  ],
+};
+
 /** Sections the backend menu doesn't know yet, in the order they appear after User Management. */
-export const localNavSections: AsideNavSection[] = [interestOfPaymentsSection, companyInvoicesSection, estimationsSection];
+export const localNavSections: AsideNavSection[] = [interestOfPaymentsSection, companyInvoicesSection, estimationsSection, mastersSection];
 
 // TODO: replace with real navigation items once routes/permissions are finalized.
 export const asideNavSections: AsideNavSection[] = [
@@ -285,6 +313,7 @@ export const asideNavSections: AsideNavSection[] = [
   interestOfPaymentsSection,
   companyInvoicesSection,
   estimationsSection,
+  mastersSection,
   {
     id: "our-features",
     title: "Product Management",
