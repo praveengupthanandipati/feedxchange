@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FiBell,
   FiMaximize,
   FiMinimize2,
   FiChevronDown,
@@ -10,7 +9,7 @@ import {
   FiLogOut,
   FiMenu,
 } from "react-icons/fi";
-import { notifications } from "./header.data";
+import NotificationBell from "../../notifications/NotificationBell";
 import { useAuth } from "../../auth/AuthContext";
 import "./Header.scss";
 
@@ -27,7 +26,7 @@ const initialsOf = (name: string) =>
     .map((part) => part[0]?.toUpperCase())
     .join("") || "U";
 
-type OpenMenu = "notifications" | "user" | null;
+type OpenMenu = "user" | null;
 
 const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
   const navigate = useNavigate();
@@ -36,10 +35,7 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
   const USER_INITIALS = initialsOf(displayName);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
-  const notificationsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  const unreadCount = notifications.filter((item) => !item.read).length;
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -55,7 +51,6 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (notificationsRef.current?.contains(target)) return;
       if (userMenuRef.current?.contains(target)) return;
       setOpenMenu(null);
     };
@@ -103,54 +98,7 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
       <h1 className="header__title">{title}</h1>
 
       <div className="header__actions">
-        <div className="header__notifications" ref={notificationsRef}>
-          <button
-            type="button"
-            className="header__icon-btn"
-            onClick={() => toggleMenu("notifications")}
-            aria-label="Notifications"
-            aria-expanded={openMenu === "notifications"}
-            aria-haspopup="true"
-          >
-            <FiBell aria-hidden />
-            {unreadCount > 0 && (
-              <span className="header__badge">{unreadCount}</span>
-            )}
-          </button>
-
-          {openMenu === "notifications" && (
-            <div className="header__dropdown header__dropdown--notifications">
-              <p className="header__dropdown-heading">Notifications</p>
-              <ul className="header__notification-list">
-                {notifications.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <li
-                      key={item.id}
-                      className={`header__notification ${item.read ? "" : "is-unread"}`}
-                    >
-                      <span className="header__notification-icon">
-                        <Icon aria-hidden />
-                      </span>
-                      <span className="header__notification-body">
-                        <span className="header__notification-title">
-                          {item.title}
-                        </span>
-                        <span className="header__notification-time">
-                          {item.time}
-                        </span>
-                      </span>
-                      {!item.read && <span className="header__notification-dot" />}
-                    </li>
-                  );
-                })}
-              </ul>
-              <button type="button" className="header__notifications-more">
-                View More Notifications
-              </button>
-            </div>
-          )}
-        </div>
+        <NotificationBell />
 
         <button
           type="button"
