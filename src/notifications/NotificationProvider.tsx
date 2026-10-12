@@ -57,6 +57,9 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       .withUrl(`${API_URL}/hubs/notifications`, {
         // Called for every (re)connect, so a token refreshed in the meantime is used.
         accessTokenFactory: async () => (await getFreshAccessToken()) ?? "",
+        // The token travels as a header / query string, not a cookie. Sending credentials would also make the browser reject the API's
+        // wildcard CORS answer, which blocks the connection.
+        withCredentials: false,
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .configureLogging(LogLevel.Warning)

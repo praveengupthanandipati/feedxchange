@@ -14,6 +14,9 @@ import type {
   RecipientCandidate,
   SendNotificationResult,
 } from "../store/notificationsApi";
+import { TemplateSelect } from "./NotifyChoicePicker";
+import { CHANNEL_ORDER, templateKey } from "./notifyChoices";
+import type { NotifyChoices } from "./notifyChoices";
 import "./Notifications.scss";
 
 export interface NotifyPanelProps {
@@ -34,9 +37,10 @@ export interface NotifyPanelProps {
   /** Called when the user chooses not to notify. */
   onSkip?: () => void;
   sendLabel?: string;
+  /** Channels and templates already chosen on the screen (per role); the panel starts from them. */
+  choices?: NotifyChoices | null;
 }
 
-const CHANNEL_ORDER: ChannelCode[] = ["EMAIL", "WHATSAPP", "SMS", "APP"];
 
 type ChannelPick = Partial<Record<ChannelCode, boolean>>;
 
@@ -57,7 +61,7 @@ const unavailableReason = (c: RecipientCandidate, channel: ChannelCode): string 
  */
 const NotifyPanel = ({
   eventCode, contractId, contractNumber, variantCode, sourceEntityType, sourceEntityId, data, allowOpenText,
-  onSent, onSkip, sendLabel = "Send",
+  onSent, onSkip, sendLabel = "Send", choices,
 }: NotifyPanelProps) => {
   const hasContract = contractId !== undefined || !!contractNumber;
   const { data: channels = [] } = useGetNotificationChannelsQuery();
@@ -80,7 +84,8 @@ const NotifyPanel = ({
   const candidates = useMemo(() => [...loaded, ...adhoc], [loaded, adhoc]);
 
   const [picks, setPicks] = useState<Record<string, ChannelPick>>({});
-  const [templateByChannel, setTemplateByChannel] = useState<Partial<Record<ChannelCode, number | null>>>({});
+  // Template choice per role AND channel: a buyer and a seller have different templates for the same channel.
+  const [templateByKey, setTemplateByKey] = useState<Record<string, number | null>>(choices?.templates ?? {});
   const [text, setText] = useState("");
   const [previewResult, setPreviewResult] = useState<NotificationPreviewResult | null>(null);
   const [sent, setSent] = useState<SendNotificationResult | null>(null);
@@ -98,19 +103,30 @@ const NotifyPanel = ({
         if (seeded.current.has(k)) continue;
         seeded.current.add(k);
         const pick: ChannelPick = {};
-        event.rules.filter((r) => r.recipientRole === c.role && r.isDefaultOn).forEach((r) => {
-          if (!unavailableReason(c, r.channelCode)) pick[r.channelCode] = true;
+        const chosen = choices?.channels[c.role];
+        // The screen's own choice wins; otherwise the event's default channels for this role.
+        const wanted = chosen ?? event.rules.filter((r) => r.recipientRole === c.role && r.isDefaultOn).map((r) => r.channelCode);
+        wanted.forEach((ch) => {
+          if (!unavailableReason(c, ch)) pick[ch] = true;
         });
         next[k] = pick;
       }
       return next;
     });
-  }, [candidates, event]);
+  }, [candidates, event, choices]);
 
-  const usedChannels = useMemo(
-    () => new Set(candidates.flatMap((c) => enabledChannels.filter((ch) => picks[keyOf(c)]?.[ch]))),
-    [candidates, picks, enabledChannels],
-  );
+  // Every (role, channel) that at least one recipient has ticked: each gets its own template choice.
+  const usedPairs = useMemo(() => {
+    const seen = new Set<string>();
+    const pairs: [string, ChannelCode][] = [];
+    for (const c of candidates) {
+      for (const ch of enabledChannels) {
+        const k = templateKey(c.role, ch);
+        if (picks[keyOf(c)]?.[ch] && !seen.has(k)) { seen.add(k); pairs.push([c.role, ch]); }
+      }
+    }
+    return pairs;
+  }, [candidates, picks, enabledChannels]);
 
   const toggle = (c: RecipientCandidate, channel: ChannelCode) => {
     setPreviewResult(null);
@@ -144,7 +160,7 @@ const NotifyPanel = ({
         displayName: c.displayName,
         email: c.recipientType === "Adhoc" ? c.email : null,
         mobile: c.recipientType === "Adhoc" ? c.mobile : null,
-        channels: chosen.map((ch) => ({ channelCode: ch, templateId: templateByChannel[ch] ?? null })),
+        channels: chosen.map((ch) => ({ channelCode: ch, templateId: templateByKey[templateKey(c.role, ch)] ?? null })),
       }));
     if (recipients.length === 0) return null;
     return {
@@ -270,25 +286,16 @@ const NotifyPanel = ({
         </div>
       )}
 
-      {usedChannels.size > 0 && (
+      {usedPairs.length > 0 && (
         <div className="fx-notify__templates">
-          {enabledChannels.filter((ch) => usedChannels.has(ch)).map((ch) => {
-            const options = templates.filter((t) => t.channelCode === ch);
-            return (
-              <div key={ch}>
-                <label className="form-label small fw-semibold" htmlFor={`fx-tpl-${ch}`}>
-                  {channels.find((c) => c.channelCode === ch)?.channelName} template
-                </label>
-                <select
-                  id={`fx-tpl-${ch}`} className="form-select form-select-sm" value={templateByChannel[ch] ?? ""}
-                  onChange={(e) => { setPreviewResult(null); setTemplateByChannel({ ...templateByChannel, [ch]: e.target.value ? Number(e.target.value) : null }); }}
-                >
-                  <option value="">Default{options.find((o) => o.isDefault) ? ` (${options.find((o) => o.isDefault)!.templateName})` : ""}</option>
-                  {options.map((o) => <option key={o.templateId} value={o.templateId}>{o.templateName}</option>)}
-                </select>
-              </div>
-            );
-          })}
+          {usedPairs.map(([role, ch]) => (
+            <TemplateSelect
+              key={`${role}|${ch}`} id={`fx-tpl-${role}-${ch}`} role={role} channel={ch} templates={templates}
+              label={`${role === "SELECTED" ? "" : role.charAt(0) + role.slice(1).toLowerCase() + " - "}${channels.find((c) => c.channelCode === ch)?.channelName} template`}
+              value={templateByKey[templateKey(role, ch)]}
+              onChange={(id) => { setPreviewResult(null); setTemplateByKey({ ...templateByKey, [templateKey(role, ch)]: id }); }}
+            />
+          ))}
         </div>
       )}
 
