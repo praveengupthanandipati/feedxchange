@@ -75,6 +75,8 @@ export interface RecipientSelection {
 export interface ComposeNotificationRequest {
   eventCode: string;
   contractId?: number | null;
+  /** Alternative to contractId; the server resolves it. */
+  contractNumber?: string | null;
   profileId?: number | null;
   sourceEntityType?: string | null;
   sourceEntityId?: number | null;

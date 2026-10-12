@@ -148,7 +148,7 @@ const NotifyPanel = ({
       }));
     if (recipients.length === 0) return null;
     return {
-      eventCode, contractId, variantCode, sourceEntityType, sourceEntityId,
+      eventCode, contractId, contractNumber, variantCode, sourceEntityType, sourceEntityId,
       openText: showText ? text : null, data: data ?? null, recipients,
       idempotencyKey: idempotencyKey.current,
     };
