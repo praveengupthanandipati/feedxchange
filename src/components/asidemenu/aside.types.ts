@@ -18,6 +18,8 @@ export interface AsideNavItem {
   /** Shown when the user holds ANY of these keys. A group without keys shows when any child does. */
   permissions?: string[];
   children?: AsideNavChild[];
+  /** Keeps the submenu closed until it's clicked, even while one of its pages is open. */
+  collapsedByDefault?: boolean;
 }
 
 export interface AsideNavSection {

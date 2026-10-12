@@ -42,7 +42,7 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onNavigate }: AsideM
   const isSectionActive =
     (hasPath && isInsidePath(item.path!)) || Boolean(item.children?.some(isChildActive));
 
-  const autoExpanded = isOpen || isSectionActive;
+  const autoExpanded = isOpen || (isSectionActive && !item.collapsedByDefault);
   const expanded = manualState !== null ? manualState === "open" : autoExpanded;
 
   // A route change means the user navigated somewhere new — drop any manual

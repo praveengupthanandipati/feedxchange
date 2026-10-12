@@ -91,6 +91,7 @@ export const mastersSection: AsideNavSection = {
       label: "Masters",
       icon: FiLayers,
       path: "/masters/overview",
+      collapsedByDefault: true,
       children: [
         // { id: "masters-notify-subscriptions", label: "Notify Subscriptions", path: "/masters/notify-subscriptions" },
         // { id: "masters-roles-permissions", label: "Roles & Permissions", path: "/masters/roles-permissions" },
