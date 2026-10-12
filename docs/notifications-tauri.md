@@ -12,6 +12,11 @@ What works today
 - To keep notifications coming when the window is closed, configure the app to start with Windows and minimize to the tray instead of quitting
   (Tauri tray icon + `tauri-plugin-autostart`). The SignalR connection lives as long as the process does.
 
+Browser (not Tauri): Web Push
+- In a normal browser the bell's "Desktop notifications" checkbox also registers a push subscription (service worker `public/sw.js`), so notifications arrive
+  while no FeedXchange tab is open. Needs HTTPS (or localhost), the user's permission and VAPID keys on the server. Tauri's WebView has no push service, so the
+  Tauri app uses the tray + SignalR approach above.
+
 What does not work yet
 - A fully quit app cannot receive anything: that needs OS-level push (WNS on Windows) or a background agent. Plan it later; until then the
   same notification also goes out by email/WhatsApp if the sender ticked those channels.

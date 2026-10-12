@@ -236,7 +236,7 @@ const ContractNotificationHistory = () => {
                     </div>
                     <div className="form-check mt-2">
                       <input className="form-check-input" type="radio" id="mode-current" checked={mode === "CurrentData"} onChange={() => setMode("CurrentData")} />
-                      <label className="form-check-label" htmlFor="mode-current"><strong>Generate using current data</strong><br /><span className="small text-secondary">Re-created from today&apos;s contract data (not available for every message type yet).</span></label>
+                      <label className="form-check-label" htmlFor="mode-current"><strong>Generate using current data</strong><br /><span className="small text-secondary">Re-created from today&apos;s data, for example the current freight or amount.</span></label>
                     </div>
                   </div>
                   <label className="form-label fw-semibold" htmlFor="resend-reason">Reason</label>

@@ -8,7 +8,8 @@ import { getFreshAccessToken } from "../api/tokenRefresh";
 import { useAuth } from "../auth/AuthContext";
 import { notificationsApi } from "../store/notificationsApi";
 import type { InboxItem } from "../store/notificationsApi";
-import { desktopNotify } from "./desktopNotify";
+import { desktopNotify, getDesktopPreference } from "./desktopNotify";
+import { subscribeWebPush } from "./webPush";
 import "./Notifications.scss";
 
 interface LiveToast {
@@ -88,6 +89,8 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         if (cancelled) return;
         setConnected(true);
         refreshInbox();
+        // The user opted in earlier: make sure this browser is registered for pushes under the current user.
+        if (getDesktopPreference()) void subscribeWebPush().catch(() => undefined);
       })
       .catch(() => {
         /* offline or API without the hub: the bell still works from the REST inbox */

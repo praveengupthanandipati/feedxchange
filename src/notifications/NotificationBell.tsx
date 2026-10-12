@@ -12,6 +12,7 @@ import { formatApiDateTime } from "../utils/apiDateTime";
 import { disableDesktopNotifications, enableDesktopNotifications, getDesktopPermission, getDesktopPreference } from "./desktopNotify";
 import type { DesktopPermission } from "./desktopNotify";
 import { useNotificationConnection } from "./NotificationProvider";
+import { subscribeWebPush, unsubscribeWebPush } from "./webPush";
 import "./Notifications.scss";
 
 /** The header bell: unread count, the latest items, mark-as-read, and the opt-in for OS notifications. */
@@ -56,11 +57,14 @@ const NotificationBell = () => {
     if (desktopOn) {
       disableDesktopNotifications();
       setDesktopOn(false);
+      void unsubscribeWebPush();
       return;
     }
     const result = await enableDesktopNotifications();
     setPermission(result);
     setDesktopOn(result === "granted");
+    // Also register for pushes, so notifications arrive when no FeedXchange tab is open (browsers only, when the server has push set up).
+    if (result === "granted") void subscribeWebPush().catch(() => undefined);
   };
 
   return (
