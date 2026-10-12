@@ -50,6 +50,11 @@ import EstimationDetail from './pages/estimations/estimations-detail/EstimationD
 import Banners from './pages/masters/banners/Banners'
 import Subscriptions from './pages/masters/subscriptions/Subscriptions'
 import ProductEnquiries from './pages/masters/product-enquiries/ProductEnquiries'
+import Contactenquiry from './pages/masters/contact-enquiry/Contactenquiry'
+import Testimonials from './pages/masters/testimonials/Testimonials'
+import Blogs from './pages/masters/blogs/Blogs'
+import Users from './pages/masters/users/Users'
+import RegistrationDetails from './pages/masters/registration-details/RegistrationDetails'
 import ViewInvoices from './pages/company-invoices/view-invoices/ViewInvoices'
 import PriceHistory from './pages/product-management/price-history/ProductPrieHistory'
 import FormulaCalculations from './pages/product-management/formula-calculations/FormulaCalculations'
@@ -181,6 +186,11 @@ function App() {
           <Route path="/masters/banners" element={<Banners />} />
           <Route path="/masters/subscriptions" element={<Subscriptions />} />
           <Route path="/masters/product-enquiry" element={<ProductEnquiries />} />
+          <Route path="/masters/contact-enquiry" element={<Contactenquiry />} />
+          <Route path="/masters/testimonials" element={<Testimonials />} />
+          <Route path="/masters/blogs" element={<Blogs />} />
+          <Route path="/masters/users" element={<Users />} />
+          <Route path="/masters/registration-details" element={<RegistrationDetails />} />
           <Route path="/company-invoices/generate" element={<GenerateInvoice />} />
           <Route path="/company-invoices/view" element={<ViewInvoices />} />
           <Route path="/truck-management/pending-contracts" element={<PendingContracts />} />
