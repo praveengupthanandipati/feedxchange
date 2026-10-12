@@ -20,6 +20,7 @@ import { useUploadDocumentFileMutation } from "../../../../../store/userProfiles
 import { useSelectedContract } from "../../../../../context/SelectedContractContext";
 import "../../../assign-transports/Assigntransports.scss";
 import "./UpdateTruckStatus.scss";
+import { useNotifyPrompt } from "../../../../../notifications/useNotifyPrompt";
 
 const INVOICE_FOLDER_NAME = "ContractTruckInvoices";
 const MAX_INVOICE_FILE_SIZE_MB = 5;
@@ -49,6 +50,7 @@ interface UpdateTruckStatusRowProps {
 const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: UpdateTruckStatusRowProps) => {
   const [selectedStatusId, setSelectedStatusId] = useState(String(truck.dispatchStatusId));
   const [updateContractTruckStatus, { isLoading: saving }] = useUpdateContractTruckStatusMutation();
+  const notify = useNotifyPrompt();
   const [uploadDocumentFile, { isLoading: uploading }] = useUploadDocumentFileMutation();
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
@@ -100,6 +102,10 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: Updat
         return;
       }
       setSaved(true);
+      // Loaded: the buyer is told, with the invoice details.
+      if (selectedIsLoaded) {
+        notify.ask({ eventCode: "TRUCK_LOADED", title: "Notify the buyer that the truck is loaded", sourceEntityType: "ContractTruckDispatch", sourceEntityId: truck.contractTruckId });
+      }
     } catch {
       setError("Failed to update truck status. Please try again.");
     }
@@ -132,6 +138,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: Updat
 
   return (
     <div className="update-truck-status-card">
+      {notify.element}
       <div className="update-truck-status-card__header">
         <span className="update-truck-status-card__truck">
           <FiTruck aria-hidden /> {truck.truckNumber}

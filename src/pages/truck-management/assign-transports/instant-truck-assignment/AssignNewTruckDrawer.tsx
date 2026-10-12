@@ -14,6 +14,8 @@ import {
 } from "../../../../store/contractTrucksApi";
 import type { InstantTruckRow } from "./instantTruckAssignment.data";
 import "./InstantTruckAssignment.scss";
+import { useNotifyPrompt } from "../../../../notifications/useNotifyPrompt";
+import type { NotifyItem } from "../../../../notifications/useNotifyPrompt";
 
 type BillChangeOption = "direct" | "changeToBeDone";
 
@@ -118,6 +120,7 @@ const AssignNewTruckDrawer = ({
 
   const [addContractTrucks, { isLoading: adding }] = useAddContractTrucksMutation();
   const [updateContractTrucks, { isLoading: updating }] = useUpdateContractTrucksMutation();
+  const notify = useNotifyPrompt();
   const saving = adding || updating;
 
   const transporterOptions = useMemo(
@@ -236,6 +239,8 @@ const AssignNewTruckDrawer = ({
       transporterOptions.find((option) => option.value === form.transporter)?.label ?? form.transporter;
     const truckNo = truckOptions.find((option) => option.value === form.truck)?.label ?? form.truck;
 
+    const askItems: NotifyItem[] = [];
+
     try {
       let contractTruckId = editingRow?.contractTruckId ?? null;
 
@@ -271,6 +276,8 @@ const AssignNewTruckDrawer = ({
           setSubmitError("The server rejected this update. Please try again.");
           return;
         }
+        // Changing a truck's details is the supplier's reply: the transporter, driver, admins and buyer are told.
+        askItems.push({ eventCode: "SUPPLIER_REPLIED", title: "Notify about this truck update", contractId, sourceEntityType: "ContractTruckDispatch", sourceEntityId: editingRow.contractTruckId });
       } else {
         const succeeded = await addContractTrucks({
           contractId,
@@ -291,6 +298,7 @@ const AssignNewTruckDrawer = ({
           setSubmitError("The server rejected this truck assignment. Please try again.");
           return;
         }
+        succeeded.contractDispatchIds.forEach((id) => askItems.push({ eventCode: "TRUCK_ADDED", title: "Notify about the truck added", contractId, sourceEntityType: "ContractTruckDispatch", sourceEntityId: id }));
       }
 
       const newRow: InstantTruckRow = {
@@ -321,8 +329,11 @@ const AssignNewTruckDrawer = ({
         trackingUrl: form.trackingUrl.trim() || "-",
       };
 
-      onSave(newRow);
-      onClose();
+      // Offer the notification first; the drawer closes when the dialog is done (or at once without permission).
+      notify.ask(askItems, () => {
+        onSave(newRow);
+        onClose();
+      });
     } catch {
       setSubmitError("Failed to save the truck assignment. Please try again.");
     }
@@ -576,6 +587,7 @@ const AssignNewTruckDrawer = ({
           </button>
         </div>
       </div>
+      {notify.element}
     </>,
     document.body,
   );

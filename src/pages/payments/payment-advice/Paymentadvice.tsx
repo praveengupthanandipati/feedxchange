@@ -39,6 +39,7 @@ import {
   type PaymentMode,
 } from "./paymentAdvice.data";
 import "./Paymentadvice.scss";
+import { useNotifyPrompt } from "../../../notifications/useNotifyPrompt";
 
 const modeIcons: Record<PaymentMode, IconType> = {
   online: FiCreditCard,
@@ -88,6 +89,7 @@ const Paymentadvice = () => {
   const { data: openReceiptsData = NO_RECEIPTS, isFetching: receiptsLoading } = useGetReceiptsQuery(pairArgs, { skip: !hasPair });
   const { data: invoicesData = NO_INVOICES, isFetching: invoicesLoading } = useGetInvoicesToClearQuery(pairArgs, { skip: !hasPair });
   const [saveReceipt, { isLoading: saving }] = useSaveReceiptMutation();
+  const notify = useNotifyPrompt();
   const [updateReceipt, { isLoading: updating }] = useUpdateReceiptMutation();
   const [deleteReceipt] = useDeleteReceiptMutation();
   const [applyAllocation, { isLoading: applying }] = useApplyAllocationMutation();
@@ -199,7 +201,11 @@ const Paymentadvice = () => {
 
     try {
       if (editingId) await updateReceipt({ ...payload, receiptId: editingId }).unwrap();
-      else await saveReceipt(payload).unwrap();
+      else {
+        const saved = await saveReceipt(payload).unwrap();
+        // The seller is told about the payment (the buyer can be added in the dialog).
+        notify.ask({ eventCode: "PAYMENT_RECORDED", title: "Notify about this payment", sourceEntityType: "PaymentReceipt", sourceEntityId: saved.receiptId, contractNumber: saved.contractNumber ?? undefined });
+      }
       setToast({ text: editingId ? "Payment updated." : `${payload.kind === "Advance" ? "Advance" : "Payment"} saved. It is now in the unallocated receipts.` });
       resetForm();
     } catch (error) {
@@ -659,6 +665,7 @@ const Paymentadvice = () => {
         onConfirm={handleConfirmDelete}
         onCancel={() => setRowPendingDelete(null)}
       />
+      {notify.element}
     </div>
   );
 };

@@ -20,6 +20,7 @@ import { useAddContractTrucksMutation } from "../../../../../store/contractTruck
 import "../../../assign-transports/Assigntransports.scss";
 import "../../../assign-transports/instant-truck-assignment/InstantTruckAssignment.scss";
 import "../contractDispatch.shared.scss";
+import { useNotifyPrompt } from "../../../../../notifications/useNotifyPrompt";
 
 type BillChangeOption = "direct" | "changeToBeDone";
 
@@ -102,6 +103,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
   const { data: trucks } = useGetAllActiveTruckDetailsQuery();
 
   const [addContractTrucks, { isLoading: saving }] = useAddContractTrucksMutation();
+  const notify = useNotifyPrompt();
 
   const transporterOptions = useMemo(
     () => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })),
@@ -213,6 +215,8 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
 
       setSaved(true);
       handleReset();
+      // One dialog per truck added: the seller, the admins and the driver are told.
+      notify.ask(succeeded.contractDispatchIds.map((id) => ({ eventCode: "TRUCK_ADDED", title: "Notify about the truck added", contractId, sourceEntityType: "ContractTruckDispatch", sourceEntityId: id })));
     } catch {
       setSubmitError("Failed to save the truck assignment. Please try again.");
     }
@@ -220,6 +224,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
 
   return (
     <div className="assign-truck-drawer__body">
+      {notify.element}
       {saved && (
         <div className="dispatch-form-success">
           <FiCheckCircle aria-hidden />

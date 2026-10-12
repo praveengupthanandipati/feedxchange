@@ -2,10 +2,8 @@ import { useState } from "react";
 import { FiMail, FiExternalLink } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
-import ShareModal from "../../../../components/dialog/ShareModal";
-import type { ShareModalPayload } from "../../../../components/dialog/ShareModal";
+import ShareInformationModal from "../../../../notifications/ShareInformationModal";
 import type { AddressRow, ContactRow, BusinessOwnerProfile } from "./businessOwnerDetail.data";
-import { toRecipientOptions } from "./businessOwnerDetail.data";
 
 interface ContactsTabProps {
   profile: BusinessOwnerProfile;
@@ -16,8 +14,6 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
   const [selectedContactKeys, setSelectedContactKeys] = useState<string[]>([]);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
-
-  const recipientOptions = toRecipientOptions(profile);
 
   const toggleKey = (keys: string[], setKeys: (value: string[]) => void, key: string) => {
     setKeys(keys.includes(key) ? keys.filter((item) => item !== key) : [...keys, key]);
@@ -56,14 +52,6 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
     { key: "phone", header: "Phone" },
     { key: "additionalPhone", header: "Additional Phone" },
   ];
-
-  const handleSendAddress = (_payload: ShareModalPayload) => {
-    setSelectedAddressKeys([]);
-  };
-
-  const handleSendContacts = (_payload: ShareModalPayload) => {
-    setSelectedContactKeys([]);
-  };
 
   return (
     <div className="business-owner-detail__tab-panel">
@@ -113,24 +101,20 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
         />
       </section>
 
-      <ShareModal
+      <ShareInformationModal
         open={addressModalOpen}
-        title="Send Address Information"
-        onClose={() => setAddressModalOpen(false)}
-        onSend={handleSendAddress}
-        recipientOptions={recipientOptions}
-        messagePlaceholder="Enter your message about addresses"
-        confirmLabel="Send Address"
+        onClose={() => { setAddressModalOpen(false); setSelectedAddressKeys([]); }}
+        informationType="SELLER_ADDRESS"
+        profileId={profile.profileId}
+        title="Send address information"
       />
 
-      <ShareModal
+      <ShareInformationModal
         open={contactModalOpen}
-        title="Send Contact Message"
-        onClose={() => setContactModalOpen(false)}
-        onSend={handleSendContacts}
-        recipientOptions={recipientOptions}
-        messagePlaceholder="Enter your message"
-        confirmLabel="Send Message"
+        onClose={() => { setContactModalOpen(false); setSelectedContactKeys([]); }}
+        informationType="CONTACT_DETAILS"
+        profileId={profile.profileId}
+        title="Send contact details"
       />
     </div>
   );

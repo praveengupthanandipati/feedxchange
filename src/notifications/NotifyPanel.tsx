@@ -28,6 +28,10 @@ export interface NotifyPanelProps {
   variantCode?: string;
   sourceEntityType?: string;
   sourceEntityId?: number;
+  /** Information sharing from a profile page (no contract). */
+  profileId?: number;
+  /** Information sharing: BANK_DETAILS, SELLER_ADDRESS, BUYER_ADDRESS, CONTRACT_INFO, PENDING_INVOICES, CONTACT_DETAILS or GREETING. */
+  informationType?: string;
   /** Extra values for the template (manual text events only; business events are filled in by the server). */
   data?: Record<string, string>;
   /** Show the free-text box. Defaults to true for OPEN_TEXT_SHARED. */
@@ -60,15 +64,15 @@ const unavailableReason = (c: RecipientCandidate, channel: ChannelCode): string 
  * messages and sends - or skips. The server resolves addresses, data and templates; this panel only sends selections.
  */
 const NotifyPanel = ({
-  eventCode, contractId, contractNumber, variantCode, sourceEntityType, sourceEntityId, data, allowOpenText,
+  eventCode, contractId, contractNumber, variantCode, sourceEntityType, sourceEntityId, profileId, informationType, data, allowOpenText,
   onSent, onSkip, sendLabel = "Send", choices,
 }: NotifyPanelProps) => {
-  const hasContract = contractId !== undefined || !!contractNumber;
+  const hasContract = contractId !== undefined || !!contractNumber || sourceEntityId !== undefined || profileId !== undefined;
   const { data: channels = [] } = useGetNotificationChannelsQuery();
   const { data: events = [] } = useGetNotificationEventsQuery();
   const { data: templates = [] } = useGetNotificationTemplatesQuery({ eventCode });
   const { data: loaded = [], isFetching: loadingRecipients } = useGetNotificationRecipientsQuery(
-    { contractId, contractNumber }, { skip: !hasContract });
+    { contractId, contractNumber, eventCode, sourceEntityType, sourceEntityId, profileId, informationType }, { skip: !hasContract });
   const [preview, { isLoading: previewing }] = usePreviewNotificationMutation();
   const [send, { isLoading: sending }] = useSendNotificationMutation();
 
@@ -96,23 +100,23 @@ const NotifyPanel = ({
   const seeded = useRef(new Set<string>());
   useEffect(() => {
     if (!event) return;
-    setPicks((prev) => {
-      const next = { ...prev };
-      for (const c of candidates) {
-        const k = keyOf(c);
-        if (seeded.current.has(k)) continue;
-        seeded.current.add(k);
-        const pick: ChannelPick = {};
-        const chosen = choices?.channels[c.role];
-        // The screen's own choice wins; otherwise the event's default channels for this role.
-        const wanted = chosen ?? event.rules.filter((r) => r.recipientRole === c.role && r.isDefaultOn).map((r) => r.channelCode);
-        wanted.forEach((ch) => {
-          if (!unavailableReason(c, ch)) pick[ch] = true;
-        });
-        next[k] = pick;
-      }
-      return next;
-    });
+    // Work out the new picks here, not inside the state updater: React may run an updater twice (strict mode), and the second run
+    // would find the recipients already marked as seeded and add nothing.
+    const additions: Record<string, ChannelPick> = {};
+    for (const c of candidates) {
+      const k = keyOf(c);
+      if (seeded.current.has(k)) continue;
+      seeded.current.add(k);
+      const pick: ChannelPick = {};
+      const chosen = choices?.channels[c.role];
+      // The screen's own choice wins; otherwise the event's default channels for this role.
+      const wanted = chosen ?? event.rules.filter((r) => r.recipientRole === c.role && r.isDefaultOn).map((r) => r.channelCode);
+      wanted.forEach((ch) => {
+        if (!unavailableReason(c, ch)) pick[ch] = true;
+      });
+      additions[k] = pick;
+    }
+    if (Object.keys(additions).length > 0) setPicks((prev) => ({ ...prev, ...additions }));
   }, [candidates, event, choices]);
 
   // Every (role, channel) that at least one recipient has ticked: each gets its own template choice.
@@ -164,8 +168,8 @@ const NotifyPanel = ({
       }));
     if (recipients.length === 0) return null;
     return {
-      eventCode, contractId, contractNumber, variantCode, sourceEntityType, sourceEntityId,
-      openText: showText ? text : null, data: data ?? null, recipients,
+      eventCode, contractId, contractNumber, profileId, variantCode, sourceEntityType, sourceEntityId,
+      openText: showText ? text : null, data: informationType ? { ...(data ?? {}), InformationType: informationType } : (data ?? null), recipients,
       idempotencyKey: idempotencyKey.current,
     };
   };

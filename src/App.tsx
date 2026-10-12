@@ -5,6 +5,7 @@ import { AuthProvider } from './auth/AuthContext'
 import { NotificationProvider } from './notifications/NotificationProvider'
 import ContractNotificationHistory from './pages/notifications/ContractNotificationHistory'
 import NotificationInbox from './pages/notifications/NotificationInbox'
+import TemplateAdmin from './pages/notifications/TemplateAdmin'
 import AppLayout from './components/layout/AppLayout'
 import Login from './pages/login/Login'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -109,6 +110,7 @@ function App() {
           <Route path="/contracts/:id" element={<ContractDetail />} />
           <Route path="/contracts/:id/notifications" element={<ContractNotificationHistory />} />
           <Route path="/notifications" element={<NotificationInbox />} />
+          <Route path="/notification-templates" element={<TemplateAdmin />} />
           <Route path="/contracts/new" element={<NewContract />} />
           <Route path="/business-owners" element={<Businessowners />} />
           <Route path="/business-owners/:id" element={<BusinessOwnerDetail />} />

@@ -11,6 +11,7 @@ import { useGetScheduleStatusesQuery } from "../../../../store/contractsApi";
 import { useScheduleContractTrucksMutation } from "../../../../store/contractTrucksApi";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 import "./ScheduleTruckAssignment.scss";
+import { useNotifyPrompt } from "../../../../notifications/useNotifyPrompt";
 
 type BillChangeOption = "direct" | "changeToBeDone";
 
@@ -93,6 +94,7 @@ const ScheduleRequestDrawer = ({
   const { data: transporters } = useGetTransporterProfileSummaryQuery();
   const { data: scheduleStatuses } = useGetScheduleStatusesQuery();
   const [scheduleContractTrucks, { isLoading: saving }] = useScheduleContractTrucksMutation();
+  const notify = useNotifyPrompt();
 
   const transporterOptions = useMemo(
     () => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })),
@@ -205,7 +207,7 @@ const ScheduleRequestDrawer = ({
       const defaultStatus =
         scheduleStatuses?.find((s) => s.statusName.toLowerCase() === "planned") ?? scheduleStatuses?.[0];
 
-      const succeeded = await scheduleContractTrucks({
+      const created = await scheduleContractTrucks({
         transporters: form.transporters.map(Number),
         contractId,
         scheduleDateTime: new Date(`${form.date}T${form.time}`).toISOString(),
@@ -221,13 +223,19 @@ const ScheduleRequestDrawer = ({
         createdOn: new Date().toISOString(),
       }).unwrap();
 
-      if (!succeeded) {
+      if (!created.succeeded) {
         setSubmitError("The server rejected this scheduled request. Please try again.");
         return;
       }
 
-      onSave(newRow);
-      onClose();
+      // Offer to notify the transporters first; the drawer closes once the dialog is done (or at once without permission).
+      notify.ask(
+        { eventCode: "DISPATCH_SCHEDULED", title: "Notify the transporters about this truck request", contractId, sourceEntityType: "DispatchSchedule", sourceEntityId: created.dispatchScheduleId },
+        () => {
+          onSave(newRow);
+          onClose();
+        },
+      );
     } catch {
       setSubmitError("Failed to save the scheduled request. Please try again.");
     }
@@ -449,6 +457,7 @@ const ScheduleRequestDrawer = ({
           </button>
         </div>
       </div>
+      {notify.element}
     </>,
     document.body,
   );

@@ -55,6 +55,17 @@ export interface RecipientCandidate {
   hasAppLogin: boolean;
 }
 
+/** What the Notify panel asks the server: the event and the record it is about, so the right people are listed. */
+export interface RecipientQuery {
+  contractId?: number;
+  contractNumber?: string;
+  eventCode?: string;
+  sourceEntityType?: string;
+  sourceEntityId?: number;
+  profileId?: number;
+  informationType?: string;
+}
+
 export interface ChannelSelection {
   channelCode: ChannelCode;
   /** Null = the default template for the event, role and channel. */
@@ -226,7 +237,7 @@ export const notificationsApi = createApi({
     getNotificationTemplates: builder.query<NotificationTemplate[], { eventCode: string; channelCode?: string; recipientRole?: string }>({
       query: (q) => `/api/Notifications/templates${qs({ ...q })}`,
     }),
-    getNotificationRecipients: builder.query<RecipientCandidate[], { contractId?: number; contractNumber?: string }>({
+    getNotificationRecipients: builder.query<RecipientCandidate[], RecipientQuery>({
       query: (q) => `/api/Notifications/recipients${qs({ ...q })}`,
     }),
     previewNotification: builder.mutation<NotificationPreviewResult, ComposeNotificationRequest>({
