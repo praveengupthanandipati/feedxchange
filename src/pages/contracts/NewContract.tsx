@@ -22,6 +22,8 @@ import {
   paymentTermsOptions,
 } from "./newContract.data";
 import "./NewContract.scss";
+import { usePermission } from "../../auth/AuthContext";
+import NotifyModal from "../../notifications/NotifyModal";
 import { useGetProductsQuery } from "../../store/productsApi";
 import {
   useGetBusinessProfileSummaryQuery,
@@ -361,6 +363,9 @@ const NewContract = () => {
   }, [contractDetails, navState]);
 
    const [saveContract, { isLoading: isSaving }] = useSaveContractMutation();
+  // After a contract is created the user chooses who to notify, on which channels and with which templates, before leaving the screen.
+  const canNotify = usePermission("notifications.send");
+  const [notifyContract, setNotifyContract] = useState<string | null>(null);
    const [updateContract, { isLoading: isUpdating }] =
   useUpdateContractMutation();
   const isSubmitting = isSaving || isUpdating;
@@ -902,12 +907,19 @@ const { data: products } = useGetProductsQuery();
         JSON.stringify(createPayload, null, 2)
       );
 
-      await saveContract(createPayload).unwrap();
+      const created = await saveContract(createPayload).unwrap();
 
       localStorage.setItem(
         "successMessage",
         "Contract created successfully."
       );
+
+      // The API returns the new contract number. Offer to notify the buyer and seller (Skip / close continues to the list).
+      const createdNumber = typeof created === "string" ? created.replace(/^"|"$/g, "") : "";
+      if (canNotify && createdNumber) {
+        setNotifyContract(createdNumber);
+        return;
+      }
     }
 
     window.location.href = "/contracts";
@@ -1888,6 +1900,17 @@ const { data: products } = useGetProductsQuery();
               : "Create Contract"}
         </button>
       </div>
+
+      <NotifyModal
+        open={notifyContract !== null}
+        title={`Contract ${notifyContract ?? ""} created - notify buyer and seller`}
+        eventCode="CONTRACT_CREATED"
+        contractNumber={notifyContract ?? undefined}
+        sendLabel="Send notifications"
+        closeOnBackdrop={false}
+        onSkip={() => undefined}
+        onClose={() => { window.location.href = "/contracts"; }}
+      />
     </div>
   );
 };

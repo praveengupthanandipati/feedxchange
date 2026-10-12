@@ -8,10 +8,12 @@ interface NotifyModalProps extends NotifyPanelProps {
   open: boolean;
   title?: string;
   onClose: () => void;
+  /** Clicking outside closes the dialog. Turn off where closing has a side effect (e.g. leaving the screen). */
+  closeOnBackdrop?: boolean;
 }
 
 /** The Notify panel in a dialog: drop it next to any "save" action, e.g. after a truck is added or a payment is recorded. */
-const NotifyModal = ({ open, title = "Send notification", onClose, onSkip, ...panel }: NotifyModalProps) => {
+const NotifyModal = ({ open, title = "Send notification", onClose, onSkip, closeOnBackdrop = true, ...panel }: NotifyModalProps) => {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -21,7 +23,7 @@ const NotifyModal = ({ open, title = "Send notification", onClose, onSkip, ...pa
 
   if (!open) return null;
   return createPortal(
-    <div className="fx-modal__backdrop" onClick={onClose}>
+    <div className="fx-modal__backdrop" onClick={closeOnBackdrop ? onClose : undefined}>
       <div className="fx-modal__box" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
         <div className="fx-modal__header">
           <h2>{title}</h2>
