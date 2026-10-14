@@ -94,7 +94,8 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
 
   // Give the success note a moment, then go back to Manage Schedule.
   useEffect(() => {
-    if (!saved) return;
+    // Hold the redirect while the "notify" dialog is open; it would be torn down with this page.
+    if (!saved || notify.busy) return;
     const timer = window.setTimeout(
       () =>
         navigate(
@@ -105,7 +106,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
       REDIRECT_DELAY_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [saved, navigate, contractNumber]);
+  }, [saved, notify.busy, navigate, contractNumber]);
 
 
   const validate = (): FormErrors => {
@@ -190,6 +191,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
 
   return (
     <div className="schedule-request-drawer__body schedule-dispatch-form">
+      {notify.element}
       {saved && (
         <div className="dispatch-form-success">
           <FiCheckCircle aria-hidden />

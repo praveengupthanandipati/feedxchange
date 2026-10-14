@@ -16,7 +16,7 @@ import {
 } from "../../../../../store/contractsApi";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../store/transportersApi";
 import { useGetAllActiveTruckDetailsQuery } from "../../../../../store/trucksApi";
-import { useAddContractTrucksMutation } from "../../../../../store/contractTrucksApi";
+import { getApiErrorMessage, useAddContractTrucksMutation } from "../../../../../store/contractTrucksApi";
 import "../../../assign-transports/Assigntransports.scss";
 import "../../../assign-transports/instant-truck-assignment/InstantTruckAssignment.scss";
 import "../contractDispatch.shared.scss";
@@ -121,7 +121,8 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
 
   // Give the success note a moment, then go back to Manage Schedule.
   useEffect(() => {
-    if (!saved) return;
+    // Hold the redirect while the "notify" dialog is open; it would be torn down with this page.
+    if (!saved || notify.busy) return;
     const timer = window.setTimeout(
       () =>
         navigate(
@@ -132,7 +133,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       REDIRECT_DELAY_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [saved, navigate, contractNumber]);
+  }, [saved, notify.busy, navigate, contractNumber]);
 
 
   const validate = (): FormErrors => {
@@ -156,6 +157,8 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
 
     if (!form.date) nextErrors.date = "Schedule date is required.";
     if (!form.time) nextErrors.time = "Schedule time is required.";
+
+    if (!form.lrNumber.trim()) nextErrors.lrNumber = "LR number is required.";
 
     if (!form.qty.trim()) {
       nextErrors.qty = "Truck quantity is required.";
@@ -217,13 +220,16 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       handleReset();
       // One dialog per truck added: the seller, the admins and the driver are told.
       notify.ask(succeeded.contractDispatchIds.map((id) => ({ eventCode: "TRUCK_ADDED", title: "Notify about the truck added", contractId, sourceEntityType: "ContractTruckDispatch", sourceEntityId: id })));
-    } catch {
-      setSubmitError("Failed to save the truck assignment. Please try again.");
+    } catch (error) {
+      // A refusal sent with an error status carries its reason in the body.
+      const data = error && typeof error === "object" ? (error as { data?: unknown }).data : undefined;
+      setSubmitError(getApiErrorMessage(data) || "Failed to save the truck assignment. Please try again.");
     }
   };
 
   return (
     <div className="assign-truck-drawer__body instant-truck-form">
+      {notify.element}
       {saved && (
         <div className="dispatch-form-success">
           <FiCheckCircle aria-hidden />
@@ -415,6 +421,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
             value={form.lrNumber}
             onChange={(event) => setField("lrNumber", event.target.value)}
           />
+          {errors.lrNumber && <p className="assign-truck-drawer__error">{errors.lrNumber}</p>}
         </div>
 
         <div className="assign-truck-drawer__field">

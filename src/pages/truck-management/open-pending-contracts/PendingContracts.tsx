@@ -3,6 +3,7 @@ import DatePickerInput from "../../../components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import {
+  useGetAllContractsQuery,
   useGetAllOpenAndPendingContractsQuery,
   type OpenAndPendingContract,
 } from "../../../store/contractsApi";
@@ -46,7 +47,7 @@ const formatShortDate = (value: string) => {
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 };
 
-function mapOpenAndPendingContract(row: OpenAndPendingContract): PendingContractRow {
+function mapOpenAndPendingContract(row: OpenAndPendingContract, status: PendingContractRow["status"] = "Open"): PendingContractRow {
   const dispatched = row.dispatchedQuantityMT ?? 0;
   const pending = row.pendingQuantityMT ?? 0;
   const total = row.totalQuantityMT ?? 0;
@@ -55,6 +56,7 @@ function mapOpenAndPendingContract(row: OpenAndPendingContract): PendingContract
 
   return {
     id: row.contractNumber,
+    status,
     date: formatShortDate(row.contractDate),
     dateValue: Number.isNaN(dateValue) ? 0 : dateValue,
     seller: row.seller ?? "-",
@@ -210,12 +212,25 @@ const PendingContracts = () => {
   const [truckDrawerRow, setTruckDrawerRow] = useState<PendingContractRow | null>(null);
   const { setSelectedContract } = useSelectedContract();
 
-  const { data: openAndPendingContracts, isLoading, isFetching } = useGetAllOpenAndPendingContractsQuery();
+  const { data: openAndPendingContracts, isLoading: listLoading, isFetching } = useGetAllOpenAndPendingContractsQuery();
 
-  const pendingContracts = useMemo(
-    () => (openAndPendingContracts ?? []).map(mapOpenAndPendingContract),
-    [openAndPendingContracts],
-  );
+  // The list endpoint also returns contracts still pending approval, which cannot take trucks.
+  // Only Open and Partially Dispatched contracts are shown; the real status comes from GetAllContracts.
+  const { data: allContracts, isLoading: statusesLoading } = useGetAllContractsQuery();
+  const isLoading = listLoading || statusesLoading;
+
+  const pendingContracts = useMemo(() => {
+    const statusByNumber = new Map<string, PendingContractRow["status"]>();
+    (allContracts?.contracts ?? []).forEach((c) => {
+      if (c.approvalStatus === false) return; // still awaiting approval
+      const status = (c.status ?? "").replace(/\s+/g, "").toLowerCase();
+      if (status === "open") statusByNumber.set(c.contractNumber, "Open");
+      else if (status === "partiallydispatched") statusByNumber.set(c.contractNumber, "Partially Dispatched");
+    });
+    return (openAndPendingContracts ?? [])
+      .filter((row) => statusByNumber.has(row.contractNumber))
+      .map((row) => mapOpenAndPendingContract(row, statusByNumber.get(row.contractNumber)));
+  }, [openAndPendingContracts, allContracts]);
 
   const sellerOptions = useMemo(() => {
     const names = Array.from(new Set(pendingContracts.map((row) => row.seller))).filter(

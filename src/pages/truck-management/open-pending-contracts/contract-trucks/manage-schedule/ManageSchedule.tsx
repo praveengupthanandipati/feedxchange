@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useSearchParams } from "react-router-dom";
 import { FiArrowLeft, FiFileText, FiCheck, FiX, FiClock, FiPlus, FiSlash } from "react-icons/fi";
 import InfoPanel from "../InfoPanel";
@@ -213,7 +214,8 @@ const ScheduleRequestRow = ({
 
   return (
     <tr>
-      {notify.element}
+      {/* Portalled: a dialog cannot sit inside a table row. */}
+      {createPortal(notify.element, document.body)}
       <td>{transporterName}</td>
       <td className="manage-schedule-table__action-cell">
         <div className="manage-schedule-table__actions">
@@ -360,12 +362,13 @@ const TransporterScheduleRows = ({
   cancelledStatusId,
   assignedQtyByRequest,
 }: TransporterScheduleRowsProps) => {
-  const { data, isFetching } = useGetScheduleTrucksDispatchDetailsQuery(
+  // isLoading, not isFetching: a refetch after a save must keep the rows (and any dialog opened from them) mounted.
+  const { data, isLoading } = useGetScheduleTrucksDispatchDetailsQuery(
     { contractId, transporterId },
     { skip: !contractId || !transporterId },
   );
 
-  if (isFetching) {
+  if (isLoading) {
     return (
       <tr>
         <td>{transporterName}</td>
@@ -408,13 +411,15 @@ const TransporterScheduleRows = ({
 };
 
 const ManageScheduleContent = ({ contractNumber }: { contractNumber: string }) => {
-  const { data: contract } = useGetContractByContractNumberQuery(contractNumber);
+  const { data: contract, isError: contractFailed } = useGetContractByContractNumberQuery(contractNumber);
   const { data: responseStatuses } = useGetTransporterScheduleResponseStatusesQuery();
 
   const contractId = contract?.id ?? 0;
 
-  const { data: scheduleTransporters, isFetching: loadingScheduleTransporters } =
+  // First load only (see TransporterScheduleRows); also wait for the contract so "No Schedule Requests Yet" does not flash.
+  const { data: scheduleTransporters, isLoading: loadingTransporters } =
     useGetDispatchScheduleTransportersQuery({ contractId }, { skip: !contractId });
+  const loadingScheduleTransporters = loadingTransporters || (!contract && !contractFailed);
 
   // Trucks added against a schedule carry its dispatchScheduleTransporterId, so their
   // quantities tell each request how much of it is still uncovered.

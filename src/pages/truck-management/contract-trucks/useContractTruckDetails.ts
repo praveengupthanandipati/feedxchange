@@ -30,7 +30,7 @@ export interface ContractTruckDetail {
 export function useContractTruckDetails(contractNumber: string, enabled: boolean) {
   const shouldFetch = enabled && Boolean(contractNumber);
 
-  const { data: contract } = useGetContractByContractNumberQuery(contractNumber, {
+  const { data: contract, isError: contractFailed } = useGetContractByContractNumberQuery(contractNumber, {
     skip: !shouldFetch,
   });
 
@@ -73,5 +73,10 @@ export function useContractTruckDetails(contractNumber: string, enabled: boolean
     });
   }, [trucksByContract, trucks, drivers]);
 
-  return { trucks: items, isLoading: shouldFetch && loadingTrucks };
+  // Loading means "no list yet": the contract is still resolving, or the first fetch is in flight. A refetch after a save keeps the
+  // rows on screen, so a dialog opened from a row (e.g. "notify the buyer") is not torn down with it.
+  const waitingForContract = !contract && !contractFailed;
+  const isLoading = shouldFetch && (waitingForContract || (loadingTrucks && trucksByContract === undefined));
+
+  return { trucks: items, isLoading };
 }

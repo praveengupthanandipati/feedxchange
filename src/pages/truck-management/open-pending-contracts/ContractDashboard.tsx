@@ -7,8 +7,10 @@ import "./ContractDashboard.scss";
 const qty = (value: number) => `${value.toLocaleString("en-IN", { maximumFractionDigits: 2 })} MT`;
 const percent = (part: number, whole: number) => (whole > 0 ? Math.round((part / whole) * 100) : 0);
 
-/** Contract status as the table shows it: a contract that has started dispatching is "Pending", one that has not is "Open". */
-export const contractStatus = (row: PendingContractRow) => (row.dQtyValue > 0 ? "Pending" : "Open");
+/** The contract's real status: "Open" or "Partially Dispatched". */
+export const contractStatus = (row: PendingContractRow) => row.status;
+// "Open" stays green; "Partially Dispatched" uses the orange (in-progress) style.
+export const contractStatusModifier = (row: PendingContractRow) => (row.status === "Open" ? "open" : "pending");
 
 interface Totals {
   contracts: number;
@@ -47,7 +49,7 @@ const SplitBar = ({ dispatched, arranged, pending, large = false }: { dispatched
 export const DashboardSummary = ({ rows }: { rows: PendingContractRow[] }) => {
   const totals = useMemo(() => sumOf(rows), [rows]);
   const tiles = [
-    { key: "contracts", label: "Contracts", value: String(totals.contracts), note: `${rows.filter((r) => contractStatus(r) === "Open").length} open · ${rows.filter((r) => contractStatus(r) === "Pending").length} pending` },
+    { key: "contracts", label: "Contracts", value: String(totals.contracts), note: `${rows.filter((r) => contractStatus(r) === "Open").length} open · ${rows.filter((r) => contractStatus(r) === "Partially Dispatched").length} partially dispatched` },
     { key: "total", label: "Total Quantity", value: qty(totals.total), note: "contracted" },
     { key: "dispatched", label: "Despatched", value: qty(totals.dispatched), note: `${percent(totals.dispatched, totals.total)}% of total` },
     { key: "arranged", label: "Arranged", value: qty(totals.arranged), note: `${percent(totals.arranged, totals.total)}% of total` },
@@ -154,7 +156,7 @@ export const ContractCards = ({ rows, onOpenTruckDetails, emptyMessage }: { rows
               <Link to={`/contracts/${row.id}`} className="cd-card__id">
                 <FiFileText aria-hidden /> {row.id}
               </Link>
-              <span className={`cd-chip cd-chip--${status.toLowerCase()}`}>{status}</span>
+              <span className={`cd-chip cd-chip--${contractStatusModifier(row)}`}>{status}</span>
             </header>
             <p className="cd-card__product">{row.product}</p>
             <div className="cd-card__parties">

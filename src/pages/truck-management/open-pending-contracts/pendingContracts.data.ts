@@ -1,5 +1,6 @@
 export interface PendingContractRow {
   id: string;
+  status: "Open" | "Partially Dispatched";
   date: string;
   dateValue: number;
   seller: string;
