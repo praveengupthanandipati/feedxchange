@@ -309,6 +309,11 @@ export interface PendingContractApiResponse {
     deliveryFromDate: string | null;
     deliveryToDate: string | null;
     calculatedStatus: string;
+    gstPercentage?: number | null;
+    netRate?: number | null;
+    arrangedQuantity?: number | null;
+    dispatchedQuantity?: number | null;
+    pendingQuantity?: number | null;
   };
 }
 /*save contract request interface*/
@@ -326,7 +331,7 @@ export interface SaveContractRequest {
   maxQuantityMT: number;
   dispatchedQuantityMT: number;
   pendingQuantityMT: number;
-  pricePerKg: number;
+  pricePerMT: number;
   currencyId: number;
   contractStatusId: number;
 
@@ -396,7 +401,7 @@ export interface UpdateContractRequest {
     maxQuantityMT: number;
     dispatchedQuantityMT: number;
     pendingQuantityMT: number;
-    pricePerKg: number;
+    pricePerMT: number;
     currencyId: number;
     contractStatusId: number;
     sellerCommission: number;
@@ -492,7 +497,7 @@ export interface OpenAndPendingContract {
   contractDate: string;
   seller: string | null;
   buyer: string | null;
-  pricePerKg: number;
+  pricePerMT: number;
   totalQuantityMT: number;
   dispatchedQuantityMT: number;
   pendingQuantityMT: number;

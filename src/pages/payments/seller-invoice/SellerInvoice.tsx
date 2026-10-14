@@ -19,6 +19,7 @@ import {
 } from "./sellerInvoice.data";
 import { apiErrorMessage, useLazyGetInvoiceContractDetailsQuery, useSaveInvoicesMutation } from "../../../store/sellerInvoiceApi";
 import type { InvoiceContract } from "../../../store/sellerInvoiceApi";
+import { useNotifyPrompt } from "../../../notifications/useNotifyPrompt";
 import "./SellerInvoice.scss";
 
 const SellerInvoice = () => {
@@ -34,6 +35,7 @@ const SellerInvoice = () => {
 
   const [lookupContract] = useLazyGetInvoiceContractDetailsQuery();
   const [saveInvoices, { isLoading: saving }] = useSaveInvoicesMutation();
+  const notify = useNotifyPrompt();
 
   // The financial year is not chosen: it follows from the invoice date.
   const financialYear = financialYearOf(invoiceDate);
@@ -116,6 +118,16 @@ const SellerInvoice = () => {
       const result = await saveInvoices({ invoiceDate, rows: latest.map(toRowInput) }).unwrap();
       setSaveToast(`${result.invoices.length} invoice${result.invoices.length === 1 ? "" : "s"} saved successfully.`);
       resetForm();
+      // The buyer is told about each invoice (the seller can be added in the dialog). One dialog per invoice, one after another; Skip or close moves on.
+      notify.ask(
+        result.invoices.map((invoice) => ({
+          eventCode: "INVOICE_CREATED",
+          title: `Notify the buyer about invoice ${invoice.invoiceNumber}`,
+          sourceEntityType: "ContractInvoice",
+          sourceEntityId: invoice.invoiceId,
+          contractNumber: invoice.contractNumber,
+        })),
+      );
     } catch (error) {
       setServerError(apiErrorMessage(error, "The invoices could not be saved."));
     }
@@ -130,6 +142,7 @@ const SellerInvoice = () => {
 
   return (
     <div className="seller-invoice-page">
+      {notify.element}
       {saveToast && (
         <div className="seller-invoice-page__toast" role="status">
           <FiCheckCircle aria-hidden />

@@ -50,6 +50,7 @@ function mapApiContract(row: PendingContractApiResponse): Contract {
   const qtyMeasure = row.basicDetails.quantityMeasure || "mt";
   const quantity = row.basicDetails.quantity ?? 0;
   const contractRate = row.basicDetails.contractRate ?? 0;
+  const netRateValue = row.basicDetails.netRate ?? contractRate;
   return {
     id: row.contractNumber,
     contractId: row.contractId,
@@ -64,14 +65,14 @@ function mapApiContract(row: PendingContractApiResponse): Contract {
     qty: `${quantity} ${qtyMeasure}`,
     qtyValue: quantity,
     poTolerance: "",
-    aQty: `0 ${qtyMeasure}`,
-    pQty: `${quantity} ${qtyMeasure}`,
-    dQty: `0 ${qtyMeasure}`,
+    aQty: `${row.basicDetails.arrangedQuantity ?? 0} ${qtyMeasure}`,
+    pQty: `${row.basicDetails.pendingQuantity ?? quantity} ${qtyMeasure}`,
+    dQty: `${row.basicDetails.dispatchedQuantity ?? 0} ${qtyMeasure}`,
     cRate: `₹${contractRate}`,
     cRateValue: contractRate,
-    gst: "0%",
-    netRate: `₹${contractRate}`,
-    netRateValue: contractRate,
+    gst: `${row.basicDetails.gstPercentage ?? 0}%`,
+    netRate: `₹${netRateValue}`,
+    netRateValue,
     // Not returned by the GetAllContracts summary endpoint.
     indicativeFreight: "",
     rateRemarks: "",

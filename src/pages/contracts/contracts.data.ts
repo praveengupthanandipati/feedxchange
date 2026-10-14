@@ -81,6 +81,8 @@ export interface Contract {
 
   currencyId?: number;
   contractStatusId?: number;
+  effectiveFrom?: string;
+  effectiveTo?: string;
 
   sellerCommission?: number;
   sellerDeliverySchedule?: string;

@@ -10,7 +10,7 @@ export interface NotifyItem {
   title: string;
   contractNumber?: string;
   contractId?: number;
-  /** "DispatchSchedule" | "DispatchScheduleTransporter" | "ContractTruckDispatch" | "PaymentReceipt" */
+  /** "DispatchSchedule" | "DispatchScheduleTransporter" | "ContractTruckDispatch" | "PaymentReceipt" | "ContractInvoice" */
   sourceEntityType?: string;
   sourceEntityId?: number;
   profileId?: number;

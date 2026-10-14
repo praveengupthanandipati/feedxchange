@@ -148,6 +148,8 @@ const findAddressByLabel = (addresses: ProfileAddressDetail[], label: string) =>
 
 const REQUIRED_FIELD_LABELS: Record<string, string> = {
   contractDate: "Date of Contract",
+  effectiveFrom: "Effective From",
+  effectiveTo: "Effective To",
   sellerId: "Select Seller",
   buyerId: "Select Buyer",
   productId: "Select Product",
@@ -199,6 +201,10 @@ const NewContract = () => {
   const [contractNumber, setContractNumber] = useState("");
 
   const [contractDate, setContractDate] = useState("");
+  // The period the contract is valid for. Effective From follows the contract date until it is set by hand.
+  const [effectiveFromInput, setEffectiveFromInput] = useState("");
+  const [effectiveTo, setEffectiveTo] = useState("");
+  const effectiveFrom = effectiveFromInput || contractDate;
   const [sellerId, setSellerId] = useState("");
   const [buyerId, setBuyerId] = useState("");
   const [productId, setProductId] = useState("");
@@ -247,6 +253,8 @@ const NewContract = () => {
       id: String(source.contractNumber ?? fallback.id),
       contractNumber: String(source.contractNumber ?? fallback.contractNumber),
       date: String(source.contractDate ?? fallback.date),
+      effectiveFrom: source.effectiveFrom ? String(source.effectiveFrom) : fallback.effectiveFrom,
+      effectiveTo: source.effectiveTo ? String(source.effectiveTo) : fallback.effectiveTo,
       dateValue: source.contractDate
         ? new Date(String(source.contractDate)).getTime()
         : fallback.dateValue,
@@ -261,7 +269,7 @@ const NewContract = () => {
       qty: `${basicDetails.quantity ?? source.totalQuantityMT ?? fallback.qtyValue} ${basicDetails.quantityMeasure ?? fallback.quantityMeasure}`,
       poTolerance: String(basicDetails.poTolerancePercentage ?? source.tolerancePercentage ?? fallback.poTolerance),
       deliveryType: String(basicDetails.deliveryType ?? source.deliveryType ?? fallback.deliveryType),
-      cRateValue: asNumber(basicDetails.contractRate ?? source.pricePerKg, fallback.cRateValue) ?? 0,
+      cRateValue: asNumber(basicDetails.contractRate ?? source.pricePerMT, fallback.cRateValue) ?? 0,
       gst:
         basicDetails.gstPercentage ?? source.gstPercentage ?? source.gstPercent
           ? `${basicDetails.gstPercentage ?? source.gstPercentage ?? source.gstPercent}%`
@@ -367,8 +375,10 @@ const NewContract = () => {
    const [saveContract, { isLoading: isSaving }] = useSaveContractMutation();
   // After a contract is created the user chooses who to notify, on which channels and with which templates, before leaving the screen.
   const canNotify = usePermission("notifications.send");
+  const notifyEventCode = navState?.isEdit ? "CONTRACT_UPDATED" : "CONTRACT_CREATED";
   const [notifyContract, setNotifyContract] = useState<string | null>(null);
-  const [notifyAfterCreate, setNotifyAfterCreate] = useState(true);
+  // A new contract notifies by default; an edit does not, so fixing a typo never messages the buyer and seller by accident.
+  const [notifyAfterSave, setNotifyAfterSave] = useState(() => !navState?.isEdit);
   const [notifyChoices, setNotifyChoices] = useState<NotifyChoices | null>(null);
    const [updateContract, { isLoading: isUpdating }] =
   useUpdateContractMutation();
@@ -522,6 +532,7 @@ const { data: products } = useGetProductsQuery();
   const requiredValues = useMemo(
     () => ({
       contractDate,
+      effectiveTo,
       sellerId,
       buyerId,
       productId,
@@ -563,6 +574,7 @@ const { data: products } = useGetProductsQuery();
     }),
     [
       contractDate,
+      effectiveTo,
       sellerId,
       buyerId,
       productId,
@@ -617,6 +629,11 @@ const { data: products } = useGetProductsQuery();
     return;
   }
 
+  if (effectiveFrom && effectiveTo && effectiveTo < effectiveFrom) {
+    setFormError("Effective To cannot be before Effective From.");
+    return;
+  }
+
   setFormError("");
 
   if (
@@ -635,6 +652,9 @@ const { data: products } = useGetProductsQuery();
     const quantity = Number(qty) || 0;
     const tolerance = Number(poTolerance) || 0;
     const rate = Number(contractRate) || 0;
+    // Stored as the readable text ("5% GST", "FOR Delivery") so lists and messages can show them as they are.
+    const gstDetailsLabel = gstDetailsOptions.find((option) => option.value === gstDetails)?.label ?? gstDetails;
+    const deliveryTypeLabel = deliveryTypeOptions.find((option) => option.value === deliveryType)?.label ?? deliveryType;
 
     const immediateAdvance =
       Number(immediateAdvancePercent) || 0;
@@ -687,8 +707,8 @@ const { data: products } = useGetProductsQuery();
         buyerId: Number(buyerId),
 
         contractDate: now,
-        effectiveFrom: now,
-        effectiveTo: now,
+        effectiveFrom: toApiDate(effectiveFrom) || now,
+        effectiveTo: toApiDate(effectiveTo) || now,
         totalQuantityMT: quantity,
         productId: Number(productId),
         tolerancePercentage: tolerance,
@@ -698,7 +718,10 @@ const { data: products } = useGetProductsQuery();
         maxQuantityMT: quantity,
         dispatchedQuantityMT: existingContract?.dispatchedQuantityMT ?? 0,
         pendingQuantityMT: Math.max(0, quantity - (existingContract?.dispatchedQuantityMT ?? 0)),
-        pricePerKg: rate,
+        pricePerMT: rate,
+        gstPercentage: Number(gstPercent) || 0,
+        gstDetails: gstDetailsLabel,
+        deliveryType: deliveryTypeLabel,
         currencyId: existingContract?.currencyId ?? 1,
         contractStatusId: existingContract?.contractStatusId ?? (status ? 2 : 1),
         sellerCommission: Number(sellerConditions.commission) || 0,
@@ -707,6 +730,7 @@ const { data: products } = useGetProductsQuery();
         sellerFromDate: sellerConditions.fromDate ? toApiDate(sellerConditions.fromDate) : now,
         sellerToDate: sellerConditions.toDate ? toApiDate(sellerConditions.toDate) : now,
         loadingAddressId: Number(sellerConditions.address) || 0,
+        sellerQualitySpecSource: sellerConditions.qualitySpecSource || null,
         sellerRemarksSpecialConditions: sellerConditions.remarks || "",
         sellerQualitySpecifications: toUpdateQualitySpecifications(
           existingContract?.sellerQualitySpecifications,
@@ -717,6 +741,7 @@ const { data: products } = useGetProductsQuery();
         buyerFromDate: buyerConditions.fromDate ? toApiDate(buyerConditions.fromDate) : now,
         buyerToDate: buyerConditions.toDate ? toApiDate(buyerConditions.toDate) : now,
         deliveryAddressId: Number(buyerConditions.address) || 0,
+        buyerQualitySpecSource: buyerConditions.qualitySpecSource || null,
         buyerRemarksSpecialConditions: buyerConditions.remarks || "",
         buyerQualitySpecifications: toUpdateQualitySpecifications(
           existingContract?.buyerQualitySpecifications,
@@ -753,6 +778,12 @@ const { data: products } = useGetProductsQuery();
         "successMessage",
         "Contract updated successfully."
       );
+
+      // Offer to tell the buyer and seller about the change (Skip / close continues to the list).
+      if (canNotify && notifyAfterSave && currentContractNumber) {
+        setNotifyContract(String(currentContractNumber));
+        return;
+      }
     }
 
     /*
@@ -769,8 +800,8 @@ const { data: products } = useGetProductsQuery();
         buyerId: Number(buyerId),
 
         contractDate: now,
-        effectiveFrom: now,
-        effectiveTo: now,
+        effectiveFrom: toApiDate(effectiveFrom) || now,
+        effectiveTo: toApiDate(effectiveTo) || now,
 
         totalQuantityMT: quantity,
 
@@ -784,7 +815,10 @@ const { data: products } = useGetProductsQuery();
         dispatchedQuantityMT: 0,
         pendingQuantityMT: quantity,
 
-        pricePerKg: rate,
+        pricePerMT: rate,
+        gstPercentage: Number(gstPercent) || 0,
+        gstDetails: gstDetailsLabel,
+        deliveryType: deliveryTypeLabel,
 
         currencyId: 1,
 
@@ -811,6 +845,9 @@ const { data: products } = useGetProductsQuery();
 
         loadingAddressId:
           Number(sellerConditions.address) || 0,
+
+        sellerQualitySpecSource:
+          sellerConditions.qualitySpecSource || null,
 
         sellerRemarksSpecialConditions:
           sellerConditions.remarks || "",
@@ -847,6 +884,9 @@ const { data: products } = useGetProductsQuery();
 
         deliveryAddressId:
           Number(buyerConditions.address) || 0,
+
+        buyerQualitySpecSource:
+          buyerConditions.qualitySpecSource || null,
 
         buyerRemarksSpecialConditions:
           buyerConditions.remarks || "",
@@ -920,7 +960,7 @@ const { data: products } = useGetProductsQuery();
 
       // The API returns the new contract number. Offer to notify the buyer and seller (Skip / close continues to the list).
       const createdNumber = typeof created === "string" ? created.replace(/^"|"$/g, "") : "";
-      if (canNotify && notifyAfterCreate && createdNumber) {
+      if (canNotify && notifyAfterSave && createdNumber) {
         setNotifyContract(createdNumber);
         return;
       }
@@ -970,6 +1010,8 @@ const { data: products } = useGetProductsQuery();
   setContractDate(
     toInputDate(contract.date) || toIsoDate(contract.dateValue)
   );
+  setEffectiveFromInput(toInputDate(contract.effectiveFrom));
+  setEffectiveTo(toInputDate(contract.effectiveTo));
 
   // IMPORTANT:
   // Use actual API IDs if they exist.
@@ -1078,7 +1120,7 @@ const { data: products } = useGetProductsQuery();
       ),
 
     address:
-      contract.loadingAddressId !== undefined
+      contract.loadingAddressId
         ? String(contract.loadingAddressId)
         : contract.sellerConditions?.address || "",
 
@@ -1127,7 +1169,7 @@ const { data: products } = useGetProductsQuery();
       ),
 
     address:
-      contract.deliveryAddressId !== undefined
+      contract.deliveryAddressId
         ? String(contract.deliveryAddressId)
         : contract.buyerConditions?.address || "",
 
@@ -1266,6 +1308,30 @@ const { data: products } = useGetProductsQuery();
           </div>
 
           <div className="form-field">
+            <label className="form-field__label" htmlFor="effectiveFrom">
+              Effective From
+            </label>
+            <DatePickerInput
+              id="effectiveFrom"
+              value={effectiveFrom}
+              onChange={(value) => setEffectiveFromInput(value)}
+              clearable
+            />
+          </div>
+
+          <div className="form-field">
+            <label className="form-field__label" htmlFor="effectiveTo">
+              Effective To <span className="form-field__required">*</span>
+            </label>
+            <DatePickerInput
+              id="effectiveTo"
+              value={effectiveTo}
+              onChange={(value) => setEffectiveTo(value)}
+              clearable
+            />
+          </div>
+
+          <div className="form-field">
             <span className="form-field__label">
               Select Seller <span className="form-field__required">*</span>
             </span>
@@ -1359,7 +1425,7 @@ const { data: products } = useGetProductsQuery();
 
           <div className="form-field">
             <label className="form-field__label" htmlFor="contractRate">
-              Contract Rate <span className="form-field__required">*</span>
+              Contract Rate (₹/MT) <span className="form-field__required">*</span>
             </label>
             <input
               id="contractRate"
@@ -1887,21 +1953,23 @@ const { data: products } = useGetProductsQuery();
         </table>
       </section>
 
-      {canNotify && !navState?.isEdit && (
+      {canNotify && (
         <section className="new-contract__section">
           <h2 className="new-contract__section-title">Notifications</h2>
           <div className="form-check mb-3">
-            <input className="form-check-input" type="checkbox" id="notify-after-create" checked={notifyAfterCreate} onChange={(e) => setNotifyAfterCreate(e.target.checked)} />
-            <label className="form-check-label" htmlFor="notify-after-create">
-              Notify the buyer and seller when the contract is created
+            <input className="form-check-input" type="checkbox" id="notify-after-save" checked={notifyAfterSave} onChange={(e) => setNotifyAfterSave(e.target.checked)} />
+            <label className="form-check-label" htmlFor="notify-after-save">
+              {navState?.isEdit
+                ? "Notify the buyer and seller about this change"
+                : "Notify the buyer and seller when the contract is created"}
             </label>
             <div className="form-text">
-              Choose the channels and the template for each below. After you click Create Contract you will see exactly who will receive what and can still change it before anything is sent.
+              Choose the channels and the template for each below. After you click {navState?.isEdit ? "Update Contract" : "Create Contract"} you will see exactly who will receive what and can still change it before anything is sent.
             </div>
           </div>
-          {notifyAfterCreate && (
+          {notifyAfterSave && (
             <NotifyChoicePicker
-              eventCode="CONTRACT_CREATED"
+              eventCode={notifyEventCode}
               roles={[{ code: "BUYER", label: "Buyer" }, { code: "SELLER", label: "Seller" }]}
               value={notifyChoices}
               onChange={setNotifyChoices}
@@ -1930,8 +1998,8 @@ const { data: products } = useGetProductsQuery();
 
       <NotifyModal
         open={notifyContract !== null}
-        title={`Contract ${notifyContract ?? ""} created - notify buyer and seller`}
-        eventCode="CONTRACT_CREATED"
+        title={`Contract ${notifyContract ?? ""} ${navState?.isEdit ? "updated" : "created"} - notify buyer and seller`}
+        eventCode={notifyEventCode}
         contractNumber={notifyContract ?? undefined}
         sendLabel="Send notifications"
         closeOnBackdrop={false}

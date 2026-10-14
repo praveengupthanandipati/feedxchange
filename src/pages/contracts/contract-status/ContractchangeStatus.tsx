@@ -13,6 +13,10 @@ import {
   useGetAllContractStatusesQuery,
   useUpdateContractStatusMutation,
 } from "../../../store/contractsApi";
+import { usePermission } from "../../../auth/AuthContext";
+import NotifyModal from "../../../notifications/NotifyModal";
+import NotifyChoicePicker from "../../../notifications/NotifyChoicePicker";
+import type { NotifyChoices } from "../../../notifications/notifyChoices";
 import { financialYearOptions } from "./contractStatus.data";
 import "../NewContract.scss";
 import "../ContractDetail.scss";
@@ -52,6 +56,8 @@ interface ContractStatusRow {
   productName: string | null;
   basicDetails: {
     contractRate: number;
+    gstPercentage: number | null;
+    netRate: number | null;
     quantity: number;
     quantityMeasure: string | null;
     deliveryType: string | null;
@@ -260,6 +266,20 @@ const ContractchangeStatus = () => {
   const { data: contractsData, isLoading: searching } = useGetAllContractsQuery();
   const [updateContractStatus, { isLoading: updating }] = useUpdateContractStatusMutation();
 
+  // Notifying the buyer and seller. A contract waiting for approval that becomes Open is an approval (ticked by default); every other change
+  // is a plain status change (not ticked, so closing a contract never messages anyone by accident).
+  const canNotify = usePermission("notifications.send");
+  const [notifyOverride, setNotifyOverride] = useState<boolean | null>(null);
+  const [notifyChoices, setNotifyChoices] = useState<NotifyChoices | null>(null);
+  const [notifyContract, setNotifyContract] = useState<string | null>(null);
+  const previousStatusName = contractStatusOptions?.find(
+    (option) => option.displayName === record?.basicDetails?.calculatedStatus,
+  )?.statusName;
+  const statusIsChanging = !!record && !!status && status !== previousStatusName;
+  const notifyEventCode =
+    previousStatusName === "Pending" && status === "Open" ? "CONTRACT_APPROVED" : "CONTRACT_STATUS_CHANGED";
+  const notifyAfterChange = notifyOverride ?? notifyEventCode === "CONTRACT_APPROVED";
+
   const contractRows = useMemo<ContractStatusRow[]>(
     () =>
       (contractsData?.contracts ?? []).map((contract) => ({
@@ -271,6 +291,8 @@ const ContractchangeStatus = () => {
         productName: contract.productName,
         basicDetails: {
           contractRate: contract.contractRate,
+          gstPercentage: contract.gstPercentage ?? null,
+          netRate: contract.netRate ?? null,
           quantity: contract.quantity,
           quantityMeasure: contract.quantityMeasure,
           deliveryType: contract.deliveryType,
@@ -378,6 +400,11 @@ const ContractchangeStatus = () => {
       }).unwrap();
 
       setError("");
+      // Offer to tell the buyer and seller (Skip / close continues to the list).
+      if (canNotify && notifyAfterChange && statusIsChanging) {
+        setNotifyContract(record.contractNumber);
+        return;
+      }
       navigate("/contracts");
     } catch (error) {
       // Only a generic message is shown; the server's reason is logged.
@@ -502,11 +529,11 @@ const ContractchangeStatus = () => {
                 />
                 <DetailField
                   label="GST %"
-                  value=""
+                  value={basicDetails?.gstPercentage != null ? `${basicDetails.gstPercentage}%` : ""}
                 />
                 <DetailField
                   label="Invoice Net Rate per MT"
-                  value=""
+                  value={basicDetails?.netRate != null ? formatINR(basicDetails.netRate) : ""}
                 />
                 <DetailField label="Contract Value" value={contractValue} />
               </div>
@@ -544,6 +571,37 @@ const ContractchangeStatus = () => {
         </div>
       </div>
 
+      {canNotify && statusIsChanging && (
+        <div className="contract-change-status__card">
+          <h2 className="new-contract__section-title">Notifications</h2>
+          <div className="form-check mb-3">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="notify-after-status-change"
+              checked={notifyAfterChange}
+              onChange={(event) => setNotifyOverride(event.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="notify-after-status-change">
+              {notifyEventCode === "CONTRACT_APPROVED"
+                ? "Notify the buyer and seller that the contract is approved"
+                : "Notify the buyer and seller about this status change"}
+            </label>
+            <div className="form-text">
+              Choose the channels and the template for each below. After you click Change you will see exactly who will receive what and can still change it before anything is sent.
+            </div>
+          </div>
+          {notifyAfterChange && (
+            <NotifyChoicePicker
+              eventCode={notifyEventCode}
+              roles={[{ code: "BUYER", label: "Buyer" }, { code: "SELLER", label: "Seller" }]}
+              value={notifyChoices}
+              onChange={setNotifyChoices}
+            />
+          )}
+        </div>
+      )}
+
       <div className="contract-change-status__actions">
         <Link to="/contracts" className="contract-change-status__cancel">
           Cancel
@@ -557,6 +615,18 @@ const ContractchangeStatus = () => {
           {updating ? "Changing…" : "Change"}
         </button>
       </div>
+
+      <NotifyModal
+        open={notifyContract !== null}
+        title={`Contract ${notifyContract ?? ""} ${notifyEventCode === "CONTRACT_APPROVED" ? "approved" : "status changed"} - notify buyer and seller`}
+        eventCode={notifyEventCode}
+        contractNumber={notifyContract ?? undefined}
+        sendLabel="Send notifications"
+        closeOnBackdrop={false}
+        choices={notifyChoices}
+        onSkip={() => undefined}
+        onClose={() => navigate("/contracts")}
+      />
 
       <GetContractsDrawer
         open={drawerOpen}

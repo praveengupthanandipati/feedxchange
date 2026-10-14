@@ -100,7 +100,7 @@ export function calculateRow(row: SellerInvoiceRow): RowAmounts | null {
   if (!row.contract || !(qty > 0)) return null;
   const freight = toNumber(row.freight);
   // freight, when entered, is part of the invoice amount (so of the GST base and the total)
-  const autoAmount = round2(qty * 1000 * row.contract.pricePerKg + freight);
+  const autoAmount = round2(qty * row.contract.pricePerMT + freight);
   const amount = row.invoiceAmountEdited ? round2(toNumber(row.invoiceAmount)) : autoAmount;
   const gstPercent = row.gstPercent.trim() ? toNumber(row.gstPercent) : defaultGstPercent(row);
   const gst = round2((amount * gstPercent) / 100);

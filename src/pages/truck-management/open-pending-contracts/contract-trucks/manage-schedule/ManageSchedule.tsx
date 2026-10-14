@@ -130,17 +130,18 @@ const ScheduleRequestRow = ({
     }
   };
 
-  // Cancelling an accepted request: the whole accepted quantity by default, or part of it.
+  // Cancelling an accepted request: everything not yet committed to trucks by default, or just part of it (the server cancels exactly the
+  // quantity sent; a partial cancel leaves the rest of the acceptance usable).
   const handleCancel = async () => {
     setActionError("");
 
-    const qty = cancelQty.trim() ? Number(cancelQty) : acceptedQty;
+    const qty = cancelQty.trim() ? Number(cancelQty) : remainingQty;
     if (!qty || Number.isNaN(qty) || qty <= 0) {
       setActionError("Enter a valid quantity to cancel.");
       return;
     }
-    if (qty > acceptedQty) {
-      setActionError(`Cancelled quantity cannot exceed the accepted ${acceptedQty} MT.`);
+    if (qty > remainingQty) {
+      setActionError(`Cancelled quantity cannot exceed the ${remainingQty} MT not yet committed to trucks.`);
       return;
     }
 
@@ -170,6 +171,10 @@ const ScheduleRequestRow = ({
 
       if (!succeeded) {
         setActionError("The server did not apply this cancellation. Please try again.");
+      } else {
+        setCancelQty("");
+        // The transporter, the admins and whoever created the schedule are told it was cancelled.
+        notify.ask({ eventCode: "TRANSPORTER_CANCELLED", title: "Notify about this cancellation", sourceEntityType: "DispatchScheduleTransporter", sourceEntityId: detail.dispatchScheduleTransporterId });
       }
     } catch {
       setActionError("Failed to cancel this request. Please try again.");
@@ -206,6 +211,9 @@ const ScheduleRequestRow = ({
 
       if (!succeeded) {
         setActionError("The server didn't apply this rejection. Please try again.");
+      } else {
+        // The admins and whoever created the schedule are told it was rejected.
+        notify.ask({ eventCode: "TRANSPORTER_REJECTED", title: "Notify about this rejection", sourceEntityType: "DispatchScheduleTransporter", sourceEntityId: detail.dispatchScheduleTransporterId });
       }
     } catch {
       setActionError("Failed to reject this request. Please try again.");

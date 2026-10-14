@@ -181,7 +181,7 @@ export const ContractCards = ({ rows, onOpenTruckDetails, emptyMessage }: { rows
               <span><FiCalendar aria-hidden /> {row.fromDate} – {row.toDate}</span>
               <span><FiCreditCard aria-hidden /> {row.paymentType}</span>
               <span className="cd-chip cd-chip--plain">{row.deliverySchedule}</span>
-              <span className="cd-card__rate">{row.cRate}/kg</span>
+              <span className="cd-card__rate">{row.cRate}/MT</span>
             </div>
 
             <footer className="cd-card__foot">

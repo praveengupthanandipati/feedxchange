@@ -26,7 +26,7 @@ export interface InvoiceContract {
   pendingQtyMT: number;
   /** The most that can still be invoiced (contract maximum less what is invoiced). */
   maxAllowedQtyMT: number;
-  pricePerKg: number;
+  pricePerMT: number;
   ratePerMT: number;
   gstPercent: number;
   netRatePerMT: number;
