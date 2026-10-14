@@ -1,0 +1,132 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+// Builds on the Create Interest page styles (.interest-calc*); only what differs lives here.
+
+$tones: (
+  navy: v.$color-navy,
+  green: #34c38f,
+  blue: #50a5f1,
+  red: #f46a6a,
+  orange: #f1b44c,
+);
+
+.interest-detail-page {
+  &__back {
+    @include m.flex(row, center, center, v.$spacing-1);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border-radius: v.$radius-md;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    text-decoration: none;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+  }
+
+  // ---------- Filters: 1 → 2 → 5 per row (Seller, Buyer, Dates, Interest No, buttons) ----------
+  &__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(xl) {
+      grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    }
+  }
+
+  &__message,
+  &__empty {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    margin: 0;
+    font-size: v.$font-size-sm;
+  }
+
+  &__message {
+    color: v.$color-danger;
+  }
+
+  &__empty {
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+  }
+
+  // ---------- Summary tiles: 1 → 2 → 4 per row on a soft grey panel ----------
+  &__tiles {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background-color: v.$color-gray-100;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: v.$spacing-4;
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+}
+
+.detail-tile {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-3;
+  min-width: 0;
+  padding: v.$spacing-3 v.$spacing-4;
+  border-left: 3px solid v.$color-navy;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+  box-shadow: 0 1px 3px rgba(v.$color-navy, 0.06);
+
+  &__icon {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    font-size: 1.05rem;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  &__label {
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+  }
+
+  &__value {
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    overflow-wrap: anywhere;
+  }
+
+  @each $name, $color in $tones {
+    &--#{$name} {
+      border-left-color: $color;
+
+      .detail-tile__icon {
+        background-color: rgba($color, 0.12);
+        color: $color;
+      }
+    }
+  }
+}

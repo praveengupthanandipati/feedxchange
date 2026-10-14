@@ -1,0 +1,673 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.commission-estimations {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  // ---------- Header ----------
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    h1 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__header-actions,
+  &__filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+  }
+
+  // Phones: header buttons share the row instead of wrapping unevenly.
+  &__header-actions {
+    @include m.respond-below(sm) {
+      width: 100%;
+
+      > * { flex: 1 1 0; }
+    }
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:hover:not(:disabled) { filter: brightness(0.93); }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--info { background-color: v.$color-info; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--navy { background-color: v.$color-navy; }
+    &--danger { background-color: v.$color-danger; }
+    &--wide { min-width: 7.5rem; }
+
+    @include m.respond-below(sm) {
+      padding: 0 v.$spacing-3;
+    }
+  }
+
+  &__input {
+    @include m.font-base;
+    width: 100%;
+    min-width: 0;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+
+    &--readonly {
+      background-color: v.$color-gray-100;
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  // ---------- Filters: 1 → 2 → 3 + buttons per row ----------
+  &__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    }
+  }
+
+  &__filter-actions {
+    @include m.respond-below(sm) {
+      > * { flex: 1 1 0; }
+    }
+  }
+
+  // ---------- Grey panel: bulk commission bar + summary cards ----------
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    border-radius: v.$radius-md;
+    background-color: v.$color-gray-100;
+    overflow: visible;
+  }
+
+  &__bulk {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    padding: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: v.$spacing-4;
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 17rem) minmax(0, 17rem) 8rem 8rem;
+    }
+  }
+
+  &__overview {
+    padding: v.$spacing-3;
+    border-top: 1px solid v.$color-border;
+    background-color: #f7f6ef;
+    border-radius: 0 0 v.$radius-md v.$radius-md;
+
+    @include m.respond-to(sm) {
+      padding: v.$spacing-4;
+    }
+
+    h2 {
+      margin: 0 0 v.$spacing-3;
+      color: v.$color-info;
+      font-size: v.$font-size-lg;
+    }
+  }
+
+  // Total Qty / Average Commission / Amount: stacked on phones, 3 across from tablet up.
+  &__stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    margin: 0;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: v.$spacing-4;
+    }
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: v.$spacing-1;
+    min-height: 5rem;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-md;
+    text-align: center;
+
+    @include m.respond-to(md) {
+      min-height: 6.25rem;
+    }
+
+    dt {
+      color: v.$color-text;
+      font-size: 0.8rem;
+      font-weight: v.$font-weight-medium;
+    }
+
+    dd {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-lg;
+      font-weight: v.$font-weight-semibold;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+
+      @include m.respond-to(md) {
+        font-size: v.$font-size-xl;
+      }
+    }
+  }
+
+  &__message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    margin: 0;
+    font-size: v.$font-size-sm;
+
+    &--success { color: v.$color-success; }
+    &--error { color: v.$color-danger; }
+
+    svg { flex-shrink: 0; }
+  }
+
+  &__message-link {
+    color: v.$color-info;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+
+  // ---------- Contracts table (lg+; phones and tablets get cards) ----------
+  &__table-view {
+    @include m.respond-below(lg) { display: none; }
+  }
+
+  &__table > .table {
+    min-width: 60rem;
+
+    th,
+    td {
+      padding-left: 0.6rem;
+      padding-right: 0.6rem;
+      vertical-align: middle;
+    }
+
+    // Two-word headers may wrap instead of widening the table.
+    th {
+      white-space: normal;
+      line-height: 1.25;
+    }
+  }
+
+  // Long party names wrap so the commission columns stay in view.
+  &__party {
+    display: inline-block;
+    min-width: 11rem;
+    max-width: 18rem;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  &__commission {
+    @include m.font-base;
+    width: 5rem;
+    height: 2.2rem;
+    padding: 0 v.$spacing-2;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+  }
+
+  &__action {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: v.$radius-pill;
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+
+    &--buy { background-color: rgba(#50a5f1, 0.15); color: #1f6fae; }
+    &--sell { background-color: rgba(#34c38f, 0.15); color: #1f8a63; }
+  }
+
+  &__expand {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    padding: 0;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    color: v.$color-navy;
+    font-size: 1rem;
+    cursor: pointer;
+
+    &:hover { background-color: rgba(v.$color-navy, 0.08); }
+
+    &[aria-expanded="true"] { background-color: rgba(v.$color-navy, 0.1); }
+  }
+
+  // ---------- Invoices under an expanded contract row ----------
+  &__invoices {
+    padding: v.$spacing-3;
+    background-color: v.$color-gray-100;
+  }
+
+  // Prefixed with the wrapper so it outranks the shared .table rules this sits inside.
+  &__invoice-table.table-wrapper {
+    background-color: v.$color-bg;
+
+    > .table {
+      min-width: 40rem;
+
+      th,
+      td {
+        padding: 0.6rem v.$spacing-3;
+      }
+
+      th { position: static; }
+    }
+  }
+
+  &__invoice-list {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    margin: v.$spacing-2 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__invoice-item {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
+    padding: v.$spacing-2 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    input {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+      accent-color: v.$color-navy;
+    }
+  }
+
+  &__invoice-main,
+  &__invoice-figures {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+
+    span { color: v.$color-text-muted; }
+  }
+
+  &__invoice-main {
+    flex: 1;
+    overflow-wrap: anywhere;
+
+    strong { color: v.$color-navy; }
+  }
+
+  &__invoice-figures {
+    align-items: flex-end;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  &__invoice-empty {
+    margin: v.$spacing-2 0 0;
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+  }
+
+  // ---------- Contract cards: 1 per row on phones, 2 on tablets ----------
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    @include m.respond-to(lg) { display: none; }
+  }
+
+  &__cards-empty {
+    grid-column: 1 / -1;
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+
+  &__card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    &.is-selected {
+      border-color: v.$color-navy;
+      box-shadow: 0 0 0 1px v.$color-navy;
+    }
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.15rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+
+    .commission-estimations__commission {
+      width: 100%;
+      height: 2.5rem;
+    }
+  }
+
+  &__card-top {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+    font-size: v.$font-size-sm;
+
+    label {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    input {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+      accent-color: v.$color-navy;
+    }
+
+    strong { color: v.$color-navy; }
+
+    span {
+      color: v.$color-text-muted;
+      white-space: nowrap;
+    }
+  }
+
+  &__card-full {
+    grid-column: 1 / -1;
+  }
+
+  &__card-total {
+    color: v.$color-navy !important;
+    font-weight: v.$font-weight-bold;
+  }
+
+  &__card-invoices {
+    padding: v.$spacing-2 v.$spacing-3 v.$spacing-3;
+    border-top: 1px solid v.$color-border;
+    background-color: v.$color-gray-50;
+  }
+
+  &__card-invoices-toggle {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+  }
+
+  // ---------- Pagination ----------
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    @include m.respond-below(sm) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    p {
+      margin: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+
+  // ---------- Summary Of Quantity & Commission: table beside the totals from lg up ----------
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+  }
+
+  &__summary-heading {
+    h2 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-lg;
+    }
+
+    p {
+      margin: v.$spacing-1 0 0;
+      color: v.$color-text-muted;
+      font-size: 0.8rem;
+    }
+  }
+
+  &__summary-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  &__summary-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid v.$color-border;
+  }
+
+  &__summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: v.$font-size-sm;
+    font-variant-numeric: tabular-nums;
+
+    th,
+    td {
+      padding: 0.85rem v.$spacing-3;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background-color: v.$color-navy;
+      color: v.$color-white;
+      font-weight: v.$font-weight-semibold;
+    }
+
+    td + td,
+    th + th {
+      border-left: 1px solid v.$color-border;
+    }
+
+    tbody tr + tr td {
+      border-top: 1px solid v.$color-border;
+    }
+  }
+
+  &__summary-empty {
+    color: v.$color-text-muted;
+    text-align: center !important;
+  }
+
+  // Difference + Total Amount side by side, Remarks across; all stacked on phones.
+  &__totals {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3 v.$spacing-4;
+    align-content: start;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+
+    &--wide { grid-column: 1 / -1; }
+
+    label {
+      color: v.$color-text;
+      font-size: 0.8rem;
+      font-weight: v.$font-weight-medium;
+    }
+  }
+
+  // ---------- Save / Cancel: stays in view at the bottom while scrolling ----------
+  &__footer {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    position: -webkit-sticky;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 0 calc(-1 * #{v.$spacing-5}) calc(-1 * #{v.$spacing-5});
+    padding: v.$spacing-3 v.$spacing-5;
+    border-top: 1px solid v.$color-border;
+    border-radius: 0 0 v.$radius-md v.$radius-md;
+    background-color: v.$color-bg;
+
+    @include m.respond-below(sm) {
+      margin: 0 calc(-1 * #{v.$spacing-3}) calc(-1 * #{v.$spacing-3});
+      padding: v.$spacing-3;
+
+      > * { flex: 1; }
+    }
+  }
+}

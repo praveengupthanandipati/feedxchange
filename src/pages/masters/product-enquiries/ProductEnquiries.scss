@@ -1,0 +1,441 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.product-enquiries {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  // ---------- Header ----------
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    h1 {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__header-actions {
+    display: flex;
+    gap: v.$spacing-2;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:hover:not(:disabled) { filter: brightness(0.93); }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--info { background-color: #50a5f1; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--navy { background-color: v.$color-navy; }
+
+    &--sm {
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border-radius: v.$radius-sm;
+      font-size: 0.78rem;
+    }
+  }
+
+  // ---------- Filters: search grows, status beside it from tablet up ----------
+  &__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(md) {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+  }
+
+  &__search {
+    position: relative;
+
+    svg {
+      position: absolute;
+      top: 50%;
+      left: v.$spacing-3;
+      color: v.$color-text-muted;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    input {
+      @include m.font-base;
+      width: 100%;
+      height: 2.5rem;
+      padding: 0 v.$spacing-3 0 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      text-overflow: ellipsis;
+      -webkit-appearance: none;
+      appearance: none;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-navy;
+      }
+    }
+  }
+
+  &__message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    margin: 0;
+    color: v.$color-success;
+    font-size: v.$font-size-sm;
+
+    svg { flex-shrink: 0; }
+  }
+
+  // ---------- Table (lg+; phones and tablets get cards) ----------
+  &__table-view {
+    @include m.respond-below(lg) { display: none; }
+  }
+
+  &__table > .table {
+    min-width: 72rem;
+
+    th,
+    td {
+      padding-left: 0.6rem;
+      padding-right: 0.6rem;
+      vertical-align: middle;
+    }
+  }
+
+  &__wrap {
+    display: inline-block;
+    min-width: 7rem;
+    max-width: 14rem;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  &__link {
+    color: v.$color-info;
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  &__email {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-bold;
+    line-height: 1.4;
+
+    &--new { background-color: #f1b44c; }
+    &--active { background-color: #34c38f; }
+    &--closed { background-color: v.$color-gray-500; }
+  }
+
+  // ---------- Cards: 1 per row on phones, 2 on tablets ----------
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) { display: none; }
+  }
+
+  &__cards-empty {
+    grid-column: 1 / -1;
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    dl {
+      display: grid;
+      flex: 1;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-content: start;
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.15rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__card-top {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+    color: v.$color-navy;
+    font-size: v.$font-size-sm;
+  }
+
+  &__card-full {
+    grid-column: 1 / -1;
+  }
+
+  &__card-actions {
+    padding: 0 v.$spacing-3 v.$spacing-3;
+
+    .product-enquiries__btn { width: 100%; }
+  }
+
+  // ---------- Pagination ----------
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    @include m.respond-below(sm) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    p {
+      margin: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
+
+// ---------- Update Enquiry Status offcanvas (rendered into <body>) ----------
+@keyframes enquiry-panel-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes enquiry-panel-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.enquiry-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: v.$z-index-modal;
+  display: flex;
+  flex-direction: column;
+  // Full width on phones, three quarters on tablets, half the viewport from laptops up.
+  width: 100%;
+  max-width: 100vw;
+  height: 100%;
+  background-color: v.$color-bg;
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.2);
+  outline: none;
+  -webkit-animation: enquiry-panel-in 0.22s ease-out;
+  animation: enquiry-panel-in 0.22s ease-out;
+
+  @include m.respond-to(md) { width: 75vw; }
+  @include m.respond-to(lg) { width: 50vw; }
+
+  @media (prefers-reduced-motion: reduce) {
+    -webkit-animation: none;
+    animation: none;
+  }
+
+  &__backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: v.$z-index-modal-backdrop;
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-animation: enquiry-panel-fade 0.22s ease-out;
+    animation: enquiry-panel-fade 0.22s ease-out;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, flex-start, v.$spacing-2);
+    padding: v.$spacing-4 v.$spacing-4 v.$spacing-2;
+
+    h2 {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-lg;
+    }
+
+    p {
+      margin: v.$spacing-1 0 0;
+      color: v.$color-text-muted;
+      font-size: 0.8rem;
+      overflow-wrap: anywhere;
+    }
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      flex-shrink: 0;
+      width: 2.25rem;
+      height: 2.25rem;
+      border: none;
+      border-radius: v.$radius-sm;
+      background: transparent;
+      color: v.$color-text;
+      font-size: 1.4rem;
+      cursor: pointer;
+
+      &:hover { background-color: v.$color-gray-100; }
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+    padding: v.$spacing-3 v.$spacing-4 v.$spacing-4;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  &__label {
+    color: v.$color-text;
+    font-size: 0.8rem;
+    font-weight: v.$font-weight-medium;
+  }
+
+  &__textarea {
+    @include m.font-base;
+    width: 100%;
+    min-height: 6.5rem;
+    padding: v.$spacing-2 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    resize: vertical;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+  }
+
+  &__error {
+    color: v.$color-danger;
+    font-size: 0.75rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+
+    @include m.respond-below(sm) {
+      > * { flex: 1 1 0; }
+    }
+  }
+}

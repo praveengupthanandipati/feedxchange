@@ -1,0 +1,472 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.estimation-detail {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  // ---------- Header ----------
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    h1 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+
+    // Phones: the three buttons share the row evenly.
+    @include m.respond-below(sm) {
+      width: 100%;
+
+      > * { flex: 1 1 0; }
+    }
+  }
+
+  &__back {
+    @include m.flex(row, center, center, v.$spacing-1);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border-radius: v.$radius-md;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    text-decoration: none;
+
+    &:hover { background-color: v.$color-gray-100; }
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    text-decoration: none;
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:hover:not(:disabled) { filter: brightness(0.93); }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--info { background-color: #50a5f1; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--navy { background-color: v.$color-navy; }
+    &--fit { align-self: flex-start; }
+
+    @include m.respond-below(sm) {
+      padding: 0 v.$spacing-3;
+    }
+  }
+
+  &__input {
+    @include m.font-base;
+    width: 100%;
+    min-width: 0;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+
+    &--readonly {
+      background-color: #f7f6ef;
+    }
+  }
+
+  // ---------- Filters: estimate on its own row, then From / To / buttons ----------
+  &__filters {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+  }
+
+  &__filter-estimate {
+    width: 100%;
+
+    @include m.respond-to(sm) {
+      max-width: 24rem;
+    }
+  }
+
+  &__filter-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 24rem) minmax(0, 24rem) auto;
+    }
+  }
+
+  &__filter-actions {
+    display: flex;
+    gap: v.$spacing-2;
+
+    @include m.respond-below(lg) {
+      grid-column: 1 / -1;
+
+      > * { flex: 1 1 0; }
+    }
+  }
+
+  &__notice {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    margin: 0;
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+
+    svg { flex-shrink: 0; }
+  }
+
+  // ---------- Stat cards: 1 → 2 → 3 → 6 per row ----------
+  &__stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    margin: 0 0 v.$spacing-2;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: v.$spacing-4;
+    }
+
+    @include m.respond-to(xl) {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: v.$spacing-1;
+    min-height: 5.5rem;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-md;
+    text-align: center;
+
+    dt {
+      color: v.$color-text;
+      font-size: 0.8rem;
+      font-weight: v.$font-weight-medium;
+    }
+
+    dd {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-xl;
+      font-weight: v.$font-weight-semibold;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    &--text dd { font-size: v.$font-size-lg; }
+    &--highlight dd { color: v.$color-success; }
+  }
+
+  // ---------- Contracts table (lg+; phones and tablets get cards) ----------
+  &__table-view {
+    @include m.respond-below(lg) { display: none; }
+  }
+
+  &__table > .table {
+    min-width: 60rem;
+
+    th,
+    td {
+      padding-left: 0.6rem;
+      padding-right: 0.6rem;
+      vertical-align: middle;
+    }
+
+    // Two-word headers may wrap instead of widening the table.
+    th {
+      white-space: normal;
+      line-height: 1.25;
+    }
+  }
+
+  // Long party names wrap instead of pushing columns off-screen.
+  &__wrap {
+    display: inline-block;
+    min-width: 10rem;
+    max-width: 18rem;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  &__badge {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-bold;
+    line-height: 1.4;
+
+    &--sell { background-color: v.$color-navy; }
+    &--buy { background-color: #34c38f; }
+  }
+
+  // ---------- Cards: 1 per row on phones, 2 on tablets ----------
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) { display: none; }
+  }
+
+  &__cards-empty {
+    grid-column: 1 / -1;
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+
+  &__card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.15rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__card-top {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+    color: v.$color-navy;
+    font-size: v.$font-size-sm;
+  }
+
+  &__card-full {
+    grid-column: 1 / -1;
+  }
+
+  &__card-total {
+    padding-top: v.$spacing-2;
+    border-top: 1px dashed v.$color-border;
+
+    dd {
+      color: v.$color-navy;
+      font-weight: v.$font-weight-bold;
+    }
+  }
+
+  // ---------- Pagination ----------
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    @include m.respond-below(sm) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    p {
+      margin: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+
+  // ---------- Summary: table beside the totals from lg up ----------
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+
+    h2 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-lg;
+    }
+  }
+
+  &__summary-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-4;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  &__summary-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid v.$color-border;
+  }
+
+  &__summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: v.$font-size-sm;
+    font-variant-numeric: tabular-nums;
+
+    th,
+    td {
+      padding: 0.85rem v.$spacing-3;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background-color: v.$color-navy;
+      color: v.$color-white;
+      font-weight: v.$font-weight-semibold;
+    }
+
+    td + td,
+    th + th {
+      border-left: 1px solid v.$color-border;
+    }
+
+    tbody tr + tr td {
+      border-top: 1px solid v.$color-border;
+    }
+  }
+
+  &__summary-empty {
+    color: v.$color-text-muted;
+    text-align: center !important;
+  }
+
+  // Difference / Total Amount / Total MT / Total Commission: 2 × 2, stacked on phones.
+  &__totals {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3 v.$spacing-4;
+    align-content: start;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+
+    label {
+      color: v.$color-text;
+      font-size: 0.8rem;
+      font-weight: v.$font-weight-medium;
+    }
+  }
+}

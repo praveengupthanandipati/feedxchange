@@ -1,0 +1,174 @@
+@use "../../assets/styles/variables" as v;
+
+.reports-dashboard {
+  margin-bottom: v.$spacing-5;
+
+  &__intro { margin-bottom: v.$spacing-4; }
+
+  &__eyebrow {
+    margin: 0 0 v.$spacing-1;
+    color: v.$color-orange-dark;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-bold;
+    letter-spacing: 0.1em;
+  }
+
+  &__heading {
+    margin: 0;
+    color: v.$color-navy;
+    font-size: v.$font-size-lg;
+  }
+
+  &__description {
+    margin: v.$spacing-1 0 0;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: v.$spacing-3;
+  }
+
+  &__card {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    min-height: 6rem;
+    gap: v.$spacing-3;
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-gray-100;
+    border-radius: v.$radius-lg;
+    background: v.$color-white;
+    box-shadow: v.$shadow-md;
+    color: v.$color-text;
+    text-decoration: none;
+    transition: transform v.$transition-fast, box-shadow v.$transition-fast, border-color v.$transition-fast;
+
+    &:hover {
+      color: v.$color-text;
+      transform: translateY(-1px);
+      border-color: v.$color-gray-300;
+      box-shadow: v.$shadow-lg;
+    }
+
+    &--navy .reports-dashboard__icon { background: rgba(v.$color-navy, 0.1); color: v.$color-navy; }
+    &--blue .reports-dashboard__icon { background: rgba(v.$color-info, 0.12); color: v.$color-info; }
+    &--green .reports-dashboard__icon { background: rgba(v.$color-success, 0.12); color: v.$color-success; }
+    &--orange .reports-dashboard__icon { background: rgba(v.$color-orange, 0.16); color: v.$color-orange-dark; }
+  }
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: v.$color-gray-100;
+    font-size: 1.1rem;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.15rem;
+  }
+
+  &__label {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+  }
+
+  &__value {
+    color: v.$color-text;
+    font-size: v.$font-size-xl;
+    line-height: 1.2;
+  }
+
+  &__lower {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(17rem, 0.8fr);
+    gap: v.$spacing-4;
+    margin-top: v.$spacing-4;
+
+    @media (max-width: 760px) { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  &__panel {
+    min-width: 0;
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-gray-100;
+    border-radius: v.$radius-lg;
+    background: v.$color-white;
+    box-shadow: v.$shadow-md;
+
+    h3 {
+      margin: 0;
+      color: v.$color-navy;
+      font-size: v.$font-size-base;
+    }
+
+    p {
+      margin: v.$spacing-1 0 0;
+      color: v.$color-text-muted;
+      font-size: 0.75rem;
+    }
+  }
+
+  &__panel-heading {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-3;
+    margin-bottom: v.$spacing-3;
+  }
+
+  &__panel-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: v.$radius-md;
+    background: rgba(v.$color-orange, 0.14);
+    color: v.$color-orange-dark;
+  }
+
+  &__muted {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__links {
+    display: grid;
+    gap: v.$spacing-2;
+    max-height: 21rem;
+    overflow-y: auto;
+    margin-top: v.$spacing-4;
+  }
+
+  &__quick-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$spacing-2;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background: v.$color-gray-50;
+    color: v.$color-navy;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: none;
+    transition: background v.$transition-fast, color v.$transition-fast;
+
+    &:hover {
+      background: rgba(v.$color-orange, 0.14);
+      color: v.$color-navy-dark;
+    }
+
+    svg { flex-shrink: 0; color: v.$color-orange-dark; }
+  }
+}

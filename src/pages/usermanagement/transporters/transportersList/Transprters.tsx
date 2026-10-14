@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
-import Table from "../../../../components/table/Table";
+import { Link, useNavigate } from "react-router-dom";
+import { FiEye, FiEyeOff, FiDownload, FiPlus, FiTruck, FiMapPin, FiPhone, FiTag } from "react-icons/fi";
 import type { TableColumn } from "../../../../components/table/table.types";
+import RowActionsMenu from "../../../../components/table/RowActionsMenu";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import SuccessToast from "../../../../components/toast/SuccessToast";
 import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
@@ -16,11 +16,18 @@ import {
   type Transporter,
   type TransporterProfileStatus,
 } from "../../../../store/transportersApi";
-import "./Transporters.scss";
+import "./Transporters.scss";
+
 import Can from "../../../../auth/Can";
 
 const PAGE_SIZE = 10;
 const DEFAULT_STATUS_FILTER: TransporterProfileStatus = "Active";
+
+const StatusBadge = ({ status }: { status: TransporterProfileStatus }) => (
+  <span className={`transporters__status transporters__status--${status.toLowerCase()}`}>
+    {status}
+  </span>
+);
 
 function getExportCellValue(row: Transporter, column: TableColumn<Transporter>): string {
   if (column.exportValue) return column.exportValue(row);
@@ -54,7 +61,7 @@ const Transprters = () => {
   };
 
   const handleView = (transporter: Transporter) => {
-    navigate(`${transporter.profileId}`);
+    navigate(`/transporters/${transporter.profileId}`);
   };
 
   const handleDelete = (transporter: Transporter) => {
@@ -201,19 +208,45 @@ const Transprters = () => {
           />
         )}
 
-        <Table
-          columns={columns}
-          data={pagedRows}
-          rowKey={(row) => String(row.profileId)}
-          emptyMessage={
-            isLoading
-              ? "Loading transporters…"
-              : error
-                ? "Failed to load transporters."
-                : "No transporters match the current filters."
-          }
-          minHeight
-        />
+        {isLoading ? (
+          <p className="transporters-cards__message">Loading transporters…</p>
+        ) : error ? (
+          <p className="transporters-cards__message">Failed to load transporters.</p>
+        ) : pagedRows.length === 0 ? (
+          <p className="transporters-cards__message">No transporters match the current filters.</p>
+        ) : (
+          <div className="transporters-cards">
+            {pagedRows.map((transporter) => (
+              <article className="transporter-profile-card" key={transporter.profileId}>
+                <div className="transporter-profile-card__topline">
+                  <span className="transporter-profile-card__icon"><FiTruck aria-hidden /></span>
+                  <StatusBadge status={transporter.status} />
+                  <div className="transporter-profile-card__actions">
+                    <RowActionsMenu
+                      manageKeys={["profiles.transporter.manage"]}
+                      onView={() => handleView(transporter)}
+                      onEdit={() => handleEdit(transporter)}
+                      onDelete={() => handleDelete(transporter)}
+                    />
+                  </div>
+                </div>
+
+                <Link to={`/transporters/${transporter.profileId}`} className="transporter-profile-card__name">
+                  {transporter.legalName || transporter.tradingName || "Unnamed Transporter"}
+                </Link>
+                {transporter.tradingName && transporter.tradingName !== transporter.legalName && (
+                  <p className="transporter-profile-card__trading-name">{transporter.tradingName}</p>
+                )}
+
+                <div className="transporter-profile-card__details">
+                  <span><FiTag aria-hidden /> {transporter.transporterTypeName || transporter.transporterSubTypeName || "Transporter type not specified"}</span>
+                  <span><FiPhone aria-hidden /> {transporter.mobileNumber || "Phone not provided"}</span>
+                  <span><FiMapPin aria-hidden /> {[transporter.location, transporter.stateName].filter(Boolean).join(", ") || "Location not provided"}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         <Pagination
           currentPage={currentPageClamped}

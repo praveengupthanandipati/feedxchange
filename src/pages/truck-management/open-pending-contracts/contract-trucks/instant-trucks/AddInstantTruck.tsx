@@ -223,8 +223,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
   };
 
   return (
-    <div className="assign-truck-drawer__body">
-      {notify.element}
+    <div className="assign-truck-drawer__body instant-truck-form">
       {saved && (
         <div className="dispatch-form-success">
           <FiCheckCircle aria-hidden />

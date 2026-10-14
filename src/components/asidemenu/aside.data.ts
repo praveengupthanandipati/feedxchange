@@ -15,8 +15,102 @@ import {
   FiSend,
   FiFolder,
   FiSettings,
+  FiPercent,
+  FiCopy,
+  FiLayers,
 } from "react-icons/fi";
 import type { AsideNavSection } from "./aside.types";
+
+/**
+ * Interest of Payments is not in the backend Modules/Pages tables yet, so the sidebar adds it after
+ * User Management whichever menu source is in use (see withLocalSections in aside.tsx).
+ * TODO: add permission keys once the backend defines them; until then any signed-in user sees it.
+ */
+export const interestOfPaymentsSection: AsideNavSection = {
+  id: "interest-of-payments-module",
+   title: "Manage Interest of Payments",
+  items: [
+    {
+      id: "interest-of-payments",
+      label: "Interest of Payments",
+      icon: FiPercent,
+      path: "/interest-payments/overview",
+      children: [
+        { id: "interest-create", label: "Create Interest", path: "/interest-payments/create" },
+        { id: "interest-view", label: "View Interest", path: "/interest-payments/view" },
+        { id: "interest-detail", label: "View Interest Detail", path: "/interest-payments/detail" },
+      ],
+    },
+  ],
+};
+
+/** Company Invoices: also not in the backend menu yet; added right after Interest of Payments. TODO: permission keys. */
+export const companyInvoicesSection: AsideNavSection = {
+  id: "company-invoices-module",
+  title: "Manage Company Invoices",
+  items: [
+    {
+      id: "company-invoices",
+      label: "Company Invoices",
+      icon: FiCopy,
+      path: "/company-invoices/overview",
+      children: [
+        { id: "company-invoices-generate", label: "Generate Invoice", path: "/company-invoices/generate" },
+        { id: "company-invoices-view", label: "View Invoices", path: "/company-invoices/view" },
+      ],
+    },
+  ],
+};
+
+/** Estimations: also not in the backend menu yet; added right after Company Invoices. TODO: permission keys. */
+export const estimationsSection: AsideNavSection = {
+  id: "estimations-module",
+  title: "Manage Estimations",
+  items: [
+    {
+      id: "estimations",
+      label: "Estimations",
+      icon: FiPercent,
+      path: "/estimations/overview",
+      children: [
+        { id: "estimations-commission", label: "Commission Estimation", path: "/estimations/commission" },
+        { id: "estimations-view", label: "View Estimations", path: "/estimations/view" },
+        { id: "estimations-detail", label: "Estimations Detail", path: "/estimations/detail" },
+      ],
+    },
+  ],
+};
+
+/** Masters: also not in the backend menu yet; added right after Estimations. TODO: permission keys and pages. */
+export const mastersSection: AsideNavSection = {
+  id: "masters-module",
+  title: "Masters",
+  items: [
+    {
+      id: "masters",
+      label: "Masters",
+      icon: FiLayers,
+      path: "/masters/overview",
+      collapsedByDefault: true,
+      children: [
+        // { id: "masters-notify-subscriptions", label: "Notify Subscriptions", path: "/masters/notify-subscriptions" },
+        // { id: "masters-roles-permissions", label: "Roles & Permissions", path: "/masters/roles-permissions" },
+        // { id: "masters-templates", label: "Templates", path: "/masters/templates" },
+        { id: "masters-banners", label: "Banners", path: "/masters/banners" },
+        { id: "masters-subscriptions", label: "Subscriptions", path: "/masters/subscriptions" },
+        { id: "masters-product-enquiry", label: "Product Enquiry", path: "/masters/product-enquiry" },
+        { id: "masters-contact-enquiry", label: "Contact Enquiry", path: "/masters/contact-enquiry" },
+        { id: "masters-testimonials", label: "Testimonials", path: "/masters/testimonials" },
+        { id: "masters-blogs", label: "Blogs", path: "/masters/blogs" },
+        { id: "masters-users", label: "Users", path: "/masters/users" },
+        { id: "masters-registration-details", label: "Registration Details", path: "/masters/registration-details" },
+      ],
+    },
+  ],
+};
+
+/** Sections the backend menu doesn't know yet, in the order they appear after User Management. */
+export const localNavSections: AsideNavSection[] = [interestOfPaymentsSection, companyInvoicesSection, estimationsSection, mastersSection];
 
 // TODO: replace with real navigation items once routes/permissions are finalized.
 export const asideNavSections: AsideNavSection[] = [
@@ -217,6 +311,10 @@ export const asideNavSections: AsideNavSection[] = [
       },
     ],
   },
+  interestOfPaymentsSection,
+  companyInvoicesSection,
+  estimationsSection,
+  mastersSection,
   {
     id: "our-features",
     title: "Product Management",
@@ -226,6 +324,7 @@ export const asideNavSections: AsideNavSection[] = [
         id: "apps",
         label: "Products",
         icon: FiGrid,
+        path: "/product-management/overview",
         children: [
           { id: "products-products", permissions: ["products.view"], label: "Products", path: "/products" },
           { id: "products-price-tracking", permissions: ["price.tracking"], label: "Price Tracking", path: "/products/price-tracking" },
@@ -250,6 +349,7 @@ export const asideNavSections: AsideNavSection[] = [
         id: "reports",
         label: "Reports",
         icon: FiFileText,
+        path: "/reports/overview",
         children: [
           { id: "reports-seller-invoice", permissions: ["reports"], label: "Seller Invoice Reports", path: "/reports/seller-invoice-reports" },
           { id: "reports-seller-buyer-account", permissions: ["reports"], label: "Seller Buyer Account", path: "/reports/seller-buyer-accounts" },

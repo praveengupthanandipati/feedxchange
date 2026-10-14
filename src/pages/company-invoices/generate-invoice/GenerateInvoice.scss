@@ -1,0 +1,392 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.generate-invoice {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  // ---------- Header ----------
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    h1 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__header-actions,
+  &__filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { filter: brightness(0.93); }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--info { background-color: v.$color-info; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--navy { background-color: v.$color-navy; }
+    &--danger { background-color: v.$color-danger; }
+    &--wide { min-width: 7.5rem; }
+  }
+
+  &__input {
+    @include m.font-base;
+    width: 100%;
+    min-width: 0;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+
+    &--readonly {
+      background-color: v.$color-gray-100;
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  // ---------- Filters: 1 → 2 → 4 per row ----------
+  &__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    }
+  }
+
+  // ---------- Bulk commission bar (grey panel) ----------
+  &__bulk {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background-color: v.$color-gray-100;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: v.$spacing-4;
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 15rem) minmax(0, 15rem) 7.5rem 7rem;
+    }
+  }
+
+  &__message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    margin: 0;
+    font-size: v.$font-size-sm;
+
+    &--success { color: v.$color-success; }
+    &--error { color: v.$color-danger; }
+  }
+
+  // ---------- Contracts table (lg+; tablets get the cards, which need no sideways scrolling) ----------
+  &__table-view {
+    @include m.respond-below(lg) { display: none; }
+  }
+
+  // 9 columns don't need the shared table's 1200px minimum.
+  &__table .table {
+    min-width: 56rem;
+
+    // Tighter than the shared 16px so all 9 columns fit beside the sidebar on a laptop screen.
+    th,
+    td {
+      padding-left: 0.6rem;
+      padding-right: 0.6rem;
+    }
+
+    // Two-word headers (Contract Rate, Commission / MT, Total Commission) may wrap instead of widening the table.
+    th {
+      white-space: normal;
+      line-height: 1.25;
+      vertical-align: middle;
+    }
+
+    td {
+      vertical-align: middle;
+    }
+  }
+
+  // Long party names wrap so Commission / MT and Total Commission stay in view.
+  &__party {
+    display: inline-block;
+    min-width: 11rem;
+    max-width: 16rem;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  &__commission {
+    @include m.font-base;
+    width: 5rem;
+    height: 2.2rem;
+    padding: 0 v.$spacing-2;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-sm;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+  }
+
+  &__action {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: v.$radius-pill;
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+
+    &--buy { background-color: rgba(#50a5f1, 0.15); color: #1f6fae; }
+    &--sell { background-color: rgba(#34c38f, 0.15); color: #1f8a63; }
+  }
+
+  // ---------- Contract cards (phones and tablets): 1 per row, 2 per row on tablets ----------
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) { display: none; }
+  }
+
+  &__cards-empty {
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+
+  &__card {
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    &.is-selected {
+      border-color: v.$color-navy;
+      box-shadow: 0 0 0 1px v.$color-navy;
+    }
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.15rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+
+    .generate-invoice__commission {
+      width: 100%;
+      height: 2.5rem;
+    }
+  }
+
+  &__card-top {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    input {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+      accent-color: v.$color-navy;
+    }
+
+    strong { color: v.$color-navy; }
+
+    span {
+      margin-left: auto;
+      color: v.$color-text-muted;
+    }
+  }
+
+  &__card-full {
+    grid-column: 1 / -1;
+  }
+
+  &__card-total {
+    color: v.$color-navy !important;
+    font-weight: v.$font-weight-bold;
+  }
+
+  // ---------- Summary ----------
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+
+    h2 {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-lg;
+    }
+  }
+
+  &__summary-note {
+    margin: calc(-1 * #{v.$spacing-2}) 0 0;
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+  }
+
+  &__summary-scroll {
+    max-width: 50rem;
+    overflow-x: auto;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+  }
+
+  &__summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: v.$font-size-sm;
+
+    th,
+    td {
+      padding: 0.75rem v.$spacing-4;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background-color: v.$color-navy;
+      color: v.$color-white;
+      font-weight: v.$font-weight-semibold;
+    }
+
+    tbody tr + tr td {
+      border-top: 1px solid v.$color-border;
+    }
+
+    .is-amount {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__summary-empty {
+    color: v.$color-text-muted;
+    text-align: center !important;
+  }
+
+  // Difference / Remarks / Total Amount: stacked on phones, 3 across from tablet up.
+  &__totals {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    max-width: 50rem;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+
+    label {
+      color: v.$color-text;
+      font-size: 0.8rem;
+      font-weight: v.$font-weight-medium;
+    }
+  }
+
+  // ---------- Save / Cancel: stays in view at the bottom while scrolling ----------
+  &__footer {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 0 calc(-1 * #{v.$spacing-5}) calc(-1 * #{v.$spacing-5});
+    padding: v.$spacing-3 v.$spacing-5;
+    border-top: 1px solid v.$color-border;
+    border-radius: 0 0 v.$radius-md v.$radius-md;
+    background-color: v.$color-bg;
+
+    @include m.respond-below(sm) {
+      margin: 0 calc(-1 * #{v.$spacing-3}) calc(-1 * #{v.$spacing-3});
+      padding: v.$spacing-3;
+
+      > * { flex: 1; }
+    }
+  }
+}

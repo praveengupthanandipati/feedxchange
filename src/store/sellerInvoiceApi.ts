@@ -198,6 +198,7 @@ export const {
   useLazyGetInvoiceContractDetailsQuery,
   useGetInvoiceContractDetailsQuery,
   useSaveInvoicesMutation,
+  useLazyGetInvoicesQuery,
   useGetInvoicesQuery,
   useGetInvoiceFinancialYearsQuery,
   useUpdateInvoiceMutation,

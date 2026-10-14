@@ -98,7 +98,61 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
       <h1 className="header__title">{title}</h1>
 
       <div className="header__actions">
-        <NotificationBell />
+        <div className="header__notifications" ref={notificationsRef}>
+          <button
+            type="button"
+            className="header__icon-btn"
+            onClick={() => toggleMenu("notifications")}
+            aria-label="Notifications"
+            aria-expanded={openMenu === "notifications"}
+            aria-haspopup="true"
+          >
+            <FiBell aria-hidden />
+            {unreadCount > 0 && (
+              <span className="header__badge">{unreadCount}</span>
+            )}
+          </button>
+
+          {openMenu === "notifications" && (
+            <div className="header__dropdown header__dropdown--notifications">
+              <p className="header__dropdown-heading">Notifications</p>
+              <ul className="header__notification-list">
+                {notifications.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <li
+                      key={item.id}
+                      className={`header__notification ${item.read ? "" : "is-unread"}`}
+                    >
+                      <span className="header__notification-icon">
+                        <Icon aria-hidden />
+                      </span>
+                      <span className="header__notification-body">
+                        <span className="header__notification-title">
+                          {item.title}
+                        </span>
+                        <span className="header__notification-time">
+                          {item.time}
+                        </span>
+                      </span>
+                      {!item.read && <span className="header__notification-dot" />}
+                    </li>
+                  );
+                })}
+              </ul>
+              <button
+                type="button"
+                className="header__notifications-more"
+                onClick={() => {
+                  setOpenMenu(null);
+                  navigate("/notifications");
+                }}
+              >
+                View More Notifications
+              </button>
+            </div>
+          )}
+        </div>
 
         <button
           type="button"

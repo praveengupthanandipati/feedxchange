@@ -1,0 +1,552 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.view-invoices {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  // ---------- Header ----------
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    h1 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__header-actions,
+  &__filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { filter: brightness(0.93); }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--info { background-color: v.$color-info; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--navy { background-color: v.$color-navy; }
+    &--danger { background-color: v.$color-danger; }
+    &--ghost { background-color: v.$color-gray-100; color: v.$color-text; }
+    &--wide { min-width: 7.5rem; }
+  }
+
+  // ---------- Filters: 1 → 2 → 4 per row ----------
+  &__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    }
+  }
+
+  &__message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    margin: 0;
+    color: v.$color-success;
+    font-size: v.$font-size-sm;
+
+    &.is-pending {
+      padding: v.$spacing-2 v.$spacing-3;
+      border-radius: v.$radius-md;
+      background-color: rgba(v.$color-orange, 0.12);
+      color: #9a6a12;
+    }
+  }
+
+  // ---------- Table (lg+; tablets and phones get cards) ----------
+  &__table-view {
+    @include m.respond-below(lg) { display: none; }
+  }
+
+  &__table .table {
+    min-width: 56rem;
+
+    th,
+    td {
+      padding-left: 0.6rem;
+      padding-right: 0.6rem;
+      vertical-align: middle;
+    }
+  }
+
+  // Long company / party names wrap instead of pushing columns off-screen.
+  &__wrap {
+    display: inline-block;
+    min-width: 9rem;
+    max-width: 17rem;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-1;
+  }
+
+  &__icon-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 1.9rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover { filter: brightness(0.9); }
+
+    &--download { background-color: v.$color-navy; }
+    &--view { background-color: #50a5f1; }
+    &--edit { background-color: #f1b44c; }
+    &--delete { background-color: #f46a6a; }
+  }
+
+  &__expand {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1.5px solid v.$color-navy;
+    border-radius: 50%;
+    background: v.$color-bg;
+    color: v.$color-navy;
+    cursor: pointer;
+
+    &:hover { background-color: rgba(v.$color-navy, 0.08); }
+
+    &[aria-expanded="true"] {
+      background-color: v.$color-navy;
+      color: v.$color-white;
+    }
+  }
+
+  // ---------- Cards: 1 per row on phones, 2 on tablets ----------
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) { display: none; }
+  }
+
+  &__cards-empty {
+    grid-column: 1 / -1;
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    dl {
+      display: grid;
+      flex: 1;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-content: start;
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.15rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__card-top {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+    color: v.$color-navy;
+    font-size: v.$font-size-sm;
+
+    span { font-weight: v.$font-weight-bold; }
+  }
+
+  &__card-full {
+    grid-column: 1 / -1;
+  }
+
+  &__card-actions {
+    padding: 0 v.$spacing-3 v.$spacing-3;
+
+    .view-invoices__actions {
+      gap: v.$spacing-2;
+    }
+
+    // Larger tap targets, sharing the card's width.
+    .view-invoices__icon-btn {
+      flex: 1;
+      height: 2.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  // ---------- Pagination ----------
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    @include m.respond-below(sm) {
+      justify-content: center;
+    }
+
+    p {
+      margin: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+
+  // ---------- Save / Cancel: stays in view at the bottom while scrolling ----------
+  &__footer {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 0 calc(-1 * #{v.$spacing-5}) calc(-1 * #{v.$spacing-5});
+    padding: v.$spacing-3 v.$spacing-5;
+    border-top: 1px solid v.$color-border;
+    border-radius: 0 0 v.$radius-md v.$radius-md;
+    background-color: v.$color-bg;
+
+    @include m.respond-below(sm) {
+      margin: 0 calc(-1 * #{v.$spacing-3}) calc(-1 * #{v.$spacing-3});
+      padding: v.$spacing-3;
+
+      > * { flex: 1; }
+    }
+  }
+}
+
+// ---------- Contract lines (expanded row and View popup) ----------
+.invoice-lines {
+  max-width: 50rem;
+  margin: v.$spacing-3 v.$spacing-4 v.$spacing-4 v.$spacing-6;
+  border: 1px solid v.$color-border;
+  border-left: 3px solid v.$color-info;
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+  overflow: hidden;
+
+  .invoices-modal & {
+    max-width: none;
+    margin: 0;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    flex-wrap: wrap;
+    padding: v.$spacing-3 v.$spacing-4;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-info, 0.06);
+  }
+
+  &__title {
+    color: v.$color-navy;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__meta {
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+
+    strong { color: v.$color-navy; }
+  }
+
+  &__scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // Prefixed with .invoice-lines so it outranks the shared .table rules this sits inside.
+  & &__table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    font-size: v.$font-size-sm;
+
+    th,
+    td {
+      padding: 0.65rem v.$spacing-4;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      position: static;
+      border-bottom: 1px solid v.$color-border;
+      background-color: v.$color-gray-100 !important;
+      color: v.$color-text-muted !important;
+      font-size: 0.72rem;
+      font-weight: v.$font-weight-semibold;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    tbody tr {
+      border-top: none;
+
+      & + tr td { border-top: 1px solid v.$color-gray-100; }
+    }
+
+    tfoot td {
+      border-top: 1px solid v.$color-border;
+      background-color: rgba(v.$color-navy, 0.04);
+      color: v.$color-navy;
+      font-weight: v.$font-weight-semibold;
+    }
+
+    .is-num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+// ---------- Popups ----------
+.invoices-modal {
+  @include m.flex-center;
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal;
+  padding: v.$spacing-3;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  &__dialog {
+    width: 100%;
+    max-width: 34rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: v.$spacing-4;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-lg;
+
+    &--wide { max-width: 46rem; }
+
+    header {
+      @include m.flex(row, space-between, center, v.$spacing-2);
+
+      h2 {
+        margin: 0;
+        color: v.$color-navy;
+        font-size: v.$font-size-lg;
+      }
+
+      button {
+        @include m.flex-center;
+        width: 2rem;
+        height: 2rem;
+        border: none;
+        border-radius: v.$radius-sm;
+        background: transparent;
+        color: v.$color-text-muted;
+        font-size: 1.1rem;
+        cursor: pointer;
+
+        &:hover { background-color: v.$color-gray-100; }
+      }
+    }
+  }
+
+  &__sub {
+    margin: v.$spacing-1 0 v.$spacing-4;
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+  }
+
+  &__facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$spacing-2 v.$spacing-3;
+    margin: v.$spacing-3 0 v.$spacing-4;
+
+    @include m.respond-below(sm) {
+      grid-template-columns: 1fr;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.75rem;
+    }
+
+    dd {
+      margin: 0.1rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-semibold;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$spacing-3;
+
+    @include m.respond-below(sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+
+    &--wide { grid-column: 1 / -1; }
+
+    label {
+      color: v.$color-text;
+      font-size: 0.8rem;
+      font-weight: v.$font-weight-medium;
+    }
+
+    input,
+    textarea {
+      @include m.font-base;
+      width: 100%;
+      height: 2.5rem;
+      padding: 0 v.$spacing-3;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-navy;
+      }
+
+      &.is-readonly {
+        background-color: v.$color-gray-100;
+        font-weight: v.$font-weight-semibold;
+      }
+    }
+
+    textarea {
+      height: auto;
+      padding: v.$spacing-2 v.$spacing-3;
+      resize: vertical;
+    }
+  }
+
+  &__error {
+    margin: v.$spacing-3 0 0;
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+  }
+
+  &__actions {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    margin-top: v.$spacing-4;
+
+    @include m.respond-below(sm) {
+      > * { flex: 1; }
+    }
+  }
+}
+
+// Toggle All on phones/tablets shows each card's contracts under its buttons.
+.view-invoices__card .invoice-lines {
+  max-width: none;
+  margin: 0 v.$spacing-3 v.$spacing-3;
+}

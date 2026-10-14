@@ -18,6 +18,8 @@ interface TableProps<T> {
   minHeight?: boolean;
   /** Key of the row currently showing its expanded detail panel. */
   expandedRowKey?: string | null;
+  /** Keys of several rows to expand at once (e.g. "Expand All"); combined with `expandedRowKey`. */
+  expandedRowKeys?: string[];
   /** Renders a full-width panel in a row inserted directly below the row matching `expandedRowKey`. */
   renderExpandedRow?: (row: T) => ReactNode;
   /** "light" swaps the default solid navy header for a softer, bordered look — for pages that want a quieter table. */
@@ -71,6 +73,7 @@ function Table<T>({
   emptyMessage = "Currently no records found.",
   minHeight = false,
   expandedRowKey = null,
+  expandedRowKeys,
   renderExpandedRow,
   variant = "default",
   className = "",
@@ -177,7 +180,8 @@ function Table<T>({
             sortedData.map((row) => {
               const key = rowKey(row);
               const isSelected = selectedSet.has(key);
-              const isExpanded = Boolean(renderExpandedRow) && expandedRowKey === key;
+              const isExpanded =
+                Boolean(renderExpandedRow) && (expandedRowKey === key || Boolean(expandedRowKeys?.includes(key)));
               return (
                 <Fragment key={key}>
                   <tr

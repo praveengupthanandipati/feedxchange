@@ -28,11 +28,16 @@ export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/truck-management/pending-contracts", any: ["pending-contracts"] },
   { path: "/truck-management/pending-delivery-orders", any: ["pending-delivery-orders"] },
   { path: "/truck-management/pending-delivery-orders/*", any: ["pending-delivery-orders"] },
+  { path: "/truck-management/add-dispatch-by-user", any: ["dispatch-by-user.manage"] },
+  { path: "/truck-management/seller-dispatches-new", any: ["dispatch-by-admin.view"] },
+  { path: "/truck-management/seller-dispatches-new/*", any: ["dispatch-by-admin.view"] },
   { path: OPEN_PENDING, any: ["pending-contracts"] },
   { path: `${OPEN_PENDING}/*`, any: ["pending-contracts"] },
   { path: "/truck-management/bulk-freight-approval", any: ["bulk-freight-approval"] },
   { path: "/truck-management/assign-transports", any: ["pending-contracts", "freight-approval"] },
   { path: `${TRANSPORTERS}/freight-approval`, any: ["freight-approval"] },
+  { path: `${TRANSPORTERS}/transport-dashboard`, any: ["transport-dashboard"] },
+  { path: `${TRANSPORTERS}/dashboard`, any: ["transport-dashboard"] },
   { path: `${TRANSPORTERS}/driver-master/new`, any: ["drivers-master.manage"] },
   { path: `${TRANSPORTERS}/driver-master`, any: ["drivers-master.view"] },
   { path: `${TRANSPORTERS}/driver-master/:id`, any: ["drivers-master.view"] },
@@ -47,7 +52,7 @@ export const routePermissionRules: RoutePermissionRule[] = [
   // Overview page of each Sub Module: shown when any page inside it is
   { path: "/truck-management/transporters/overview", any: ["freight-approval", "transport-dashboard", "truck-master.view", "drivers-master.view", "driver-truck-mapping.view", "truck-trips.view"] },
   { path: "/payments/overview", any: ["payment-advice", "refunds.view", "seller-invoice.view", "payment-allocation"] },
-  { path: "/product-management/overview", any: ["products.view", "price.tracking", "price.history", "price.formula"] },
+  { path: "/product-management/overview", any: ["products.view", "products.manage", "categories.view", "price.tracking", "price.history", "price.formula"] },
   { path: "/reports/overview", any: ["reports"] },
 
   // Payments
@@ -80,6 +85,9 @@ export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/products/price-tracking", any: ["price.tracking"] },
   { path: "/products/price-history", any: ["price.history"] },
   { path: "/products/formula-calculations", any: ["price.formula"] },
+  { path: "/notifications", any: ["subscriptions.view"] },
+  // Interest of Payments has no permission keys yet, so its screens are open to any signed-in user.
+
   { path: "/products", any: ["products.view"] },
   { path: "/products/:id", any: ["products.view"] },
 

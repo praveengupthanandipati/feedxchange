@@ -1,4 +1,5 @@
 import type { AsideNavChild, AsideNavItem, AsideNavSection } from "./aside.types";
+import { localNavSections } from "./aside.data";
 
 type CanFn = (...keys: string[]) => boolean;
 
@@ -32,4 +33,32 @@ export const firstNavPath = (sections: AsideNavSection[]): string | null => {
     }
   }
   return null;
+};
+
+/**
+ * Adds menu sections the backend menu doesn't know about yet (Interest of Payments, Company Invoices), in order,
+ * right after User Management. A section the menu already has (any of its screens) is left where the backend put it,
+ * and the next local section follows it.
+ */
+export const withLocalSections = (sections: AsideNavSection[]): AsideNavSection[] => {
+  const result = [...sections];
+  const pathsOf = (section: AsideNavSection) =>
+    section.items.flatMap((item) => [item.path, ...(item.children ?? []).map((child) => child.path)]).filter(Boolean);
+
+  const userManagement = result.findIndex(
+    (section) => section.id === "user-management" || /user management/i.test(section.title ?? ""),
+  );
+  let at = userManagement === -1 ? result.length : userManagement + 1;
+
+  for (const local of localNavSections) {
+    const localPaths = new Set(pathsOf(local));
+    const existing = result.findIndex((section) => pathsOf(section).some((path) => localPaths.has(path)));
+    if (existing !== -1) {
+      at = existing + 1;
+      continue;
+    }
+    result.splice(at, 0, local);
+    at += 1;
+  }
+  return result;
 };

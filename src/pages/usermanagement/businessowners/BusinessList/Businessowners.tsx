@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus, FiSearch, FiX } from "react-icons/fi";
-import Table from "../../../../components/table/Table";
+import { FiEye, FiEyeOff, FiDownload, FiPlus, FiSearch, FiX, FiBriefcase, FiMapPin, FiPhone, FiTag } from "react-icons/fi";
 import type { TableColumn } from "../../../../components/table/table.types";
 import RowActionsMenu from "../../../../components/table/RowActionsMenu";
 import SearchableSelect from "../../../../components/dropdown/SearchableSelect";
@@ -11,7 +10,8 @@ import SuccessToast from "../../../../components/toast/SuccessToast";
 import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
 
 
-import "./Businessowners.scss";
+import "./Businessowners.scss";
+
 import Can from "../../../../auth/Can";
 import {
   useGetBusinessProfileSummaryQuery,
@@ -399,19 +399,45 @@ const Businessowners = () => {
           />
         )}
 
-        <Table
-          columns={columns}
-          data={pagedRows}
-          rowKey={(row) => String(row.profileId)}
-          emptyMessage={
-            isLoading
-              ? "Loading business owners…"
-              : error
-                ? "Failed to load business owners."
-                : "No business owners match the current filters."
-          }
-          minHeight
-        />
+        {isLoading ? (
+          <p className="business-owners-cards__message">Loading business owners…</p>
+        ) : error ? (
+          <p className="business-owners-cards__message">Failed to load business owners.</p>
+        ) : pagedRows.length === 0 ? (
+          <p className="business-owners-cards__message">No business owners match the current filters.</p>
+        ) : (
+          <div className="business-owners-cards">
+            {pagedRows.map((owner) => (
+              <article className="business-owner-card" key={owner.profileId}>
+                <div className="business-owner-card__topline">
+                  <span className="business-owner-card__icon"><FiBriefcase aria-hidden /></span>
+                  <StatusBadge status={owner.status} />
+                  <div className="business-owner-card__actions">
+                    <RowActionsMenu
+                      manageKeys={["profiles.business.manage"]}
+                      onView={() => handleView(owner)}
+                      onEdit={() => handleEdit(owner)}
+                      onDelete={() => handleDelete(owner)}
+                    />
+                  </div>
+                </div>
+
+                <Link to={`/business-owners/${owner.profileId}`} className="business-owner-card__name">
+                  {owner.legalName || owner.tradingName || "Unnamed Business"}
+                </Link>
+                {owner.tradingName && owner.tradingName !== owner.legalName && (
+                  <p className="business-owner-card__trading-name">{owner.tradingName}</p>
+                )}
+
+                <div className="business-owner-card__details">
+                  <span><FiTag aria-hidden /> {owner.businessTypeName || owner.businessUnitTypeName || "Business type not specified"}</span>
+                  <span><FiPhone aria-hidden /> {owner.mobileNumber || "Phone not provided"}</span>
+                  <span><FiMapPin aria-hidden /> {[owner.location, owner.stateName].filter(Boolean).join(", ") || "Location not provided"}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         <Pagination
           currentPage={currentPageClamped}

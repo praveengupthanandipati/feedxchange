@@ -1,0 +1,419 @@
+@use "../../../assets/styles/variables" as v;
+@use "../../../assets/styles/mixins" as m;
+
+.view-estimations {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  // ---------- Header ----------
+  &__header {
+    @include m.flex(row, space-between, flex-start, v.$spacing-3);
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: v.$spacing-1 v.$spacing-3;
+    min-width: 0;
+
+    h1 {
+      margin: 0;
+      color: v.$color-info;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+
+    span {
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:hover:not(:disabled) { filter: brightness(0.93); }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--info { background-color: #50a5f1; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--navy { background-color: v.$color-navy; }
+    &--ghost { background-color: v.$color-gray-100; color: v.$color-text; }
+  }
+
+  // ---------- Filters: party on its own row, then From / To / buttons ----------
+  &__filters {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+  }
+
+  &__filter-party {
+    width: 100%;
+
+    @include m.respond-to(sm) {
+      max-width: 24rem;
+    }
+  }
+
+  &__filter-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 24rem) minmax(0, 24rem) auto;
+    }
+  }
+
+  &__filter-actions {
+    display: flex;
+    gap: v.$spacing-2;
+
+    // Phones and tablets: Show / Reset share a full row.
+    @include m.respond-below(lg) {
+      grid-column: 1 / -1;
+
+      > * { flex: 1 1 0; }
+    }
+  }
+
+  &__message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    margin: 0;
+    color: v.$color-success;
+    font-size: v.$font-size-sm;
+
+    svg { flex-shrink: 0; }
+  }
+
+  // ---------- Table (lg+; phones and tablets get cards) ----------
+  &__table-view {
+    @include m.respond-below(lg) { display: none; }
+  }
+
+  &__table > .table {
+    min-width: 56rem;
+
+    th,
+    td {
+      padding-left: 0.6rem;
+      padding-right: 0.6rem;
+      vertical-align: middle;
+    }
+  }
+
+  // Long party names wrap instead of pushing columns off-screen.
+  &__wrap {
+    display: inline-block;
+    min-width: 10rem;
+    max-width: 20rem;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+  }
+
+  &__icon-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 1.9rem;
+    padding: 0;
+    border: none;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:hover { filter: brightness(0.9); }
+
+    &--download { background-color: v.$color-navy; }
+    &--view { background-color: #50a5f1; }
+    &--edit { background-color: #f1b44c; }
+    &--delete { background-color: #f46a6a; }
+  }
+
+  // ---------- Cards: 1 per row on phones, 2 on tablets ----------
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) { display: none; }
+  }
+
+  &__cards-empty {
+    grid-column: 1 / -1;
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    overflow: hidden;
+
+    dl {
+      display: grid;
+      flex: 1;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-content: start;
+      gap: v.$spacing-2 v.$spacing-3;
+      margin: 0;
+      padding: v.$spacing-3;
+    }
+
+    dt {
+      color: v.$color-text-muted;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.15rem 0 0;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__card-top {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.$color-border;
+    background-color: rgba(v.$color-navy, 0.06);
+    color: v.$color-navy;
+    font-size: v.$font-size-sm;
+
+    span {
+      font-weight: v.$font-weight-bold;
+      white-space: nowrap;
+    }
+  }
+
+  &__card-full {
+    grid-column: 1 / -1;
+  }
+
+  // Larger tap targets, sharing the card's width.
+  &__card-actions {
+    padding: 0 v.$spacing-3 v.$spacing-3;
+
+    .view-estimations__icon-btn {
+      flex: 1;
+      height: 2.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  // ---------- Pagination ----------
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    @include m.respond-below(sm) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    p {
+      margin: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
+
+// ---------- Popups (rendered into <body>) ----------
+.estimations-modal {
+  @include m.flex-center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: v.$z-index-modal;
+  padding: v.$spacing-3;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  &__dialog {
+    width: 100%;
+    max-width: 34rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: v.$spacing-4;
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-lg;
+
+    header {
+      @include m.flex(row, space-between, center, v.$spacing-2);
+
+      h2 {
+        margin: 0;
+        color: v.$color-navy;
+        font-size: v.$font-size-lg;
+      }
+
+      button {
+        @include m.flex-center;
+        width: 2rem;
+        height: 2rem;
+        border: none;
+        border-radius: v.$radius-sm;
+        background: transparent;
+        color: v.$color-text-muted;
+        font-size: 1.1rem;
+        cursor: pointer;
+
+        &:hover { background-color: v.$color-gray-100; }
+      }
+    }
+  }
+
+  &__sub {
+    margin: v.$spacing-1 0 v.$spacing-4;
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$spacing-3;
+
+    @include m.respond-below(sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+
+    &--wide { grid-column: 1 / -1; }
+
+    label {
+      color: v.$color-text;
+      font-size: 0.8rem;
+      font-weight: v.$font-weight-medium;
+    }
+
+    textarea {
+      @include m.font-base;
+      width: 100%;
+      padding: v.$spacing-2 v.$spacing-3;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      resize: vertical;
+      -webkit-appearance: none;
+      appearance: none;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-navy;
+      }
+    }
+  }
+
+  &__error {
+    margin: v.$spacing-3 0 0;
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+  }
+
+  &__actions {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    margin-top: v.$spacing-4;
+
+    @include m.respond-below(sm) {
+      > * { flex: 1; }
+    }
+  }
+}
