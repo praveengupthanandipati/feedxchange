@@ -19,6 +19,7 @@ import { formatApiDateTime } from "../../../../../utils/apiDateTime";
 import "../../../assign-transports/Assigntransports.scss";
 import "../../../transporter-review-assign-trucks/ReviewAndAssignTrucks.scss";
 import "./ManageSchedule.scss";
+import { useNotifyPrompt } from "../../../../../notifications/useNotifyPrompt";
 
 function statusModifier(statusLabel: string): string {
   const normalized = statusLabel.toLowerCase();
@@ -55,6 +56,7 @@ const ScheduleRequestRow = ({
   assignedQty,
 }: ScheduleRequestRowProps) => {
   const [updateScheduleDispatch, { isLoading: updating }] = useUpdateScheduleDispatchMutation();
+  const notify = useNotifyPrompt();
   const [cancelDispatchScheduleTransporter, { isLoading: cancelling }] =
     useCancelDispatchScheduleTransporterMutation();
   const [actionError, setActionError] = useState("");
@@ -118,6 +120,9 @@ const ScheduleRequestRow = ({
 
       if (!succeeded) {
         setActionError("The server rejected this acceptance. Please try again.");
+      } else {
+        // The admins and whoever created the schedule are told it was accepted.
+        notify.ask({ eventCode: "TRANSPORTER_ACCEPTED", title: "Notify about this acceptance", sourceEntityType: "DispatchScheduleTransporter", sourceEntityId: detail.dispatchScheduleTransporterId });
       }
     } catch {
       setActionError("Failed to accept this request. Please try again.");
@@ -208,6 +213,7 @@ const ScheduleRequestRow = ({
 
   return (
     <tr>
+      {notify.element}
       <td>{transporterName}</td>
       <td className="manage-schedule-table__action-cell">
         <div className="manage-schedule-table__actions">

@@ -2,6 +2,17 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { apiBaseQuery } from "../api/baseQuery";
 import { unwrapArray } from "./userProfilesCommonApi";
 
+/** The ids of the dispatches just created; the notification dialog needs them to know which truck to talk about. */
+export interface AddedTrucksResult {
+  contractDispatchIds: number[];
+}
+
+/** Whether the schedule saved, and its id (the notification about it is built from that record). */
+export interface ScheduleCreatedResult {
+  succeeded: boolean;
+  dispatchScheduleId: number;
+}
+
 export interface AddContractTruckPayload {
   contractId: number;
   truckAssignmentTypeId: number;
@@ -413,7 +424,7 @@ export const contractTrucksApi = createApi({
   tagTypes: ["ContractTruck"],
 
   endpoints: (builder) => ({
-    addContractTrucks: builder.mutation<boolean, AddContractTruckPayload>({
+    addContractTrucks: builder.mutation<AddedTrucksResult, AddContractTruckPayload>({
       query: ({ dispatchScheduleTransporterId, ...truck }) => ({
         url: "/api/ContractTrucks/AddContractTrucks",
         method: "POST",
@@ -427,7 +438,7 @@ export const contractTrucksApi = createApi({
       invalidatesTags: ["ContractTruck"],
     }),
 
-    addMultipleTrucks: builder.mutation<boolean, AddMultipleTrucksPayload>({
+    addMultipleTrucks: builder.mutation<AddedTrucksResult, AddMultipleTrucksPayload>({
       query: (body) => ({
         url: "/api/ContractTrucks/AddMultipleTrucks",
         method: "POST",
@@ -456,7 +467,7 @@ export const contractTrucksApi = createApi({
       invalidatesTags: ["ContractTruck"],
     }),
 
-    scheduleContractTrucks: builder.mutation<boolean, ScheduleContractTruckPayload>({
+    scheduleContractTrucks: builder.mutation<ScheduleCreatedResult, ScheduleContractTruckPayload>({
       query: (body) => ({
         url: "/api/ContractTrucks/ScheduleContractTrucks",
         method: "POST",

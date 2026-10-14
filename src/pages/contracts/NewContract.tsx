@@ -22,6 +22,10 @@ import {
   paymentTermsOptions,
 } from "./newContract.data";
 import "./NewContract.scss";
+import { usePermission } from "../../auth/AuthContext";
+import NotifyModal from "../../notifications/NotifyModal";
+import NotifyChoicePicker from "../../notifications/NotifyChoicePicker";
+import type { NotifyChoices } from "../../notifications/notifyChoices";
 import { useGetProductsQuery } from "../../store/productsApi";
 import {
   useGetBusinessProfileSummaryQuery,
@@ -361,6 +365,11 @@ const NewContract = () => {
   }, [contractDetails, navState]);
 
    const [saveContract, { isLoading: isSaving }] = useSaveContractMutation();
+  // After a contract is created the user chooses who to notify, on which channels and with which templates, before leaving the screen.
+  const canNotify = usePermission("notifications.send");
+  const [notifyContract, setNotifyContract] = useState<string | null>(null);
+  const [notifyAfterCreate, setNotifyAfterCreate] = useState(true);
+  const [notifyChoices, setNotifyChoices] = useState<NotifyChoices | null>(null);
    const [updateContract, { isLoading: isUpdating }] =
   useUpdateContractMutation();
   const isSubmitting = isSaving || isUpdating;
@@ -902,12 +911,19 @@ const { data: products } = useGetProductsQuery();
         JSON.stringify(createPayload, null, 2)
       );
 
-      await saveContract(createPayload).unwrap();
+      const created = await saveContract(createPayload).unwrap();
 
       localStorage.setItem(
         "successMessage",
         "Contract created successfully."
       );
+
+      // The API returns the new contract number. Offer to notify the buyer and seller (Skip / close continues to the list).
+      const createdNumber = typeof created === "string" ? created.replace(/^"|"$/g, "") : "";
+      if (canNotify && notifyAfterCreate && createdNumber) {
+        setNotifyContract(createdNumber);
+        return;
+      }
     }
 
     window.location.href = "/contracts";
@@ -1871,6 +1887,29 @@ const { data: products } = useGetProductsQuery();
         </table>
       </section>
 
+      {canNotify && !navState?.isEdit && (
+        <section className="new-contract__section">
+          <h2 className="new-contract__section-title">Notifications</h2>
+          <div className="form-check mb-3">
+            <input className="form-check-input" type="checkbox" id="notify-after-create" checked={notifyAfterCreate} onChange={(e) => setNotifyAfterCreate(e.target.checked)} />
+            <label className="form-check-label" htmlFor="notify-after-create">
+              Notify the buyer and seller when the contract is created
+            </label>
+            <div className="form-text">
+              Choose the channels and the template for each below. After you click Create Contract you will see exactly who will receive what and can still change it before anything is sent.
+            </div>
+          </div>
+          {notifyAfterCreate && (
+            <NotifyChoicePicker
+              eventCode="CONTRACT_CREATED"
+              roles={[{ code: "BUYER", label: "Buyer" }, { code: "SELLER", label: "Seller" }]}
+              value={notifyChoices}
+              onChange={setNotifyChoices}
+            />
+          )}
+        </section>
+      )}
+
       <div className="new-contract__actions">
         <Link to="/contracts" className="new-contract__cancel">
           Cancel
@@ -1888,6 +1927,18 @@ const { data: products } = useGetProductsQuery();
               : "Create Contract"}
         </button>
       </div>
+
+      <NotifyModal
+        open={notifyContract !== null}
+        title={`Contract ${notifyContract ?? ""} created - notify buyer and seller`}
+        eventCode="CONTRACT_CREATED"
+        contractNumber={notifyContract ?? undefined}
+        sendLabel="Send notifications"
+        closeOnBackdrop={false}
+        choices={notifyChoices}
+        onSkip={() => undefined}
+        onClose={() => { window.location.href = "/contracts"; }}
+      />
     </div>
   );
 };

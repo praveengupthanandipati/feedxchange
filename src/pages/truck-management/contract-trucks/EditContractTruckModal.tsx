@@ -13,6 +13,7 @@ import { splitApiDateTimeForForm } from "../../../utils/apiDateTime";
 import "../assign-transports/instant-truck-assignment/InstantTruckAssignment.scss";
 import "../../../components/dialog/ConfirmDialog.scss";
 import "./EditContractTruckModal.scss";
+import { useNotifyPrompt } from "../../../notifications/useNotifyPrompt";
 
 interface FormState {
   truck: string;
@@ -52,6 +53,7 @@ const EditContractTruckModal = ({
   const { data: trucks } = useGetAllActiveTruckDetailsQuery(undefined, { skip: !open });
   const { data: drivers } = useGetAllActiveDriversQuery(undefined, { skip: !open });
   const [updateContractTrucks, { isLoading: saving }] = useUpdateContractTrucksMutation();
+  const notify = useNotifyPrompt();
 
   const [form, setForm] = useState<FormState>({
     truck: "",
@@ -191,7 +193,8 @@ const EditContractTruckModal = ({
         return;
       }
 
-      onSaved();
+      // The supplier's reply: offer to tell the transporter, driver, admins and buyer, then close.
+      notify.ask({ eventCode: "SUPPLIER_REPLIED", title: "Notify about this truck update", contractId: truck.contractId, sourceEntityType: "ContractTruckDispatch", sourceEntityId: truck.contractDispatchId }, () => onSaved());
     } catch {
       setSubmitError("Failed to update this truck. Please try again.");
     }
@@ -376,6 +379,7 @@ const EditContractTruckModal = ({
           <FiX aria-hidden />
         </button>
       </div>
+      {notify.element}
     </div>,
     document.body,
   );

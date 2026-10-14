@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FiBell,
   FiMaximize,
   FiMinimize2,
   FiChevronDown,
@@ -10,7 +9,7 @@ import {
   FiLogOut,
   FiMenu,
 } from "react-icons/fi";
-import { notifications } from "./header.data";
+import NotificationBell from "../../notifications/NotificationBell";
 import { useAuth } from "../../auth/AuthContext";
 import "./Header.scss";
 
@@ -27,7 +26,7 @@ const initialsOf = (name: string) =>
     .map((part) => part[0]?.toUpperCase())
     .join("") || "U";
 
-type OpenMenu = "notifications" | "user" | null;
+type OpenMenu = "user" | null;
 
 const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
   const navigate = useNavigate();
@@ -36,10 +35,7 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
   const USER_INITIALS = initialsOf(displayName);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
-  const notificationsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  const unreadCount = notifications.filter((item) => !item.read).length;
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -55,7 +51,6 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (notificationsRef.current?.contains(target)) return;
       if (userMenuRef.current?.contains(target)) return;
       setOpenMenu(null);
     };
