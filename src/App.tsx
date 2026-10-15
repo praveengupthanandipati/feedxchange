@@ -59,6 +59,7 @@ import Testimonials from './pages/masters/testimonials/Testimonials'
 import Blogs from './pages/masters/blogs/Blogs'
 import Users from './pages/masters/users/Users'
 import RegistrationDetails from './pages/masters/registration-details/RegistrationDetails'
+import Settings from './pages/settings/Settings'
 import ViewInvoices from './pages/company-invoices/view-invoices/ViewInvoices'
 import PriceHistory from './pages/product-management/price-history/ProductPrieHistory'
 import FormulaCalculations from './pages/product-management/formula-calculations/FormulaCalculations'
@@ -128,6 +129,7 @@ function App() {
 
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/contracts/:id" element={<ContractDetail />} />
           <Route path="/contracts/:id/notifications" element={<ContractNotificationHistory />} />
