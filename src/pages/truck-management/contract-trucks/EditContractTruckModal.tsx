@@ -8,11 +8,12 @@ import AddressSelectField from "./AddressSelectField";
 import { timeOptions } from "../open-pending-contracts/contract-trucks/contractDispatch.options";
 import { useGetAllActiveTruckDetailsQuery } from "../../../store/trucksApi";
 import { useGetAllActiveDriversQuery } from "../../../store/driversApi";
-import { useUpdateContractTrucksMutation, type TruckByContract } from "../../../store/contractTrucksApi";
+import { getApiErrorMessage, useUpdateContractTrucksMutation, type TruckByContract } from "../../../store/contractTrucksApi";
 import { splitApiDateTimeForForm } from "../../../utils/apiDateTime";
 import "../assign-transports/instant-truck-assignment/InstantTruckAssignment.scss";
 import "../../../components/dialog/ConfirmDialog.scss";
 import "./EditContractTruckModal.scss";
+import { useNotifyPrompt } from "../../../notifications/useNotifyPrompt";
 
 interface FormState {
   truck: string;
@@ -52,6 +53,7 @@ const EditContractTruckModal = ({
   const { data: trucks } = useGetAllActiveTruckDetailsQuery(undefined, { skip: !open });
   const { data: drivers } = useGetAllActiveDriversQuery(undefined, { skip: !open });
   const [updateContractTrucks, { isLoading: saving }] = useUpdateContractTrucksMutation();
+  const notify = useNotifyPrompt();
 
   const [form, setForm] = useState<FormState>({
     truck: "",
@@ -191,9 +193,12 @@ const EditContractTruckModal = ({
         return;
       }
 
-      onSaved();
-    } catch {
-      setSubmitError("Failed to update this truck. Please try again.");
+      // The supplier's reply: offer to tell the transporter, driver, admins and buyer, then close.
+      notify.ask({ eventCode: "SUPPLIER_REPLIED", title: "Notify about this truck update", contractId: truck.contractId, sourceEntityType: "ContractTruckDispatch", sourceEntityId: truck.contractDispatchId }, () => onSaved());
+    } catch (error) {
+      // A refusal sent with an error status carries its reason in the body.
+      const data = error && typeof error === "object" ? (error as { data?: unknown }).data : undefined;
+      setSubmitError(getApiErrorMessage(data) || "Failed to update this truck. Please try again.");
     }
   };
 
@@ -376,6 +381,7 @@ const EditContractTruckModal = ({
           <FiX aria-hidden />
         </button>
       </div>
+      {notify.element}
     </div>,
     document.body,
   );

@@ -1,4 +1,9 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import Can from "../../auth/Can";
+import NotifyModal from "../../notifications/NotifyModal";
+import ShareInformationModal from "../../notifications/ShareInformationModal";
+import { INFORMATION_TYPES } from "../../notifications/informationTypes";
 import { useGetContractByContractNumberQuery } from "../../store/contractsApi";
 import "./ContractDetail.scss";
 import "./NewContract.scss";
@@ -25,6 +30,8 @@ const DetailField = ({ label, value }: { label: string; value: unknown }) => (
 
 const ContractDetail = () => {
   const { id = "" } = useParams<{ id: string }>();
+  const [notifyOpen, setNotifyOpen] = useState(false);
+  const [shareType, setShareType] = useState<string | null>(null);
   const { data, isLoading, error } = useGetContractByContractNumberQuery(
     decodeURIComponent(id),
     { skip: !id },
@@ -54,9 +61,40 @@ const ContractDetail = () => {
                 <h1>Contract {displayValue(source.contractNumber ?? id)}</h1>
                 <p>{displayValue(source.contractDate)}</p>
               </div>
-              <span className="contracts-table__status">{displayValue(basicDetails.calculatedStatus)}</span>
+              <div className="d-flex flex-wrap align-items-center gap-2">
+                <Can any={["notifications.send"]}>
+                  <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setNotifyOpen(true)}>Notify</button>
+                </Can>
+                <Can any={["notifications.send"]}>
+                  <div className="dropdown">
+                    <button type="button" className="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Share information</button>
+                    <ul className="dropdown-menu">
+                      {INFORMATION_TYPES.map((t) => (
+                        <li key={t.value}><button type="button" className="dropdown-item" onClick={() => setShareType(t.value)}>{t.label}</button></li>
+                      ))}
+                    </ul>
+                  </div>
+                </Can>
+                <Can any={["notifications.history"]}>
+                  <Link className="btn btn-outline-secondary btn-sm" to={`/contracts/${encodeURIComponent(String(source.contractNumber ?? id))}/notifications`}>Notification history</Link>
+                </Can>
+                <span className="contracts-table__status">{displayValue(basicDetails.calculatedStatus)}</span>
+              </div>
             </div>
           </div>
+          <ShareInformationModal
+            open={shareType !== null}
+            onClose={() => setShareType(null)}
+            informationType={shareType ?? "GREETING"}
+            contractNumber={String(source.contractNumber ?? id)}
+          />
+          <NotifyModal
+            open={notifyOpen}
+            onClose={() => setNotifyOpen(false)}
+            title={`Notify about contract ${displayValue(source.contractNumber ?? id)}`}
+            eventCode="OPEN_TEXT_SHARED"
+            contractNumber={String(source.contractNumber ?? id)}
+          />
 
           <div className="contract-detail__layout">
             <div className="contract-detail__main">

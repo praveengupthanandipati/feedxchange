@@ -11,6 +11,7 @@ import {
   useGetInvoicesQuery,
   type Invoice,
 } from "../../../store/sellerInvoiceApi";
+import { useNotifyPrompt } from "../../../notifications/useNotifyPrompt";
 import "./EditSellerInvoices.scss";
 
 const PAGE_SIZE = 10;
@@ -53,6 +54,7 @@ const EditSellerInvoices = () => {
     { refetchOnMountOrArgChange: true },
   );
   const [cancelInvoice, { isLoading: cancelBusy }] = useCancelInvoiceMutation();
+  const notify = useNotifyPrompt();
 
   useEffect(() => {
     if (!toast) return;
@@ -69,6 +71,14 @@ const EditSellerInvoices = () => {
     try {
       await cancelInvoice({ invoiceId: cancelling.invoiceId, reason: cancelReason.trim() || undefined }).unwrap();
       setToast({ kind: "ok", text: `Invoice ${cancelling.invoiceNumber} cancelled.` });
+      // The buyer may already have been told about this invoice, so offer to tell them it is cancelled (the seller can be added in the dialog).
+      notify.ask({
+        eventCode: "INVOICE_CANCELLED",
+        title: `Notify the buyer that invoice ${cancelling.invoiceNumber} is cancelled`,
+        sourceEntityType: "ContractInvoice",
+        sourceEntityId: cancelling.invoiceId,
+        contractNumber: cancelling.contractNumber,
+      });
     } catch (e) {
       setToast({ kind: "error", text: apiErrorMessage(e, "The invoice could not be cancelled.") });
     } finally {
@@ -126,6 +136,7 @@ const EditSellerInvoices = () => {
 
   return (
     <div className="edit-invoices">
+      {notify.element}
       {toast && (
         <div className={`edit-invoices__toast edit-invoices__toast--${toast.kind}`} role="status">
           {toast.kind === "ok" && <FiCheckCircle aria-hidden />} {toast.text}
@@ -218,6 +229,14 @@ const EditSellerInvoices = () => {
         onSaved={(invoice) => {
           setEditing(null);
           setToast({ kind: "ok", text: `Invoice ${invoice.invoiceNumber} updated.` });
+          // The buyer may already have been told about this invoice, so offer to send the corrected figures (the seller can be added in the dialog).
+          notify.ask({
+            eventCode: "INVOICE_EDITED",
+            title: `Notify the buyer that invoice ${invoice.invoiceNumber} was amended`,
+            sourceEntityType: "ContractInvoice",
+            sourceEntityId: invoice.invoiceId,
+            contractNumber: invoice.contractNumber,
+          });
         }}
       />
 

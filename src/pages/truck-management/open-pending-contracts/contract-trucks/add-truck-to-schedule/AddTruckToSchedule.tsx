@@ -22,6 +22,7 @@ import "../../../assign-transports/Assigntransports.scss";
 import "../../../assign-transports/instant-truck-assignment/InstantTruckAssignment.scss";
 import "../contractDispatch.shared.scss";
 import "./AddTruckToSchedule.scss";
+import { useNotifyPrompt } from "../../../../../notifications/useNotifyPrompt";
 
 interface TruckRow {
   id: string;
@@ -84,6 +85,7 @@ const AddTruckToScheduleForm = ({
   const { data: transporters } = useGetTransporterProfileSummaryQuery();
   const { data: trucks } = useGetAllActiveTruckDetailsQuery();
   const [addMultipleTrucks, { isLoading: saving }] = useAddMultipleTrucksMutation();
+  const notify = useNotifyPrompt();
 
   const scheduleTypeId = useMemo(
     () =>
@@ -127,7 +129,8 @@ const AddTruckToScheduleForm = ({
 
   // Give the success note a moment, then go back to Manage Schedule.
   useEffect(() => {
-    if (!saved) return;
+    // Hold the redirect while the "notify" dialog is open; it would be torn down with this page.
+    if (!saved || notify.busy) return;
     const timer = window.setTimeout(
       () =>
         navigate(
@@ -138,7 +141,7 @@ const AddTruckToScheduleForm = ({
       REDIRECT_DELAY_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [saved, navigate, contractNumber]);
+  }, [saved, notify.busy, navigate, contractNumber]);
 
 
 
@@ -225,6 +228,7 @@ const AddTruckToScheduleForm = ({
       }
 
       setSaved(true);
+      notify.ask(succeeded.contractDispatchIds.map((id) => ({ eventCode: "TRUCK_ADDED", title: "Notify about the truck added", contractId: detail.contractId, sourceEntityType: "ContractTruckDispatch", sourceEntityId: id })));
     } catch {
       setSubmitError("Failed to add the trucks to this schedule. Please try again.");
     }
@@ -250,6 +254,7 @@ const AddTruckToScheduleForm = ({
 
   return (
     <div className="assign-truck-drawer__body">
+      {notify.element}
       {saved && (
         <div className="dispatch-form-success">
           <FiCheckCircle aria-hidden />

@@ -20,6 +20,7 @@ import { useScheduleContractTrucksMutation } from "../../../../../store/contract
 import "../../../assign-transports/Assigntransports.scss";
 import "../../../assign-transports/schedule-truck-assignment/ScheduleTruckAssignment.scss";
 import "../contractDispatch.shared.scss";
+import { useNotifyPrompt } from "../../../../../notifications/useNotifyPrompt";
 
 type BillChangeOption = "direct" | "changeToBeDone";
 
@@ -74,6 +75,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
 
   const { data: transporters } = useGetTransporterProfileSummaryQuery();
   const [scheduleContractTrucks, { isLoading: saving }] = useScheduleContractTrucksMutation();
+  const notify = useNotifyPrompt();
 
   const transporterOptions = useMemo(
     () => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })),
@@ -92,7 +94,8 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
 
   // Give the success note a moment, then go back to Manage Schedule.
   useEffect(() => {
-    if (!saved) return;
+    // Hold the redirect while the "notify" dialog is open; it would be torn down with this page.
+    if (!saved || notify.busy) return;
     const timer = window.setTimeout(
       () =>
         navigate(
@@ -103,7 +106,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
       REDIRECT_DELAY_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [saved, navigate, contractNumber]);
+  }, [saved, notify.busy, navigate, contractNumber]);
 
 
   const validate = (): FormErrors => {
@@ -156,7 +159,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
       const defaultStatus =
         scheduleStatuses?.find((s) => s.statusName.toLowerCase() === "planned") ?? scheduleStatuses?.[0];
 
-      const succeeded = await scheduleContractTrucks({
+      const created = await scheduleContractTrucks({
         transporters: form.transporters.map(Number),
         contractId,
         scheduleDateTime: new Date(`${form.date}T${form.time}`).toISOString(),
@@ -172,13 +175,15 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
         autoApprove: form.autoApprove,
       }).unwrap();
 
-      if (!succeeded) {
+      if (!created.succeeded) {
         setSubmitError("The server rejected this scheduled request. Please try again.");
         return;
       }
 
       setSaved(true);
       handleReset();
+      // Tell the transporters it was sent to: the user picks recipients, channels and templates.
+      notify.ask({ eventCode: "DISPATCH_SCHEDULED", title: "Notify the transporters about this truck request", contractId, sourceEntityType: "DispatchSchedule", sourceEntityId: created.dispatchScheduleId });
     } catch {
       setSubmitError("Failed to save the scheduled request. Please try again.");
     }
@@ -186,6 +191,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
 
   return (
     <div className="schedule-request-drawer__body schedule-dispatch-form">
+      {notify.element}
       {saved && (
         <div className="dispatch-form-success">
           <FiCheckCircle aria-hidden />

@@ -2,6 +2,10 @@ import './assets/styles/App.scss'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { SelectedContractProvider } from './context/SelectedContractContext'
 import { AuthProvider } from './auth/AuthContext'
+import { NotificationProvider } from './notifications/NotificationProvider'
+import ContractNotificationHistory from './pages/notifications/ContractNotificationHistory'
+import NotificationInbox from './pages/notifications/NotificationInbox'
+import TemplateAdmin from './pages/notifications/TemplateAdmin'
 import AppLayout from './components/layout/AppLayout'
 import Login from './pages/login/Login'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -116,6 +120,7 @@ import UserAccess from './pages/roles/UserAccess'
 function App() {
   return (
     <AuthProvider>
+    <NotificationProvider>
     <SelectedContractProvider>
     <Router>
       <Routes>
@@ -127,6 +132,9 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/contracts/:id" element={<ContractDetail />} />
+          <Route path="/contracts/:id/notifications" element={<ContractNotificationHistory />} />
+          <Route path="/notifications" element={<NotificationInbox />} />
+          <Route path="/notification-templates" element={<TemplateAdmin />} />
           <Route path="/contracts/new" element={<NewContract />} />
           <Route path="/business-owners" element={<Businessowners />} />
           <Route path="/business-owners/:id" element={<BusinessOwnerDetail />} />
@@ -251,6 +259,7 @@ function App() {
       </Routes>
     </Router>
     </SelectedContractProvider>
+    </NotificationProvider>
     </AuthProvider>
   )
 }

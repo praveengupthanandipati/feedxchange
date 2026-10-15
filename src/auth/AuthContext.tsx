@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { apiFetch, revokeSessionOnServer, SESSION_REFRESHED_EVENT } from "../api/tokenRefresh";
+import { unsubscribeWebPush } from "../notifications/webPush";
 import { hasAnyPermission } from "./access";
 import { canOnPage } from "./menu";
 import type { AccessMenu, PageAction } from "./menu";
@@ -64,6 +65,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const reload = useCallback(() => setState(readState()), []);
 
   const logout = useCallback(() => {
+    // This browser must stop receiving the signed-out user's desktop notifications. Start it first: it needs the token to tell the server.
+    void unsubscribeWebPush();
     revokeSessionOnServer(); // reads the refresh token, so it must run before the session is cleared
     clearSession();
     setMenu(null);

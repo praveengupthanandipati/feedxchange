@@ -49,15 +49,15 @@ export function buildPendingContractColumns({
     render: (row) => (
       <span
         className={
-          row.dQtyValue > 0
-            ? "pending-contracts-table__status pending-contracts-table__status--pending"
-            : "pending-contracts-table__status pending-contracts-table__status--open"
+          row.status === "Open"
+            ? "pending-contracts-table__status pending-contracts-table__status--open"
+            : "pending-contracts-table__status pending-contracts-table__status--pending"
         }
       >
-        {row.dQtyValue > 0 ? "Pending" : "Open"}
+        {row.status}
       </span>
     ),
-    exportValue: (row) => (row.dQtyValue > 0 ? "Pending" : "Open"),
+    exportValue: (row) => row.status,
   },
   {
     key: "date",

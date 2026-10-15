@@ -3,6 +3,7 @@ import { FiMail, FiDownload } from "react-icons/fi";
 import Table from "../../../../components/table/Table";
 import type { TableColumn } from "../../../../components/table/table.types";
 import ShareModal from "../../../../components/dialog/ShareModal";
+import ShareInformationModal from "../../../../notifications/ShareInformationModal";
 import type { ShareModalPayload } from "../../../../components/dialog/ShareModal";
 import type { BankRow, DocumentRow, BusinessOwnerProfile } from "./businessOwnerDetail.data";
 import { toRecipientOptions } from "./businessOwnerDetail.data";
@@ -60,10 +61,6 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
     },
   ];
 
-  const handleSendBank = (_payload: ShareModalPayload) => {
-    setSelectedBankKeys([]);
-  };
-
   const handleSendDocuments = (_payload: ShareModalPayload) => {
     setSelectedDocumentKeys([]);
   };
@@ -118,14 +115,13 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
         />
       </section>
 
-      <ShareModal
+      {/* Real sending: pick people, channels and a template. The message carries the bank name only - never account number or IFSC. */}
+      <ShareInformationModal
         open={bankModalOpen}
-        title="Send Bank Details"
-        onClose={() => setBankModalOpen(false)}
-        onSend={handleSendBank}
-        recipientOptions={recipientOptions}
-        messagePlaceholder="Enter your message about bank details"
-        confirmLabel="Send Bank Details"
+        onClose={() => { setBankModalOpen(false); setSelectedBankKeys([]); }}
+        informationType="BANK_DETAILS"
+        profileId={profile.profileId}
+        title="Send bank details"
       />
 
       <ShareModal

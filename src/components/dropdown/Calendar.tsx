@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useEffect, useRef, useState } from "react";
+import { FiChevronDown, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import "./DateRangeInput.scss";
 
 const MONTHS = [
@@ -54,6 +54,26 @@ interface CalendarProps {
  */
 const Calendar = ({ from, to = "", onPick, min, max }: CalendarProps) => {
   const [view, setView] = useState(() => monthOf(from || to));
+  const [yearOpen, setYearOpen] = useState(false);
+  // While true, a grid of the 12 months takes the place of the day grid (no extra height or width).
+  const [monthsOpen, setMonthsOpen] = useState(false);
+  const yearRef = useRef<HTMLDivElement>(null);
+  const yearListRef = useRef<HTMLUListElement>(null);
+
+  // A short scrolling list (5 years visible) instead of a native <select>, whose list fills the whole
+  // screen on phones. Opens centred on the selected year.
+  useEffect(() => {
+    if (!yearOpen) return;
+    const list = yearListRef.current;
+    const selected = list?.querySelector<HTMLElement>(".is-selected");
+    if (list && selected) list.scrollTop = selected.offsetTop - (list.clientHeight - selected.offsetHeight) / 2;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!yearRef.current?.contains(event.target as Node)) setYearOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [yearOpen]);
 
   const shiftMonth = (delta: number) => {
     setView(({ year, month }) => {
@@ -71,20 +91,87 @@ const Calendar = ({ from, to = "", onPick, min, max }: CalendarProps) => {
   const now = new Date();
   const todayIso = toIso(now.getFullYear(), now.getMonth(), now.getDate());
 
+  // Year dropdown spans min..max when given, else 100 years back (dates of birth) to 20 ahead.
+  const firstYear = Math.min(min ? Number(min.slice(0, 4)) : now.getFullYear() - 100, view.year);
+  const lastYear = Math.max(max ? Number(max.slice(0, 4)) : now.getFullYear() + 20, view.year);
+  const years = Array.from({ length: lastYear - firstYear + 1 }, (_, index) => lastYear - index);
+
   return (
     <>
       <div className="date-range-input__month">
         <button type="button" onClick={() => shiftMonth(-1)} aria-label="Previous month">
           <FiChevronLeft aria-hidden />
         </button>
-        <strong>
-          {MONTHS[view.month]} {view.year}
-        </strong>
+        <span className="date-range-input__month-selects">
+          <button
+            type="button"
+            className="date-range-input__month-trigger"
+            onClick={() => setMonthsOpen((prev) => !prev)}
+            aria-expanded={monthsOpen}
+            aria-label={`Month ${MONTHS[view.month]}`}
+          >
+            {MONTHS[view.month].slice(0, 3)}
+            <FiChevronDown aria-hidden />
+          </button>
+          <div className="date-range-input__month-year" ref={yearRef}>
+            <button
+              type="button"
+              className="date-range-input__month-trigger"
+              onClick={() => setYearOpen((prev) => !prev)}
+              aria-haspopup="listbox"
+              aria-expanded={yearOpen}
+              aria-label={`Year ${view.year}`}
+            >
+              {view.year}
+              <FiChevronDown aria-hidden />
+            </button>
+            {yearOpen && (
+              <ul className="date-range-input__month-year-list" role="listbox" aria-label="Year" ref={yearListRef}>
+                {years.map((year) => (
+                  <li key={year}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={year === view.year}
+                      className={year === view.year ? "is-selected" : ""}
+                      onClick={() => {
+                        setView({ year, month: view.month });
+                        setYearOpen(false);
+                      }}
+                    >
+                      {year}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </span>
         <button type="button" onClick={() => shiftMonth(1)} aria-label="Next month">
           <FiChevronRight aria-hidden />
         </button>
       </div>
 
+      {monthsOpen ? (
+        <div className="date-range-input__months" role="listbox" aria-label="Month">
+          {MONTHS.map((name, index) => (
+            <button
+              type="button"
+              key={name}
+              role="option"
+              aria-selected={index === view.month}
+              aria-label={name}
+              className={`date-range-input__day ${index === view.month ? "is-edge" : ""}`}
+              onClick={() => {
+                setView({ year: view.year, month: index });
+                setMonthsOpen(false);
+              }}
+            >
+              {name.slice(0, 3)}
+            </button>
+          ))}
+        </div>
+      ) : (
       <div className="date-range-input__days" role="grid">
         {WEEKDAYS.map((weekday) => (
           <span className="date-range-input__weekday" key={weekday}>
@@ -120,6 +207,7 @@ const Calendar = ({ from, to = "", onPick, min, max }: CalendarProps) => {
           );
         })}
       </div>
+      )}
     </>
   );
 };
