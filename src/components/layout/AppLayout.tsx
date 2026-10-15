@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Aside from "../asidemenu/aside";
 import Header from "../header/Header";
+import BottomNav from "../bottomnav/BottomNav";
 import { RequireSession, RoutePermissionGate } from "../../auth/RouteGuard";
 
 const AppLayout = () => {
@@ -31,6 +32,7 @@ const AppLayout = () => {
             <Outlet />
           </RoutePermissionGate>
         </main>
+        <BottomNav />
       </div>
     </div>
     </RequireSession>
