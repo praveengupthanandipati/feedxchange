@@ -1,0 +1,29 @@
+// ============================================================
+// Website stylesheet. Every partial is loaded inside .fx-site,
+// so none of it reaches the admin application, and the app's
+// global styles (Bootstrap, App.scss) are reset inside it.
+// ============================================================
+@use "sass:meta";
+@use "variables" as v;
+
+.fx-site {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: v.$surface;
+  color: v.$ink;
+  font-family: v.$font-body;
+  font-size: v.$fs-base;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  @include meta.load-css("base");
+  @include meta.load-css("buttons");
+  @include meta.load-css("header");
+  @include meta.load-css("footer");
+  @include meta.load-css("sections");
+  @include meta.load-css("pages");
+}

@@ -1,0 +1,222 @@
+@use "variables" as v;
+@use "mixins" as m;
+
+.site-footer {
+  flex-shrink: 0;
+  background-color: v.$navy-900;
+  color: rgba(v.$white, 0.7);
+  font-size: v.$fs-sm;
+
+  h3 {
+    margin-bottom: v.$space-4;
+    color: v.$white;
+    font-size: v.$fs-base;
+    font-weight: v.$fw-semibold;
+  }
+
+  a {
+    @include m.focus-ring;
+    border-radius: 3px;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: v.$orange-500;
+    }
+  }
+
+  // 1 column on phones → 2 on tablets → brand + 3 link columns + newsletter on desktops.
+  &__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: v.$space-6;
+    padding-top: v.$space-8;
+    padding-bottom: v.$space-7;
+
+    @include m.up(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.up(lg) {
+      grid-template-columns: 1.4fr 0.8fr 0.8fr 1.3fr 1.3fr;
+      gap: v.$space-6;
+    }
+  }
+
+  &__brand {
+    @include m.up(sm) {
+      grid-column: 1 / -1;
+    }
+
+    @include m.up(lg) {
+      grid-column: auto;
+    }
+
+    p {
+      max-width: 22rem;
+      margin: v.$space-4 0 v.$space-5;
+      line-height: 1.7;
+    }
+  }
+
+  &__social {
+    @include m.reset-list;
+    display: flex;
+    gap: v.$space-2;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border: 1px solid rgba(v.$white, 0.15);
+      border-radius: 50%;
+      color: v.$white;
+      font-size: 1.05rem;
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s v.$ease;
+
+      &:hover {
+        border-color: v.$orange-500;
+        background-color: v.$orange-500;
+        color: v.$navy-900;
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  &__col ul {
+    @include m.reset-list;
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-3;
+  }
+
+  &__contact li {
+    display: flex;
+    align-items: flex-start;
+    gap: v.$space-3;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 0.2rem;
+      color: v.$orange-500;
+    }
+  }
+
+  &__newsletter {
+    p {
+      margin-bottom: v.$space-4;
+    }
+  }
+
+  &__subscribe {
+    display: flex;
+    padding: 0.3rem;
+    border: 1px solid rgba(v.$white, 0.15);
+    border-radius: v.$radius-pill;
+    background-color: rgba(v.$white, 0.06);
+
+    &:focus-within {
+      border-color: v.$orange-500;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 0 v.$space-3;
+      border: none;
+      background: transparent;
+      color: v.$white;
+      // 16px stops iOS Safari zooming in when the field is focused.
+      font-size: 1rem;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+
+      &::placeholder {
+        color: rgba(v.$white, 0.45);
+        opacity: 1;
+      }
+    }
+
+    button {
+      @include m.focus-ring;
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border: none;
+      border-radius: 50%;
+      background-color: v.$orange-500;
+      color: v.$navy-900;
+      cursor: pointer;
+
+      &:hover {
+        background-color: v.$orange-600;
+      }
+    }
+  }
+
+  &__status {
+    display: block;
+    min-height: 1.25rem;
+    margin-top: v.$space-2;
+    font-size: v.$fs-xs;
+
+    &.is-error {
+      color: #ff9a9a;
+    }
+
+    &.is-done {
+      color: #7ee2b0;
+    }
+  }
+
+  &__bottom {
+    border-top: 1px solid rgba(v.$white, 0.1);
+    // Clears the iPhone home indicator.
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  &__bottom-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-3;
+    padding-top: v.$space-5;
+    padding-bottom: v.$space-5;
+    text-align: center;
+
+    @include m.up(md) {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+    }
+
+    ul {
+      @include m.reset-list;
+      display: flex;
+      gap: v.$space-5;
+    }
+  }
+}
+
+// Screen-reader-only text.
+.visually-hidden-site {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

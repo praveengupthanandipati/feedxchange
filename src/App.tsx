@@ -6,6 +6,7 @@ import { NotificationProvider } from './notifications/NotificationProvider'
 import ContractNotificationHistory from './pages/notifications/ContractNotificationHistory'
 import NotificationInbox from './pages/notifications/NotificationInbox'
 import TemplateAdmin from './pages/notifications/TemplateAdmin'
+import { lazy, Suspense } from 'react'
 import AppLayout from './components/layout/AppLayout'
 import Login from './pages/login/Login'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -117,6 +118,9 @@ import RoleAccess from './pages/roles/RoleAccess'
 import UserAccess from './pages/roles/UserAccess'
 
 
+// Public website: its own routes (src/website/routes), loaded only when a /website page is opened.
+const Website = lazy(() => import('./website'))
+
 function App() {
   return (
     <AuthProvider>
@@ -125,6 +129,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/website/*" element={<Suspense fallback={null}><Website /></Suspense>} />
         <Route element={<AppLayout />}>
 
           <Route path="/" element={<Dashboard />} />

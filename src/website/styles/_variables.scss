@@ -1,0 +1,72 @@
+// ============================================================
+// Website design tokens. Kept separate from the app's tokens
+// (src/assets/styles) so the two can evolve independently.
+// ============================================================
+
+// ---------- Brand ----------
+$navy-900: #071a33;
+$navy-800: #0b2547;
+$navy-700: #12345f;
+$navy-600: #1b4a85;
+$orange-500: #f5a524;
+$orange-600: #e08c0b;
+$green-500: #22a06b;
+$sky-100: #e8f1fb;
+$sky-50: #f4f8fd;
+
+// ---------- Neutrals ----------
+$white: #ffffff;
+$ink: #0f1b2d;
+$ink-soft: #46546a;
+$ink-muted: #6b7a90;
+$line: #e3e9f1;
+$surface: #ffffff;
+$surface-alt: #f6f8fb;
+
+// ---------- Type ----------
+// Inter and Poppins are already loaded by index.html, so the site needs no extra font download.
+$font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-heading: "Poppins", $font-body;
+
+$fs-xs: 0.75rem;
+$fs-sm: 0.875rem;
+$fs-base: 1rem;
+$fs-lg: 1.125rem;
+$fs-xl: 1.25rem;
+
+$fw-regular: 400;
+$fw-medium: 500;
+$fw-semibold: 600;
+$fw-bold: 700;
+
+// ---------- Space / shape ----------
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-5: 1.5rem;
+$space-6: 2rem;
+$space-7: 3rem;
+$space-8: 4rem;
+$space-9: 6rem;
+
+$radius-sm: 0.5rem;
+$radius-md: 0.875rem;
+$radius-lg: 1.25rem;
+$radius-pill: 999px;
+
+$shadow-sm: 0 1px 2px rgba($navy-900, 0.06), 0 1px 3px rgba($navy-900, 0.05);
+$shadow-md: 0 12px 32px -12px rgba($navy-900, 0.18);
+$shadow-lg: 0 30px 60px -20px rgba($navy-900, 0.3);
+
+$container: 72rem;
+$header-height: 4.5rem;
+$ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+// ---------- Breakpoints (mobile first) ----------
+$breakpoints: (
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+);

@@ -1,0 +1,55 @@
+@use "sass:map";
+@use "variables" as v;
+
+/// Styles from `$name` and wider.
+@mixin up($name) {
+  @media (min-width: map.get(v.$breakpoints, $name)) {
+    @content;
+  }
+}
+
+/// Styles below `$name` only.
+@mixin down($name) {
+  @media (max-width: calc(#{map.get(v.$breakpoints, $name)} - 1px)) {
+    @content;
+  }
+}
+
+@mixin container {
+  width: 100%;
+  max-width: v.$container;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: v.$space-4;
+  padding-left: v.$space-4;
+
+  @include up(md) {
+    padding-right: v.$space-6;
+    padding-left: v.$space-6;
+  }
+}
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 3px solid rgba(v.$orange-500, 0.7);
+    outline-offset: 2px;
+  }
+}
+
+/// Fluid heading size between a phone and a desktop value.
+@mixin fluid-type($min, $max) {
+  font-size: $min;
+  font-size: clamp(#{$min}, calc(#{$min} + 2vw), #{$max});
+}
+
+@mixin reset-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
