@@ -1,0 +1,253 @@
+@use "variables" as v;
+@use "mixins" as m;
+
+.site-logo {
+  @include m.focus-ring;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: v.$space-2;
+  border-radius: v.$radius-sm;
+  color: v.$navy-900;
+  font-family: v.$font-heading;
+  font-size: 1.3rem;
+  font-weight: v.$fw-semibold;
+  letter-spacing: -0.02em;
+
+  img {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  strong {
+    color: v.$orange-600;
+    font-weight: v.$fw-bold;
+  }
+
+  &--inverse {
+    color: v.$white;
+
+    &:hover {
+      color: v.$white;
+    }
+
+    strong {
+      color: v.$orange-500;
+    }
+  }
+}
+
+.site-header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid transparent;
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+
+  // The background lives on a pseudo-element: backdrop-filter on the header itself would make it the
+  // containing block for the fixed mobile drawer and backdrop, and break their positioning.
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    background-color: rgba(v.$white, 0.96);
+
+    // Frosted glass where supported; the near-opaque background above is the fallback.
+    @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+      background-color: rgba(v.$white, 0.82);
+      -webkit-backdrop-filter: saturate(180%) blur(14px);
+      backdrop-filter: saturate(180%) blur(14px);
+    }
+  }
+
+  &.is-scrolled {
+    border-color: v.$line;
+    box-shadow: v.$shadow-sm;
+  }
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-4;
+    height: v.$header-height;
+  }
+
+  &__toggle {
+    @include m.focus-ring;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid v.$line;
+    border-radius: v.$radius-sm;
+    background-color: v.$white;
+    color: v.$navy-900;
+    font-size: 1.35rem;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+    @include m.up(lg) {
+      display: none;
+    }
+  }
+
+  &__backdrop {
+    position: fixed;
+    top: v.$header-height;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    padding: 0;
+    border: none;
+    background-color: rgba(v.$navy-900, 0.45);
+    cursor: pointer;
+
+    @include m.up(lg) {
+      display: none;
+    }
+  }
+}
+
+// ---------- Navigation: drawer under the header on phones/tablets, inline from laptops ----------
+.site-nav {
+  @include m.down(lg) {
+    position: fixed;
+    top: v.$header-height;
+    right: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-5;
+    max-height: calc(100vh - #{v.$header-height});
+    max-height: calc(100dvh - #{v.$header-height});
+    padding: v.$space-4 v.$space-4 v.$space-6;
+    border-bottom: 1px solid v.$line;
+    background-color: v.$white;
+    box-shadow: v.$shadow-md;
+    overflow-y: auto;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.25s v.$ease,
+      visibility 0s linear 0.25s;
+
+    &.is-open {
+      visibility: visible;
+      opacity: 1;
+      transform: none;
+      transition:
+        opacity 0.2s ease,
+        transform 0.25s v.$ease;
+    }
+
+    @include m.reduced-motion {
+      transition: none;
+    }
+  }
+
+  @include m.up(lg) {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: v.$space-7;
+  }
+
+  &__list {
+    @include m.reset-list;
+    display: flex;
+    flex-direction: column;
+
+    @include m.up(lg) {
+      flex-direction: row;
+      gap: v.$space-2;
+    }
+  }
+
+  &__link {
+    @include m.focus-ring;
+    position: relative;
+    display: block;
+    padding: v.$space-3 v.$space-2;
+    border-radius: v.$radius-sm;
+    color: v.$ink-soft;
+    font-size: v.$fs-base;
+    font-weight: v.$fw-medium;
+    transition: color 0.2s ease;
+
+    @include m.down(lg) {
+      border-bottom: 1px solid v.$line;
+    }
+
+    @include m.up(lg) {
+      padding: v.$space-2 v.$space-3;
+      font-size: v.$fs-sm;
+
+      // Underline that grows from the centre.
+      &::after {
+        content: "";
+        position: absolute;
+        right: v.$space-3;
+        bottom: 2px;
+        left: v.$space-3;
+        height: 2px;
+        border-radius: 2px;
+        background-color: v.$orange-500;
+        transform: scaleX(0);
+        transition: transform 0.25s v.$ease;
+      }
+    }
+
+    &:hover,
+    &.is-active {
+      color: v.$navy-900;
+
+      &::after {
+        transform: scaleX(1);
+      }
+    }
+
+    &.is-active {
+      font-weight: v.$fw-semibold;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-3;
+
+    @include m.up(lg) {
+      flex-direction: row;
+      align-items: center;
+      gap: v.$space-4;
+    }
+  }
+
+  &__login {
+    @include m.focus-ring;
+    padding: v.$space-2;
+    border-radius: v.$radius-sm;
+    color: v.$navy-800;
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-semibold;
+    text-align: center;
+
+    &:hover {
+      color: v.$orange-600;
+    }
+  }
+}

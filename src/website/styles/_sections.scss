@@ -1,0 +1,518 @@
+@use "variables" as v;
+@use "mixins" as m;
+
+// ---------- Hero ----------
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: v.$space-7 0 v.$space-8;
+  background: radial-gradient(110% 90% at 85% 10%, v.$navy-600 0%, v.$navy-800 45%, v.$navy-900 100%);
+  color: rgba(v.$white, 0.82);
+
+  @include m.up(lg) {
+    padding: v.$space-9 0;
+  }
+
+  // Soft orange glow and a faint dot grid for depth.
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: -10rem;
+    right: -8rem;
+    width: 32rem;
+    height: 32rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(v.$orange-500, 0.28), transparent 65%);
+  }
+
+  &::after {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: radial-gradient(rgba(v.$white, 0.08) 1px, transparent 1px);
+    background-size: 22px 22px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 85%);
+    mask-image: linear-gradient(180deg, #000 0%, transparent 85%);
+  }
+
+  &__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: v.$space-7;
+
+    @include m.up(lg) {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    }
+  }
+
+  .eyebrow {
+    color: v.$orange-500;
+  }
+
+  h1 {
+    @include m.fluid-type(2.1rem, 3.4rem);
+    color: v.$white;
+    letter-spacing: -0.025em;
+  }
+
+  &__text {
+    max-width: 34rem;
+    margin-top: v.$space-4;
+    font-size: v.$fs-lg;
+    line-height: 1.7;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$space-3;
+    margin-top: v.$space-6;
+
+    @include m.down(sm) {
+      .btn-site {
+        flex: 1 1 100%;
+      }
+    }
+  }
+
+  &__points {
+    @include m.reset-list;
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$space-2 v.$space-5;
+    margin-top: v.$space-5;
+    font-size: v.$fs-sm;
+
+    li {
+      display: inline-flex;
+      align-items: center;
+      gap: v.$space-2;
+    }
+
+    svg {
+      color: v.$green-500;
+    }
+  }
+
+  &__visual {
+    max-width: 34rem;
+    margin: 0 auto;
+    animation: hero-float 6s ease-in-out infinite;
+
+    @include m.reduced-motion {
+      animation: none;
+    }
+  }
+}
+
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+// ---------- Partners ----------
+.partners {
+  padding: v.$space-6 0;
+  border-bottom: 1px solid v.$line;
+
+  &__title {
+    margin-bottom: v.$space-4;
+    color: v.$ink-muted;
+    font-size: v.$fs-xs;
+    font-weight: v.$fw-semibold;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  &__list {
+    @include m.reset-list;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: v.$space-3 v.$space-7;
+
+    li {
+      color: rgba(v.$navy-800, 0.55);
+      font-family: v.$font-heading;
+      font-size: v.$fs-lg;
+      font-weight: v.$fw-semibold;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: v.$navy-800;
+      }
+    }
+  }
+}
+
+// ---------- Card grids ----------
+.card-grid {
+  @include m.reset-list;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: v.$space-5;
+
+  @include m.up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include m.up(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  &--3 {
+    @include m.up(md) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}
+
+.feature-card {
+  position: relative;
+  padding: v.$space-6 v.$space-5;
+  border: 1px solid v.$line;
+  border-radius: v.$radius-lg;
+  background-color: v.$surface;
+  transition:
+    transform 0.3s v.$ease,
+    box-shadow 0.3s v.$ease,
+    border-color 0.3s ease;
+
+  &:hover {
+    border-color: transparent;
+    box-shadow: v.$shadow-md;
+    transform: translateY(-4px);
+
+    .feature-card__icon {
+      background-color: v.$orange-500;
+      color: v.$navy-900;
+    }
+  }
+
+  @include m.reduced-motion {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  h3 {
+    margin: v.$space-5 0 v.$space-2;
+    font-size: v.$fs-lg;
+  }
+
+  p {
+    color: v.$ink-soft;
+    font-size: v.$fs-sm;
+    line-height: 1.7;
+  }
+
+  &__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: v.$radius-md;
+    background-color: v.$sky-100;
+    color: v.$navy-600;
+    font-size: 1.3rem;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+}
+
+// ---------- Split (image + copy) ----------
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: v.$space-7;
+
+  @include m.up(lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$space-8;
+  }
+
+  &__visual img {
+    width: 100%;
+    border-radius: v.$radius-lg;
+  }
+
+  .section-head {
+    margin-bottom: v.$space-5;
+  }
+}
+
+.check-list {
+  @include m.reset-list;
+  display: grid;
+  gap: v.$space-3;
+  margin-bottom: v.$space-6;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: v.$space-3;
+    color: v.$ink;
+    font-weight: v.$fw-medium;
+  }
+
+  span {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 0.05rem;
+    border-radius: 50%;
+    background-color: rgba(v.$green-500, 0.12);
+    color: v.$green-500;
+    font-size: 0.85rem;
+  }
+}
+
+// ---------- Stats ----------
+.stats-band {
+  padding: v.$space-7 0;
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$space-6 v.$space-4;
+    margin: 0;
+
+    @include m.up(lg) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  // dt follows dd visually: big number on top, label under it.
+  &__item {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: v.$space-1;
+    text-align: center;
+
+    @include m.up(lg) {
+      &:not(:first-child) {
+        border-left: 1px solid rgba(v.$white, 0.12);
+      }
+    }
+  }
+
+  dd {
+    margin: 0;
+    color: v.$white;
+    font-family: v.$font-heading;
+    font-weight: v.$fw-bold;
+    @include m.fluid-type(1.9rem, 2.75rem);
+    line-height: 1.1;
+  }
+
+  dt {
+    color: rgba(v.$white, 0.7);
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-regular;
+  }
+}
+
+// ---------- Steps ----------
+.steps {
+  @include m.reset-list;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: v.$space-5;
+  counter-reset: none;
+
+  @include m.up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include m.up(lg) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  &__item {
+    position: relative;
+    padding: v.$space-5;
+    border-radius: v.$radius-lg;
+    background-color: v.$surface;
+    box-shadow: v.$shadow-sm;
+
+    h3 {
+      margin: v.$space-4 0 v.$space-2;
+      font-size: v.$fs-base;
+    }
+
+    p {
+      color: v.$ink-soft;
+      font-size: v.$fs-sm;
+    }
+  }
+
+  &__number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, v.$orange-500, v.$orange-600);
+    color: v.$navy-900;
+    font-family: v.$font-heading;
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-bold;
+  }
+}
+
+// ---------- Testimonials ----------
+.quote-card {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-4;
+  padding: v.$space-6 v.$space-5;
+  border: 1px solid v.$line;
+  border-radius: v.$radius-lg;
+  background-color: v.$surface;
+
+  &__stars {
+    display: flex;
+    gap: 0.2rem;
+    color: v.$orange-500;
+
+    svg {
+      fill: currentColor;
+    }
+  }
+
+  blockquote {
+    flex: 1;
+    margin: 0;
+    color: v.$ink;
+    font-size: v.$fs-base;
+    line-height: 1.7;
+  }
+
+  &__author {
+    display: flex;
+    align-items: center;
+    gap: v.$space-3;
+    padding-top: v.$space-4;
+    border-top: 1px solid v.$line;
+
+    > span {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 50%;
+      background-color: v.$navy-800;
+      color: v.$white;
+      font-size: v.$fs-sm;
+      font-weight: v.$fw-semibold;
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    strong {
+      color: v.$ink;
+      font-size: v.$fs-sm;
+    }
+
+    small {
+      color: v.$ink-muted;
+      font-size: v.$fs-xs;
+    }
+  }
+}
+
+// ---------- CTA ----------
+.cta {
+  padding: 0 0 v.$space-8;
+
+  &__box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-5;
+    overflow: hidden;
+    padding: v.$space-7 v.$space-5;
+    border-radius: v.$radius-lg;
+    background: linear-gradient(120deg, v.$navy-800 0%, v.$navy-600 100%);
+    color: rgba(v.$white, 0.8);
+
+    @include m.up(md) {
+      padding: v.$space-7;
+    }
+
+    @include m.up(lg) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      right: -6rem;
+      bottom: -8rem;
+      width: 20rem;
+      height: 20rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(v.$orange-500, 0.35), transparent 65%);
+      pointer-events: none;
+    }
+
+    h2 {
+      @include m.fluid-type(1.6rem, 2.2rem);
+      color: v.$white;
+    }
+
+    p {
+      margin-top: v.$space-2;
+    }
+  }
+
+  &__actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$space-3;
+
+    @include m.down(sm) {
+      .btn-site {
+        flex: 1 1 100%;
+      }
+    }
+  }
+}
