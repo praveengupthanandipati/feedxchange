@@ -4,8 +4,12 @@ export const WEBSITE_BASE = "/website";
 export const sitePaths = {
   home: WEBSITE_BASE,
   about: `${WEBSITE_BASE}/about`,
-  services: `${WEBSITE_BASE}/services`,
+  products: `${WEBSITE_BASE}/products`,
+  faqs: `${WEBSITE_BASE}/faqs`,
+  blogs: `${WEBSITE_BASE}/blogs`,
   contact: `${WEBSITE_BASE}/contact`,
-  /** The admin application's sign-in, linked from the header. */
-  login: "/login",
+  join: `${WEBSITE_BASE}/join`,
 } as const;
+
+/** One product's page, e.g. /website/products/maize-ddgs. */
+export const productPath = (slug: string) => `${sitePaths.products}/${slug}`;

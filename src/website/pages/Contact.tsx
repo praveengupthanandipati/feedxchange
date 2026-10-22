@@ -19,7 +19,7 @@ const Contact = () => {
       <PageHero title="Contact Us" text="Questions about pricing, onboarding or partnerships? We'd love to hear from you." />
       <section className="section">
         <div className="site-container contact-layout">
-          <ul className="contact-details">
+          <ul className="contact-details" data-reveal>
             {details.map(({ icon: Icon, title, body, href }) => (
               <li key={title} className="contact-details__item">
                 <span className="feature-card__icon">

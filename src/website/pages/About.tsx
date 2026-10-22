@@ -15,7 +15,7 @@ const About = () => {
 
       <section className="section" aria-labelledby="story-title">
         <div className="site-container split">
-          <div className="split__copy">
+          <div className="split__copy" data-reveal>
             <SectionHead id="story-title" eyebrow="Our story" title="Born in the market, built for the market" align="left" />
             <div className="prose-site">
               <p>
@@ -28,7 +28,7 @@ const About = () => {
               </p>
             </div>
           </div>
-          <div className="split__visual">
+          <div className="split__visual" data-reveal data-reveal-delay="120">
             <img src={aboutImage} alt="The FeedXchange partner network" width={520} height={420} loading="lazy" />
           </div>
         </div>
@@ -38,8 +38,8 @@ const About = () => {
         <div className="site-container">
           <SectionHead id="values-title" eyebrow="Our values" title="What guides every decision we make" />
           <ul className="card-grid card-grid--3">
-            {values.map(({ icon: Icon, title, text }) => (
-              <li key={title} className="feature-card">
+            {values.map(({ icon: Icon, title, text }, index) => (
+              <li key={title} className="feature-card" data-reveal data-reveal-delay={index * 100}>
                 <span className="feature-card__icon">
                   <Icon aria-hidden />
                 </span>

@@ -4,7 +4,8 @@
 // ---------- Inner page banner ----------
 .page-hero {
   padding: v.$space-7 0;
-  background: radial-gradient(120% 140% at 100% 0%, v.$navy-600 0%, v.$navy-900 60%);
+  background-color: v.$navy-900;
+  background-image: radial-gradient(120% 140% at 100% 0%, v.$navy-600 0%, v.$navy-900 60%);
   color: rgba(v.$white, 0.8);
 
   @include m.up(lg) {
@@ -91,9 +92,13 @@
     display: flex;
     align-items: flex-start;
     gap: v.$space-4;
-    padding: v.$space-5;
+    padding: v.$space-4;
     border: 1px solid v.$line;
     border-radius: v.$radius-lg;
+
+    @include m.up(md) {
+      padding: v.$space-5;
+    }
 
     h3 {
       margin-bottom: v.$space-1;
@@ -164,7 +169,7 @@
   }
 }
 
-.form-field {
+.site-field {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -248,5 +253,452 @@
   p {
     margin: v.$space-3 0 v.$space-6;
     color: v.$ink-soft;
+  }
+}
+
+// ---------- Products ----------
+.product-card {
+  padding: 0;
+
+  &__link {
+    @include m.focus-ring;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: v.$space-6 v.$space-5;
+    border-radius: inherit;
+    color: inherit;
+
+    &:hover {
+      color: inherit;
+    }
+
+    p {
+      flex: 1;
+    }
+
+    // Phones: compact row with the icon beside the name, description and link.
+    @include m.down(sm) {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      column-gap: v.$space-4;
+      padding: v.$space-5 v.$space-4;
+
+      .feature-card__icon {
+        grid-row: 1 / span 3;
+      }
+
+      h3 {
+        margin: 0 0 v.$space-1;
+        font-size: v.$fs-base;
+      }
+
+      .product-card__more {
+        margin-top: v.$space-2;
+      }
+    }
+  }
+
+  &__more {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$space-2;
+    margin-top: v.$space-4;
+    color: v.$orange-600;
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-semibold;
+
+    svg {
+      transition: transform 0.25s v.$ease;
+    }
+  }
+
+  &:hover &__more svg,
+  .blog-card:hover &__more svg {
+    transform: translateX(4px);
+  }
+}
+
+.product-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: v.$space-6;
+  align-items: start;
+
+  @include m.up(lg) {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: v.$space-8;
+  }
+
+  .check-list {
+    margin-top: v.$space-3;
+    font-size: v.$fs-base;
+  }
+}
+
+.spec-card {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  padding: v.$space-6 v.$space-5;
+  border: 1px solid v.$line;
+  border-radius: v.$radius-lg;
+  background-color: v.$surface;
+  box-shadow: v.$shadow-md;
+
+  @include m.up(lg) {
+    position: -webkit-sticky;
+    position: sticky;
+    top: calc(#{v.$header-height} + #{v.$space-5});
+  }
+
+  h2 {
+    font-size: v.$fs-lg;
+  }
+
+  dl {
+    margin: 0 0 v.$space-3;
+
+    div {
+      display: flex;
+      justify-content: space-between;
+      gap: v.$space-4;
+      padding: v.$space-3 0;
+      border-bottom: 1px dashed v.$line;
+    }
+  }
+
+  dt {
+    color: v.$ink-muted;
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-regular;
+  }
+
+  dd {
+    margin: 0;
+    color: v.$ink;
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-semibold;
+    text-align: right;
+  }
+
+  .btn-site--outline svg {
+    color: #25d366;
+    font-size: 1.15rem;
+  }
+}
+
+// ---------- FAQ accordion ----------
+.faq-list {
+  @include m.reset-list;
+  display: grid;
+  gap: v.$space-3;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.faq-item {
+  border: 1px solid v.$line;
+  border-radius: v.$radius-lg;
+  background-color: v.$surface;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+
+  &.is-open {
+    border-color: transparent;
+    box-shadow: v.$shadow-md;
+  }
+
+  h2 {
+    font-size: v.$fs-base;
+  }
+
+  button {
+    @include m.focus-ring;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-4;
+    width: 100%;
+    padding: v.$space-5;
+    border: none;
+    border-radius: v.$radius-lg;
+    background: none;
+    color: v.$ink;
+    font-family: v.$font-heading;
+    font-size: v.$fs-base;
+    font-weight: v.$fw-semibold;
+    text-align: left;
+    cursor: pointer;
+
+    svg {
+      flex-shrink: 0;
+      width: 1.75rem;
+      height: 1.75rem;
+      padding: 0.3rem;
+      border-radius: 50%;
+      background-color: v.$sky-100;
+      color: v.$navy-600;
+      transition:
+        transform 0.35s v.$ease,
+        background-color 0.25s ease;
+    }
+  }
+
+  &.is-open button svg {
+    background-color: v.$orange-500;
+    color: v.$navy-900;
+    transform: rotate(45deg);
+  }
+
+  // Smooth height: grid rows 0fr → 1fr.
+  &__answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s v.$ease;
+
+    > div {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    p {
+      padding: 0 v.$space-5 v.$space-5;
+      color: v.$ink-soft;
+      line-height: 1.75;
+    }
+  }
+
+  &.is-open &__answer {
+    grid-template-rows: 1fr;
+  }
+
+  @include m.reduced-motion {
+    &__answer,
+    button svg {
+      transition: none;
+    }
+  }
+}
+
+// ---------- Blogs ----------
+.blog-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid v.$line;
+  border-radius: v.$radius-lg;
+  background-color: v.$surface;
+  transition:
+    transform 0.3s v.$ease,
+    box-shadow 0.3s v.$ease;
+
+  &:hover {
+    box-shadow: v.$shadow-md;
+    transform: translateY(-4px);
+  }
+
+  @include m.reduced-motion {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  &__cover {
+    display: flex;
+    align-items: flex-end;
+    // Flatter on phones so a cover doesn't fill half the screen.
+    aspect-ratio: 5 / 2;
+
+    @include m.up(md) {
+      aspect-ratio: 16 / 9;
+    }
+    padding: v.$space-4;
+
+    &--0 {
+      background: linear-gradient(135deg, v.$navy-600, v.$navy-900);
+    }
+
+    &--1 {
+      background: linear-gradient(135deg, v.$orange-500, #c96b00);
+    }
+
+    &--2 {
+      background: linear-gradient(135deg, v.$green-500, #0f6b45);
+    }
+
+    span {
+      padding: 0.3rem 0.75rem;
+      border-radius: v.$radius-pill;
+      background-color: rgba(v.$white, 0.92);
+      color: v.$navy-900;
+      font-size: v.$fs-xs;
+      font-weight: v.$fw-semibold;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: v.$space-2;
+    padding: v.$space-5;
+
+    h2 {
+      font-size: v.$fs-lg;
+      line-height: 1.35;
+    }
+
+    > p:not(.blog-card__meta) {
+      flex: 1;
+      color: v.$ink-soft;
+      font-size: v.$fs-sm;
+      line-height: 1.7;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$space-2;
+    color: v.$ink-muted;
+    font-size: v.$fs-xs;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+  }
+}
+
+// ============================================================
+// Motion: scroll reveal keyframes + back-to-top (merged from _motion.scss)
+// ============================================================
+
+// ---------- Scroll reveal (vertical only) ----------
+// The rules using it live in styles.scss, on the .fx-site root.
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// ---------- Back to top ----------
+.back-to-top {
+  @include m.focus-ring;
+  position: fixed;
+  right: max(#{v.$space-4}, env(safe-area-inset-right, 0px));
+  bottom: calc(#{v.$space-4} + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, v.$navy-700, v.$navy-900);
+  box-shadow: 0 12px 28px -10px rgba(v.$navy-900, 0.6);
+  color: v.$white;
+  cursor: pointer;
+  // Hidden: shrunk and faded; visibility waits for the fade-out.
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 0.3s ease,
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    visibility 0s linear 0.45s;
+  -webkit-appearance: none;
+  appearance: none;
+
+  @include m.up(md) {
+    right: v.$space-6;
+    bottom: v.$space-6;
+  }
+
+  &.is-visible {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+    transition:
+      opacity 0.3s ease,
+      transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    // Gentle "breathing" scale once it has popped in.
+    animation: back-to-top-pulse 2.6s ease-in-out 0.6s infinite;
+  }
+
+  &:hover {
+    animation-play-state: paused;
+    background: linear-gradient(135deg, v.$orange-500, v.$orange-600);
+    color: v.$navy-900;
+
+    .back-to-top__icon {
+      transform: translateY(-3px);
+    }
+  }
+
+  &__icon {
+    position: relative;
+    font-size: 1.25rem;
+    transition: transform 0.25s v.$ease;
+  }
+
+  // Ring that fills as you scroll down the page.
+  &__ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+
+    circle {
+      fill: none;
+      stroke: rgba(v.$white, 0.18);
+      stroke-width: 2.5;
+    }
+  }
+
+  &__progress {
+    stroke: v.$orange-500 !important;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.15s linear;
+  }
+
+  &:hover &__progress {
+    stroke: v.$navy-900 !important;
+  }
+
+  @include m.reduced-motion {
+    transition: none;
+
+    &.is-visible {
+      transition: none;
+      animation: none;
+    }
+  }
+}
+
+@keyframes back-to-top-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
   }
 }

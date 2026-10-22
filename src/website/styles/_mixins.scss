@@ -15,9 +15,17 @@
   }
 }
 
+/// Content column: 80% of the viewport from laptops up. Phones and tablets use the full width with
+/// side padding instead, since 80% would waste too much of a small screen.
+/// The smallest phones (320–374px, e.g. iPhone SE 1st gen), where every pixel in the header counts.
+@mixin tiny {
+  @media (max-width: 374.98px) {
+    @content;
+  }
+}
+
 @mixin container {
   width: 100%;
-  max-width: v.$container;
   margin-right: auto;
   margin-left: auto;
   padding-right: v.$space-4;
@@ -26,6 +34,12 @@
   @include up(md) {
     padding-right: v.$space-6;
     padding-left: v.$space-6;
+  }
+
+  @include up(lg) {
+    width: v.$container-width;
+    padding-right: 0;
+    padding-left: 0;
   }
 }
 
