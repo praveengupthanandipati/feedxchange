@@ -3,15 +3,19 @@ import type { IconType } from "react-icons";
 import {
   FiBarChart2,
   FiCreditCard,
+  FiEye,
   FiFacebook,
   FiFileText,
+  FiGrid,
   FiInstagram,
+  FiLink,
   FiLinkedin,
   FiPackage,
   FiShield,
+  FiTrendingUp,
   FiTruck,
   FiTwitter,
-  FiUsers,
+  FiUserCheck,
 } from "react-icons/fi";
 import { productPath, sitePaths } from "../routes/paths";
 
@@ -283,10 +287,91 @@ export const dealingPartners: DealingPartner[] = [
   },
 ];
 
-export const values: Service[] = [
-  { icon: FiShield, title: "Trust", text: "We verify every partner and keep every transaction transparent." },
-  { icon: FiUsers, title: "Partnership", text: "We grow when farmers, mills and traders grow with us." },
-  { icon: FiBarChart2, title: "Efficiency", text: "We remove paperwork so trade moves at the speed of business." },
+// ---------- About page ----------
+export const about = {
+  parent: "Sri Sai Raghavendra Trade Services",
+  founded: 1996,
+  city: "Vijayawada, Andhra Pradesh",
+  expertise: ["Deoiled Cakes", "Feed-Quality Grains", "DDGS", "Other essential raw materials"],
+};
+
+export interface Clientele {
+  kind: DealingPartner["kind"];
+  title: string;
+}
+
+export const clientele: Clientele[] = [
+  { kind: "poultry", title: "Poultry Farmers & Poultry Feed Plants" },
+  { kind: "fish", title: "Fish Farmers & Fish Feed Plants" },
+  { kind: "prawn", title: "Prawn Feed Plants" },
+  { kind: "cattle", title: "Cattle Feed Plants" },
+];
+
+/** The three ideas in "Our Legacy: Trust, Transparency, and Direct Access". */
+export const pillars: Service[] = [
+  { icon: FiShield, title: "Trust", text: "Unwavering commitment to the success of both our buyers and suppliers." },
+  { icon: FiEye, title: "Transparency", text: "Known across the industry for our transparent nature and fair mediation." },
+  { icon: FiLink, title: "Direct Access", text: "High-quality raw materials directly from the manufacturers at the best possible prices." },
+];
+
+export interface TeamMember {
+  name: string;
+  /** Only shown when the copy gives one. */
+  role?: string;
+  /** Short line shown as a tag, e.g. when they joined. */
+  tag: string;
+  bio: string[];
+}
+
+export const team: TeamMember[] = [
+  {
+    name: "Mithinti VGS Prakash",
+    role: "Founder",
+    tag: "30+ years in the trade",
+    bio: [
+      "As the guiding force of Sri Sai Raghavendra Trade Services, Mr. Prakash brings more than three decades of invaluable expertise to the table. He has built a renowned reputation across the industry as a fierce advocate for fair trade and superior quality.",
+      "Having witnessed countless crop cycles firsthand, his deep understanding of market dynamics allows him to accurately predict price trends, serving as a trusted advisor who helps our customers take confident action.",
+    ],
+  },
+  {
+    name: "Mithinti Mani Kiran",
+    tag: "Since 2013",
+    bio: [
+      "Since entering the business in 2013, Mani Kiran has perfectly bridged our time-honored practices with modern innovation. Armed with a strong corporate background, he has been instrumental in integrating digital solutions into our classic business model.",
+      "His strategic vision has successfully driven growth—introducing new product lines and welcoming new customers—while fiercely protecting the foundational values of transparency and trust our business was built upon.",
+    ],
+  },
+  {
+    name: "Peram Teja",
+    tag: "Since 2018",
+    bio: [
+      "Bringing four years of valuable corporate experience, Peram Teja joined the organization in 2018. He is the operational anchor of the business, instrumental in managing the seamless execution of our day-to-day transactions.",
+      "His expertise ensures that as the business scales and modernizes, our core trading activities, client communications, and daily processes run smoothly and efficiently.",
+    ],
+  },
+];
+
+export const milestones: Step[] = [
+  { title: "1996", text: "Sri Sai Raghavendra Trade Services begins as canvassing agents for feed ingredients in Vijayawada." },
+  { title: "2013", text: "Mani Kiran joins and starts bringing digital tools into the business." },
+  { title: "2018", text: "Peram Teja joins to anchor day-to-day trading operations." },
+  { title: "Today", text: "FeedXchange.in takes three decades of trade online." },
+];
+
+export const platformFeatures: Service[] = [
+  { icon: FiBarChart2, title: "Digital Transparency", text: "Real-time digital access to the pricing of animal feed ingredients." },
+  { icon: FiTrendingUp, title: "Smart Tracking", text: "Advanced price tracking mechanisms to help you make informed buying decisions." },
+  { icon: FiGrid, title: "Personalized Dashboards", text: "Secure login access for customers to effortlessly view, manage, and track all contracts executed through us." },
+  {
+    icon: FiTruck,
+    title: "Integrated Logistics",
+    text: "Real-time visibility into the vehicles loaded against your contracts, with an ecosystem that seamlessly connects buyers, sellers, and enrolled transporters.",
+  },
+  {
+    icon: FiUserCheck,
+    title: "Verified Trading",
+    text: "A secure environment where KYC and bank details are transparently shared between transacting parties to ensure trust and smooth financial settlements.",
+  },
 ];
 
 export const footerColumns: { title: string; links: NavLinkItem[] }[] = [
