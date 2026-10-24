@@ -14,6 +14,13 @@ $green-500: #22a06b;
 $sky-100: #e8f1fb;
 $sky-50: #f4f8fd;
 
+// ---------- Section gradients ----------
+$gradient-light: linear-gradient(180deg, #ffffff 0%, #f4f8fd 100%);
+$gradient-alt: linear-gradient(135deg, #eef4fb 0%, #fbf7ee 100%);
+$gradient-warm: linear-gradient(90deg, #ffffff 0%, #fff6e6 50%, #ffffff 100%);
+$gradient-dark: radial-gradient(120% 120% at 100% 0%, #1b4a85 0%, #071a33 55%);
+$gradient-footer: linear-gradient(160deg, #0b2547 0%, #071a33 60%);
+
 // ---------- Neutrals ----------
 $white: #ffffff;
 $ink: #0f1b2d;
@@ -59,8 +66,9 @@ $shadow-sm: 0 1px 2px rgba($navy-900, 0.06), 0 1px 3px rgba($navy-900, 0.05);
 $shadow-md: 0 12px 32px -12px rgba($navy-900, 0.18);
 $shadow-lg: 0 30px 60px -20px rgba($navy-900, 0.3);
 
-$container: 72rem;
-$header-height: 4.5rem;
+// Share of the viewport the content column uses from laptops up (.fx-site spans the full viewport).
+$container-width: 80%;
+$header-height: 4.75rem;
 $ease: cubic-bezier(0.22, 1, 0.36, 1);
 
 // ---------- Breakpoints (mobile first) ----------

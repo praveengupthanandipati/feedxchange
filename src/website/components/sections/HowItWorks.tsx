@@ -7,7 +7,7 @@ const HowItWorks = () => (
       <SectionHead id="steps-title" eyebrow="How it works" title="From sign-up to settlement in four steps" />
       <ol className="steps">
         {steps.map((step, index) => (
-          <li key={step.title} className="steps__item">
+          <li key={step.title} className="steps__item" data-reveal data-reveal-delay={index * 100}>
             <span className="steps__number" aria-hidden>
               {String(index + 1).padStart(2, "0")}
             </span>

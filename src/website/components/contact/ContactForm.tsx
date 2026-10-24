@@ -24,7 +24,12 @@ function validate(values: ContactValues): Errors {
   return errors;
 }
 
-const ContactForm = () => {
+interface ContactFormProps {
+  title?: string;
+  submitLabel?: string;
+}
+
+const ContactForm = ({ title = "Send us a message", submitLabel = "Send message" }: ContactFormProps) => {
   const [values, setValues] = useState<ContactValues>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [sent, setSent] = useState(false);
@@ -62,7 +67,7 @@ const ContactForm = () => {
   }
 
   const field = (key: keyof ContactValues, label: string, props: { type?: string; required?: boolean; autoComplete?: string; inputMode?: "email" | "tel" } = {}) => (
-    <div className="form-field">
+    <div className="site-field">
       <label htmlFor={`contact-${key}`}>
         {label} {props.required && <span aria-hidden>*</span>}
       </label>
@@ -78,7 +83,7 @@ const ContactForm = () => {
         aria-describedby={errors[key] ? `contact-${key}-error` : undefined}
       />
       {errors[key] && (
-        <small id={`contact-${key}-error`} className="form-field__error">
+        <small id={`contact-${key}-error`} className="site-field__error">
           {errors[key]}
         </small>
       )}
@@ -86,14 +91,14 @@ const ContactForm = () => {
   );
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit} noValidate>
-      <h2>Send us a message</h2>
+    <form className="contact-form" onSubmit={handleSubmit} noValidate data-reveal data-reveal-delay="120">
+      <h2>{title}</h2>
       <div className="contact-form__grid">
         {field("name", "Full name", { required: true, autoComplete: "name" })}
         {field("email", "Email", { type: "email", required: true, autoComplete: "email", inputMode: "email" })}
         {field("phone", "Phone", { type: "tel", autoComplete: "tel", inputMode: "tel" })}
         {field("company", "Company", { autoComplete: "organization" })}
-        <div className="form-field form-field--wide">
+        <div className="site-field site-field--wide">
           <label htmlFor="contact-message">
             Message <span aria-hidden>*</span>
           </label>
@@ -107,14 +112,14 @@ const ContactForm = () => {
             aria-describedby={errors.message ? "contact-message-error" : undefined}
           />
           {errors.message && (
-            <small id="contact-message-error" className="form-field__error">
+            <small id="contact-message-error" className="site-field__error">
               {errors.message}
             </small>
           )}
         </div>
       </div>
       <button type="submit" className="btn-site btn-site--primary">
-        Send message <FiSend aria-hidden />
+        {submitLabel} <FiSend aria-hidden />
       </button>
     </form>
   );

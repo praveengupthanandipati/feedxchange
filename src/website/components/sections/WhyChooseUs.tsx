@@ -8,10 +8,10 @@ import SectionHead from "../common/SectionHead";
 const WhyChooseUs = () => (
   <section className="section" aria-labelledby="why-title">
     <div className="site-container split">
-      <div className="split__visual">
+      <div className="split__visual" data-reveal>
         <img src={aboutImage} alt="FeedXchange connects mills, traders, transporters and warehouses" width={520} height={420} loading="lazy" />
       </div>
-      <div className="split__copy">
+      <div className="split__copy" data-reveal data-reveal-delay="120">
         <SectionHead
           id="why-title"
           eyebrow="Why FeedXchange"

@@ -4,6 +4,7 @@
 .site-footer {
   flex-shrink: 0;
   background-color: v.$navy-900;
+  background-image: v.$gradient-footer;
   color: rgba(v.$white, 0.7);
   font-size: v.$fs-sm;
 
@@ -25,27 +26,34 @@
   }
 
   // 1 column on phones → 2 on tablets → brand + 3 link columns + newsletter on desktops.
+  // Phones: brand full width, the two link columns side by side, then contact and newsletter full width.
+  // Tablets: two columns throughout. Laptops: brand + 4 columns in one row.
   &__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: v.$space-6;
-    padding-top: v.$space-8;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$space-6 v.$space-4;
+    padding-top: v.$space-7;
     padding-bottom: v.$space-7;
 
-    @include m.up(sm) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    @include m.up(md) {
+      gap: v.$space-6;
+      padding-top: v.$space-8;
     }
 
     @include m.up(lg) {
       grid-template-columns: 1.4fr 0.8fr 0.8fr 1.3fr 1.3fr;
-      gap: v.$space-6;
+    }
+  }
+
+  &__contact,
+  &__newsletter {
+    @include m.down(sm) {
+      grid-column: 1 / -1;
     }
   }
 
   &__brand {
-    @include m.up(sm) {
-      grid-column: 1 / -1;
-    }
+    grid-column: 1 / -1;
 
     @include m.up(lg) {
       grid-column: auto;
