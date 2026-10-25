@@ -150,6 +150,10 @@
     max-width: 32rem;
   }
 
+  &__box--medium {
+    max-width: 44rem;
+  }
+
   &__header,
   &__footer {
     display: flex;
@@ -178,6 +182,15 @@
     min-height: 0;
     padding: 0 1.25rem;
     overflow-y: auto;
+
+    // content that is not the Notify panel gets its own breathing room top and bottom
+    > :first-child:not(.fx-notify) {
+      margin-top: 1.25rem;
+    }
+
+    > :last-child:not(.fx-notify) {
+      margin-bottom: 1.25rem;
+    }
   }
 
   &__close {
@@ -597,4 +610,105 @@
 
 .fx-notify--done {
   padding-bottom: 0;
+}
+
+// ---- a sent message in detail ---------------------------------------------------------------------------------------
+
+.fx-detail {
+  &__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.6rem 1.25rem;
+    margin: 0 0 1rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.6rem;
+    background: #f9fafb;
+
+    dt {
+      margin-bottom: 0.15rem;
+      color: #6b7280;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    small {
+      display: block;
+      color: #6b7280;
+      font-size: 0.78rem;
+      font-weight: 400;
+    }
+  }
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  &__subject {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  &__body {
+    margin: 0 0 1rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid #d1fae5;
+    border-radius: 0.2rem 0.8rem 0.8rem 0.8rem;
+    background: #f0fdf4;
+    font-family: inherit;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  &__attempts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.45rem 0.8rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    small {
+      display: block;
+      color: #6b7280;
+      font-size: 0.78rem;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__num {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: #e5e7eb;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
 }
