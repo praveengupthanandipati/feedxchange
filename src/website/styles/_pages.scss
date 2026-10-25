@@ -402,6 +402,9 @@
 }
 
 .faq-nav {
+  // Lets the chip row scroll inside the column instead of widening the page.
+  min-width: 0;
+
   @include m.up(lg) {
     position: -webkit-sticky;
     position: sticky;
@@ -698,16 +701,31 @@
     justify-content: space-between;
     gap: v.$space-4;
     width: 100%;
-    padding: v.$space-5;
+    padding: v.$space-4;
     border: none;
     border-radius: v.$radius-lg;
     background: none;
     color: v.$ink;
     font-family: v.$font-heading;
-    font-size: v.$fs-base;
+    font-size: v.$fs-sm;
     font-weight: v.$fw-semibold;
+    line-height: 1.45;
     text-align: left;
     cursor: pointer;
+    // No native iOS button look, grey tap flash or double-tap zoom delay.
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    @include m.up(sm) {
+      padding: v.$space-5;
+      font-size: v.$fs-base;
+    }
+
+    &:hover {
+      color: v.$navy-600;
+    }
 
     svg {
       flex-shrink: 0;
@@ -735,24 +753,39 @@
     grid-template-rows: 0fr;
     transition: grid-template-rows 0.35s v.$ease;
 
+    // Closed answers are also hidden from screen readers; visibility waits for the collapse to finish.
     > div {
       min-height: 0;
       overflow: hidden;
+      visibility: hidden;
+      transition: visibility 0s linear 0.35s;
     }
 
     p {
-      padding: 0 v.$space-5 v.$space-5;
+      padding: 0 v.$space-4 v.$space-4;
       color: v.$ink-soft;
+      font-size: v.$fs-sm;
       line-height: 1.75;
+
+      @include m.up(sm) {
+        padding: 0 v.$space-5 v.$space-5;
+        font-size: v.$fs-base;
+      }
     }
   }
 
   &.is-open &__answer {
     grid-template-rows: 1fr;
+
+    > div {
+      visibility: visible;
+      transition: none;
+    }
   }
 
   @include m.reduced-motion {
     &__answer,
+    &__answer > div,
     button svg {
       transition: none;
     }

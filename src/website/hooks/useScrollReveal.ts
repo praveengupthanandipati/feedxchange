@@ -23,7 +23,9 @@ export const useScrollReveal = (rootRef: RefObject<HTMLElement | null>, disabled
           const delay = el.dataset.revealDelay;
           // A one-off animation (not a transition), so it never interferes with the element's hover effects.
           if (delay) el.style.animationDelay = `${delay}ms`;
-          el.classList.add("is-revealed");
+          // An attribute, not a class: React rewrites className on re-render (e.g. an FAQ toggling
+          // "is-open"), which would wipe a class and hide the element again.
+          el.setAttribute("data-revealed", "");
           observer.unobserve(el);
         });
       },
@@ -31,7 +33,7 @@ export const useScrollReveal = (rootRef: RefObject<HTMLElement | null>, disabled
       { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
     );
 
-    const watch = () => root.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-revealed)").forEach((el) => observer.observe(el));
+    const watch = () => root.querySelectorAll<HTMLElement>("[data-reveal]:not([data-revealed])").forEach((el) => observer.observe(el));
     // New page content mounts after the route changes, so wait a frame before collecting elements.
     const frame = requestAnimationFrame(watch);
 
