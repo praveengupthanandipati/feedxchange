@@ -293,6 +293,10 @@
   font-size: v.$font-size-sm;
 }
 
+.nc-error--inline {
+  padding: 0;
+}
+
 .nc-sr {
   @include m.visually-hidden;
 }

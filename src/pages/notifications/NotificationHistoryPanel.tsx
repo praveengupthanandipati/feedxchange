@@ -49,9 +49,10 @@ const NotificationHistoryPanel = () => {
 
   const sellerNum = Number(draft.sellerId) || undefined;
   const buyerNum = Number(draft.buyerId) || undefined;
-  const { data: sellers = [] } = useGetHistorySellersQuery(buyerNum);
-  const { data: buyers = [] } = useGetHistoryBuyersQuery(sellerNum);
-  const { data: contracts = [] } = useGetHistoryContractsQuery({ sellerId: sellerNum, buyerId: buyerNum });
+  const { data: sellers = [], isError: sellersFailed, error: sellersError } = useGetHistorySellersQuery(buyerNum);
+  const { data: buyers = [], isError: buyersFailed } = useGetHistoryBuyersQuery(sellerNum);
+  const { data: contracts = [], isError: contractsFailed } = useGetHistoryContractsQuery({ sellerId: sellerNum, buyerId: buyerNum });
+  const lookupFailed = sellersFailed || buyersFailed || contractsFailed;
 
   const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: p.name })), [sellers]);
   const buyerOptions = useMemo(() => buyers.map((p) => ({ value: String(p.id), label: p.name })), [buyers]);
@@ -127,6 +128,11 @@ const NotificationHistoryPanel = () => {
             </div>
           </div>
         </div>
+        {lookupFailed && (
+          <p className="nc-error nc-error--inline" role="alert">
+            <FiX aria-hidden /> {apiErrorMessage(sellersError, "The seller, buyer and contract lists could not be loaded. Check that the API is up to date and that you have the notification history permission.")}
+          </p>
+        )}
         <div className="nc-filters__actions">
           <p>{canSearch ? "Ready to search." : "Choose a contract, or a seller and buyer, to see what was sent."}</p>
           <button type="button" className="nc-btn" onClick={reset}><FiRefreshCw aria-hidden /> Reset</button>
