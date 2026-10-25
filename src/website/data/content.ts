@@ -7,7 +7,9 @@ import {
   FiFacebook,
   FiFileText,
   FiGrid,
+  FiInfo,
   FiInstagram,
+  FiLifeBuoy,
   FiLink,
   FiLinkedin,
   FiPackage,
@@ -16,6 +18,7 @@ import {
   FiTruck,
   FiTwitter,
   FiUserCheck,
+  FiUsers,
 } from "react-icons/fi";
 import { productPath, sitePaths } from "../routes/paths";
 
@@ -396,13 +399,115 @@ export interface Faq {
   answer: string;
 }
 
-export const faqs: Faq[] = [
-  { question: "Who can trade on FeedXchange?", answer: "Feed mills, traders, processors and transporters registered in India. Every business completes a quick KYC check before its first trade." },
-  { question: "How are prices decided?", answer: "Buyers and sellers agree prices directly. Our live market board shows daily rates and trends for each product to help you negotiate." },
-  { question: "How is product quality assured?", answer: "Each consignment carries the seller's specification sheet and, where agreed, an independent lab report. Disputes are handled by our quality desk." },
-  { question: "Do you arrange transport?", answer: "Yes. Our partner transporters can be assigned to any contract, and every truck can be tracked from loading to delivery." },
-  { question: "When do sellers get paid?", answer: "Payments follow the terms in the contract. Invoices and payment advice are reconciled on the platform, so both sides always see the same status." },
-  { question: "Is there a joining fee?", answer: "Registration is free. A small, transparent service fee applies only to completed trades, with no hidden commissions." },
+export interface FaqCategory {
+  /** Anchor id, used by the category menu. */
+  id: string;
+  title: string;
+  icon: IconType;
+  items: Faq[];
+}
+
+export const faqCategories: FaqCategory[] = [
+  {
+    id: "general",
+    title: "General Information",
+    icon: FiInfo,
+    items: [
+      {
+        question: "What is FeedXchange.in?",
+        answer:
+          "FeedXchange.in is India’s first dedicated B2B digital portal designed exclusively for the animal feed ingredient trade. Backed by the legacy of Sri Sai Raghavendra Trade Services, the platform connects buyers and sellers of raw materials (such as Deoiled Cakes, Grains, DDGS, Crude Oil etc) while providing transparent pricing, contract tracking, and integrated logistics.",
+      },
+      {
+        question: "Who can register on the platform?",
+        answer:
+          "The portal is built to support the entire animal feed raw material procurement ecosystem. This includes Poultry Farms, Fish Farms, Prawn Farms, Cattle Feed Plants, Feed Manufacturers, Enrolled Transporters, and Referral Aggregators.",
+      },
+      {
+        question: "Is there a fee to use the portal?",
+        answer:
+          "Currently, creating an account and accessing the digital portal is completely free. Should we introduce premium subscription features in the future, all users will be notified well in advance.",
+      },
+    ],
+  },
+  {
+    id: "contracts",
+    title: "Contracts, Pricing & Platform Usage",
+    icon: FiFileText,
+    items: [
+      {
+        question: "Are the prices shown on the portal final?",
+        answer:
+          "Because commodity markets are highly volatile, the prices displayed on the portal are indicative and meant for real-time market tracking. Final contract prices are always subject to confirmation at the exact time the deal is locked and executed.",
+      },
+      {
+        question: "Are the prices shown on the portal inclusive of GST and freight?",
+        answer:
+          "The indicative prices displayed on the portal are generally basic prices (Ex-factory/Ex-warehouse) unless explicitly stated otherwise. Applicable GST and negotiated freight charges will be clearly outlined when the final contract is executed.",
+      },
+      {
+        question: "Can I view my old, completed contracts?",
+        answer:
+          "Yes! One of the major benefits of FeedXchange.in is your personalized dashboard. You can access a full history of all your past contracts, associated vehicles, and shared KYC documents for your own auditing and record-keeping purposes.",
+      },
+      {
+        question: "What happens if there is a dispute over the quality of the materials?",
+        answer:
+          "We are committed to fair trade, so it’s a rare case to even occur. If there is a discrepancy in quality or delivery, we step in to actively mediate the dispute between the buyer and the supplier. If poor quality is proven, it will result in a debit to the supplier. Please note that all final financial settlements regarding quality claims are handled directly between the buyer and the supplier.",
+      },
+    ],
+  },
+  {
+    id: "payments",
+    title: "Payments & Fees",
+    icon: FiCreditCard,
+    items: [
+      {
+        question: "Do I make payments for the goods through the FeedXchange portal?",
+        answer:
+          "No. To maintain absolute transparency, all payments for the physical goods are transferred directly from the Buyer's bank account to the Manufacturer/Supplier's bank account. FeedXchange does not act as a payment gateway for raw materials.",
+      },
+      {
+        question: "How do canvassing fees work?",
+        answer:
+          "For our services in facilitating the trade, negotiating best prices, and mediating disputes, a standard canvassing/service fee may apply depending on your specific trading agreement with us. If applicable, this fee is billed separately and paid directly to Sri Sai Raghavendra Trade Services.",
+      },
+    ],
+  },
+  {
+    id: "aggregators",
+    title: "Aggregators & Referrals",
+    icon: FiUsers,
+    items: [
+      {
+        question: "What is the Aggregator program?",
+        answer:
+          "We believe in rewarding those who help our ecosystem grow. Aggregators are provided with a separate login to refer new buyers, sellers, or transporters to the platform. Based on successful onboarding and trading volume, Aggregators can earn referral bonuses and credits.",
+      },
+      {
+        question: "How do I track my successful referrals?",
+        answer:
+          "Aggregators have a dedicated login dashboard where they can see the status of the users they have referred (e.g., Pending KYC, Verified, Active).",
+      },
+      {
+        question: "When are referral bonuses credited?",
+        answer:
+          "Referral bonuses or credits are allocated based on our internal policies, typically after the referred user successfully completes their KYC and executes their first verified contract.",
+      },
+    ],
+  },
+  {
+    id: "support",
+    title: "Technical Support",
+    icon: FiLifeBuoy,
+    items: [
+      {
+        question: "What should I do if I face a technical error or the portal is down?",
+        answer:
+          "If you experience any technical issues, you can reach out to our support team directly. During standard business hours, we also provide offline support for any urgent trade executions while the portal is being restored.",
+      },
+    ],
+  },
 ];
 
 export interface BlogPost {
