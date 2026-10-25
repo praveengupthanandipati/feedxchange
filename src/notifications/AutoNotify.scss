@@ -1,0 +1,247 @@
+@use "../assets/styles/variables" as v;
+@use "../assets/styles/mixins" as m;
+
+// The card that counts down before an automatic notification goes out.
+.auto-notify {
+  position: fixed;
+  left: 50%;
+  bottom: v.$spacing-5;
+  z-index: v.$z-index-tooltip;
+  display: flex;
+  align-items: flex-start;
+  gap: v.$spacing-4;
+  width: min(36rem, calc(100vw - 2rem));
+  padding: v.$spacing-4 v.$spacing-5;
+  overflow: hidden;
+  border: 1px solid v.$color-border;
+  border-left: 4px solid v.$color-primary;
+  border-radius: v.$radius-lg;
+  background-color: v.$color-white;
+  box-shadow: v.$shadow-lg;
+  transform: translateX(-50%);
+  animation: auto-notify-in 220ms ease-out;
+
+  &--sent {
+    border-left-color: v.$color-success;
+  }
+
+  &--error {
+    border-left-color: v.$color-danger;
+  }
+
+  &--empty {
+    border-left-color: v.$color-orange;
+  }
+
+  &__icon {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background-color: rgba(v.$color-primary, 0.1);
+    color: v.$color-primary;
+    font-size: 1.05rem;
+
+    .auto-notify--sent & {
+      background-color: rgba(v.$color-success, 0.12);
+      color: v.$color-success;
+    }
+
+    .auto-notify--error & {
+      background-color: rgba(v.$color-danger, 0.12);
+      color: v.$color-danger;
+    }
+
+    .auto-notify--sending & svg {
+      animation: auto-notify-fly 900ms ease-in-out infinite;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    min-width: 0;
+    font-size: v.$font-size-sm;
+    color: v.$color-text;
+
+    strong {
+      @include m.font-base(v.$font-weight-semibold);
+      line-height: 1.35;
+    }
+  }
+
+  &__sub {
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+  }
+
+  &__more {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    align-self: flex-start;
+    padding: 0;
+    border: none;
+    background: none;
+    color: v.$color-primary;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: v.$spacing-1 0 0;
+    padding: v.$spacing-2 v.$spacing-3;
+    max-height: 9rem;
+    overflow-y: auto;
+    list-style: none;
+    border-radius: v.$radius-md;
+    background-color: v.$color-gray-50;
+    font-size: 0.8rem;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      gap: v.$spacing-3;
+    }
+
+    .is-skipped {
+      color: v.$color-text-muted;
+      font-style: italic;
+    }
+  }
+
+  &__chips {
+    display: flex;
+    gap: 0.25rem;
+
+    em {
+      padding: 0 0.45rem;
+      border-radius: v.$radius-pill;
+      background-color: rgba(v.$color-primary, 0.1);
+      color: v.$color-primary;
+      font-size: 0.7rem;
+      font-style: normal;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    align-items: stretch;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    @include m.font-base(v.$font-weight-semibold);
+    height: 2rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    background-color: v.$color-white;
+    color: v.$color-text;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$color-bg-muted;
+    }
+
+    &--primary {
+      border-color: v.$color-primary;
+      background-color: v.$color-primary;
+      color: v.$color-white;
+
+      &:hover {
+        background-color: v.$color-primary-dark;
+      }
+    }
+
+    &--quiet {
+      border-color: transparent;
+      color: v.$color-text-muted;
+    }
+  }
+
+  &__close {
+    @include m.flex-center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: none;
+    border-radius: v.$radius-md;
+    background: none;
+    color: v.$color-text-muted;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-bg-muted;
+    }
+  }
+
+  // drains while the countdown runs
+  &__bar {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background-color: v.$color-primary;
+    transform-origin: left center;
+    transition: transform 200ms linear;
+  }
+
+  @media (max-width: 36rem) {
+    flex-wrap: wrap;
+
+    &__actions {
+      flex-direction: row;
+      width: 100%;
+    }
+
+    &__btn {
+      flex: 1;
+    }
+  }
+}
+
+@keyframes auto-notify-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes auto-notify-fly {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(2px, -2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auto-notify,
+  .auto-notify__icon svg {
+    animation: none !important;
+  }
+}

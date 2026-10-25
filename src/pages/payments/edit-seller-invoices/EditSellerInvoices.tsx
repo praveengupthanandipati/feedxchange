@@ -97,6 +97,27 @@ const EditSellerInvoices = () => {
     { key: "truckNumber", header: "Truck", render: (row) => row.truckNumber ?? "—" },
     { key: "invoiceQty", header: "Qty (MT)", align: "right" },
     { key: "totalAmount", header: "Total", align: "right", render: (row) => money(row.totalAmount) },
+    {
+      key: "deductions",
+      header: "Deductions",
+      render: (row) =>
+        row.deductions.length === 0 ? (
+          "—"
+        ) : (
+          <div className="edit-invoices__deductions">
+            <strong>{money(row.deductionsTotal)}</strong>
+            <ul>
+              {row.deductions.map((d) => (
+                <li key={d.deductionId} title={d.remarks ?? undefined}>
+                  {formatDate(d.date)}: {money(d.amount)}
+                  {d.isTdsTcs && <span className="edit-invoices__tag">TDS/TCS</span>}
+                  {d.remarks && <em> – {d.remarks}</em>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ),
+    },
     { key: "payableAmount", header: "Payable", align: "right", render: (row) => money(row.payableAmount) },
     { key: "paidAmount", header: "Paid", align: "right", render: (row) => money(row.paidAmount) },
     {

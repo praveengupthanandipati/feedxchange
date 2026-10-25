@@ -26,6 +26,10 @@
     @include m.respond-to(sm) {
       left: auto;
     }
+
+    &--error {
+      background-color: v.$color-danger;
+    }
   }
 }
 
@@ -53,6 +57,13 @@
   &__actions {
     display: flex;
     gap: v.$spacing-2;
+  }
+
+  &__subtitle {
+    @include m.font-heading(v.$font-weight-semibold);
+    color: v.$color-primary;
+    font-size: v.$font-size-lg;
+    margin: v.$spacing-2 0 0;
   }
 
   &__notice {
@@ -337,6 +348,130 @@
         border-color: v.$color-primary;
         color: v.$color-white;
       }
+    }
+  }
+}
+
+// ============================================================
+// Seller / buyer / contract pickers and the refund form
+// ============================================================
+.refunds-selectors {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+
+  @include m.respond-to(xl) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.refunds-filters__error {
+  color: v.$color-danger;
+  font-size: v.$font-size-sm;
+  margin: 0;
+}
+
+.refunds-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: v.$spacing-3;
+
+  @include m.respond-to(sm) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    min-width: 0;
+
+    &--wide {
+      @include m.respond-to(sm) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    label {
+      @include m.font-base(v.$font-weight-semibold);
+      font-size: v.$font-size-sm;
+      color: v.$color-text;
+    }
+
+    input[type="text"],
+    select {
+      @include m.font-base;
+      height: 2.5rem;
+      padding: 0 v.$spacing-3;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+    grid-column: 1 / -1;
+  }
+}
+
+.refunds-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refunds-table {
+  &__refund-input {
+    display: flex;
+    gap: v.$spacing-2;
+
+    input {
+      @include m.font-base;
+      width: 7rem;
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-sm;
+      text-align: right;
+    }
+
+    button {
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-sm;
+      background: v.$color-bg;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+    }
+  }
+
+  &__link-btn {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    padding: 0.25rem 0.6rem;
+    border: 1px solid rgba(v.$color-danger, 0.5);
+    border-radius: v.$radius-sm;
+    background: transparent;
+    color: v.$color-danger;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+    background-color: rgba(v.$color-success, 0.15);
+    color: v.$color-success;
+
+    &--cancelled {
+      background-color: v.$color-gray-50;
+      color: v.$color-text-muted;
     }
   }
 }

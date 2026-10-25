@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiEdit3, FiShare2, FiUser, FiPhone, FiCreditCard, FiUsers } from "react-icons/fi";
+import { FiArrowLeft, FiBell, FiEdit3, FiShare2, FiUser, FiPhone, FiCreditCard, FiUsers } from "react-icons/fi";
 import {
   useGetBusinessProfileByIdQuery,
   useGetAllBusinessLinesQuery,
@@ -18,18 +18,22 @@ import LinkedBusinessTab from "./LinkedBusinessTab";
 import "../BusinessList/Businessowners.scss";
 import "./BusinessOwnerDetail.scss";
 import Can from "../../../../auth/Can";
+import { usePermission } from "../../../../auth/AuthContext";
+import ProfilePreferencesPanel from "../../../notification-preferences/ProfilePreferencesPanel";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: FiUser },
   { id: "contacts", label: "Contacts", icon: FiPhone },
   { id: "bank", label: "Bank Details & Docs", icon: FiCreditCard },
   { id: "linked", label: "Linked Business", icon: FiUsers },
+  { id: "notifications", label: "Notifications", icon: FiBell },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
 
 const BusinessOwnerDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const canSeeNotifications = usePermission("notification-preferences.view");
   const navigate = useNavigate();
   const [shareProfileOpen, setShareProfileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("overview");
@@ -144,7 +148,7 @@ const BusinessOwnerDetail = () => {
         </div>
 
         <nav className="business-owner-detail__tabs" role="tablist" aria-label="Business owner detail sections">
-          {TABS.map((tab) => {
+          {TABS.filter((tab) => tab.id !== "notifications" || canSeeNotifications).map((tab) => {
             const Icon = tab.icon;
             const selected = activeTab === tab.id;
             return (
@@ -175,6 +179,7 @@ const BusinessOwnerDetail = () => {
           {activeTab === "contacts" && <ContactsTab profile={profile} />}
           {activeTab === "bank" && <BankDetailsTab profile={profile} />}
           {activeTab === "linked" && <LinkedBusinessTab ownerId={String(profile.profileId)} />}
+          {activeTab === "notifications" && canSeeNotifications && <ProfilePreferencesPanel profileId={profile.profileId} compact />}
         </div>
       </div>
 

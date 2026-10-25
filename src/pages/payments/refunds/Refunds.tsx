@@ -1,324 +1,323 @@
 import { useEffect, useMemo, useState } from "react";
+import { FiAlertCircle, FiCheckCircle, FiRotateCcw } from "react-icons/fi";
 import DatePickerInput from "../../../components/dropdown/DatePickerInput";
-import {
-  FiCheck,
-  FiCheckCircle,
-  FiChevronLeft,
-  FiChevronRight,
-  FiFilter,
-  FiPlus,
-  FiRefreshCw,
-} from "react-icons/fi";
 import SearchableSelect from "../../../components/dropdown/SearchableSelect";
 import Table from "../../../components/table/Table";
+import type { TableColumn } from "../../../components/table/table.types";
 import ConfirmDialog from "../../../components/dialog/ConfirmDialog";
-import RefundDialog, { type RefundDialogMode } from "./RefundDialog";
-import { buildRefundColumns } from "./refunds.columns";
+import { apiErrorMessage } from "../../../store/sellerInvoiceApi";
 import {
-  buyerOptions,
-  defaultBuyer,
-  defaultSeller,
-  emptyRefundForm,
-  nextRefundId,
-  refundToForm,
-  seedRefundRows,
-  sellerOptions,
-  type RefundFormValues,
-  type RefundRow,
-} from "./refunds.data";
+  useCancelRefundMutation,
+  useGetRefundBuyersQuery,
+  useGetRefundableReceiptsQuery,
+  useGetRefundSellersQuery,
+  useGetRefundsQuery,
+  useSaveRefundMutation,
+  type Receipt,
+  type ReceiptMode,
+  type Refund,
+} from "../../../store/paymentAdviceApi";
 import "./Refunds.scss";
 
-const PAGE_SIZE = 10;
+const MODES: ReceiptMode[] = ["Online", "Cheque", "Cash", "None"];
 
-interface Filters {
-  seller: string;
-  buyer: string;
-  dateFrom: string;
-  dateTo: string;
+function money(value: number): string {
+  return `₹${value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-const defaultFilters: Filters = { seller: defaultSeller, buyer: defaultBuyer, dateFrom: "", dateTo: "" };
-const clearedFilters: Filters = { seller: "", buyer: "", dateFrom: "", dateTo: "" };
-
-interface DialogState {
-  mode: RefundDialogMode;
-  row: RefundRow | null;
-  initialValues: RefundFormValues;
+function formatDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
 }
 
+function todayInput(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/** Credit balance refund: pick a seller and buyer, see the unallocated money on their receipts, and refund all of it or a part. */
 const Refunds = () => {
-  const [rows, setRows] = useState<RefundRow[]>(seedRefundRows);
-  const [filtersVisible, setFiltersVisible] = useState(false);
-  const [draft, setDraft] = useState<Filters>(defaultFilters);
-  const [applied, setApplied] = useState<Filters>(defaultFilters);
-  const [filterError, setFilterError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [sellerId, setSellerId] = useState("");
+  const [buyerId, setBuyerId] = useState("");
 
-  const [dialog, setDialog] = useState<DialogState | null>(null);
-  const [rowPendingDelete, setRowPendingDelete] = useState<RefundRow | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
+  /** Amount typed against each receipt, keyed by receipt id. */
+  const [amounts, setAmounts] = useState<Record<number, string>>({});
+  const [refundDate, setRefundDate] = useState(todayInput());
+  const [mode, setMode] = useState<ReceiptMode>("Online");
+  const [reference, setReference] = useState("");
+  const [remarks, setRemarks] = useState("");
+
+  const [cancelling, setCancelling] = useState<Refund | null>(null);
+  const [toast, setToast] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  const [formError, setFormError] = useState("");
+
+  const sellerNum = Number(sellerId) || 0;
+  const buyerNum = Number(buyerId) || 0;
+  const hasPair = sellerNum > 0 && buyerNum > 0;
+
+  const { data: sellers = [] } = useGetRefundSellersQuery(undefined, { refetchOnMountOrArgChange: true });
+  const { data: buyers = [] } = useGetRefundBuyersQuery(sellerNum || undefined, { refetchOnMountOrArgChange: true });
+  const {
+    data: receipts = [],
+    isFetching: receiptsLoading,
+    isError: receiptsFailed,
+    error: receiptsError,
+  } = useGetRefundableReceiptsQuery({ sellerId: sellerNum, buyerId: buyerNum }, { skip: !hasPair, refetchOnMountOrArgChange: true });
+  const { data: refunds = [] } = useGetRefundsQuery({ sellerId: sellerNum, buyerId: buyerNum }, { skip: !hasPair, refetchOnMountOrArgChange: true });
+  const [saveRefund, { isLoading: saving }] = useSaveRefundMutation();
+  const [cancelRefund, { isLoading: cancelBusy }] = useCancelRefundMutation();
 
   useEffect(() => {
     if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 3000);
+    const timer = setTimeout(() => setToast(null), 4000);
     return () => clearTimeout(timer);
   }, [toast]);
 
+  // a different seller / buyer starts a fresh form
   useEffect(() => {
-    setCurrentPage(1);
-  }, [applied]);
+    setAmounts({});
+    setFormError("");
+  }, [sellerId, buyerId]);
 
-  const filteredRows = useMemo(
-    () =>
-      rows.filter((row) => {
-        if (applied.seller && row.seller !== applied.seller) return false;
-        if (applied.buyer && row.buyer !== applied.buyer) return false;
-        if (applied.dateFrom && row.date < applied.dateFrom) return false;
-        if (applied.dateTo && row.date > applied.dateTo) return false;
-        return true;
-      }),
-    [rows, applied],
-  );
+  const totalUnallocated = round2(receipts.reduce((sum, r) => sum + r.unallocatedAmount, 0));
+  const refundTotal = round2(receipts.reduce((sum, r) => sum + (Number(amounts[r.receiptId]) || 0), 0));
 
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
-  const currentPageClamped = Math.min(currentPage, totalPages);
-  const pageStart = (currentPageClamped - 1) * PAGE_SIZE;
-  const pagedRows = filteredRows.slice(pageStart, pageStart + PAGE_SIZE);
+  const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: p.name })), [sellers]);
+  const buyerOptions = useMemo(() => buyers.map((p) => ({ value: String(p.id), label: p.name })), [buyers]);
 
-  const setDraftField = <K extends keyof Filters>(key: K, value: Filters[K]) => {
-    setDraft((prev) => ({ ...prev, [key]: value }));
-    setFilterError("");
+  const setAmount = (receipt: Receipt, raw: string) => {
+    const cleaned = raw.replace(/[^0-9.]/g, "");
+    setAmounts((prev) => ({ ...prev, [receipt.receiptId]: cleaned }));
+    setFormError("");
   };
 
-  const handleApply = () => {
-    if (draft.dateFrom && draft.dateTo && draft.dateFrom > draft.dateTo) {
-      setFilterError("The From date must be on or before the To date.");
-      return;
+  const handleSubmit = async () => {
+    const lines = receipts
+      .map((r) => ({ receipt: r, amount: round2(Number(amounts[r.receiptId]) || 0) }))
+      .filter((l) => l.amount !== 0);
+    if (lines.length === 0) return setFormError("Enter the amount to refund against at least one receipt.");
+    const over = lines.find((l) => l.amount > l.receipt.unallocatedAmount + 0.004 || l.amount < 0);
+    if (over) return setFormError(`Receipt ${over.receipt.receiptNumber}: enter an amount between 0 and ${money(over.receipt.unallocatedAmount)}.`);
+    if (!refundDate) return setFormError("Select the refund date.");
+    if ((mode === "Online" || mode === "Cheque") && !reference.trim()) {
+      return setFormError(mode === "Online" ? "Enter the transaction ID." : "Enter the cheque / UTR number.");
     }
-    setApplied(draft);
-    setNotice("");
-  };
 
-  const handleReset = () => {
-    setDraft(clearedFilters);
-    setApplied(clearedFilters);
-    setFilterError("");
-    setNotice("");
-  };
-
-  const handleNew = () => {
-    if (!applied.seller || !applied.buyer) {
-      setFiltersVisible(true);
-      setNotice("Select a seller and a buyer and click Apply before adding a refund.");
-      return;
+    try {
+      await saveRefund({
+        sellerId: sellerNum,
+        buyerId: buyerNum,
+        refundDate,
+        paymentMode: mode,
+        reference: reference.trim() || undefined,
+        remarks: remarks.trim() || undefined,
+        lines: lines.map((l) => ({ receiptId: l.receipt.receiptId, amount: l.amount })),
+      }).unwrap();
+      setToast({ kind: "ok", text: `${money(refundTotal)} refunded.` });
+      setAmounts({});
+      setReference("");
+      setRemarks("");
+      setFormError("");
+    } catch (e) {
+      setFormError(apiErrorMessage(e, "The refund could not be saved."));
     }
-    setNotice("");
-    setDialog({ mode: "new", row: null, initialValues: emptyRefundForm() });
   };
 
-  const handleSubmitDialog = (values: RefundFormValues) => {
-    if (!dialog) return;
-    const base = {
-      date: values.date,
-      refNumber: values.refNumber.trim(),
-      payType: values.payType,
-      amountPaid: Number(values.amountPaid),
-      difference: Number(values.difference) || 0,
-      remarks: values.remarks.trim(),
-    };
-
-    // TODO: wire up to the payments API once available.
-    if (dialog.mode === "edit" && dialog.row) {
-      const target = dialog.row;
-      setRows((prev) => prev.map((row) => (row.id === target.id ? { ...row, ...base } : row)));
-      setToast("Refund updated successfully.");
-    } else {
-      setRows((prev) => [{ id: nextRefundId(), seller: applied.seller, buyer: applied.buyer, ...base }, ...prev]);
-      setToast("Refund added successfully.");
+  const confirmCancel = async () => {
+    if (!cancelling) return;
+    try {
+      await cancelRefund(cancelling.refundId).unwrap();
+      setToast({ kind: "ok", text: `Refund of ${money(cancelling.amount)} cancelled; the amount is unallocated again.` });
+    } catch (e) {
+      setToast({ kind: "error", text: apiErrorMessage(e, "The refund could not be cancelled.") });
+    } finally {
+      setCancelling(null);
     }
-    setDialog(null);
   };
 
-  const handleConfirmDelete = () => {
-    if (!rowPendingDelete) return;
-    setRows((prev) => prev.filter((row) => row.id !== rowPendingDelete.id));
-    setRowPendingDelete(null);
-    setToast("Refund deleted.");
-  };
+  const receiptColumns: TableColumn<Receipt>[] = [
+    { key: "receiptNumber", header: "Receipt #" },
+    { key: "receiptDate", header: "Date", render: (r) => formatDate(r.receiptDate) },
+    { key: "contractNumber", header: "Contract #", render: (r) => r.contractNumber ?? "—" },
+    { key: "paymentMode", header: "Mode" },
+    { key: "reference", header: "Reference", render: (r) => r.reference ?? "—" },
+    { key: "amount", header: "Receipt Amount", align: "right", render: (r) => money(r.amount) },
+    { key: "allocatedAmount", header: "Allocated", align: "right", render: (r) => money(r.allocatedAmount) },
+    { key: "refundedAmount", header: "Refunded", align: "right", render: (r) => money(r.refundedAmount) },
+    {
+      key: "unallocatedAmount",
+      header: "Unallocated",
+      align: "right",
+      render: (r) => <span className="refunds-table__amount">{money(r.unallocatedAmount)}</span>,
+    },
+    {
+      key: "refundNow",
+      header: "Refund Amount",
+      render: (r) => (
+        <div className="refunds-table__refund-input">
+          <input
+            type="text"
+            inputMode="decimal"
+            value={amounts[r.receiptId] ?? ""}
+            placeholder="0.00"
+            onChange={(e) => setAmount(r, e.target.value)}
+            aria-label={`Refund amount for receipt ${r.receiptNumber}`}
+          />
+          <button type="button" onClick={() => setAmounts((prev) => ({ ...prev, [r.receiptId]: String(r.unallocatedAmount) }))}>
+            Full
+          </button>
+        </div>
+      ),
+    },
+  ];
 
-  const columns = useMemo(
-    () =>
-      buildRefundColumns({
-        onView: (row) => setDialog({ mode: "view", row, initialValues: refundToForm(row) }),
-        onEdit: (row) => setDialog({ mode: "edit", row, initialValues: refundToForm(row) }),
-        onDelete: setRowPendingDelete,
-      }),
-    [],
-  );
+  const historyColumns: TableColumn<Refund>[] = [
+    { key: "refundDate", header: "Refund Date", render: (r) => formatDate(r.refundDate) },
+    { key: "receiptNumber", header: "Receipt #" },
+    { key: "contractNumber", header: "Contract #", render: (r) => r.contractNumber ?? "—" },
+    { key: "paymentMode", header: "Mode" },
+    { key: "reference", header: "Reference", render: (r) => r.reference ?? "—" },
+    { key: "amount", header: "Amount", align: "right", render: (r) => money(r.amount) },
+    { key: "remarks", header: "Remarks", render: (r) => r.remarks ?? "—" },
+    {
+      key: "status",
+      header: "Status",
+      render: (r) => <span className={`refunds-table__status refunds-table__status--${r.status.toLowerCase()}`}>{r.status}</span>,
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      render: (r) =>
+        r.status === "Active" ? (
+          <button type="button" className="refunds-table__link-btn" onClick={() => setCancelling(r)} aria-label={`Cancel refund of ${money(r.amount)}`}>
+            <FiRotateCcw aria-hidden /> Cancel
+          </button>
+        ) : (
+          "—"
+        ),
+    },
+  ];
 
   return (
     <div className="refunds-page">
       {toast && (
-        <div className="refunds-page__toast" role="status">
-          <FiCheckCircle aria-hidden />
-          {toast}
+        <div className={`refunds-page__toast${toast.kind === "error" ? " refunds-page__toast--error" : ""}`} role="status">
+          {toast.kind === "ok" ? <FiCheckCircle aria-hidden /> : <FiAlertCircle aria-hidden />}
+          {toast.text}
         </div>
       )}
 
       <section className="refunds-card" aria-labelledby="refunds-title">
         <div className="refunds-card__header">
           <h1 id="refunds-title">Credit Balance Refund</h1>
-          <div className="refunds-card__actions">
-            <button
-              type="button"
-              className="refunds-btn refunds-btn--info"
-              onClick={() => setFiltersVisible((prev) => !prev)}
-              aria-expanded={filtersVisible}
-              aria-controls="refunds-filters"
-            >
-              <FiFilter aria-hidden /> Filters
-            </button>
-            <button type="button" className="refunds-btn refunds-btn--primary" onClick={handleNew}>
-              <FiPlus aria-hidden /> New
-            </button>
-          </div>
         </div>
 
-        {filtersVisible && (
-          <div className="refunds-filters" id="refunds-filters">
-            <div className="refunds-filters__field">
-              <SearchableSelect
-                options={sellerOptions}
-                value={draft.seller}
-                onChange={(value) => setDraftField("seller", value)}
-                placeholder="Select Seller"
-                ariaLabel="Select Seller"
-                clearable
-              />
-            </div>
-            <div className="refunds-filters__field">
-              <SearchableSelect
-                options={buyerOptions}
-                value={draft.buyer}
-                onChange={(value) => setDraftField("buyer", value)}
-                placeholder="Select Buyer"
-                ariaLabel="Select Buyer"
-                clearable
-              />
-            </div>
-            <div className="refunds-filters__dates" role="group" aria-label="Payment date range">
-              <DatePickerInput
-                value={draft.dateFrom}
-                onChange={(value) => setDraftField("dateFrom", value)}
-                ariaLabel="From date"
-                clearable
-              />
-              <span aria-hidden>to</span>
-              <DatePickerInput
-                value={draft.dateTo}
-                onChange={(value) => setDraftField("dateTo", value)}
-                ariaLabel="To date"
-                clearable
-              />
-            </div>
-            <div className="refunds-filters__buttons">
-              <button type="button" className="refunds-btn refunds-btn--primary" onClick={handleApply}>
-                <FiCheck aria-hidden /> Apply
-              </button>
-              <button type="button" className="refunds-btn refunds-btn--danger" onClick={handleReset}>
-                <FiRefreshCw aria-hidden /> Reset
-              </button>
-            </div>
-            {filterError && (
-              <p className="refunds-filters__error" role="alert">
-                {filterError}
-              </p>
+        <div className="refunds-selectors">
+          <SearchableSelect
+            options={sellerOptions}
+            value={sellerId}
+            onChange={(value) => {
+              setSellerId(value);
+              setBuyerId("");
+            }}
+            placeholder="Select Seller"
+            ariaLabel="Select Seller"
+          />
+          <SearchableSelect
+            options={buyerOptions}
+            value={buyerId}
+            onChange={(value) => {
+              setBuyerId(value);
+            }}
+            placeholder="Select Buyer"
+            ariaLabel="Select Buyer"
+            disabled={!sellerNum}
+          />
+        </div>
+
+        {!hasPair && <p className="refunds-card__notice">Select a seller and a buyer to see the unallocated amounts that can be refunded.</p>}
+
+        {hasPair && (
+          <>
+            <dl className="refunds-summary">
+              <div>
+                <dt>Total unallocated:</dt>
+                <dd>{money(totalUnallocated)}</dd>
+              </div>
+              <div>
+                <dt>Refunding now:</dt>
+                <dd>{money(refundTotal)}</dd>
+              </div>
+            </dl>
+
+            {receiptsFailed && <p className="refunds-filters__error">{apiErrorMessage(receiptsError, "Could not load the receipts.")}</p>}
+
+            <h2 className="refunds-card__subtitle">Unallocated amounts</h2>
+            <Table
+              columns={receiptColumns}
+              data={receipts}
+              rowKey={(row) => String(row.receiptId)}
+              emptyMessage={receiptsLoading ? "Loading…" : "There is no unallocated amount to refund for this seller and buyer."}
+              className="refunds-table"
+            />
+
+            {receipts.length > 0 && (
+              <div className="refunds-form">
+                <div className="refunds-form__field">
+                  <label htmlFor="refund-date">Refund Date</label>
+                  <DatePickerInput id="refund-date" value={refundDate} onChange={setRefundDate} />
+                </div>
+                <div className="refunds-form__field">
+                  <label htmlFor="refund-mode">Pay Type</label>
+                  <select id="refund-mode" value={mode} onChange={(e) => setMode(e.target.value as ReceiptMode)}>
+                    {MODES.map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="refunds-form__field">
+                  <label htmlFor="refund-ref">Ref Number</label>
+                  <input id="refund-ref" type="text" value={reference} placeholder="Transaction ID / cheque / UTR" onChange={(e) => setReference(e.target.value)} />
+                </div>
+                <div className="refunds-form__field refunds-form__field--wide">
+                  <label htmlFor="refund-remarks">Remarks</label>
+                  <input id="refund-remarks" type="text" value={remarks} placeholder="Enter Remarks" onChange={(e) => setRemarks(e.target.value)} />
+                </div>
+
+                {formError && (
+                  <p className="refunds-filters__error" role="alert">
+                    {formError}
+                  </p>
+                )}
+
+                <div className="refunds-form__buttons">
+                  <button type="button" className="refunds-btn refunds-btn--primary" disabled={saving || refundTotal <= 0} onClick={() => void handleSubmit()}>
+                    {saving ? "Refunding…" : `Refund (${money(refundTotal)})`}
+                  </button>
+                </div>
+              </div>
             )}
-          </div>
+
+            <h2 className="refunds-card__subtitle">Refunds made</h2>
+            <Table columns={historyColumns} data={refunds} rowKey={(row) => String(row.refundId)} emptyMessage="No refunds yet." className="refunds-table" />
+          </>
         )}
-
-        <dl className="refunds-summary">
-          <div>
-            <dt>Seller:</dt>
-            <dd>{applied.seller || "All"}</dd>
-          </div>
-          <div>
-            <dt>Buyer:</dt>
-            <dd>{applied.buyer || "All"}</dd>
-          </div>
-        </dl>
-
-        {notice && (
-          <p className="refunds-card__notice" role="alert">
-            {notice}
-          </p>
-        )}
-
-        <Table
-          columns={columns}
-          data={pagedRows}
-          rowKey={(row) => row.id}
-          emptyMessage="No refunds match the current filters."
-          className="refunds-table"
-        />
-
-        <div className="refunds-pagination">
-          <p>
-            {filteredRows.length === 0
-              ? "Showing 0 Results"
-              : `Showing ${pageStart + 1}-${Math.min(pageStart + PAGE_SIZE, filteredRows.length)} of ${
-                  filteredRows.length
-                } Results`}
-          </p>
-          <div className="refunds-pagination__controls">
-            <button
-              type="button"
-              disabled={currentPageClamped === 1}
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              aria-label="Previous page"
-            >
-              <FiChevronLeft aria-hidden />
-            </button>
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-              <button
-                key={page}
-                type="button"
-                className={page === currentPageClamped ? "is-active" : ""}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            ))}
-            <button
-              type="button"
-              disabled={currentPageClamped === totalPages}
-              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-              aria-label="Next page"
-            >
-              <FiChevronRight aria-hidden />
-            </button>
-          </div>
-        </div>
       </section>
 
-      <RefundDialog
-        open={dialog !== null}
-        mode={dialog?.mode ?? "new"}
-        initialValues={dialog?.initialValues ?? emptyRefundForm()}
-        seller={dialog?.row?.seller ?? applied.seller}
-        buyer={dialog?.row?.buyer ?? applied.buyer}
-        onSubmit={handleSubmitDialog}
-        onClose={() => setDialog(null)}
-      />
-
       <ConfirmDialog
-        open={rowPendingDelete !== null}
-        title="Delete this refund?"
-        message={`This will remove refund ${rowPendingDelete?.refNumber ?? ""}. This cannot be undone.`}
-        confirmLabel="Delete"
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setRowPendingDelete(null)}
+        open={cancelling !== null}
+        title="Cancel this refund?"
+        message={`The refund of ${cancelling ? money(cancelling.amount) : ""} against receipt ${cancelling?.receiptNumber ?? ""} is cancelled and the amount becomes unallocated again. Make sure the money was not actually paid out.`}
+        confirmLabel={cancelBusy ? "Cancelling…" : "Cancel refund"}
+        cancelLabel="Keep"
+        confirmDisabled={cancelBusy}
+        onConfirm={() => void confirmCancel()}
+        onCancel={() => setCancelling(null)}
       />
     </div>
   );

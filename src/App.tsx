@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { SelectedContractProvider } from './context/SelectedContractContext'
 import { AuthProvider } from './auth/AuthContext'
 import { NotificationProvider } from './notifications/NotificationProvider'
+import { AutoNotifyProvider } from './notifications/AutoNotifyProvider'
+import NotificationPreferences from './pages/notification-preferences/NotificationPreferences'
+import MyNotificationPreferences from './pages/notification-preferences/MyNotificationPreferences'
 import ContractNotificationHistory from './pages/notifications/ContractNotificationHistory'
 import NotificationInbox from './pages/notifications/NotificationInbox'
 import TemplateAdmin from './pages/notifications/TemplateAdmin'
@@ -126,6 +129,7 @@ function App() {
   return (
     <AuthProvider>
     <NotificationProvider>
+    <AutoNotifyProvider>
     <SelectedContractProvider>
     <Router>
       <Routes>
@@ -141,6 +145,8 @@ function App() {
           <Route path="/contracts/:id/notifications" element={<ContractNotificationHistory />} />
           <Route path="/notifications" element={<NotificationInbox />} />
           <Route path="/notification-templates" element={<TemplateAdmin />} />
+          <Route path="/notification-preferences" element={<NotificationPreferences />} />
+          <Route path="/my-notification-preferences" element={<MyNotificationPreferences />} />
           <Route path="/contracts/new" element={<NewContract />} />
           <Route path="/business-owners" element={<Businessowners />} />
           <Route path="/business-owners/:id" element={<BusinessOwnerDetail />} />
@@ -265,6 +271,7 @@ function App() {
       </Routes>
     </Router>
     </SelectedContractProvider>
+    </AutoNotifyProvider>
     </NotificationProvider>
     </AuthProvider>
   )

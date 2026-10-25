@@ -22,6 +22,8 @@ export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/contracts/:id", any: ["contracts.view"] },
   { path: "/contracts/:id/notifications", any: ["notifications.history"] },
   { path: "/notification-templates", any: ["notification-templates.view"] },
+  { path: "/notification-preferences", any: ["notification-preferences.view"] },
+  { path: "/my-notification-preferences", any: ["my-notification-preferences"] },
   { path: "/contract-status", any: ["contract-status"] },
 
   // Truck management

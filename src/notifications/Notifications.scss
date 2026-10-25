@@ -257,3 +257,24 @@
     color: #991b1b;
   }
 }
+
+// Where a recipient in the Notify dialog came from, when the dialog started from saved preferences.
+.fx-notify__tag {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.4;
+
+  &--pref {
+    background: rgba(24, 78, 140, 0.1);
+    color: #184e8c;
+  }
+
+  &--added {
+    background: rgba(245, 158, 11, 0.16);
+    color: #8a5a00;
+  }
+}

@@ -43,6 +43,12 @@ export interface NotifyPanelProps {
   sendLabel?: string;
   /** Channels and templates already chosen on the screen (per role); the panel starts from them. */
   choices?: NotifyChoices | null;
+  /**
+   * What the saved notification preferences propose, per recipient ("Type:Id" -> channels). When given, the panel starts from exactly this
+   * (people not listed start unticked), tags each person as from preferences or added by the user, offers "Reset to preferences", and the
+   * send is recorded as AutoOverridden.
+   */
+  initialPicks?: Record<string, ChannelCode[]>;
 }
 
 
@@ -65,7 +71,7 @@ const unavailableReason = (c: RecipientCandidate, channel: ChannelCode): string 
  */
 const NotifyPanel = ({
   eventCode, contractId, contractNumber, variantCode, sourceEntityType, sourceEntityId, profileId, informationType, data, allowOpenText,
-  onSent, onSkip, sendLabel = "Send", choices,
+  onSent, onSkip, sendLabel = "Send", choices, initialPicks,
 }: NotifyPanelProps) => {
   const hasContract = contractId !== undefined || !!contractNumber || sourceEntityId !== undefined || profileId !== undefined;
   const { data: channels = [] } = useGetNotificationChannelsQuery();
@@ -109,15 +115,15 @@ const NotifyPanel = ({
       seeded.current.add(k);
       const pick: ChannelPick = {};
       const chosen = choices?.channels[c.role];
-      // The screen's own choice wins; otherwise the event's default channels for this role.
-      const wanted = chosen ?? event.rules.filter((r) => r.recipientRole === c.role && r.isDefaultOn).map((r) => r.channelCode);
+      // The saved preferences win when they were given; then the screen's own choice; otherwise the event's default channels for this role.
+      const wanted = initialPicks ? (initialPicks[k] ?? []) : (chosen ?? event.rules.filter((r) => r.recipientRole === c.role && r.isDefaultOn).map((r) => r.channelCode));
       wanted.forEach((ch) => {
         if (!unavailableReason(c, ch)) pick[ch] = true;
       });
       additions[k] = pick;
     }
     if (Object.keys(additions).length > 0) setPicks((prev) => ({ ...prev, ...additions }));
-  }, [candidates, event, choices]);
+  }, [candidates, event, choices, initialPicks]);
 
   // Every (role, channel) that at least one recipient has ticked: each gets its own template choice.
   const usedPairs = useMemo(() => {
@@ -131,6 +137,12 @@ const NotifyPanel = ({
     }
     return pairs;
   }, [candidates, picks, enabledChannels]);
+
+  const resetToPreferences = () => {
+    if (!initialPicks) return;
+    setPreviewResult(null);
+    setPicks(Object.fromEntries(candidates.map((c) => [keyOf(c), Object.fromEntries((initialPicks[keyOf(c)] ?? []).filter((ch) => !unavailableReason(c, ch)).map((ch) => [ch, true]))])));
+  };
 
   const toggle = (c: RecipientCandidate, channel: ChannelCode) => {
     setPreviewResult(null);
@@ -171,6 +183,7 @@ const NotifyPanel = ({
       eventCode, contractId, contractNumber, profileId, variantCode, sourceEntityType, sourceEntityId,
       openText: showText ? text : null, data: informationType ? { ...(data ?? {}), InformationType: informationType } : (data ?? null), recipients,
       idempotencyKey: idempotencyKey.current,
+      dispatchMode: initialPicks ? "AutoOverridden" : undefined,
     };
   };
 
@@ -237,7 +250,10 @@ const NotifyPanel = ({
         </div>
       )}
 
-      <div className="fw-semibold mb-1">Send to</div>
+      <div className="d-flex align-items-center justify-content-between mb-1">
+        <div className="fw-semibold">Send to</div>
+        {initialPicks && <button type="button" className="btn btn-link btn-sm p-0" onClick={resetToPreferences}>Reset to preferences</button>}
+      </div>
       {loadingRecipients ? (
         <p className="text-secondary small">Loading recipients…</p>
       ) : candidates.length === 0 ? (
@@ -259,6 +275,9 @@ const NotifyPanel = ({
                     <div className="small text-secondary">
                       {c.role === "SELECTED" ? "Added by you" : c.role.charAt(0) + c.role.slice(1).toLowerCase()}
                       {c.organisation ? ` · ${c.organisation}` : ""}
+                      {initialPicks && (initialPicks[keyOf(c)]
+                        ? <span className="fx-notify__tag fx-notify__tag--pref">From preferences</span>
+                        : Object.values(picks[keyOf(c)] ?? {}).some(Boolean) && <span className="fx-notify__tag fx-notify__tag--added">Added by you</span>)}
                     </div>
                   </td>
                   {enabledChannels.map((ch) => {

@@ -36,6 +36,8 @@ export interface Receipt {
   bankName: string | null;
   amount: number;
   allocatedAmount: number;
+  /** Given back to the buyer. */
+  refundedAmount: number;
   unallocatedAmount: number;
   towards: string | null;
   remarks: string | null;
@@ -94,6 +96,31 @@ export interface ApplyAllocationResult {
   invoices: { invoiceId: number; invoiceNumber: string; cashAllocated: number; advanceAdjusted: number; balanceAmount: number; status: string }[];
 }
 
+export interface SaveRefundPayload {
+  sellerId: number;
+  buyerId: number;
+  /** yyyy-MM-dd */
+  refundDate: string;
+  paymentMode: ReceiptMode;
+  reference?: string;
+  remarks?: string;
+  lines: { receiptId: number; amount: number }[];
+}
+
+export interface Refund {
+  refundId: number;
+  receiptId: number;
+  receiptNumber: string;
+  contractId: number | null;
+  contractNumber: string | null;
+  refundDate: string;
+  paymentMode: ReceiptMode;
+  reference: string | null;
+  amount: number;
+  remarks: string | null;
+  status: string;
+}
+
 interface PairArgs {
   sellerId: number;
   buyerId: number;
@@ -102,7 +129,7 @@ interface PairArgs {
 export const paymentAdviceApi = createApi({
   reducerPath: "paymentAdviceApi",
   baseQuery: apiBaseQuery,
-  tagTypes: ["Receipts", "InvoicesToClear"],
+  tagTypes: ["Receipts", "InvoicesToClear", "Refunds"],
   endpoints: (builder) => ({
     getPaymentSellers: builder.query<PaymentParty[], void>({ query: () => "/api/PaymentAdvice/GetSellers" }),
     getPaymentBuyers: builder.query<PaymentParty[], number | undefined>({
@@ -131,9 +158,29 @@ export const paymentAdviceApi = createApi({
       query: (receiptId) => ({ url: `/api/PaymentAdvice/DeleteReceipt/${receiptId}`, method: "POST" }),
       invalidatesTags: ["Receipts"],
     }),
+    getRefundSellers: builder.query<PaymentParty[], void>({ query: () => "/api/PaymentAdvice/GetRefundSellers" }),
+    getRefundBuyers: builder.query<PaymentParty[], number | undefined>({
+      query: (sellerId) => `/api/PaymentAdvice/GetRefundBuyers${sellerId ? `?sellerId=${sellerId}` : ""}`,
+    }),
+    getRefundableReceipts: builder.query<Receipt[], PairArgs>({
+      query: ({ sellerId, buyerId }) => `/api/PaymentAdvice/GetRefundableReceipts?sellerId=${sellerId}&buyerId=${buyerId}`,
+      providesTags: ["Refunds"],
+    }),
+    getRefunds: builder.query<Refund[], PairArgs>({
+      query: ({ sellerId, buyerId }) => `/api/PaymentAdvice/GetRefunds?sellerId=${sellerId}&buyerId=${buyerId}`,
+      providesTags: ["Refunds"],
+    }),
+    saveRefund: builder.mutation<Refund[], SaveRefundPayload>({
+      query: (body) => ({ url: "/api/PaymentAdvice/SaveRefund", method: "POST", body }),
+      invalidatesTags: ["Refunds", "Receipts"],
+    }),
+    cancelRefund: builder.mutation<void, number>({
+      query: (refundId) => ({ url: `/api/PaymentAdvice/CancelRefund/${refundId}`, method: "POST" }),
+      invalidatesTags: ["Refunds", "Receipts"],
+    }),
     applyAllocation: builder.mutation<ApplyAllocationResult, ApplyAllocationPayload>({
       query: (body) => ({ url: "/api/PaymentAdvice/ApplyAllocation", method: "POST", body }),
-      invalidatesTags: ["Receipts", "InvoicesToClear"],
+      invalidatesTags: ["Receipts", "InvoicesToClear", "Refunds"],
       // the seller invoice screens show what has been paid, so they must read it again
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
@@ -157,4 +204,10 @@ export const {
   useUpdateReceiptMutation,
   useDeleteReceiptMutation,
   useApplyAllocationMutation,
+  useGetRefundSellersQuery,
+  useGetRefundBuyersQuery,
+  useGetRefundableReceiptsQuery,
+  useGetRefundsQuery,
+  useSaveRefundMutation,
+  useCancelRefundMutation,
 } = paymentAdviceApi;

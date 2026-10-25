@@ -1,45 +1,64 @@
 import { useRef, useState } from "react";
 import type { ReactElement } from "react";
 import { usePermission } from "../auth/AuthContext";
+import { useResolveNotificationMutation } from "../store/notificationPreferencesApi";
 import NotifyModal from "./NotifyModal";
-import type { NotifyChoices } from "./notifyChoices";
+import { useAutoNotify } from "./AutoNotifyProvider";
+import type { NotifyItem } from "./notifyItem";
 
-/** What a screen tells the module after a successful save: which event, and the record it is about. The server does the rest. */
-export interface NotifyItem {
-  eventCode: string;
-  title: string;
-  contractNumber?: string;
-  contractId?: number;
-  /** "DispatchSchedule" | "DispatchScheduleTransporter" | "ContractTruckDispatch" | "PaymentReceipt" | "ContractInvoice" */
-  sourceEntityType?: string;
-  sourceEntityId?: number;
-  profileId?: number;
-  informationType?: string;
-  sendLabel?: string;
-  choices?: NotifyChoices | null;
-}
+export type { NotifyItem } from "./notifyItem";
 
 /**
- * Call `ask(item)` right after a screen saves something (a schedule, a truck, a payment...). If the user may send notifications a dialog
- * opens where they choose recipients, channels and templates; Send, Skip or closing it all continue. Pass several items (e.g. several
- * trucks) and the dialogs appear one after another. `onDone` runs when the last one is closed - use it for the redirect that used to
- * happen immediately. Users without the permission never see the dialog and `onDone` runs straight away.
+ * Call `ask(item)` right after a screen saves something (a schedule, a truck, a payment...). The server first checks the business
+ * profiles involved:
+ *  - profiles that use notification preferences (Auto): the screen carries on at once and a card counts down and sends by itself, with
+ *    Send now / Customize / Cancel. Nobody needs the "notifications.send" permission for this.
+ *  - everything else (the default): the Notify dialog opens exactly as before, where the user chooses recipients, channels and templates;
+ *    Send, Skip or closing it all continue. Users without the permission never see the dialog.
+ * Pass several items (e.g. several trucks) and they are handled one after another. `onDone` runs when the last dialog is closed
+ * (or straight away when there was none) - use it for the redirect that used to happen immediately.
  *
  * Render `element` somewhere in the screen's JSX.
  */
 export const useNotifyPrompt = () => {
   const canNotify = usePermission("notifications.send");
+  const { enqueue } = useAutoNotify();
+  const [resolve] = useResolveNotificationMutation();
   const [queue, setQueue] = useState<NotifyItem[]>([]);
+  const [resolving, setResolving] = useState(false);
   const onDone = useRef<(() => void) | undefined>(undefined);
 
   const ask = (items: NotifyItem | NotifyItem[], done?: () => void): boolean => {
     const list = (Array.isArray(items) ? items : [items]).filter((i) => i.sourceEntityId !== undefined || i.contractNumber || i.contractId || i.profileId);
-    if (!canNotify || list.length === 0) {
+    if (list.length === 0) {
       done?.();
       return false;
     }
     onDone.current = done;
-    setQueue(list);
+    setResolving(true);
+    void (async () => {
+      const manual: NotifyItem[] = [];
+      for (const item of list) {
+        try {
+          const result = await resolve({
+            eventCode: item.eventCode, contractId: item.contractId, contractNumber: item.contractNumber,
+            sourceEntityType: item.sourceEntityType, sourceEntityId: item.sourceEntityId, profileId: item.profileId,
+          }).unwrap();
+          if (result.mode === "Auto") enqueue(item, result);
+          else manual.push(item);
+        } catch {
+          manual.push(item);   // if the check fails, fall back to asking the person, as before
+        }
+      }
+      setResolving(false);
+      if (!canNotify || manual.length === 0) {
+        const cb = onDone.current;
+        onDone.current = undefined;
+        cb?.();
+        return;
+      }
+      setQueue(manual);
+    })();
     return true;
   };
 
@@ -73,5 +92,5 @@ export const useNotifyPrompt = () => {
     />
   ) : null;
 
-  return { ask, element, busy: queue.length > 0 };
+  return { ask, element, busy: queue.length > 0 || resolving };
 };

@@ -96,6 +96,8 @@ export interface ComposeNotificationRequest {
   data?: Record<string, string> | null;
   recipients: RecipientSelection[];
   idempotencyKey?: string | null;
+  /** Manual (default), or AutoOverridden when the person changed what the preferences proposed. Stored for the audit trail. */
+  dispatchMode?: "Manual" | "AutoOverridden";
 }
 
 export interface RenderedMessage {
