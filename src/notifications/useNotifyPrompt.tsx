@@ -3,7 +3,7 @@ import type { ReactElement } from "react";
 import { usePermission } from "../auth/AuthContext";
 import { useResolveNotificationMutation } from "../store/notificationPreferencesApi";
 import NotifyModal from "./NotifyModal";
-import { useAutoNotify } from "./AutoNotifyProvider";
+import { useAutoNotify } from "./autoNotifyContext";
 import type { NotifyItem } from "./notifyItem";
 
 export type { NotifyItem } from "./notifyItem";
@@ -22,7 +22,7 @@ export type { NotifyItem } from "./notifyItem";
  */
 export const useNotifyPrompt = () => {
   const canNotify = usePermission("notifications.send");
-  const { enqueue } = useAutoNotify();
+  const auto = useAutoNotify();
   const [resolve] = useResolveNotificationMutation();
   const [queue, setQueue] = useState<NotifyItem[]>([]);
   const [resolving, setResolving] = useState(false);
@@ -44,7 +44,7 @@ export const useNotifyPrompt = () => {
             eventCode: item.eventCode, contractId: item.contractId, contractNumber: item.contractNumber,
             sourceEntityType: item.sourceEntityType, sourceEntityId: item.sourceEntityId, profileId: item.profileId,
           }).unwrap();
-          if (result.mode === "Auto") enqueue(item, result);
+          if (result.mode === "Auto" && auto) auto.enqueue(item, result);
           else manual.push(item);
         } catch {
           manual.push(item);   // if the check fails, fall back to asking the person, as before

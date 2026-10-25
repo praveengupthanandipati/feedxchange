@@ -1,11 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import { Component, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ErrorInfo, ReactNode } from "react";
 import { FiAlertCircle, FiBell, FiCheck, FiChevronDown, FiChevronUp, FiSend, FiSliders, FiX } from "react-icons/fi";
 import { useDispatchNotificationMutation } from "../store/notificationPreferencesApi";
 import type { ResolveNotificationResult } from "../store/notificationPreferencesApi";
 import type { ChannelCode } from "../store/notificationsApi";
 import { apiErrorMessage } from "../store/sellerInvoiceApi";
 import NotifyModal from "./NotifyModal";
+import { AutoNotifyContext } from "./autoNotifyContext";
 import type { NotifyItem } from "./notifyItem";
 import "./AutoNotify.scss";
 
@@ -22,18 +23,13 @@ interface AutoJob {
   message?: string;
 }
 
-interface AutoNotifyContextValue {
-  /** Hand over an event whose recipients the server resolved from preferences. The screen can carry on: this outlives it. */
-  enqueue: (item: NotifyItem, result: ResolveNotificationResult) => void;
+/** A problem drawing the card must never take the whole screen down with it: the notification is simply not shown. */
+class CardBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(error: Error, info: ErrorInfo) { console.error("Automatic notification card failed to render", error, info.componentStack); }
+  render() { return this.state.failed ? null : this.props.children; }
 }
-
-const AutoNotifyContext = createContext<AutoNotifyContextValue | null>(null);
-
-export const useAutoNotify = (): AutoNotifyContextValue => {
-  const ctx = useContext(AutoNotifyContext);
-  if (!ctx) throw new Error("useAutoNotify must be used inside <AutoNotifyProvider>.");
-  return ctx;
-};
 
 const CHANNEL_LABEL: Record<string, string> = { EMAIL: "Email", WHATSAPP: "WhatsApp", SMS: "SMS", APP: "App" };
 const RESUME_MS = 3000;
@@ -92,7 +88,12 @@ export const AutoNotifyProvider = ({ children }: { children: ReactNode }) => {
 
   const enqueue = useCallback((item: NotifyItem, result: ResolveNotificationResult) => {
     const id = crypto.randomUUID();
-    const job: AutoJob = { id, item, result, phase: "countdown", deadline: null, customizing: false };
+    // nobody is subscribed: say so at once instead of counting down to nothing
+    const empty = result.recipients.length === 0;
+    const job: AutoJob = {
+      id, item, result, phase: empty ? "empty" : "countdown", deadline: null, customizing: false,
+      message: empty ? "Nobody is subscribed to this notification, so nothing was sent. Choose who hears about it under Notification preferences." : undefined,
+    };
     setJobs((all) => [...all, job]);
   }, []);
 
@@ -140,6 +141,7 @@ export const AutoNotifyProvider = ({ children }: { children: ReactNode }) => {
     <AutoNotifyContext.Provider value={value}>
       {children}
 
+      <CardBoundary key={current?.id ?? "none"}>
       {current && !customizing && (
         <div className={`auto-notify auto-notify--${current.phase}`} role="status" aria-live="polite">
           <div className="auto-notify__icon" aria-hidden>
@@ -234,6 +236,7 @@ export const AutoNotifyProvider = ({ children }: { children: ReactNode }) => {
           }}
         />
       )}
+      </CardBoundary>
     </AutoNotifyContext.Provider>
   );
 };
