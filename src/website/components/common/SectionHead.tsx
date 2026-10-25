@@ -8,7 +8,7 @@ interface SectionHeadProps {
 }
 
 const SectionHead = ({ id, eyebrow, title, text, align = "center" }: SectionHeadProps) => (
-  <div className={`section-head ${align === "left" ? "section-head--left" : ""}`}>
+  <div className={`section-head ${align === "left" ? "section-head--left" : ""}`} data-reveal>
     <span className="eyebrow">{eyebrow}</span>
     <h2 id={id}>{title}</h2>
     {text && <p>{text}</p>}

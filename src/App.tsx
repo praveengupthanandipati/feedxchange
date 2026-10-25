@@ -7,6 +7,7 @@ import ContractNotificationHistory from './pages/notifications/ContractNotificat
 import NotificationInbox from './pages/notifications/NotificationInbox'
 import TemplateAdmin from './pages/notifications/TemplateAdmin'
 import { lazy, Suspense } from 'react'
+import SiteLoader from './website/components/common/SiteLoader'
 import AppLayout from './components/layout/AppLayout'
 import Login from './pages/login/Login'
 import Dashboard from './pages/dashboard/Dashboard'
@@ -129,7 +130,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/website/*" element={<Suspense fallback={null}><Website /></Suspense>} />
+        <Route path="/website/*" element={<Suspense fallback={<SiteLoader />}><Website /></Suspense>} />
         <Route element={<AppLayout />}>
 
           <Route path="/" element={<Dashboard />} />

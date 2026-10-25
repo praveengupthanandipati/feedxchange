@@ -63,8 +63,16 @@ textarea {
   @include m.container;
 }
 
+// Every section has a soft gradient background; the solid colour underneath is the fallback.
 .section {
-  padding: v.$space-8 0;
+  // 48px on phones → 64px on tablets → 96px on laptops.
+  padding: v.$space-7 0;
+  background-color: v.$white;
+  background-image: v.$gradient-light;
+
+  @include m.up(md) {
+    padding: v.$space-8 0;
+  }
 
   @include m.up(lg) {
     padding: v.$space-9 0;
@@ -72,10 +80,12 @@ textarea {
 
   &--alt {
     background-color: v.$surface-alt;
+    background-image: v.$gradient-alt;
   }
 
   &--dark {
-    background: radial-gradient(120% 120% at 100% 0%, v.$navy-600 0%, v.$navy-900 55%);
+    background-color: v.$navy-900;
+    background-image: v.$gradient-dark;
     color: rgba(v.$white, 0.85);
 
     h2,
@@ -87,8 +97,12 @@ textarea {
 
 .section-head {
   max-width: 40rem;
-  margin: 0 auto v.$space-7;
+  margin: 0 auto v.$space-6;
   text-align: center;
+
+  @include m.up(md) {
+    margin-bottom: v.$space-7;
+  }
 
   h2 {
     @include m.fluid-type(1.75rem, 2.5rem);

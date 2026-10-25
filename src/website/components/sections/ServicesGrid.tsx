@@ -11,8 +11,8 @@ const ServicesGrid = ({ limit }: ServicesGridProps) => (
     <div className="site-container">
       <SectionHead id="services-title" eyebrow="What we do" title="Everything you need to trade feed ingredients" text="From the first price check to the final payment, every step runs on one connected platform." />
       <ul className="card-grid">
-        {services.slice(0, limit).map(({ icon: Icon, title, text }) => (
-          <li key={title} className="feature-card">
+        {services.slice(0, limit).map(({ icon: Icon, title, text }, index) => (
+          <li key={title} className="feature-card" data-reveal data-reveal-delay={(index % 3) * 100}>
             <span className="feature-card__icon">
               <Icon aria-hidden />
             </span>
