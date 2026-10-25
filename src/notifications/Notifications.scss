@@ -129,19 +129,21 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding: 2rem 1rem;
-    overflow-y: auto;
+    padding: 1.5rem 1rem;
+    overflow: hidden;
     background: rgba(0, 0, 0, 0.5);
   }
 
   &__box {
     width: 100%;
-    max-width: 56rem;
+    max-width: 62rem;
+    max-height: calc(100vh - 3rem);
     background: #fff;
     border-radius: 0.75rem;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   &__box--narrow {
@@ -172,8 +174,10 @@
   }
 
   &__body {
-    padding: 1.25rem;
-    overflow-x: auto;
+    flex: 1;
+    min-height: 0;
+    padding: 0 1.25rem;
+    overflow-y: auto;
   }
 
   &__close {
@@ -276,5 +280,266 @@
   &--added {
     background: rgba(245, 158, 11, 0.16);
     color: #8a5a00;
+  }
+}
+
+// ---- the people list in the Notify dialog: one row per person, every channel visible, no sideways scrolling --------------
+
+.fx-notify {
+  padding-top: 1.25rem;
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__count {
+    color: #6b7280;
+    font-size: 0.8rem;
+  }
+
+  &__tools {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 2rem;
+    padding: 0 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    color: #6b7280;
+
+    input {
+      width: 11rem;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font-size: 0.85rem;
+      color: #111827;
+    }
+
+    &:focus-within {
+      border-color: #184e8c;
+      box-shadow: 0 0 0 3px rgba(24, 78, 140, 0.12);
+    }
+  }
+
+  // sticks to the bottom of the dialog so Send is always in reach, however long the list
+  &__actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin: 0.75rem -1.25rem 0;
+    padding: 0.85rem 1.25rem;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+  }
+}
+
+.fx-list {
+  --fx-cols: 5.6rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.6rem;
+  margin-bottom: 1rem;
+  overflow: clip; // not hidden: the column header must be able to stick
+
+  &__cols,
+  &__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(var(--fx-n, 4), var(--fx-cols));
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.75rem;
+  }
+
+  &__cols {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #184e8c;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+
+    span:not(:first-child) {
+      text-align: center;
+    }
+  }
+
+  &__ghead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    background: #f3f4f6;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.8rem;
+    color: #374151;
+
+    em {
+      margin-left: 0.3rem;
+      padding: 0 0.45rem;
+      border-radius: 999px;
+      background: #e5e7eb;
+      font-style: normal;
+      font-size: 0.7rem;
+    }
+  }
+
+  &__gall {
+    display: grid;
+    grid-template-columns: repeat(var(--fx-n, 4), var(--fx-cols));
+    gap: 0.4rem;
+    // lines the "All" buttons up under their channel columns
+    margin-right: 0;
+  }
+
+  &__all {
+    border: 0;
+    background: transparent;
+    color: #184e8c;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      text-decoration: underline;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    &.is-on {
+      color: #6b7280;
+    }
+  }
+
+  &__row {
+    border-top: 1px solid #f0f1f3;
+
+    &:hover {
+      background: #fafbfc;
+    }
+  }
+
+  &__who {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.4rem;
+    min-width: 0;
+
+    strong {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    small {
+      flex-basis: 100%;
+      overflow: hidden;
+      color: #6b7280;
+      font-size: 0.75rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+.fx-notify__tag {
+  margin-left: 0;
+}
+
+.fx-chan {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  height: 1.9rem;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #fff;
+  color: #6b7280;
+  font-size: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+
+  input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: inherit;
+  }
+
+  &:hover:not(.is-off):not(.is-on) {
+    border-color: #184e8c;
+    color: #184e8c;
+  }
+
+  &.is-on {
+    border-color: #184e8c;
+    background: rgba(24, 78, 140, 0.1);
+    color: #184e8c;
+    font-weight: 600;
+  }
+
+  &.is-off {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #f9fafb;
+  }
+
+  &:focus-within {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4);
+  }
+}
+
+// narrow screens: icons only, and the names sit above the channels
+@media (max-width: 40rem) {
+  .fx-list {
+    --fx-cols: 2.4rem;
+
+    &__cols,
+    &__row {
+      grid-template-columns: 1fr;
+    }
+
+    &__cols {
+      display: none;
+    }
+
+    &__row {
+      grid-template-columns: repeat(var(--fx-n, 4), 1fr);
+    }
+
+    &__who {
+      grid-column: 1 / -1;
+    }
+
+    &__gall {
+      display: none;
+    }
+  }
+
+  .fx-chan span {
+    display: none;
   }
 }

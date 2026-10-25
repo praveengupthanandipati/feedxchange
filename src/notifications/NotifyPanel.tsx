@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FiBell, FiMail, FiMessageCircle, FiSearch, FiSmartphone } from "react-icons/fi";
 import {
   useGetNotificationChannelsQuery,
   useGetNotificationEventsQuery,
@@ -64,6 +65,10 @@ const unavailableReason = (c: RecipientCandidate, channel: ChannelCode): string 
   return null;
 };
 
+const CHANNEL_ICON = { EMAIL: FiMail, WHATSAPP: FiMessageCircle, SMS: FiSmartphone, APP: FiBell } as const;
+const CHANNEL_SHORT: Record<ChannelCode, string> = { EMAIL: "Email", WHATSAPP: "WhatsApp", SMS: "SMS", APP: "In-app" };
+const roleLabel = (role: string) => (role === "SELECTED" ? "Added by you" : role.charAt(0) + role.slice(1).toLowerCase());
+
 /**
  * The "who do you want to tell, and how?" panel used on every screen that triggers a notification. The user ticks channels per
  * recipient (defaults come from the event rules), picks a template per channel (e.g. which email template), previews the exact
@@ -94,6 +99,7 @@ const NotifyPanel = ({
   const candidates = useMemo(() => [...loaded, ...adhoc], [loaded, adhoc]);
 
   const [picks, setPicks] = useState<Record<string, ChannelPick>>({});
+  const [filter, setFilter] = useState("");
   // Template choice per role AND channel: a buyer and a seller have different templates for the same channel.
   const [templateByKey, setTemplateByKey] = useState<Record<string, number | null>>(choices?.templates ?? {});
   const [text, setText] = useState("");
@@ -142,6 +148,34 @@ const NotifyPanel = ({
     if (!initialPicks) return;
     setPreviewResult(null);
     setPicks(Object.fromEntries(candidates.map((c) => [keyOf(c), Object.fromEntries((initialPicks[keyOf(c)] ?? []).filter((ch) => !unavailableReason(c, ch)).map((ch) => [ch, true]))])));
+  };
+
+  const needle = filter.trim().toLowerCase();
+  const visible = useMemo(
+    () => candidates.filter((c) => !needle || `${c.displayName} ${c.organisation ?? ""} ${c.role} ${c.email ?? ""} ${c.mobile ?? ""}`.toLowerCase().includes(needle)),
+    [candidates, needle],
+  );
+  // people of one business and role sit together, so "all of the buyer's people" is one click
+  const groups = useMemo(() => {
+    const map = new Map<string, { key: string; role: string; organisation: string | null; people: RecipientCandidate[] }>();
+    for (const c of visible) {
+      const key = `${c.role}|${c.organisation ?? ""}`;
+      if (!map.has(key)) map.set(key, { key, role: c.role, organisation: c.organisation, people: [] });
+      map.get(key)!.people.push(c);
+    }
+    return [...map.values()];
+  }, [visible]);
+
+  const toggleGroup = (people: RecipientCandidate[], channel: ChannelCode) => {
+    const usable = people.filter((c) => !unavailableReason(c, channel));
+    if (usable.length === 0) return;
+    const allOn = usable.every((c) => picks[keyOf(c)]?.[channel]);
+    setPreviewResult(null);
+    setPicks((prev) => {
+      const next = { ...prev };
+      for (const c of usable) next[keyOf(c)] = { ...next[keyOf(c)], [channel]: !allOn };
+      return next;
+    });
   };
 
   const toggle = (c: RecipientCandidate, channel: ChannelCode) => {
@@ -193,6 +227,8 @@ const NotifyPanel = ({
     return err?.data?.message ?? err?.data?.title ?? "Something went wrong. Please try again.";
   };
 
+  const peopleSelected = candidates.filter((c) => Object.values(picks[keyOf(c)] ?? {}).some(Boolean)).length;
+  const messageCount = candidates.reduce((n, c) => n + enabledChannels.filter((ch) => picks[keyOf(c)]?.[ch] && !unavailableReason(c, ch)).length, 0);
   const canCompose = !showText || text.trim().length > 0;
   const request = buildRequest();
 
@@ -250,53 +286,77 @@ const NotifyPanel = ({
         </div>
       )}
 
-      <div className="d-flex align-items-center justify-content-between mb-1">
-        <div className="fw-semibold">Send to</div>
-        {initialPicks && <button type="button" className="btn btn-link btn-sm p-0" onClick={resetToPreferences}>Reset to preferences</button>}
+      <div className="fx-notify__head">
+        <div>
+          <div className="fw-semibold">Send to</div>
+          <div className="fx-notify__count">
+            {loadingRecipients ? "Loading…" : `${peopleSelected} of ${candidates.length} selected · ${messageCount} ${messageCount === 1 ? "message" : "messages"}`}
+          </div>
+        </div>
+        <div className="fx-notify__tools">
+          {candidates.length > 8 && (
+            <label className="fx-notify__search">
+              <FiSearch aria-hidden />
+              <input type="search" value={filter} placeholder="Search people" onChange={(e) => setFilter(e.target.value)} aria-label="Search people" />
+            </label>
+          )}
+          {initialPicks && <button type="button" className="btn btn-link btn-sm p-0" onClick={resetToPreferences}>Reset to preferences</button>}
+        </div>
       </div>
+
       {loadingRecipients ? (
         <p className="text-secondary small">Loading recipients…</p>
       ) : candidates.length === 0 ? (
         <p className="text-secondary small">No recipients found{event?.allowsAdhocRecipients ? " - add one below" : ""}.</p>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-sm align-middle fx-notify__channels">
-            <thead>
-              <tr>
-                <th>Recipient</th>
-                {enabledChannels.map((ch) => <th key={ch}>{channels.find((c) => c.channelCode === ch)?.channelName ?? ch}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {candidates.map((c) => (
-                <tr key={keyOf(c)}>
-                  <td>
-                    <div className="fw-semibold">{c.displayName}</div>
-                    <div className="small text-secondary">
-                      {c.role === "SELECTED" ? "Added by you" : c.role.charAt(0) + c.role.slice(1).toLowerCase()}
-                      {c.organisation ? ` · ${c.organisation}` : ""}
-                      {initialPicks && (initialPicks[keyOf(c)]
-                        ? <span className="fx-notify__tag fx-notify__tag--pref">From preferences</span>
-                        : Object.values(picks[keyOf(c)] ?? {}).some(Boolean) && <span className="fx-notify__tag fx-notify__tag--added">Added by you</span>)}
-                    </div>
-                  </td>
+        <div className="fx-list" role="group" aria-label="Recipients" style={{ "--fx-n": enabledChannels.length } as React.CSSProperties}>
+          <div className="fx-list__cols" aria-hidden>
+            <span>Recipient</span>
+            {enabledChannels.map((ch) => <span key={ch}>{CHANNEL_SHORT[ch] ?? ch}</span>)}
+          </div>
+          {groups.length === 0 && <p className="text-secondary small p-3 mb-0">No one matches “{filter}”.</p>}
+          {groups.map((g) => (
+            <section key={g.key} className="fx-list__group">
+              <header className="fx-list__ghead">
+                <span><strong>{roleLabel(g.role)}</strong>{g.organisation ? ` · ${g.organisation}` : ""} <em>{g.people.length}</em></span>
+                <span className="fx-list__gall">
                   {enabledChannels.map((ch) => {
-                    const why = unavailableReason(c, ch);
+                    const usable = g.people.filter((c) => !unavailableReason(c, ch));
+                    const all = usable.length > 0 && usable.every((c) => picks[keyOf(c)]?.[ch]);
                     return (
-                      <td key={ch} title={why ?? undefined}>
-                        <input
-                          type="checkbox" className="form-check-input" disabled={!!why}
-                          checked={!!picks[keyOf(c)]?.[ch] && !why}
-                          onChange={() => toggle(c, ch)}
-                          aria-label={`${c.displayName} by ${ch}`}
-                        />
-                      </td>
+                      <button key={ch} type="button" className={`fx-list__all ${all ? "is-on" : ""}`} disabled={usable.length === 0}
+                        onClick={() => toggleGroup(g.people, ch)} title={`${all ? "Clear" : "Select"} ${CHANNEL_SHORT[ch] ?? ch} for everyone below`}>
+                        {all ? "Clear" : "All"}
+                      </button>
                     );
                   })}
-                </tr>
+                </span>
+              </header>
+              {g.people.map((c) => (
+                <div key={keyOf(c)} className="fx-list__row">
+                  <div className="fx-list__who">
+                    <strong>{c.displayName}</strong>
+                    {initialPicks && (initialPicks[keyOf(c)]
+                      ? <span className="fx-notify__tag fx-notify__tag--pref">From preferences</span>
+                      : Object.values(picks[keyOf(c)] ?? {}).some(Boolean) && <span className="fx-notify__tag fx-notify__tag--added">Added by you</span>)}
+                    <small>{[c.email, c.mobile].filter(Boolean).join(" · ") || "No contact details"}</small>
+                  </div>
+                  {enabledChannels.map((ch) => {
+                    const why = unavailableReason(c, ch);
+                    const Icon = CHANNEL_ICON[ch];
+                    const on = !!picks[keyOf(c)]?.[ch] && !why;
+                    return (
+                      <label key={ch} className={`fx-chan ${on ? "is-on" : ""} ${why ? "is-off" : ""}`} title={why ?? `${CHANNEL_SHORT[ch] ?? ch}`}>
+                        <input type="checkbox" disabled={!!why} checked={on} onChange={() => toggle(c, ch)} aria-label={`${c.displayName} by ${CHANNEL_SHORT[ch] ?? ch}`} />
+                        <Icon aria-hidden />
+                        <span>{CHANNEL_SHORT[ch] ?? ch}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               ))}
-            </tbody>
-          </table>
+            </section>
+          ))}
         </div>
       )}
 
@@ -338,7 +398,7 @@ const NotifyPanel = ({
 
       {error && <div className="alert alert-danger py-2">{error}</div>}
 
-      <div className="d-flex gap-2 justify-content-end">
+      <div className="fx-notify__actions">
         {onSkip && <button type="button" className="btn btn-outline-secondary" onClick={onSkip} disabled={sending}>Skip</button>}
         <button type="button" className="btn btn-outline-primary" onClick={() => void doPreview()} disabled={!request || !canCompose || previewing || sending}>
           {previewing ? "Rendering…" : "Preview"}
