@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiBell, FiMail, FiMessageCircle, FiSearch, FiSmartphone } from "react-icons/fi";
+import { FiBell, FiCheck, FiMail, FiMessageCircle, FiSearch, FiSmartphone } from "react-icons/fi";
 import {
   useGetNotificationChannelsQuery,
   useGetNotificationEventsQuery,
@@ -41,6 +41,8 @@ export interface NotifyPanelProps {
   onSent?: (result: SendNotificationResult) => void;
   /** Called when the user chooses not to notify. */
   onSkip?: () => void;
+  /** Called by the Done button on the confirmation shown after sending (a dialog passes its close). */
+  onDone?: () => void;
   sendLabel?: string;
   /** Channels and templates already chosen on the screen (per role); the panel starts from them. */
   choices?: NotifyChoices | null;
@@ -76,7 +78,7 @@ const roleLabel = (role: string) => (role === "SELECTED" ? "Added by you" : role
  */
 const NotifyPanel = ({
   eventCode, contractId, contractNumber, variantCode, sourceEntityType, sourceEntityId, profileId, informationType, data, allowOpenText,
-  onSent, onSkip, sendLabel = "Send", choices, initialPicks,
+  onSent, onSkip, onDone, sendLabel = "Send", choices, initialPicks,
 }: NotifyPanelProps) => {
   const hasContract = contractId !== undefined || !!contractNumber || sourceEntityId !== undefined || profileId !== undefined;
   const { data: channels = [] } = useGetNotificationChannelsQuery();
@@ -256,19 +258,40 @@ const NotifyPanel = ({
   };
 
   if (sent) {
+    const people = new Set(sent.deliveries.map((d) => d.displayName ?? d.recipientRole)).size;
     return (
-      <div className="fx-notify">
-        <div className="alert alert-success">
-          {sent.duplicate ? "This notification was already sent." : "Notification queued. Delivery status will update here and in the notification history."}
+      <div className="fx-notify fx-notify--done">
+        <div className="fx-done">
+          <span className="fx-done__icon" aria-hidden><FiCheck /></span>
+          <div>
+            <strong>{sent.duplicate ? "This notification was already sent" : `Notification queued for ${people} ${people === 1 ? "person" : "people"}`}</strong>
+            <p>{sent.deliveries.length} {sent.deliveries.length === 1 ? "message" : "messages"} will go out shortly. Delivery status updates in the notification history.</p>
+          </div>
         </div>
-        <table className="table table-sm">
-          <thead><tr><th>Recipient</th><th>Channel</th><th>Status</th></tr></thead>
-          <tbody>
-            {sent.deliveries.map((d) => (
-              <tr key={d.deliveryId}><td>{d.displayName ?? d.recipientRole}</td><td>{d.channelCode}</td><td>{d.status}</td></tr>
-            ))}
-          </tbody>
-        </table>
+
+        <div className="fx-list" style={{ "--fx-n": 0 } as React.CSSProperties}>
+          <div className="fx-list__cols fx-list__cols--three" aria-hidden>
+            <span>Recipient</span><span>Channel</span><span>Status</span>
+          </div>
+          {sent.deliveries.map((d) => {
+            const code = d.channelCode.toUpperCase() as ChannelCode;
+            const Icon = CHANNEL_ICON[code] ?? FiMail;
+            const tone = /fail|bounce|reject/i.test(d.status) ? "bad" : /deliver|sent|read|submit/i.test(d.status) ? "ok" : "wait";
+            return (
+              <div key={d.deliveryId} className="fx-list__row fx-list__row--three">
+                <div className="fx-list__who"><strong>{d.displayName ?? d.recipientRole}</strong><small>{roleLabel(d.recipientRole)}</small></div>
+                <span className="fx-done__channel"><Icon aria-hidden /> {CHANNEL_SHORT[code] ?? d.channelCode}</span>
+                <span className={`fx-status fx-status--${tone}`}>{d.status}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {onDone && (
+          <div className="fx-notify__actions">
+            <button type="button" className="btn btn-primary" onClick={onDone}>Done</button>
+          </div>
+        )}
       </div>
     );
   }

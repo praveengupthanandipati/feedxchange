@@ -543,3 +543,58 @@
     display: none;
   }
 }
+
+// ---- confirmation after sending ------------------------------------------------------------------------------------
+
+.fx-done {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(22, 101, 52, 0.25);
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, #ecfdf3, #f7fffa);
+
+  strong {
+    display: block;
+    color: #14532d;
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 0.15rem 0 0;
+    color: #4b5563;
+    font-size: 0.85rem;
+  }
+
+  &__icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #fff;
+    font-size: 1.1rem;
+  }
+
+  &__channel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #374151;
+    font-size: 0.85rem;
+  }
+}
+
+.fx-list__cols--three,
+.fx-list__row--three {
+  grid-template-columns: minmax(0, 1fr) 9rem 7rem;
+}
+
+.fx-notify--done {
+  padding-bottom: 0;
+}

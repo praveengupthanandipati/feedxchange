@@ -30,7 +30,7 @@ const NotifyModal = ({ open, title = "Send notification", onClose, onSkip, close
           <button type="button" className="fx-modal__close" onClick={onClose} aria-label="Close">×</button>
         </div>
         <div className="fx-modal__body">
-          <NotifyPanel {...panel} onSkip={() => { onSkip?.(); onClose(); }} />
+          <NotifyPanel {...panel} onSkip={() => { onSkip?.(); onClose(); }} onDone={onClose} />
         </div>
       </div>
     </div>,
