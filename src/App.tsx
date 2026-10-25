@@ -7,7 +7,7 @@ import { AutoNotifyProvider } from './notifications/AutoNotifyProvider'
 import NotificationPreferences from './pages/notification-preferences/NotificationPreferences'
 import MyNotificationPreferences from './pages/notification-preferences/MyNotificationPreferences'
 import ContractNotificationHistory from './pages/notifications/ContractNotificationHistory'
-import NotificationInbox from './pages/notifications/NotificationInbox'
+import NotificationsCenter from './pages/notifications/NotificationsCenter'
 import TemplateAdmin from './pages/notifications/TemplateAdmin'
 import { lazy, Suspense } from 'react'
 import SiteLoader from './website/components/common/SiteLoader'
@@ -143,7 +143,7 @@ function App() {
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/contracts/:id" element={<ContractDetail />} />
           <Route path="/contracts/:id/notifications" element={<ContractNotificationHistory />} />
-          <Route path="/notifications" element={<NotificationInbox />} />
+          <Route path="/notifications" element={<NotificationsCenter />} />
           <Route path="/notification-templates" element={<TemplateAdmin />} />
           <Route path="/notification-preferences" element={<NotificationPreferences />} />
           <Route path="/my-notification-preferences" element={<MyNotificationPreferences />} />

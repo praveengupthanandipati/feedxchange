@@ -337,7 +337,7 @@ export const asideNavSections: AsideNavSection[] = [
         ],
       },
 
-      { id: "notifications", permissions: ["subscriptions.view"], label: "Notifications", icon: FiBell, path: "/notifications" },
+      { id: "notifications", permissions: ["subscriptions.view", "notifications.history"], label: "Notifications", icon: FiBell, path: "/notifications" },
 
     ],
   },

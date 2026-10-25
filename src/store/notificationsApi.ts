@@ -141,6 +141,9 @@ export interface NotificationHistoryItem {
   notificationId: number;
   eventCode: string;
   eventName: string;
+  contractNumber: string | null;
+  sellerName: string | null;
+  buyerName: string | null;
   recipientRole: string | null;
   recipientName: string | null;
   channelCode: ChannelCode;
@@ -163,8 +166,26 @@ export interface NotificationHistoryQuery {
   status?: string;
   recipientRole?: string;
   eventCode?: string;
+  sellerId?: number;
+  buyerId?: number;
+  /** yyyy-MM-dd */
+  from?: string;
+  to?: string;
   page?: number;
   pageSize?: number;
+}
+
+export interface HistoryParty {
+  id: number;
+  name: string;
+}
+
+export interface HistoryContract {
+  contractId: number;
+  contractNumber: string;
+  productName: string | null;
+  sellerName: string | null;
+  buyerName: string | null;
 }
 
 export interface NotificationHistoryPage {
@@ -258,6 +279,15 @@ export const notificationsApi = createApi({
       query: (q) => `/api/Notifications/history${qs({ ...q })}`,
       providesTags: ["History"],
     }),
+    getHistorySellers: builder.query<HistoryParty[], number | undefined>({
+      query: (buyerId) => `/api/Notifications/history/sellers${qs({ buyerId })}`,
+    }),
+    getHistoryBuyers: builder.query<HistoryParty[], number | undefined>({
+      query: (sellerId) => `/api/Notifications/history/buyers${qs({ sellerId })}`,
+    }),
+    getHistoryContracts: builder.query<HistoryContract[], { sellerId?: number; buyerId?: number }>({
+      query: (q) => `/api/Notifications/history/contracts${qs({ ...q })}`,
+    }),
     getDeliveryDetail: builder.query<DeliveryDetail, number>({ query: (id) => `/api/Notifications/deliveries/${id}` }),
     resendNotifications: builder.mutation<ResendResult, ResendPayload>({
       query: (body) => ({
@@ -293,6 +323,9 @@ export const {
   useSendNotificationMutation,
   useGetNotificationHistoryQuery,
   useGetDeliveryDetailQuery,
+  useGetHistorySellersQuery,
+  useGetHistoryBuyersQuery,
+  useGetHistoryContractsQuery,
   useResendNotificationsMutation,
   useGetInboxQuery,
   useGetUnreadCountQuery,

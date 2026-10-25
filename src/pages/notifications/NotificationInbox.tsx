@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FiBell, FiCheckCircle } from "react-icons/fi";
 import { useGetInboxQuery, useMarkAllNotificationsReadMutation, useMarkNotificationReadMutation } from "../../store/notificationsApi";
 import type { InboxItem } from "../../store/notificationsApi";
 import { formatApiDateTime } from "../../utils/apiDateTime";
-import "../../notifications/Notifications.scss";
+import "./NotificationsCenter.scss";
 
 const STEP = 30;
 
 /** The signed-in user's own notifications, newest first. Everyone can open this; it only ever shows their own. */
-const NotificationInbox = () => {
+const NotificationInbox = ({ embedded = false }: { embedded?: boolean }) => {
   const navigate = useNavigate();
   const [size, setSize] = useState(STEP);
   const { data, isFetching } = useGetInboxQuery({ pageSize: size });
@@ -20,37 +21,52 @@ const NotificationInbox = () => {
     if (item.deepLink) navigate(item.deepLink);
   };
 
-  return (
-    <div className="container py-3" style={{ maxWidth: "48rem" }}>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h1 className="h4 mb-0">Notifications{data && data.unreadCount > 0 ? ` (${data.unreadCount} unread)` : ""}</h1>
-        <button type="button" className="btn btn-outline-secondary btn-sm" disabled={!data || data.unreadCount === 0} onClick={() => void markAll()}>
-          Mark all read
-        </button>
-      </div>
+  const unread = data?.unreadCount ?? 0;
 
-      {!data && isFetching && <p className="text-secondary">Loading…</p>}
-      {data && data.items.length === 0 && <p className="text-secondary">You have no notifications.</p>}
+  const body = (
+    <section className="nc-inbox" aria-label="My inbox">
+      <header className="nc-inbox__head">
+        <strong>{unread > 0 ? `${unread} unread` : "All caught up"}</strong>
+        <button type="button" className="nc-btn" disabled={unread === 0} onClick={() => void markAll()}><FiCheckCircle aria-hidden /> Mark all read</button>
+      </header>
 
-      <div className="list-group">
-        {data?.items.map((item) => (
-          <button key={item.inboxId} type="button" className={`list-group-item list-group-item-action text-start ${item.isRead ? "" : "fw-semibold"}`} onClick={() => open(item)}>
-            <div className="d-flex justify-content-between gap-2">
-              <span>{item.title}</span>
-              <span className="small text-secondary text-nowrap fw-normal">{formatApiDateTime(item.createdAt)}</span>
-            </div>
-            <div className="small text-secondary fw-normal" style={{ whiteSpace: "pre-wrap" }}>{item.body}</div>
-          </button>
-        ))}
-      </div>
-
-      {data?.nextCursor != null && (
-        <div className="text-center mt-3">
-          <button type="button" className="btn btn-outline-secondary btn-sm" disabled={isFetching} onClick={() => setSize(size + STEP)}>
-            {isFetching ? "Loading…" : "Show older"}
-          </button>
+      {!data && isFetching && <p className="nc-muted nc-pad">Loading…</p>}
+      {data && data.items.length === 0 && (
+        <div className="nc-empty nc-empty--flat">
+          <span aria-hidden><FiBell /></span>
+          <h3>No notifications yet</h3>
+          <p>Messages sent to you in the app will appear here.</p>
         </div>
       )}
+
+      <ul className="nc-inbox__list">
+        {data?.items.map((item) => (
+          <li key={item.inboxId}>
+            <button type="button" className={`nc-inbox__item ${item.isRead ? "" : "is-unread"}`} onClick={() => open(item)}>
+              <span className="nc-inbox__dot" aria-hidden />
+              <span className="nc-inbox__text">
+                <strong>{item.title}</strong>
+                <span>{item.body}</span>
+              </span>
+              <time className="nc-inbox__time">{formatApiDateTime(item.createdAt)}</time>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {data?.nextCursor != null && (
+        <div className="nc-pad nc-center">
+          <button type="button" className="nc-btn" disabled={isFetching} onClick={() => setSize(size + STEP)}>{isFetching ? "Loading…" : "Show older"}</button>
+        </div>
+      )}
+    </section>
+  );
+
+  if (embedded) return body;
+  return (
+    <div className="nc-page">
+      <header className="nc-page__header"><h1>Notifications</h1><p>Your own notifications, newest first.</p></header>
+      {body}
     </div>
   );
 };

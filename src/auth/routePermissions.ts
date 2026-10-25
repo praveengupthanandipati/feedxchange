@@ -87,7 +87,7 @@ export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/products/price-tracking", any: ["price.tracking"] },
   { path: "/products/price-history", any: ["price.history"] },
   { path: "/products/formula-calculations", any: ["price.formula"] },
-  { path: "/notifications", any: ["subscriptions.view"] },
+  { path: "/notifications", any: ["subscriptions.view", "notifications.history"] },
   // Interest of Payments has no permission keys yet, so its screens are open to any signed-in user.
 
   { path: "/products", any: ["products.view"] },
