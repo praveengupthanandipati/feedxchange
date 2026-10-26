@@ -65,7 +65,7 @@
     color: v.fg(v.$color-text-muted);
 
     &:focus-within {
-      border-color: v.line(v.$color-navy);
+      border-color: var(--fx-field-border-focus);
     }
 
     input {
@@ -227,7 +227,7 @@
 
       &:focus {
         outline: none;
-        border-color: v.line(v.$color-navy);
+        border-color: var(--fx-field-border-focus);
       }
     }
 

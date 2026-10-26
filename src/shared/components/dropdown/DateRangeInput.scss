@@ -34,7 +34,7 @@
     }
 
     &:hover {
-      border-color: v.line(v.$color-primary);
+      border-color: var(--fx-field-border-hover);
     }
   }
 
@@ -100,7 +100,7 @@
       cursor: pointer;
 
       &:hover {
-        border-color: v.line(v.$color-primary);
+        border-color: var(--fx-field-border-hover);
       }
 
       @include m.respond-below(sm) {

@@ -215,7 +215,7 @@ $tones: (
 
       &:focus {
         outline: none;
-        border-color: v.line(v.$color-navy);
+        border-color: var(--fx-field-border-focus);
       }
     }
   }
@@ -350,7 +350,7 @@ $tones: (
 
     &:focus {
       outline: none;
-      border-color: v.line(v.$color-navy);
+      border-color: var(--fx-field-border-focus);
     }
   }
 
@@ -465,7 +465,7 @@ $tones: (
     overflow: hidden;
 
     &:focus-within {
-      border-color: v.line(v.$color-navy);
+      border-color: var(--fx-field-border-focus);
     }
 
     span {

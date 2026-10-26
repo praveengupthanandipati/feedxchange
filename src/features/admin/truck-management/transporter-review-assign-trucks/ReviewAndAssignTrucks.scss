@@ -255,7 +255,7 @@
 
       &:focus {
         outline: none;
-        border-color: v.line(v.$color-primary);
+        border-color: var(--fx-field-border-focus);
       }
     }
 

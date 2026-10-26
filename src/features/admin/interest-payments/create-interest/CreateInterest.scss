@@ -76,7 +76,7 @@
 
     &:focus {
       outline: none;
-      border-color: v.line(v.$color-navy);
+      border-color: var(--fx-field-border-focus);
     }
   }
 
