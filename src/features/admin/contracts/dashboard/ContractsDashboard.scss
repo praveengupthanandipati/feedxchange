@@ -1,0 +1,412 @@
+@use "../../../../shared/assets/styles/variables" as v;
+@use "../../../../shared/assets/styles/mixins" as m;
+
+// Contracts overview above the list: tokens and the compact density only, so it follows every theme.
+
+.contracts-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  margin-bottom: v.$spacing-4;
+
+  &--message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    padding: v.$spacing-3 v.$spacing-4;
+    border: 1px dashed v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+}
+
+.cd-filterbar {
+  @include m.flex(row, space-between, center, v.$spacing-2);
+  flex-wrap: wrap;
+  padding: v.$spacing-2 v.$spacing-3;
+  border-radius: v.$radius-md;
+  background-color: v.alpha(v.$color-primary, 0.08);
+  color: v.fg(v.$color-text);
+  font-size: v.$font-size-sm;
+
+  &__clear {
+    @include m.flex(row, center, center, 0.25rem);
+    @include m.focus-ring;
+    min-height: var(--fx-control-height-sm);
+    padding: 0 0.6rem;
+    border: 1px solid v.line(v.$color-gray-300);
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+  }
+}
+
+// ---------------- headline cards ----------------
+.cd-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: v.$spacing-3;
+
+  @include m.respond-to(lg) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.cd-card {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  text-align: left;
+
+  &--button {
+    @include m.focus-ring;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: v.$shadow-lg;
+    }
+  }
+
+  &__label {
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+
+  &__value {
+    @include m.font-heading(v.$font-weight-semibold);
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-xl;
+    line-height: 1.2;
+  }
+
+  &__note {
+    color: v.fg(v.$color-text-muted);
+    font-size: var(--fx-text-xs);
+  }
+}
+
+.cd-progress {
+  display: block;
+  height: 0.4rem;
+  margin-top: 0.2rem;
+  overflow: hidden;
+  border-radius: v.$radius-pill;
+  background-color: v.$color-gray-100;
+
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--fx-chart-2);
+  }
+}
+
+// ---------------- panels ----------------
+.cd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: v.$spacing-3;
+
+  @include m.respond-to(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    // twelve month labels need the full width on tablets
+    .cd-panel--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @include m.respond-to(xl) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    .cd-panel--wide,
+    .cd-panel--half {
+      grid-column: span 2;
+    }
+
+    .cd-panel--wide {
+      grid-column: auto / span 2;
+    }
+  }
+}
+
+.cd-panel {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  min-width: 0;
+
+  &__title {
+    @include m.font-heading(v.$font-weight-semibold);
+    margin: 0;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-base;
+  }
+
+  &__empty {
+    margin: 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+}
+
+// shared look of the clickable rows
+%cd-row {
+  @include m.flex(row, flex-start, center, v.$spacing-2);
+  @include m.focus-ring;
+  width: 100%;
+  min-height: 1.9rem;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: v.$radius-sm;
+  background: transparent;
+  color: v.fg(v.$color-text);
+  font: inherit;
+  font-size: v.$font-size-sm;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: v.$color-gray-100;
+  }
+
+  &.is-active {
+    border-color: v.line(v.$color-primary);
+    background-color: v.alpha(v.$color-primary, 0.08);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+// ---------------- needs attention ----------------
+.cd-attention {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__row {
+    @extend %cd-row;
+
+    svg {
+      flex-shrink: 0;
+      color: v.fg(v.$color-text-muted);
+    }
+
+    &--overdue:not(.is-zero) svg {
+      color: v.fg(v.$color-danger);
+    }
+
+    &--due7:not(.is-zero) svg,
+    &--approval:not(.is-zero) svg {
+      color: v.fg(v.$color-orange-dark);
+    }
+
+    &.is-zero {
+      color: v.fg(v.$color-text-muted);
+    }
+  }
+
+  &__label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__count {
+    min-width: 1.6rem;
+    padding: 0 0.4rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-gray-100;
+    color: v.fg(v.$color-text);
+    font-weight: v.$font-weight-semibold;
+    text-align: center;
+
+    .cd-attention__row--overdue:not(.is-zero) & {
+      background-color: v.alpha(v.$color-danger, 0.14);
+      color: v.fg(v.$color-danger);
+    }
+  }
+}
+
+// ---------------- by status ----------------
+.cd-status {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-3;
+
+  &__chart {
+    flex-shrink: 0;
+    width: 7.5rem;
+    height: 7.5rem;
+  }
+}
+
+.cd-legend {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__row {
+    @extend %cd-row;
+  }
+
+  &__swatch {
+    flex-shrink: 0;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 2px;
+  }
+
+  &__name {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  &__count {
+    font-weight: v.$font-weight-semibold;
+  }
+}
+
+// ---------------- per month ----------------
+.cd-months {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.25rem;
+  height: 8.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  > li {
+    display: flex;
+    min-width: 0;
+  }
+
+  &__bar {
+    @include m.focus-ring;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.15rem;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+
+    &:hover:not(:disabled) .cd-months__fill,
+    &.is-active .cd-months__fill {
+      background-color: v.$color-primary;
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  &__count {
+    color: v.fg(v.$color-text);
+    font-size: var(--fx-text-xs);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__fill {
+    width: 70%;
+    min-height: 2px;
+    border-radius: 3px 3px 0 0;
+    background-color: var(--fx-chart-1);
+  }
+
+  &__label {
+    color: v.fg(v.$color-text-muted);
+    font-size: var(--fx-text-xs);
+    white-space: nowrap;
+
+    // phones: every other month label, so they do not run into each other
+    @include m.respond-below(sm) {
+      li:nth-child(even) & {
+        visibility: hidden;
+      }
+    }
+  }
+}
+
+// ---------------- ranked lists ----------------
+.cd-ranked {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__row {
+    @extend %cd-row;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 0.15rem;
+  }
+
+  &__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__value {
+    color: v.fg(v.$color-text-muted);
+    font-size: var(--fx-text-xs);
+    white-space: nowrap;
+  }
+
+  &__bar {
+    grid-column: 1 / -1;
+    height: 0.3rem;
+    overflow: hidden;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-gray-100;
+
+    > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background-color: var(--fx-chart-1);
+    }
+  }
+}
+
+// ---------------- show / hide ----------------
+.contracts-dashboard-toggle {
+  @include m.flex(row, center, center, 0.3rem);
+  @include m.focus-ring;
+  align-self: flex-start;
+  min-height: var(--fx-control-height-sm);
+  margin-bottom: v.$spacing-2;
+  padding: 0 0.6rem;
+  border: 1px solid v.line(v.$color-gray-300);
+  border-radius: v.$radius-sm;
+  background-color: v.$color-bg;
+  color: v.fg(v.$color-text);
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+}

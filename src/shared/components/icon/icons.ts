@@ -14,6 +14,7 @@ import {
   Box,
   Briefcase,
   Calendar,
+  ChartColumn,
   ChartNoAxesColumn,
   ChartPie,
   Check,
@@ -125,6 +126,7 @@ export const BellOffIcon = createIcon(BellOff, "BellOffIcon");
 export const BoxIcon = createIcon(Box, "BoxIcon");
 export const BriefcaseIcon = createIcon(Briefcase, "BriefcaseIcon");
 export const CalendarIcon = createIcon(Calendar, "CalendarIcon");
+export const ChartColumnIcon = createIcon(ChartColumn, "ChartColumnIcon");
 export const ChartNoAxesColumnIcon = createIcon(ChartNoAxesColumn, "ChartNoAxesColumnIcon");
 export const ChartPieIcon = createIcon(ChartPie, "ChartPieIcon");
 export const CheckIcon = createIcon(Check, "CheckIcon");
