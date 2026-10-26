@@ -2,6 +2,7 @@ import { BellIcon, ChevronRightIcon, LogOutIcon } from "../../../shared/componen
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../core/auth/AuthContext";
 import ThemePicker from "../../../shared/theme/ThemePicker";
+import { PageHeader } from "../../../shared/components/ui";
 import "./Settings.scss";
 
 /** Account screen behind the phone tab bar's Settings tab. */
@@ -16,7 +17,7 @@ const Settings = () => {
 
   return (
     <div className="settings">
-      <h1>Settings</h1>
+      <PageHeader title="Settings" />
 
       <section className="settings__profile" aria-label="Account">
         <span className="settings__avatar" aria-hidden>
