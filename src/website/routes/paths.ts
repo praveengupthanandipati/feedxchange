@@ -9,6 +9,8 @@ export const sitePaths = {
   blogs: `${WEBSITE_BASE}/blogs`,
   contact: `${WEBSITE_BASE}/contact`,
   join: `${WEBSITE_BASE}/join`,
+  privacy: `${WEBSITE_BASE}/privacy`,
+  terms: `${WEBSITE_BASE}/terms`,
 } as const;
 
 /** One product's page, e.g. /website/products/maize-ddgs. */

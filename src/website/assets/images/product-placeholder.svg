@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none">
+  <!-- Placeholder product photo: a feed sack on a pile of grain. Replace with real photos before launch. -->
+  <rect width="320" height="240" fill="#eef4fb"/>
+  <circle cx="262" cy="52" r="70" fill="#fff6e6"/>
+  <circle cx="40" cy="214" r="80" fill="#e3edf8"/>
+  <!-- grain pile -->
+  <ellipse cx="160" cy="198" rx="112" ry="18" fill="#f5a524" opacity=".25"/>
+  <g fill="#e08c0b" opacity=".75">
+    <ellipse cx="70" cy="196" rx="5" ry="3" transform="rotate(-20 70 196)"/>
+    <ellipse cx="88" cy="203" rx="5" ry="3" transform="rotate(15 88 203)"/>
+    <ellipse cx="232" cy="200" rx="5" ry="3" transform="rotate(-10 232 200)"/>
+    <ellipse cx="250" cy="193" rx="5" ry="3" transform="rotate(25 250 193)"/>
+    <ellipse cx="214" cy="206" rx="5" ry="3" transform="rotate(5 214 206)"/>
+    <ellipse cx="104" cy="208" rx="5" ry="3" transform="rotate(-30 104 208)"/>
+  </g>
+  <!-- sack -->
+  <path d="M112 78c10-8 86-8 96 0l-6 14c18 22 28 52 26 82-1 16-14 26-30 26h-76c-16 0-29-10-30-26-2-30 8-60 26-82z" fill="#ffffff" stroke="#1b4a85" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M118 92h84" stroke="#1b4a85" stroke-width="3" stroke-linecap="round"/>
+  <path d="M126 72c8-10 60-10 68 0" stroke="#1b4a85" stroke-width="3" stroke-linecap="round"/>
+  <!-- label -->
+  <rect x="128" y="124" width="64" height="44" rx="8" fill="#e8f1fb"/>
+  <path d="M146 150c4-12 24-12 28 0" stroke="#f5a524" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="160" cy="138" r="5" fill="#1b4a85"/>
+</svg>
