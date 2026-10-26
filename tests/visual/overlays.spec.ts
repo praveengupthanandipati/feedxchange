@@ -64,3 +64,24 @@ for (const viewport of OVERLAY_WIDTHS) {
     });
   });
 }
+
+// Bootstrap's JavaScript is no longer loaded for every page: the two screens that use it import their own module.
+test.describe("bootstrap behaviour where it is used", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test("contract detail: Share information dropdown opens", async ({ page }) => {
+    await openScreen(page, { name: "contract-detail", path: "/admin/contracts/FX-2026-101", signedIn: true });
+    const toggle = page.getByRole("button", { name: "Share information" });
+    await expect(toggle).toBeVisible();
+    await toggle.click();
+    await expect(page.locator(".dropdown-menu.show")).toBeVisible();
+  });
+
+  test("driver view: Send message modal opens", async ({ page }) => {
+    await openScreen(page, { name: "driver-view", path: "/admin/truck-management/transporters/driver-master/1", signedIn: true });
+    const opener = page.locator('[data-bs-toggle="modal"]').first();
+    await expect(opener).toBeVisible();
+    await opener.click();
+    await expect(page.locator("#sendMessageModal.show")).toBeVisible();
+  });
+});

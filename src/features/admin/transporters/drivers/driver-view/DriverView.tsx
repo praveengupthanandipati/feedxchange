@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+// Bootstrap's modal behaviour (data-bs-toggle="modal") for the Send message dialog; only this screen needs it
+import "bootstrap/js/dist/modal";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftIcon, PenLineIcon, SendIcon } from "../../../../../shared/components/icon";
