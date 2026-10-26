@@ -6,6 +6,8 @@
 .pref-page {
   display: flex;
   flex-direction: column;
+  // fill the content area, so the finder can reach the bottom of the screen
+  min-height: 100%;
   gap: v.$spacing-5;
   padding-bottom: v.$spacing-6;
 
@@ -78,14 +80,43 @@
   }
 }
 
+// The finder reaches the bottom of the screen with its list scrolling inside: always beside the details (wide screens), and
+// on phones and tablets while no business is open (then the details below it need the room).
 .pref-layout {
   display: grid;
+  flex: 1 1 0;
   grid-template-columns: 1fr;
   gap: v.$spacing-5;
   align-items: start;
 
+  // contain: size: the finder takes the height of its row, never the height of its list, so a long list scrolls inside it
+  // instead of making the page taller
+  &:has(> .pref-layout__main > .pref-state) {
+    grid-template-rows: minmax(0, 1fr) auto;
+    align-items: stretch;
+
+    .pref-finder {
+      contain: size;
+      min-height: 12rem;
+    }
+
+    .pref-finder__list {
+      max-height: none;
+    }
+  }
+
   @include m.respond-to(lg) {
     grid-template-columns: 17rem minmax(0, 1fr);
+    grid-template-rows: minmax(auto, 1fr);
+    align-items: stretch;
+
+    > .pref-layout__main {
+      align-self: start;
+    }
+
+    .pref-finder {
+      contain: size;
+    }
   }
 
   &__main {
@@ -94,25 +125,24 @@
 }
 
 .pref-finder {
-  @include m.card(v.$spacing-3);
-  display: flex;
-  flex-direction: column;
+  @include m.card;
+  @include m.side-panel;
   gap: v.$spacing-3;
 
   &__list {
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
     gap: 0.25rem;
+    min-height: 0;
     max-height: 12rem;
     margin: 0;
     padding: 0;
     overflow-y: auto;
     list-style: none;
-  }
 
-  &__list {
     @include m.respond-to(lg) {
-      max-height: 26rem;
+      max-height: none;
     }
   }
 

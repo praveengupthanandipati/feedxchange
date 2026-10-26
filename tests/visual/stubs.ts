@@ -84,6 +84,12 @@ const businessOwners = [
   sellCharge: 75,
 }));
 
+const preferenceProfiles = [
+  "Anitha Reddy Marketing", "Balaji Carriers", "Coastal Feeds", "Deccan Agro", "Eswar Industries", "Godavari Poultry",
+  "Krishna Hatcheries", "Lakshmi Poultry Complex", "Mini Transporter", "Nandi Proteins", "Purnima Feeds", "Raghavendra Seeds",
+  "SL International", "Sri Balaji Feeds", "Tara Poultry Farm", "Vijaya Layers", "Annapurna Oils", "Elite Agro Foods",
+].map((name, index) => ({ profileId: 200 + index, name, contactCount: (index % 4) + 1, dispatchMode: index % 3 === 0 ? "Auto" : "Manual" }));
+
 /** Responses by API path (case-insensitive, without the query string). Anything not listed gets an empty list. */
 const responses: Record<string, unknown> = {
   "/api/contracts/getallcontractsbyfilters": contracts,
@@ -91,6 +97,7 @@ const responses: Record<string, unknown> = {
   "/api/contracts/getcontractstatuses": contractStatuses,
   "/api/businessprofiles/getbusinessprofilesummary": businessOwners,
   "/api/notifications/unread-count": 0,
+  "/api/notificationpreferences/profiles": preferenceProfiles,
 };
 
 const json = (route: Route, body: unknown, status = 200) =>

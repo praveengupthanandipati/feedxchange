@@ -33,6 +33,7 @@ export const SCREENS: Screen[] = [
   { name: "users", path: "/admin/masters/users", signedIn: true },
   { name: "role-access", path: "/admin/menu-management/assign-role", signedIn: true },
   { name: "notifications", path: "/admin/notifications", signedIn: true },
+  { name: "notification-preferences", path: "/admin/notification-preferences", signedIn: true },
   { name: "settings", path: "/admin/settings", signedIn: true },
   { name: "products", path: "/admin/products", signedIn: true },
   { name: "pending-contracts", path: "/admin/truck-management/pending-contracts", signedIn: true },

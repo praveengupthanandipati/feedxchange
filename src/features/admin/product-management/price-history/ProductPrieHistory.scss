@@ -82,6 +82,11 @@
 
   @include m.respond-to(lg) {
     grid-template-columns: 18rem 1fr;
+    align-items: stretch;
+
+    > .price-history-main {
+      align-self: start;
+    }
   }
 }
 
@@ -89,7 +94,8 @@
 // Premium Sellers sidebar
 // ============================================================
 .price-history-sellers {
-  @include m.card(0);
+  @include m.card;
+  @include m.side-panel;
   overflow: hidden;
   padding: 0;
 
@@ -111,9 +117,10 @@
     gap: v.$spacing-1;
 
     @include m.respond-to(lg) {
-      max-height: 32rem;
+      flex: 1 1 auto;
+      min-height: 0;
       overflow-x: hidden;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
   }
 
