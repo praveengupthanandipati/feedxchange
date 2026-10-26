@@ -5,6 +5,7 @@ import { CircleAlertIcon, ClockIcon, FileTextIcon, PackageIcon, TriangleAlertIco
 import { Skeleton } from "../../../../shared/components/ui";
 import { ATTENTION, buildMetrics, formatMT, formatRupees, statusKey } from "./contractsDashboard.utils";
 import type { AttentionKind, MonthBar, Ranked } from "./contractsDashboard.utils";
+import SummaryCard from "./SummaryCard";
 import "./ContractsDashboard.scss";
 
 /** Status colours from the theme tokens, so the chart follows Light, Dark and High contrast. */
@@ -172,49 +173,39 @@ const ContractsDashboard = ({ contracts, loading, error, active, onStatus, onFoc
 
       {/* ---------------- headline numbers ---------------- */}
       <div className="cd-cards">
-        <button type="button" className="cd-card cd-card--button cd-tint--blue" onClick={onClear} title="Show all contracts">
-          <span className="cd-card__head">
-            <span className="cd-card__label">Contracts</span>
-            <span className="cd-card__icon" aria-hidden>
-              <FileTextIcon size={16} />
-            </span>
-          </span>
-          <strong className="cd-card__value">{metrics.total.toLocaleString("en-IN")}</strong>
-          <span className="cd-card__note">{metrics.active.toLocaleString("en-IN")} active</span>
-        </button>
-        <div className="cd-card cd-tint--teal">
-          <span className="cd-card__head">
-            <span className="cd-card__label">Contracted quantity</span>
-            <span className="cd-card__icon" aria-hidden>
-              <PackageIcon size={16} />
-            </span>
-          </span>
-          <strong className="cd-card__value">{formatMT(metrics.quantity)}</strong>
-          <span className="cd-card__note">Value {formatRupees(metrics.value)} (excl. GST)</span>
-        </div>
-        <div className="cd-card cd-tint--green">
-          <span className="cd-card__head">
-            <span className="cd-card__label">Dispatched</span>
-            <span className="cd-card__icon" aria-hidden>
-              <TruckIcon size={16} />
-            </span>
-          </span>
-          <strong className="cd-card__value">{formatMT(metrics.dispatched)}</strong>
-          <span className="cd-progress" role="progressbar" aria-label="Share of contracted quantity dispatched" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
-            <span style={{ width: `${percent}%` }} />
-          </span>
-          <span className="cd-card__note">{percent}% of contracted</span>
-        </div>
-        <div className="cd-card cd-tint--orange">
-          <span className="cd-card__head">
-            <span className="cd-card__label">Still to dispatch</span>
-            <span className="cd-card__icon" aria-hidden>
-              <ClockIcon size={16} />
-            </span>
-          </span>
-          <strong className="cd-card__value">{formatMT(metrics.pending)}</strong>
-          <span className="cd-card__note">{formatMT(metrics.arranged)} arranged with trucks</span>
-        </div>
+        <SummaryCard
+          tone="blue"
+          icon={FileTextIcon}
+          label="Contracts"
+          value={metrics.total.toLocaleString("en-IN")}
+          meter={{ share: metrics.total ? metrics.active / metrics.total : 0, label: "Share of contracts still active" }}
+          note={`${metrics.active.toLocaleString("en-IN")} active · ${(metrics.total - metrics.active).toLocaleString("en-IN")} done`}
+          onClick={onClear}
+          title="Show all contracts"
+        />
+        <SummaryCard
+          tone="teal"
+          icon={PackageIcon}
+          label="Contracted quantity"
+          value={formatMT(metrics.quantity)}
+          note={`Value ${formatRupees(metrics.value)} excl. GST`}
+        />
+        <SummaryCard
+          tone="green"
+          icon={TruckIcon}
+          label="Dispatched"
+          value={formatMT(metrics.dispatched)}
+          meter={{ share: metrics.dispatchedShare, label: "Share of contracted quantity dispatched" }}
+          note={`${percent}% of contracted`}
+        />
+        <SummaryCard
+          tone="orange"
+          icon={ClockIcon}
+          label="Still to dispatch"
+          value={formatMT(metrics.pending)}
+          meter={{ share: metrics.pending ? metrics.pendingArranged / metrics.pending : 0, label: "Share of the quantity still to dispatch that has trucks arranged" }}
+          note={`${formatMT(metrics.pendingArranged)} has trucks arranged`}
+        />
       </div>
 
       <div className="cd-grid">

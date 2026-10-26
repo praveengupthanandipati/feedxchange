@@ -84,6 +84,8 @@ export interface ContractsMetrics {
   arranged: number;
   dispatched: number;
   pending: number;
+  /** Of the quantity still to dispatch (active contracts), how much already has trucks arranged */
+  pendingArranged: number;
   /** Share of the contracted quantity dispatched so far, 0 to 1 */
   dispatchedShare: number;
   statuses: StatusSlice[];
@@ -168,6 +170,10 @@ export const buildMetrics = (all: PendingContractApiResponse[], now: number, mon
     arranged: contracts.reduce((sum, contract) => sum + arranged(contract), 0),
     dispatched: totalDispatched,
     pending: contracts.filter((contract) => !isFinished(contract)).reduce((sum, contract) => sum + pending(contract), 0),
+    // trucks arranged but not yet dispatched, capped at what is still pending, per active contract
+    pendingArranged: contracts
+      .filter((contract) => !isFinished(contract))
+      .reduce((sum, contract) => sum + Math.min(pending(contract), Math.max(0, arranged(contract) - dispatched(contract))), 0),
     dispatchedShare: totalQuantity > 0 ? Math.min(1, totalDispatched / totalQuantity) : 0,
     statuses,
     attention,
