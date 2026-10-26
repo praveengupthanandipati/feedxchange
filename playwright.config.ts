@@ -12,7 +12,7 @@ export default defineConfig({
   outputDir: "test-results",
   snapshotPathTemplate: "{testDir}/__screenshots__/{arg}{ext}",
   fullyParallel: true,
-  workers: 4,
+  workers: 3, // 4 overloaded this PC now and then (timeouts, ERR_INSUFFICIENT_RESOURCES)
   retries: 0,
   reporter: [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]],
   timeout: 60_000,

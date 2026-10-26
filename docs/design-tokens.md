@@ -59,6 +59,24 @@ Every size is in `rem`, and the root size sets the density for everything at onc
 - `tests/visual/layout.spec.ts` checks every screen at every width: no sideways page scroll, no text under 11px; small
   targets are listed in `test-results/layout/`.
 
+## Field borders (an accessibility trade-off)
+
+Text fields, selects, searchable and multi selects, date pickers and Bootstrap form controls take their edge from
+`--fx-field-border` (and `-hover`, `-focus`, `-disabled`). They are plain neutral greys, set per theme:
+
+| Theme | Rest | Hover | Focus | Disabled |
+| --- | --- | --- | --- | --- |
+| Light | `#d4d4d4` (1.48:1 on white) | `#b8b8b8` (1.98:1) | `#949494` (3.03:1) + focus ring | `#e6e6e6` |
+| Dark | `#4a4a4a` (2.05:1 on the dark field) | `#5c5c5c` (2.71:1) | `#7a7a7a` (4.22:1) + focus ring | `#3d3d3d` |
+| High contrast | strong border, unchanged | | | |
+
+**Deliberate exception:** WCAG 1.4.11 asks for 3:1 between a field's boundary and its background. The owner chose a
+softer look, so resting and hover borders are below that in Light and Dark. What stays at 3:1 or more is the focused field
+(border, plus the focus ring) and the High contrast theme, which anyone who needs stronger edges can pick in the theme
+menu. `tests/visual/field-borders.spec.ts` checks exactly this: the soft grey at rest, 3:1 on focus. Error borders stay
+red. To go back to compliant borders, set Light rest to `#949494` and Dark rest to `#636363` in `_themes.scss` /
+`tokens.scss`.
+
 ## Themes
 
 | Choice | What it does |
