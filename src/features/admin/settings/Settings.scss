@@ -1,0 +1,100 @@
+@use "../../../shared/assets/styles/variables" as v;
+@use "../../../shared/assets/styles/mixins" as m;
+
+.settings {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  max-width: 40rem;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  h1 {
+    margin: 0;
+    color: v.$color-text;
+    font-size: v.$font-size-xl;
+  }
+
+  &__profile {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background: linear-gradient(135deg, rgba(v.$color-primary, 0.08), rgba(v.$color-info, 0.08));
+
+    div {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    strong {
+      color: v.$color-text;
+      overflow-wrap: anywhere;
+    }
+
+    small {
+      color: v.$color-text-muted;
+      font-size: 0.8rem;
+    }
+  }
+
+  &__avatar {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: v.$color-navy;
+    color: v.$color-white;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    list-style: none;
+    overflow: hidden;
+
+    li + li { border-top: 1px solid v.$color-border; }
+  }
+
+  &__row {
+    @include m.font-base;
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    font-size: v.$font-size-sm;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:hover { background-color: v.$color-gray-50; color: v.$color-text; }
+
+    &:focus-visible {
+      outline: 2px solid v.$color-orange;
+      outline-offset: -2px;
+    }
+
+    svg { flex-shrink: 0; font-size: 1.05rem; }
+
+    span { flex: 1; }
+
+    &--danger,
+    &--danger:hover { color: v.$color-danger; }
+  }
+
+  &__chevron { color: v.$color-text-muted; }
+}

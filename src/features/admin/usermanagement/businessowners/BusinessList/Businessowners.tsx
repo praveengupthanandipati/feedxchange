@@ -1,0 +1,465 @@
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { FiEye, FiEyeOff, FiDownload, FiPlus, FiSearch, FiX, FiBriefcase, FiMapPin, FiPhone, FiTag } from "react-icons/fi";
+import type { TableColumn } from "../../../../../shared/components/table/table.types";
+import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
+import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
+import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
+import Pagination from "./Pagination";
+import SuccessToast from "../../../../../shared/components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../../shared/components/toast/useSuccessToast";
+
+
+import "./Businessowners.scss";
+
+import Can from "../../../../../core/auth/Can";
+import {
+  useGetBusinessProfileSummaryQuery,
+  useDeleteBusinessProfileMutation,
+  type BusinessOwner,
+  type BusinessOwnerStatus,
+} from "../../../../../core/store/businessProfilesApi";
+
+const PAGE_SIZE = 10;
+const DEFAULT_STATUS_FILTER: BusinessOwnerStatus = "Active";
+const statusFilterOptions = [
+  { value: "All", label: "All" },
+  { value: "Active", label: "Active" },
+  { value: "Inactive", label: "Inactive" },
+  { value: "Deleted", label: "Deleted" },
+];
+
+export const indianStates = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+];
+
+export function buildFilterOptions(values: string[], allLabel = "All") {
+  const unique = Array.from(new Set(values.filter(Boolean))).sort();
+  return [{ value: "All", label: allLabel }, ...unique.map((value) => ({ value, label: value }))];
+}
+
+const StatusBadge = ({ status }: { status: BusinessOwner["status"] }) => (
+  <span className={`business-owners__status business-owners__status--${status.toLowerCase()}`}>
+    {status}
+  </span>
+);
+
+interface ColumnHandlers {
+  onView: (owner: BusinessOwner) => void;
+  onEdit: (owner: BusinessOwner) => void;
+  onDelete: (owner: BusinessOwner) => void;
+}
+
+function buildBusinessOwnerColumns({ onView, onEdit, onDelete }: ColumnHandlers): TableColumn<BusinessOwner>[] {
+  return [
+    {
+      key: "legalName",
+      header: "Company Name",
+      sortable: true,
+      render: (row) => (
+        <Link to={`/admin/business-owners/${row.profileId}`} className="business-owners__link">
+          {row.legalName}
+        </Link>
+      ),
+      exportValue: (row) => row.legalName,
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "center",
+      render: (row) => (
+        <RowActionsMenu manageKeys={["profiles.business.manage"]} onView={() => onView(row)} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      sortable: true,
+      render: (row) => <StatusBadge status={row.status} />,
+      exportValue: (row) => row.status,
+    },
+    {
+      key: "businessTypeName",
+      header: "Business Type",
+      sortable: true,
+    },
+    {
+      key: "location",
+      header: "Location",
+      sortable: true,
+    },
+    {
+      key: "mobileNumber",
+      header: "Mobile Number",
+      sortable: true,
+      render: (row) => (
+        <a href={`tel:${row.mobileNumber}`} className="business-owners__link">
+          {row.mobileNumber}
+        </a>
+      ),
+      exportValue: (row) => row.mobileNumber,
+    },
+    {
+      key: "stateName",
+      header: "State",
+      sortable: true,
+    },
+  ];
+}
+
+interface FilterOption {
+  value: string;
+  label: string;
+}
+
+interface BusinessOwnersFiltersProps {
+  keyword: string;
+  onKeywordChange: (value: string) => void;
+  status: string;
+  onStatusChange: (value: string) => void;
+  businessType: string;
+  onBusinessTypeChange: (value: string) => void;
+  businessTypeOptions: FilterOption[];
+  location: string;
+  onLocationChange: (value: string) => void;
+  locationOptions: FilterOption[];
+  onClear: () => void;
+}
+
+const BusinessOwnersFilters = ({
+  keyword,
+  onKeywordChange,
+  status,
+  onStatusChange,
+  businessType,
+  onBusinessTypeChange,
+  businessTypeOptions,
+  location,
+  onLocationChange,
+  locationOptions,
+  onClear,
+}: BusinessOwnersFiltersProps) => {
+  return (
+    <div className="business-owners-filters">
+      <SearchableSelect
+        options={statusFilterOptions}
+        value={status}
+        onChange={onStatusChange}
+        placeholder="Select Status"
+        ariaLabel="Filter by status"
+      />
+
+      <SearchableSelect
+        options={businessTypeOptions}
+        value={businessType}
+        onChange={onBusinessTypeChange}
+        placeholder="Select Business Type"
+        ariaLabel="Filter by business type"
+      />
+
+      <SearchableSelect
+        options={locationOptions}
+        value={location}
+        onChange={onLocationChange}
+        placeholder="Select Location"
+        ariaLabel="Filter by location"
+      />
+
+      <div className="business-owners-filters__search">
+        <FiSearch aria-hidden />
+        <input
+          type="text"
+          value={keyword}
+          onChange={(event) => onKeywordChange(event.target.value)}
+          placeholder="Search by Company Name,Location,Mobile Number...."
+        />
+      </div>
+
+      <button
+        type="button"
+        className="business-owners-filters__clear"
+        onClick={onClear}
+        title="Clear filters"
+        aria-label="Clear filters"
+      >
+        <FiX aria-hidden />
+      </button>
+    </div>
+  );
+};
+
+function getExportCellValue(row: BusinessOwner, column: TableColumn<BusinessOwner>): string {
+  if (column.exportValue) return column.exportValue(row);
+  const raw = (row as unknown as Record<string, unknown>)[column.key];
+  return raw === undefined || raw === null ? "" : String(raw);
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const Businessowners = () => {
+  const navigate = useNavigate();
+  const { data, isLoading, error } = useGetBusinessProfileSummaryQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [deleteBusinessProfile] = useDeleteBusinessProfileMutation();
+  const rows = useMemo(() => data ?? [], [data]);
+  const [keyword, setKeyword] = useState("");
+  const [status, setStatus] = useState<string>(DEFAULT_STATUS_FILTER);
+  const [businessType, setBusinessType] = useState("All");
+  const [location, setLocation] = useState("All");
+  const [filtersVisible, setFiltersVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pendingDeleteOwner, setPendingDeleteOwner] = useState<BusinessOwner | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
+
+  const handleView = (owner: BusinessOwner) => {
+    navigate(`/admin/business-owners/${owner.profileId}`);
+  };
+
+  const handleEdit = (owner: BusinessOwner) => {
+    navigate(`/admin/business-owners/profile?id=${owner.profileId}`);
+  };
+
+  const handleDelete = (owner: BusinessOwner) => {
+    setDeleteError(null);
+    setPendingDeleteOwner(owner);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteOwner) return;
+
+    const modifiedBy = Number(localStorage.getItem("userId")) || 0;
+
+    try {
+      await deleteBusinessProfile({
+        profileId: pendingDeleteOwner.profileId,
+        modifiedOn: new Date().toISOString(),
+        modifiedBy,
+      }).unwrap();
+      setPendingDeleteOwner(null);
+      showSuccessMessage("Business owner deleted successfully");
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete business owner.");
+    }
+  };
+
+  const columns = useMemo(
+    () => buildBusinessOwnerColumns({ onView: handleView, onEdit: handleEdit, onDelete: handleDelete }),
+    [],
+  );
+
+  const businessTypeOptions = useMemo(
+    () => buildFilterOptions(rows.map((row) => row.businessTypeName), "Business Type"),
+    [rows],
+  );
+
+  const locationOptions = useMemo(
+    () => buildFilterOptions(rows.map((row) => row.location), "By State"),
+    [rows],
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [keyword, status, businessType, location]);
+
+  const filteredRows = useMemo(() => {
+    const q = keyword.trim().toLowerCase();
+
+    return rows.filter((row) => {
+      if (status !== "All" && row.status !== status) return false;
+      if (businessType !== "All" && row.businessTypeName !== businessType) return false;
+      if (location !== "All" && row.location !== location) return false;
+
+      if (q) {
+        const haystack = [row.stateName, row.legalName, row.mobileNumber]
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+
+      return true;
+    });
+  }, [rows, keyword, status, businessType, location]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  const currentPageClamped = Math.min(currentPage, totalPages);
+  const pagedRows = filteredRows.slice(
+    (currentPageClamped - 1) * PAGE_SIZE,
+    currentPageClamped * PAGE_SIZE,
+  );
+
+  const handleClearFilters = () => {
+    setKeyword("");
+    setStatus(DEFAULT_STATUS_FILTER);
+    setBusinessType("All");
+    setLocation("All");
+  };
+
+  const handleExport = () => {
+    const exportColumns = columns.filter((column) => column.key !== "actions");
+    const headerRow = exportColumns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
+    const bodyRows = filteredRows
+      .map((row) => {
+        const cells = exportColumns
+          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
+          .join("");
+        return `<tr>${cells}</tr>`;
+      })
+      .join("");
+
+    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
+    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "business-owners.xls";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="business-owners-page">
+      <SuccessToast message={successMessage} />
+      <div className="business-owners-card">
+        <div className="business-owners-card__header">
+          <h1>Business Owners</h1>
+          <div className="business-owners-card__actions">
+            <button
+              type="button"
+              className="business-owners-btn business-owners-btn--outline"
+              onClick={() => setFiltersVisible((prev) => !prev)}
+            >
+              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? "Hide Filters" : "Show Filters"}
+            </button>
+            <button
+              type="button"
+              className="business-owners-btn business-owners-btn--warning"
+              onClick={handleExport}
+            >
+              <FiDownload aria-hidden /> Export
+            </button>
+            <Can any={["profiles.business.manage"]}>
+              <button
+                type="button"
+                className="business-owners-btn business-owners-btn--primary"
+                onClick={() => navigate("/admin/business-owners/profile")}
+              >
+                <FiPlus aria-hidden /> New
+              </button>
+            </Can>
+          </div>
+        </div>
+
+        {filtersVisible && (
+          <BusinessOwnersFilters
+            keyword={keyword}
+            onKeywordChange={setKeyword}
+            status={status}
+            onStatusChange={setStatus}
+            businessType={businessType}
+            onBusinessTypeChange={setBusinessType}
+            businessTypeOptions={businessTypeOptions}
+            location={location}
+            onLocationChange={setLocation}
+            locationOptions={locationOptions}
+            onClear={handleClearFilters}
+          />
+        )}
+
+        {isLoading ? (
+          <p className="business-owners-cards__message">Loading business owners…</p>
+        ) : error ? (
+          <p className="business-owners-cards__message">Failed to load business owners.</p>
+        ) : pagedRows.length === 0 ? (
+          <p className="business-owners-cards__message">No business owners match the current filters.</p>
+        ) : (
+          <div className="business-owners-cards">
+            {pagedRows.map((owner) => (
+              <article className="business-owner-card" key={owner.profileId}>
+                <div className="business-owner-card__topline">
+                  <span className="business-owner-card__icon"><FiBriefcase aria-hidden /></span>
+                  <StatusBadge status={owner.status} />
+                  <div className="business-owner-card__actions">
+                    <RowActionsMenu
+                      manageKeys={["profiles.business.manage"]}
+                      onView={() => handleView(owner)}
+                      onEdit={() => handleEdit(owner)}
+                      onDelete={() => handleDelete(owner)}
+                    />
+                  </div>
+                </div>
+
+                <Link to={`/admin/business-owners/${owner.profileId}`} className="business-owner-card__name">
+                  {owner.legalName || owner.tradingName || "Unnamed Business"}
+                </Link>
+                {owner.tradingName && owner.tradingName !== owner.legalName && (
+                  <p className="business-owner-card__trading-name">{owner.tradingName}</p>
+                )}
+
+                <div className="business-owner-card__details">
+                  <span><FiTag aria-hidden /> {owner.businessTypeName || owner.businessUnitTypeName || "Business type not specified"}</span>
+                  <span><FiPhone aria-hidden /> {owner.mobileNumber || "Phone not provided"}</span>
+                  <span><FiMapPin aria-hidden /> {[owner.location, owner.stateName].filter(Boolean).join(", ") || "Location not provided"}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+
+        <Pagination
+          currentPage={currentPageClamped}
+          totalPages={totalPages}
+          totalResults={filteredRows.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={setCurrentPage}
+        />
+      </div>
+
+      <ConfirmDialog
+        open={pendingDeleteOwner !== null}
+        title="Remove this business owner?"
+        message={
+          deleteError ||
+          `This will permanently delete "${pendingDeleteOwner?.legalName}". This cannot be undone.`
+        }
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDeleteOwner(null)}
+      />
+    </div>
+  );
+};
+
+export default Businessowners;

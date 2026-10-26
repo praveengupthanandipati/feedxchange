@@ -1,0 +1,458 @@
+@use "../../../../shared/assets/styles/variables" as v;
+@use "../../../../shared/assets/styles/mixins" as m;
+
+.testimonials {
+  @include m.card(v.$spacing-5);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  // ---------- Header + search ----------
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+
+    h1 {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-xl;
+
+      @include m.respond-below(sm) {
+        font-size: v.$font-size-lg;
+      }
+    }
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: 2.5rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.$color-white;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:hover:not(:disabled) { filter: brightness(0.93); }
+
+    &--navy { background-color: v.$color-navy; }
+    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+  }
+
+  &__search {
+    position: relative;
+    width: 100%;
+
+    @include m.respond-to(md) {
+      max-width: 32rem;
+    }
+
+    svg {
+      position: absolute;
+      top: 50%;
+      left: v.$spacing-3;
+      color: v.$color-text-muted;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    input {
+      @include m.font-base;
+      width: 100%;
+      height: 2.5rem;
+      padding: 0 v.$spacing-3 0 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      -webkit-appearance: none;
+      appearance: none;
+
+      &:focus {
+        outline: none;
+        border-color: v.$color-navy;
+      }
+    }
+  }
+
+  &__message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    margin: 0;
+    color: v.$color-success;
+    font-size: v.$font-size-sm;
+
+    svg { flex-shrink: 0; }
+  }
+
+  // ---------- Table (md+; phones get cards) ----------
+  &__table-view {
+    @include m.respond-below(md) { display: none; }
+  }
+
+  &__table > .table {
+    min-width: 44rem;
+
+    td {
+      vertical-align: middle;
+    }
+  }
+
+  &__author {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.35;
+
+    strong {
+      color: v.$color-text;
+      font-weight: v.$font-weight-semibold;
+      overflow-wrap: anywhere;
+    }
+
+    small {
+      color: v.$color-text-muted;
+      font-size: 0.78rem;
+    }
+  }
+
+  // One line with an ellipsis, sized to the column on any screen.
+  &__content {
+    @include m.truncate-text;
+    display: block;
+    max-width: 18rem;
+
+    @include m.respond-to(lg) { max-width: 26rem; }
+    @include m.respond-to(xl) { max-width: 36rem; }
+  }
+
+  &__nowrap { white-space: nowrap; }
+
+  &__status {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-bold;
+    line-height: 1.4;
+
+    &--active { background-color: #34c38f; }
+    &--inactive { background-color: v.$color-gray-500; }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+  }
+
+  &__icon-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: v.$radius-sm;
+    color: v.$color-white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:hover { filter: brightness(0.9); }
+
+    &--edit { background-color: v.$color-navy; }
+    &--delete { background-color: #f46a6a; }
+  }
+
+  // ---------- Cards (phones) ----------
+  &__cards {
+    display: grid;
+    gap: v.$spacing-3;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include m.respond-to(md) { display: none; }
+  }
+
+  &__cards-empty {
+    padding: v.$spacing-4;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    padding: v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+  }
+
+  &__card-top {
+    @include m.flex(row, space-between, flex-start, v.$spacing-2);
+  }
+
+  &__card-content {
+    margin: 0;
+    color: v.$color-text;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  &__card-meta {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    color: v.$color-text-muted;
+    font-size: 0.8rem;
+  }
+
+  // ---------- Pagination ----------
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    @include m.respond-below(sm) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    p {
+      margin: 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      min-width: 2.25rem;
+      height: 2.25rem;
+      border: 1px solid v.$color-border;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.$color-primary;
+        color: v.$color-white;
+      }
+    }
+  }
+}
+
+// ---------- Create / Edit offcanvas (rendered into <body>) ----------
+@keyframes testimonial-panel-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes testimonial-panel-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.testimonial-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: v.$z-index-modal;
+  display: flex;
+  flex-direction: column;
+  // Full width on phones (half would be too narrow to type in), half the viewport from tablets up.
+  width: 100%;
+  max-width: 100vw;
+  height: 100%;
+  background-color: v.$color-bg;
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.2);
+  -webkit-animation: testimonial-panel-in 0.22s ease-out;
+  animation: testimonial-panel-in 0.22s ease-out;
+
+  @include m.respond-to(md) { width: 50vw; }
+
+  @media (prefers-reduced-motion: reduce) {
+    -webkit-animation: none;
+    animation: none;
+  }
+
+  &__backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: v.$z-index-modal-backdrop;
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-animation: testimonial-panel-fade 0.22s ease-out;
+    animation: testimonial-panel-fade 0.22s ease-out;
+  }
+
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-3 v.$spacing-4;
+
+    h2 {
+      margin: 0;
+      color: v.$color-text;
+      font-size: v.$font-size-lg;
+    }
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      flex-shrink: 0;
+      width: 2.25rem;
+      height: 2.25rem;
+      border: none;
+      border-radius: v.$radius-sm;
+      background: transparent;
+      color: v.$color-text;
+      font-size: 1.4rem;
+      cursor: pointer;
+
+      &:hover { background-color: v.$color-gray-100; }
+    }
+  }
+
+  // The whole form scrolls, so the buttons sit right under the last field as in the design.
+  &__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: v.$spacing-4;
+    min-height: 0;
+    padding: v.$spacing-2 v.$spacing-4 v.$spacing-5;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  &__label {
+    padding: 0;
+    color: v.$color-text;
+    font-size: 0.8rem;
+    font-weight: v.$font-weight-medium;
+  }
+
+  &__required { color: v.$color-danger; }
+
+  &__input {
+    @include m.font-base;
+    width: 100%;
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.$color-text;
+    // 16px stops iOS Safari zooming in when a field is focused.
+    font-size: 1rem;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    appearance: none;
+
+    @include m.respond-to(md) { font-size: v.$font-size-sm; }
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &::placeholder {
+      color: v.$color-text-muted;
+      opacity: 1;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: v.$color-navy;
+    }
+
+    &.is-invalid { border-color: v.$color-danger; }
+  }
+
+  &__textarea {
+    height: auto;
+    min-height: 6.5rem;
+    padding: v.$spacing-2 v.$spacing-3;
+    line-height: 1.45;
+    resize: vertical;
+  }
+
+  &__error {
+    color: v.$color-danger;
+    font-size: 0.75rem;
+  }
+
+  &__radios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-4;
+
+    label {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      color: v.$color-text;
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+    }
+
+    input {
+      width: 1.05rem;
+      height: 1.05rem;
+      margin: 0;
+      accent-color: v.$color-navy;
+      cursor: pointer;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+
+    @include m.respond-below(sm) {
+      > * { flex: 1 1 0; }
+    }
+  }
+}
