@@ -126,9 +126,11 @@
 // ============================================================
 // Accessibility
 // ============================================================
-@mixin focus-ring($color: v.$color-orange) {
+// The ring colour comes from the theme (--fx-focus-ring: navy on light pages, orange on dark ones), so it always has 3:1
+// against what is around it. $color is kept for existing callers and no longer changes the colour.
+@mixin focus-ring($color: null) {
   &:focus-visible {
-    outline: 2px solid v.line($color);
+    outline: 2px solid var(--fx-focus-ring);
     outline-offset: 2px;
   }
 }
