@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import "../../features/website/styles/styles.scss";
-import heroBg from "../../features/website/assets/images/herobg.jpg";
+import { heroImage } from "../../features/website/assets/images/hero/heroImage";
 import BackToTop from "../../features/website/components/common/BackToTop";
 import SiteLoader from "../../features/website/components/common/SiteLoader";
 import Footer from "./footer/Footer";
@@ -19,7 +19,7 @@ const WebsiteLayout = () => {
   const rootRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
   // Show the loader until the hero photo and fonts are in, then fade it out and remove it.
-  const ready = usePageReady([heroBg]);
+  const ready = usePageReady([heroImage()]);
   const [loaderGone, setLoaderGone] = useState(false);
 
   useEffect(() => {
