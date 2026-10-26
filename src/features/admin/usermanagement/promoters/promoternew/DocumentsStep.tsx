@@ -23,7 +23,7 @@ const DocumentsStep = () => {
       </section>
 
       {submitError && (
-        <p className="new-contract__error" style={{ color: "#d92d20" }}>
+        <p className="new-contract__error" style={{ color: "var(--fx-red-49-fg)" }}>
           {submitError}
         </p>
       )}

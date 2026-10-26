@@ -103,7 +103,7 @@ const ReportsDashboard = ({ entries }: ReportsDashboardProps) => {
                 <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="category" width={125} tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(value) => [`${value} ${Number(value) === 1 ? "report" : "reports"}`, "Available"]} />
-                <Bar dataKey="reports" name="Reports" fill="#2f8fd6" radius={[0, 5, 5, 0]} barSize={22} />
+                <Bar dataKey="reports" name="Reports" fill="var(--fx-chart-1)" radius={[0, 5, 5, 0]} barSize={22} />
               </BarChart>
             </ResponsiveContainer>
           )}

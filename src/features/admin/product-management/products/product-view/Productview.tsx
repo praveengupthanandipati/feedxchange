@@ -233,27 +233,27 @@ const Productview = () => {
                     }))}
                     margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
                   >
-                    <CartesianGrid vertical={false} stroke="#eef0f3" />
+                    <CartesianGrid vertical={false} stroke="var(--fx-chart-grid)" />
                     <XAxis
                       dataKey="label"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: "#9ea4ad", fontSize: 12 }}
+                      tick={{ fill: "var(--fx-chart-axis)", fontSize: 12 }}
                     />
                     <YAxis
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: "#9ea4ad", fontSize: 12 }}
+                      tick={{ fill: "var(--fx-chart-axis)", fontSize: 12 }}
                       width={56}
                     />
                     <Tooltip
-                      contentStyle={{ borderRadius: 8, border: "1px solid #e1e4e8", fontSize: 13 }}
+                      contentStyle={{ borderRadius: 8, border: "1px solid var(--fx-gray-90-line)", fontSize: 13 }}
                       formatter={(value) => [`₹${Number(value).toLocaleString("en-IN")}`, "Price"]}
                     />
                     <Line
                       type="monotone"
                       dataKey="price"
-                      stroke="#1b3664"
+                      stroke="var(--fx-brand-navy)"
                       strokeWidth={2}
                       dot={{ r: 3 }}
                       activeDot={{ r: 5 }}

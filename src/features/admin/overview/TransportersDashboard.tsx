@@ -45,7 +45,7 @@ const QUICK_LINK_PATHS = new Set([
   "/admin/truck-management/transporters/driver-truck-mapping",
   "/admin/truck-management/transporters/truck-trips",
 ]);
-const CHART_COLORS = ["#2f8fd6", "#2e9e5b", "#faa41a", "#7657d5"];
+const CHART_COLORS = ["var(--fx-chart-1)", "var(--fx-chart-2)", "var(--fx-chart-3)", "var(--fx-chart-4)"];
 
 const isWithinDateRange = (value: string | null | undefined, from: string, to: string) => {
   if (!from && !to) return true;
@@ -209,7 +209,7 @@ const TransportersDashboard = ({ entries }: TransportersDashboardProps) => {
                           <XAxis dataKey="type" tick={{ fontSize: 11 }} interval={0} />
                           <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                           <Tooltip />
-                          <Bar dataKey="count" name="Trucks" fill="#2f8fd6" radius={[5, 5, 0, 0]} />
+                          <Bar dataKey="count" name="Trucks" fill="var(--fx-chart-1)" radius={[5, 5, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     )}

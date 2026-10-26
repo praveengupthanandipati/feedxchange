@@ -31,12 +31,12 @@ interface PaymentsDashboardProps {
 
 const PAGE_SIZE = 100;
 const STATUS_COLORS: Record<string, string> = {
-  Paid: "#2e9e5b",
-  "Partially Paid": "#2f8fd6",
-  Pending: "#faa41a",
-  Cancelled: "#e0483c",
+  Paid: "var(--fx-chart-2)",
+  "Partially Paid": "var(--fx-chart-1)",
+  Pending: "var(--fx-chart-3)",
+  Cancelled: "var(--fx-chart-5)",
 };
-const CHART_COLORS = ["#2f8fd6", "#2e9e5b", "#faa41a", "#7657d5", "#e0483c"];
+const CHART_COLORS = ["var(--fx-chart-1)", "var(--fx-chart-2)", "var(--fx-chart-3)", "var(--fx-chart-4)", "var(--fx-chart-5)"];
 
 function money(value: number): string {
   return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -243,8 +243,8 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                       <YAxis tickFormatter={(value: number) => value >= 100000 ? `₹${Math.round(value / 100000)}L` : `₹${Math.round(value / 1000)}k`} tick={{ fontSize: 11 }} />
                       <Tooltip formatter={(value) => money(Number(value))} />
-                      <Bar dataKey="paid" name="Paid" fill="#2e9e5b" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="outstanding" name="Amount due" fill="#2f8fd6" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="paid" name="Paid" fill="var(--fx-chart-2)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="outstanding" name="Amount due" fill="var(--fx-chart-1)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}

@@ -30,7 +30,7 @@ interface ProductsDashboardProps {
   entries: DashboardEntry[];
 }
 
-const STOCK_COLORS = ["#2e9e5b", "#faa41a", "#9ea4ad"];
+const STOCK_COLORS = ["var(--fx-chart-2)", "var(--fx-chart-3)", "var(--fx-slate-65)"];
 
 function money(value: number): string {
   return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -176,7 +176,7 @@ const ProductsDashboard = ({ entries }: ProductsDashboardProps) => {
                   <XAxis dataKey="category" tick={{ fontSize: 11 }} />
                   <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                   <Tooltip />
-                  <Bar dataKey="count" name="Products" fill="#2f8fd6" radius={[5, 5, 0, 0]} />
+                  <Bar dataKey="count" name="Products" fill="var(--fx-chart-1)" radius={[5, 5, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}

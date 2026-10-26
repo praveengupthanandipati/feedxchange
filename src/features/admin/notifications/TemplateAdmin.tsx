@@ -180,7 +180,7 @@ const TemplateEditor = ({ templateId, onClose }: { templateId: number; onClose: 
                     : <div className="fx-notify__preview">
                         {preview.subject && <div className="small"><strong>{preview.subject}</strong></div>}
                         <pre>{preview.body}</pre>
-                        {preview.html && <iframe title="Email preview" sandbox="" srcDoc={preview.html} style={{ width: "100%", height: "22rem", border: "1px solid #e5e7eb", background: "#fff" }} />}
+                        {preview.html && <iframe title="Email preview" sandbox="" srcDoc={preview.html} style={{ width: "100%", height: "22rem", border: "1px solid var(--fx-gray-90-line)", background: "var(--fx-white)" }} />}
                       </div>)}
                 </div>
               </div>

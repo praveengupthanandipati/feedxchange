@@ -215,29 +215,29 @@ const ProductPrieHistory = () => {
 
             <ResponsiveContainer width="100%" height={320} minWidth={0}>
               <ComposedChart data={chartPoints} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="#eef0f3" />
+                <CartesianGrid vertical={false} stroke="var(--fx-chart-grid)" />
                 <XAxis
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "#9ea4ad", fontSize: 12 }}
+                  tick={{ fill: "var(--fx-chart-axis)", fontSize: 12 }}
                   minTickGap={16}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "#9ea4ad", fontSize: 12 }}
+                  tick={{ fill: "var(--fx-chart-axis)", fontSize: 12 }}
                   width={56}
                   tickFormatter={(value) => `₹${value}`}
                   label={{
                     value: "Price (₹)",
                     angle: -90,
                     position: "insideLeft",
-                    style: { fill: "#9ea4ad", fontSize: 12 },
+                    style: { fill: "var(--fx-chart-axis)", fontSize: 12 },
                   }}
                 />
                 <Tooltip
-                  contentStyle={{ borderRadius: 8, border: "1px solid #e1e4e8", fontSize: 13 }}
+                  contentStyle={{ borderRadius: 8, border: "1px solid var(--fx-gray-90-line)", fontSize: 13 }}
                   formatter={(value, name) => [
                     formatINR(Number(value)),
                     SERIES_LABELS[String(name)] ?? String(name),
@@ -246,8 +246,8 @@ const ProductPrieHistory = () => {
                 <Area
                   type="monotone"
                   dataKey="offerPrice"
-                  stroke="#2e9e5b"
-                  fill="#2e9e5b"
+                  stroke="var(--fx-chart-2)"
+                  fill="var(--fx-chart-2)"
                   fillOpacity={0.15}
                   strokeWidth={2}
                   dot={{ r: 3 }}
@@ -256,7 +256,7 @@ const ProductPrieHistory = () => {
                 <Line
                   type="monotone"
                   dataKey="originalPrice"
-                  stroke="#1b3664"
+                  stroke="var(--fx-brand-navy)"
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   activeDot={{ r: 5 }}
@@ -264,7 +264,7 @@ const ProductPrieHistory = () => {
                 <Line
                   type="monotone"
                   dataKey="resalePrice"
-                  stroke="#faa41a"
+                  stroke="var(--fx-chart-3)"
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   activeDot={{ r: 5 }}
