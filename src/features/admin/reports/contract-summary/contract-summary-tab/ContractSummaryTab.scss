@@ -12,7 +12,7 @@
     max-width: 20rem;
     height: 2.5rem;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
 
@@ -23,11 +23,11 @@
       border: none;
       outline: none;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
 
       &::placeholder {
-        color: v.$color-gray-400;
+        color: v.fg(v.$color-gray-400);
       }
     }
 
@@ -41,7 +41,7 @@
     flex-wrap: wrap;
 
     p {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
       margin: 0;
     }
@@ -56,10 +56,10 @@
         min-width: 2rem;
         height: 2rem;
         padding: 0 v.$spacing-2;
-        border: 1px solid v.$color-border;
+        border: 1px solid v.line(v.$color-border);
         border-radius: v.$radius-md;
         background-color: v.$color-bg;
-        color: v.$color-text;
+        color: v.fg(v.$color-text);
         font-size: v.$font-size-sm;
         cursor: pointer;
         transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -75,8 +75,8 @@
 
         &.is-active {
           background-color: v.$color-primary;
-          border-color: v.$color-primary;
-          color: v.$color-white;
+          border-color: v.line(v.$color-primary);
+          color: v.on(v.$color-white);
         }
       }
     }
@@ -84,6 +84,6 @@
 }
 
 .contract-summary-tab-table__contract {
-  color: v.$color-primary;
+  color: v.fg(v.$color-primary);
   font-weight: v.$font-weight-semibold;
 }

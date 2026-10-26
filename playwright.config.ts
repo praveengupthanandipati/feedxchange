@@ -4,7 +4,7 @@ import { defineConfig } from "@playwright/test";
 // The API is never called: tests/visual/stubs.ts answers every /api and /hubs request, so no live server or real account is needed.
 //   npm run test:visual                      build, serve on :4173, compare with the saved screenshots
 //   npm run test:visual -- --update-snapshots   accept the current look as the new baseline
-// Set VISUAL_NO_BUILD=1 to reuse the dist/ folder from the last build.
+// Set VISUAL_NO_BUILD=1 to reuse the dist/ folder from the last build, VISUAL_STRICT=1 to count every changed pixel.
 const PORT = 4173;
 
 export default defineConfig({
@@ -18,7 +18,9 @@ export default defineConfig({
   timeout: 60_000,
   expect: {
     // anti-aliasing differs a little between runs; a real change moves far more pixels than this
-    toHaveScreenshot: { maxDiffPixelRatio: 0.002, animations: "disabled", caret: "hide" },
+    toHaveScreenshot: process.env.VISUAL_STRICT
+      ? { maxDiffPixels: 0, threshold: 0, animations: "disabled", caret: "hide" }
+      : { maxDiffPixelRatio: 0.002, animations: "disabled", caret: "hide" },
   },
   use: {
     baseURL: `http://localhost:${PORT}`,

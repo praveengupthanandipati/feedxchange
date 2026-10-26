@@ -34,7 +34,7 @@
   &__label {
     @include m.font-base(v.$font-weight-medium);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   &.is-on {

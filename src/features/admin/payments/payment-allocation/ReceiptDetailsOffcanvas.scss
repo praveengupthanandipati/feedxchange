@@ -54,7 +54,7 @@
     @include m.flex(row, space-between, center, v.$spacing-3);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
   }
 
   &__heading {
@@ -65,14 +65,14 @@
 
     h2 {
       @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-lg;
       margin: 0;
     }
 
     span {
       @include m.truncate-text;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -86,14 +86,14 @@
     border: none;
     border-radius: v.$radius-pill;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 1.25rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -117,7 +117,7 @@
     display: flex;
     gap: v.$spacing-1;
     flex-shrink: 0;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
     overflow-x: auto;
     scrollbar-width: none;
 
@@ -134,7 +134,7 @@
       border-bottom: 3px solid transparent;
       border-radius: v.$radius-sm v.$radius-sm 0 0;
       background: transparent;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
       white-space: nowrap;
       cursor: pointer;
@@ -142,13 +142,13 @@
 
       &:hover {
         background-color: v.$color-bg-muted;
-        color: v.$color-text;
+        color: v.fg(v.$color-text);
       }
 
       &.is-active {
-        border-bottom-color: v.$color-orange;
+        border-bottom-color: v.line(v.$color-orange);
         background-color: v.$color-bg-muted;
-        color: v.$color-primary;
+        color: v.fg(v.$color-primary);
       }
     }
   }

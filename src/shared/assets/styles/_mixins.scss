@@ -103,9 +103,10 @@
   }
 }
 
-@mixin button-variant($bg, $color: v.$color-white, $bg-hover: darken($bg, 8%)) {
+// $color is text on the $bg fill, so it keeps its Light colour in every theme (on()); $bg-hover defaults to 8% darker.
+@mixin button-variant($bg, $color: v.$color-white, $bg-hover: v.shade($bg, 8%)) {
   background-color: $bg;
-  color: $color;
+  color: v.on($color);
   border: 1px solid transparent;
   border-radius: v.$radius-md;
   transition: background-color v.$transition-fast, box-shadow v.$transition-fast;
@@ -113,7 +114,7 @@
   &:hover,
   &:focus-visible {
     background-color: $bg-hover;
-    color: $color;
+    color: v.on($color);
   }
 
   &:disabled {
@@ -127,7 +128,7 @@
 // ============================================================
 @mixin focus-ring($color: v.$color-orange) {
   &:focus-visible {
-    outline: 2px solid $color;
+    outline: 2px solid v.line($color);
     outline-offset: 2px;
   }
 }

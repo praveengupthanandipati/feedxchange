@@ -7,8 +7,8 @@
   @include m.flex(row, flex-start, center, v.$spacing-2);
   padding: v.$spacing-3 v.$spacing-4;
   border-radius: v.$radius-md;
-  background-color: rgba(v.$color-success, 0.12);
-  color: v.$color-success;
+  background-color: v.alpha(v.$color-success, 0.12);
+  color: v.fg(v.$color-success);
   font-size: v.$font-size-sm;
   font-weight: v.$font-weight-semibold;
 
@@ -27,16 +27,16 @@
 .schedule-dispatch-form {
   .searchable-select__trigger,
   .date-range-input__trigger {
-    color: v.$color-gray-400;
+    color: v.fg(v.$color-gray-400);
   }
 
   .searchable-select__trigger > span:first-child,
   .date-range-input__trigger > span:first-child {
-    color: v.$color-gray-400;
+    color: v.fg(v.$color-gray-400);
   }
 }
 
 .schedule-dispatch-form .multi-select__trigger,
 .schedule-dispatch-form .multi-select__chip {
-  color: v.$color-gray-400;
+  color: v.fg(v.$color-gray-400);
 }

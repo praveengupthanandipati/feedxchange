@@ -6,12 +6,12 @@
   display: inline-flex;
   align-items: center;
   margin-left: 0.3rem;
-  color: v.$color-gray-400;
+  color: v.fg(v.$color-gray-400);
   cursor: help;
 
   &:hover,
   &:focus-visible {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
 
     .info-tooltip__bubble {
       opacity: 1;
@@ -30,7 +30,7 @@
     padding: v.$spacing-2 v.$spacing-3;
     border-radius: v.$radius-md;
     background-color: v.$color-navy-dark;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-regular;
     line-height: v.$line-height-tight;

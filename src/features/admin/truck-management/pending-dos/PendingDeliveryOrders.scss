@@ -22,7 +22,7 @@
     gap: v.$spacing-3;
 
     h1 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-xl;
       margin: 0;
 
@@ -53,16 +53,16 @@
 
   &--info {
     background-color: v.$color-info;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-sky-40);
     }
   }
 
   &--warning {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -106,10 +106,10 @@
     min-width: 0;
     height: 2.5rem;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
 
     input {
       flex: 1;
@@ -118,10 +118,10 @@
       outline: none;
       background: transparent;
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
 
       &::placeholder {
-        color: v.$color-gray-400;
+        color: v.fg(v.$color-gray-400);
       }
     }
   }
@@ -135,12 +135,12 @@
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-danger;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: #c43a2f;
+      background-color: var(--fx-red-48);
     }
   }
 }
@@ -172,21 +172,21 @@
 // ============================================================
 .pending-dos-table {
   &__contract {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-weight: v.$font-weight-semibold;
     text-decoration: underline;
 
     &:hover {
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
     }
   }
 
   &__do-link {
-    color: v.$color-info;
+    color: v.fg(v.$color-info);
     text-decoration: underline;
 
     &:hover {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
     }
   }
 
@@ -197,7 +197,7 @@
     border: none;
     border-radius: v.$radius-sm;
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: 0.75rem;
     font-weight: v.$font-weight-medium;
     white-space: nowrap;
@@ -228,7 +228,7 @@
     white-space: nowrap;
 
     &--strong {
-      color: v.$color-navy;
+      color: v.fg(v.$color-navy);
       font-weight: v.$font-weight-bold;
     }
   }
@@ -245,12 +245,12 @@
   }
 
   &__gst {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 0.8em;
   }
 
   &__qty {
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-weight: v.$font-weight-bold;
     white-space: nowrap;
   }
@@ -269,16 +269,16 @@
   &__empty {
     @include m.flex(row, center, center, v.$spacing-2);
     padding: v.$spacing-5;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
   }
 }
 
 .pending-dos-card {
-  border: 1px solid v.$color-border;
+  border: 1px solid v.line(v.$color-border);
   border-radius: v.$radius-md;
   background-color: v.$color-bg;
   overflow: hidden;
@@ -286,15 +286,15 @@
   &__top {
     @include m.flex(row, space-between, center, v.$spacing-2);
     padding: v.$spacing-2 v.$spacing-3;
-    background-color: rgba(v.$color-navy, 0.06);
-    border-bottom: 1px solid v.$color-border;
+    background-color: v.alpha(v.$color-navy, 0.06);
+    border-bottom: 1px solid v.line(v.$color-border);
   }
 
   &__status {
     padding: 0.2rem 0.6rem;
     border-radius: v.$radius-pill;
-    background-color: rgba(v.$color-success, 0.12);
-    color: v.$color-success;
+    background-color: v.alpha(v.$color-success, 0.12);
+    color: v.fg(v.$color-success);
     font-size: 0.7rem;
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
@@ -308,7 +308,7 @@
     padding: v.$spacing-3;
 
     dt {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: 0.7rem;
       font-weight: v.$font-weight-medium;
       text-transform: uppercase;
@@ -317,7 +317,7 @@
 
     dd {
       margin: 0.1rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -353,7 +353,7 @@
   }
 
   p {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -369,10 +369,10 @@
       min-width: 2.25rem;
       height: 2.25rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
       transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -388,8 +388,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }

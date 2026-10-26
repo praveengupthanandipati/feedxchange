@@ -1,17 +1,27 @@
+@use "functions" as f;
+@forward "functions";
+
 // ============================================================
-// Brand colors — sampled directly from src/assets/img/logo.png
+// The SCSS API for components: semantic names for the design tokens.
+// Colours, type, spacing, radius and shadows are CSS custom properties (see _palette.scss and _themes.scss), so the theme
+// can change them at runtime; these variables hold var(--fx-...). Sass cannot compute with them: use alpha(), shade(),
+// fg(), line() and on() from _functions.scss (forwarded here, so `v.alpha(...)` works) instead of rgba() or darken().
 // ============================================================
-$color-navy: #1b3664; // logo wordmark / background panel
-$color-orange: #faa41a; // logo background panel / accent
-$color-white: #ffffff; // logo "X" cutout + dot
+
+// ============================================================
+// Brand colors - sampled directly from src/assets/img/logo.png
+// ============================================================
+$color-navy: f.token("brand-navy"); // logo wordmark / background panel
+$color-orange: f.token("brand-orange"); // logo background panel / accent
+$color-white: f.token("white"); // logo "X" cutout + dot
 
 // Tints & shades derived from the brand colors
-$color-navy-dark: #12263f; // pressed / active states
-$color-navy-light: #2c4d84; // hover on dark surfaces
-$color-orange-dark: #d98a12; // pressed / active states
-$color-orange-light: #ffc25c; // hover, highlights, badges
+$color-navy-dark: f.token("blue-16-2"); // pressed / active states
+$color-navy-light: f.token("blue-35"); // hover on dark surfaces
+$color-orange-dark: f.token("amber-46"); // pressed / active states
+$color-orange-light: f.token("amber-68"); // hover, highlights, badges
 
-// Semantic aliases — reference these in components, not the raw colors above
+// Semantic aliases - reference these in components, not the raw colors above
 $color-primary: $color-navy;
 $color-primary-dark: $color-navy-dark;
 $color-primary-light: $color-navy-light;
@@ -23,23 +33,23 @@ $color-secondary-light: $color-orange-light;
 $color-accent: $color-orange;
 
 // Neutrals
-$color-black: #0d1117;
-$color-gray-900: #1a1d24;
-$color-gray-800: #2b2f38;
-$color-gray-700: #40454f;
-$color-gray-600: #5a606b;
-$color-gray-500: #767c87;
-$color-gray-400: #9ea4ad;
-$color-gray-300: #c4c8ce;
-$color-gray-200: #e1e4e8;
-$color-gray-100: #f2f4f6;
-$color-gray-50: #f9fafb;
+$color-black: f.token("gray-7");
+$color-gray-900: f.token("gray-12");
+$color-gray-800: f.token("slate-19");
+$color-gray-700: f.token("slate-28");
+$color-gray-600: f.token("slate-39");
+$color-gray-500: f.token("slate-50");
+$color-gray-400: f.token("slate-65");
+$color-gray-300: f.token("gray-79");
+$color-gray-200: f.token("gray-90");
+$color-gray-100: f.token("gray-96");
+$color-gray-50: f.token("gray-98-2");
 
 // Feedback / status colors
-$color-success: #2e9e5b;
-$color-danger: #e0483c;
+$color-success: f.token("green-40");
+$color-danger: f.token("red-56");
 $color-warning: $color-orange;
-$color-info: #2f8fd6;
+$color-info: f.token("sky-51");
 
 // Text & surface
 $color-text: $color-gray-900;
@@ -58,12 +68,9 @@ $color-border: $color-gray-200;
 // the logo's wordmark for headings/branding.
 // Both stacks end in the platform's native UI font so text never
 // falls back to an unstyled serif while a web font is loading.
-$font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-  Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-  "Apple Color Emoji", "Segoe UI Emoji";
-$font-family-heading: "Poppins", #{$font-family-base};
-$font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
-  monospace;
+$font-family-base: var(--fx-font-body);
+$font-family-heading: var(--fx-font-heading);
+$font-family-mono: var(--fx-font-mono);
 
 $font-weight-light: 300;
 $font-weight-regular: 400;
@@ -72,14 +79,14 @@ $font-weight-semibold: 600;
 $font-weight-bold: 700;
 $font-weight-extrabold: 800;
 
-$font-size-base: 1rem; // 16px
-$font-size-sm: 0.875rem;
-$font-size-lg: 1.125rem;
-$font-size-xl: 1.25rem;
-$font-size-2xl: 1.5rem;
-$font-size-3xl: 1.875rem;
-$font-size-4xl: 2.25rem;
-$font-size-5xl: 3rem;
+$font-size-base: var(--fx-text-base); // 16px
+$font-size-sm: var(--fx-text-sm);
+$font-size-lg: var(--fx-text-lg);
+$font-size-xl: var(--fx-text-xl);
+$font-size-2xl: var(--fx-text-2xl);
+$font-size-3xl: var(--fx-text-3xl);
+$font-size-4xl: var(--fx-text-4xl);
+$font-size-5xl: var(--fx-text-5xl);
 
 $line-height-tight: 1.2;
 $line-height-base: 1.5;
@@ -88,27 +95,27 @@ $line-height-loose: 1.75;
 // ============================================================
 // Spacing scale (rem-based, 4px baseline)
 // ============================================================
-$spacer: 1rem;
-$spacing-1: $spacer * 0.25; // 4px
-$spacing-2: $spacer * 0.5; // 8px
-$spacing-3: $spacer * 0.75; // 12px
-$spacing-4: $spacer; // 16px
-$spacing-5: $spacer * 1.5; // 24px
-$spacing-6: $spacer * 2; // 32px
-$spacing-7: $spacer * 3; // 48px
-$spacing-8: $spacer * 4; // 64px
+$spacer: var(--fx-space-4);
+$spacing-1: var(--fx-space-1); // 4px
+$spacing-2: var(--fx-space-2); // 8px
+$spacing-3: var(--fx-space-3); // 12px
+$spacing-4: var(--fx-space-4); // 16px
+$spacing-5: var(--fx-space-5); // 24px
+$spacing-6: var(--fx-space-6); // 32px
+$spacing-7: var(--fx-space-7); // 48px
+$spacing-8: var(--fx-space-8); // 64px
 
 // ============================================================
 // Radius, shadow & motion
 // ============================================================
-$radius-sm: 0.25rem;
-$radius-md: 0.5rem;
-$radius-lg: 1rem;
-$radius-pill: 999px;
+$radius-sm: var(--fx-radius-1);
+$radius-md: var(--fx-radius-2);
+$radius-lg: var(--fx-radius-4);
+$radius-pill: var(--fx-radius-pill);
 
-$shadow-sm: 0 1px 2px rgba($color-black, 0.06);
-$shadow-md: 0 4px 12px rgba($color-navy, 0.12);
-$shadow-lg: 0 12px 32px rgba($color-navy, 0.18);
+$shadow-sm: var(--fx-shadow-sm);
+$shadow-md: var(--fx-shadow-md);
+$shadow-lg: var(--fx-shadow-lg);
 
 $transition-fast: 0.15s ease-in-out;
 $transition-base: 0.25s ease-in-out;

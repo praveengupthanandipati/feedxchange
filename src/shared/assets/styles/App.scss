@@ -14,7 +14,7 @@ body {
   @include m.font-base;
   font-size: v.$font-size-base;
   line-height: v.$line-height-base;
-  color: v.$color-text;
+  color: v.fg(v.$color-text);
   background-color: v.$color-bg;
   margin: 0;
   // Nothing should ever make the page scroll sideways; wide content scrolls inside its own box.
@@ -34,15 +34,15 @@ h4,
 h5,
 h6 {
   @include m.font-heading;
-  color: v.$color-text;
+  color: v.fg(v.$color-text);
   margin-top: 0;
 }
 
 a {
-  color: v.$color-primary;
+  color: v.fg(v.$color-primary);
 
   &:hover {
-    color: v.$color-primary-dark;
+    color: v.fg(v.$color-primary-dark);
   }
 }
 

@@ -1,0 +1,11 @@
+// ============================================================
+// Design tokens as CSS custom properties, loaded once for the whole app and the website (main.tsx, after Bootstrap's CSS).
+// Values live in _palette.scss (colours) and _themes.scss (everything else); this file only places them.
+// ============================================================
+@use "themes" as t;
+
+:root,
+[data-bs-theme="light"] {
+  @include t.palette-tokens(light);
+  @include t.scale-tokens;
+}

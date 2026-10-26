@@ -12,7 +12,7 @@
   min-height: 100vh;
   min-height: 100dvh;
   background-color: v.$surface;
-  color: v.$ink;
+  color: v.fg(v.$ink);
   font-family: v.$font-body;
   font-size: v.$fs-base;
   line-height: 1.6;

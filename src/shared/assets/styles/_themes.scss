@@ -1,0 +1,136 @@
+@use "sass:color";
+@use "sass:map";
+@use "sass:math";
+@use "palette" as p;
+@use "functions" as f;
+
+// ============================================================
+// Emits the design tokens as CSS custom properties. tokens.scss includes these once, on :root (Light) and on
+// [data-theme="..."] for the other themes; nothing else should define --fx-* properties.
+// ============================================================
+
+/// The value of one palette colour in a theme, for one job: bg (backgrounds, fills, shadows), fg (text, icons) or line (borders).
+@function theme-colour($colour, $theme, $role) {
+  @return $colour;
+}
+
+/// --fx-<name>, --fx-<name>-fg, --fx-<name>-line for every palette colour, plus the hover shades.
+/// The Light theme also emits --fx-<name>-on (text on a brand fill), which no other theme changes.
+@mixin palette-tokens($theme) {
+  @each $name, $colour in p.$palette {
+    @if $theme == light {
+      @include -colour("#{$name}-on", $colour);
+    }
+    @include -colour($name, theme-colour($colour, $theme, bg));
+    @include -colour("#{$name}-fg", theme-colour($colour, $theme, fg));
+    @include -colour("#{$name}-line", theme-colour($colour, $theme, line));
+  }
+  @each $name, $steps in p.$shades {
+    @each $amount in $steps {
+      @include -colour("#{$name}-d#{math.div($amount, 1%)}", color.adjust(theme-colour(map.get(p.$palette, $name), $theme, bg), $lightness: -$amount));
+    }
+  }
+}
+
+/// --fx-<name> as a colour and --fx-<name>-rgb as "r, g, b" for alpha() (rgba(var(--fx-<name>-rgb), 0.5)).
+@mixin -colour($name, $colour) {
+  --fx-#{$name}: #{$colour};
+  --fx-#{$name}-rgb: #{math.round(color.channel($colour, "red", $space: rgb))}, #{math.round(color.channel($colour, "green", $space: rgb))}, #{math.round(color.channel($colour, "blue", $space: rgb))};
+}
+
+/// Everything that is not a colour: type, spacing, radius, shadow and density. Shared by the admin app and the website.
+@mixin scale-tokens {
+  // type
+  --fx-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --fx-font-heading: "Poppins", var(--fx-font-body);
+  --fx-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --fx-text-xs: 0.75rem;
+  --fx-text-sm: 0.875rem;
+  --fx-text-base: 1rem;
+  --fx-text-lg: 1.125rem;
+  --fx-text-xl: 1.25rem;
+  --fx-text-2xl: 1.5rem;
+  --fx-text-3xl: 1.875rem;
+  --fx-text-4xl: 2.25rem;
+  --fx-text-5xl: 3rem;
+
+  // spacing, 4px steps
+  --fx-space-1: 0.25rem;
+  --fx-space-2: 0.5rem;
+  --fx-space-3: 0.75rem;
+  --fx-space-4: 1rem;
+  --fx-space-5: 1.5rem;
+  --fx-space-6: 2rem;
+  --fx-space-7: 3rem;
+  --fx-space-8: 4rem;
+  --fx-space-9: 6rem;
+
+  // radius
+  --fx-radius-1: 0.25rem;
+  --fx-radius-2: 0.5rem;
+  --fx-radius-3: 0.875rem;
+  --fx-radius-4: 1rem;
+  --fx-radius-5: 1.25rem;
+  --fx-radius-pill: 999px;
+
+  // shadows: the admin app's, then the website's softer ones
+  --fx-shadow-sm: 0 1px 2px #{f.alpha(f.token("gray-7"), 0.06)};
+  --fx-shadow-md: 0 4px 12px #{f.alpha(f.token("brand-navy"), 0.12)};
+  --fx-shadow-lg: 0 12px 32px #{f.alpha(f.token("brand-navy"), 0.18)};
+  --fx-site-shadow-sm: 0 1px 2px #{f.alpha(f.token("blue-11"), 0.06)}, 0 1px 3px #{f.alpha(f.token("blue-11"), 0.05)};
+  --fx-site-shadow-md: 0 12px 32px -12px #{f.alpha(f.token("blue-11"), 0.18)};
+  --fx-site-shadow-lg: 0 30px 60px -20px #{f.alpha(f.token("blue-11"), 0.3)};
+
+  // density: control and table sizes for the shared components (a compact density overrides these)
+  --fx-control-height: 2.5rem;
+  --fx-table-row-height: 3rem;
+  --fx-table-cell-py: 0.75rem;
+  --fx-table-cell-px: 1rem;
+
+  // focus ring, used by every focusable control
+  --fx-focus-ring: var(--fx-brand-orange-line);
+
+  // charts (recharts takes these as fill / stroke values): series colours in order, then grid lines and axis text
+  --fx-chart-1: var(--fx-sky-51);
+  --fx-chart-2: var(--fx-green-40);
+  --fx-chart-3: var(--fx-brand-orange);
+  --fx-chart-4: var(--fx-indigo-59);
+  --fx-chart-5: var(--fx-red-56);
+  --fx-chart-grid: var(--fx-gray-96-line);
+  --fx-chart-axis: var(--fx-slate-65-fg);
+}
+
+/// Bootstrap 5.3 reads these; pointing them at the tokens makes its components (forms, tables, modals, offcanvas, buttons)
+/// follow the brand and the theme.
+@mixin bootstrap-tokens {
+  --bs-body-font-family: var(--fx-font-body);
+  --bs-body-color: var(--fx-gray-12-fg);
+  --bs-body-color-rgb: 26, 29, 36;
+  --bs-body-bg: var(--fx-white);
+  --bs-emphasis-color: var(--fx-gray-7-fg);
+  --bs-secondary-color: var(--fx-slate-39-fg);
+  --bs-secondary-bg: var(--fx-gray-96);
+  --bs-tertiary-color: var(--fx-slate-50-fg);
+  --bs-tertiary-bg: var(--fx-gray-98-2);
+  --bs-heading-color: var(--fx-gray-12-fg);
+  --bs-link-color: var(--fx-brand-navy-fg);
+  --bs-link-hover-color: var(--fx-blue-16-2-fg);
+  --bs-border-color: var(--fx-gray-90-line);
+  --bs-border-color-translucent: #{f.alpha(f.token("gray-7"), 0.175)};
+  --bs-primary: var(--fx-brand-navy);
+  --bs-secondary: var(--fx-slate-39);
+  --bs-success: var(--fx-green-40);
+  --bs-danger: var(--fx-red-56);
+  --bs-warning: var(--fx-brand-orange);
+  --bs-info: var(--fx-sky-51);
+  --bs-primary-text-emphasis: var(--fx-brand-navy-fg);
+  --bs-danger-text-emphasis: var(--fx-red-45-fg);
+  --bs-danger-bg-subtle: var(--fx-red-94);
+  --bs-danger-border-subtle: var(--fx-red-80-line);
+  --bs-form-valid-color: var(--fx-green-40-fg);
+  --bs-form-valid-border-color: var(--fx-green-40-line);
+  --bs-form-invalid-color: var(--fx-red-56-fg);
+  --bs-form-invalid-border-color: var(--fx-red-56-line);
+  --bs-focus-ring-color: #{f.alpha(f.token("brand-navy"), 0.25)};
+}

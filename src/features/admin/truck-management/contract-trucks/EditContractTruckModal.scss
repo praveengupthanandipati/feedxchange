@@ -6,8 +6,8 @@
   text-align: left;
 
   &__icon {
-    background-color: rgba(v.$color-primary, 0.12);
-    color: v.$color-primary;
+    background-color: v.alpha(v.$color-primary, 0.12);
+    color: v.fg(v.$color-primary);
   }
 
   &__scroll {
@@ -21,7 +21,7 @@
     background-color: v.$color-primary;
 
     &:hover:not(:disabled) {
-      background-color: darken(v.$color-primary, 8%);
+      background-color: v.shade(v.$color-primary, 8%);
     }
   }
 
@@ -36,7 +36,7 @@
     border: none;
     border-radius: v.$radius-pill;
     background: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     cursor: pointer;
 
     &:hover {

@@ -5,12 +5,12 @@
   flex-shrink: 0;
   background-color: v.$navy-900;
   background-image: v.$gradient-footer;
-  color: rgba(v.$white, 0.7);
+  color: v.alpha(v.on(v.$white), 0.7);
   font-size: v.$fs-sm;
 
   h3 {
     margin-bottom: v.$space-4;
-    color: v.$white;
+    color: v.fg(v.$white);
     font-size: v.$fs-base;
     font-weight: v.$fw-semibold;
   }
@@ -21,7 +21,7 @@
     transition: color 0.2s ease;
 
     &:hover {
-      color: v.$orange-500;
+      color: v.fg(v.$orange-500);
     }
   }
 
@@ -77,9 +77,9 @@
       justify-content: center;
       width: 2.5rem;
       height: 2.5rem;
-      border: 1px solid rgba(v.$white, 0.15);
+      border: 1px solid v.alpha(v.line(v.$white), 0.15);
       border-radius: 50%;
-      color: v.$white;
+      color: v.fg(v.$white);
       font-size: 1.05rem;
       transition:
         background-color 0.2s ease,
@@ -87,9 +87,9 @@
         transform 0.2s v.$ease;
 
       &:hover {
-        border-color: v.$orange-500;
+        border-color: v.line(v.$orange-500);
         background-color: v.$orange-500;
-        color: v.$navy-900;
+        color: v.on(v.$navy-900);
         transform: translateY(-2px);
       }
     }
@@ -112,7 +112,7 @@
     svg {
       flex-shrink: 0;
       margin-top: 0.2rem;
-      color: v.$orange-500;
+      color: v.fg(v.$orange-500);
     }
   }
 
@@ -125,12 +125,12 @@
   &__subscribe {
     display: flex;
     padding: 0.3rem;
-    border: 1px solid rgba(v.$white, 0.15);
+    border: 1px solid v.alpha(v.line(v.$white), 0.15);
     border-radius: v.$radius-pill;
-    background-color: rgba(v.$white, 0.06);
+    background-color: v.alpha(v.$white, 0.06);
 
     &:focus-within {
-      border-color: v.$orange-500;
+      border-color: v.line(v.$orange-500);
     }
 
     input {
@@ -139,7 +139,7 @@
       padding: 0 v.$space-3;
       border: none;
       background: transparent;
-      color: v.$white;
+      color: v.fg(v.$white);
       // 16px stops iOS Safari zooming in when the field is focused.
       font-size: 1rem;
       outline: none;
@@ -147,7 +147,7 @@
       appearance: none;
 
       &::placeholder {
-        color: rgba(v.$white, 0.45);
+        color: v.alpha(v.fg(v.$white), 0.45);
         opacity: 1;
       }
     }
@@ -163,7 +163,7 @@
       border: none;
       border-radius: 50%;
       background-color: v.$orange-500;
-      color: v.$navy-900;
+      color: v.on(v.$navy-900);
       cursor: pointer;
 
       &:hover {
@@ -179,16 +179,16 @@
     font-size: v.$fs-xs;
 
     &.is-error {
-      color: #ff9a9a;
+      color: var(--fx-red-80-fg);
     }
 
     &.is-done {
-      color: #7ee2b0;
+      color: var(--fx-teal-69-fg);
     }
   }
 
   &__bottom {
-    border-top: 1px solid rgba(v.$white, 0.1);
+    border-top: 1px solid v.alpha(v.line(v.$white), 0.1);
     // Clears the iPhone home indicator.
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }

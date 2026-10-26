@@ -22,19 +22,19 @@
   }
 
   &__stat-label {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0 0 v.$spacing-2;
   }
 
   &__stat-value {
     @include m.font-heading(v.$font-weight-bold);
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-2xl;
     margin: 0;
 
     &--danger {
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
   }
 
@@ -43,7 +43,7 @@
     flex-wrap: wrap;
 
     p {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
       margin: 0;
     }
@@ -58,10 +58,10 @@
         min-width: 2rem;
         height: 2rem;
         padding: 0 v.$spacing-2;
-        border: 1px solid v.$color-border;
+        border: 1px solid v.line(v.$color-border);
         border-radius: v.$radius-md;
         background-color: v.$color-bg;
-        color: v.$color-text;
+        color: v.fg(v.$color-text);
         font-size: v.$font-size-sm;
         cursor: pointer;
         transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -77,8 +77,8 @@
 
         &.is-active {
           background-color: v.$color-primary;
-          border-color: v.$color-primary;
-          color: v.$color-white;
+          border-color: v.line(v.$color-primary);
+          color: v.on(v.$color-white);
         }
       }
     }
