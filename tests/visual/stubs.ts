@@ -1,4 +1,7 @@
 import type { Page, Route } from "@playwright/test";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 // Fixed data for the screenshot tests. Every /api and /hubs request is answered here (on whatever host VITE_API_URL points at),
 // so the tests never reach a real server and every run shows the same rows.
@@ -93,6 +96,28 @@ const responses: Record<string, unknown> = {
 const json = (route: Route, body: unknown, status = 200) =>
   route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
 
+// Google Fonts, from a local copy after the first download: ~150 page loads in a run would otherwise be throttled now and then,
+// and a page drawn in the fallback font fails its screenshot.
+const FONT_CACHE = join("node_modules", ".cache", "visual-fonts");
+
+const serveFont = async (route: Route) => {
+  const key = createHash("sha1").update(route.request().url()).digest("hex");
+  const body = join(FONT_CACHE, key);
+  const meta = `${body}.json`;
+  if (existsSync(body) && existsSync(meta)) {
+    const { contentType } = JSON.parse(readFileSync(meta, "utf8")) as { contentType: string };
+    return route.fulfill({ status: 200, contentType, body: readFileSync(body), headers: { "access-control-allow-origin": "*" } });
+  }
+  const response = await route.fetch();
+  const buffer = await response.body();
+  if (response.ok()) {
+    mkdirSync(FONT_CACHE, { recursive: true });
+    writeFileSync(body, buffer);
+    writeFileSync(meta, JSON.stringify({ contentType: response.headers()["content-type"] ?? "application/octet-stream" }));
+  }
+  return route.fulfill({ response, body: buffer });
+};
+
 /** Answers every API and live-notification request with fixed data. Call before the first navigation. */
 export const stubApi = async (page: Page) => {
   await page.route(/\/(api|hubs)\//i, (route) => {
@@ -105,6 +130,7 @@ export const stubApi = async (page: Page) => {
   });
   // other outside calls (pincode lookup and the like) are not needed for a screenshot
   await page.route("https://api.postalpincode.in/**", (route) => json(route, []));
+  await page.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, serveFont);
 };
 
 /** Signs in without the API: writes the keys src/core/auth/session.ts and Login.tsx read. No permission keys = nothing hidden. */
