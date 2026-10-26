@@ -1,4 +1,4 @@
-import { FiUnlock } from "react-icons/fi";
+import { LockOpenIcon } from "../../../../../shared/components/icon";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import type { DriverTruckMapping } from "../../../../../core/store/driverTruckMappingApi";
@@ -45,7 +45,7 @@ export function buildDriverTruckMappingColumns({
           manageKeys={["driver-truck-mapping.manage"]}
           onView={() => onView(row)}
           onDelete={() => onDelete(row)}
-          deleteIcon={FiUnlock}
+          deleteIcon={LockOpenIcon}
           deleteLabel="Release"
         />
       ),

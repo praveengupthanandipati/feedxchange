@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiPlus, FiX } from "react-icons/fi";
+import { PlusIcon, XIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ToggleSwitch from "../../../../../shared/components/toggle/ToggleSwitch";
@@ -12,7 +12,8 @@ import {
   type PromoCodeRow,
 } from "./promocodes.data";
 import "../promoterslist/Promoters.scss";
-import "./Promocodes.scss";
+import "./Promocodes.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 const PAGE_SIZE = 10;
@@ -67,7 +68,7 @@ const NewPromoCodeDrawer = ({
             onClick={onClose}
             aria-label="Close"
           >
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -258,7 +259,7 @@ const Promocodes = () => {
               className="promocodes-btn promocodes-btn--primary"
               onClick={handleOpenDrawer}
             >
-              <FiPlus aria-hidden /> New Promo Code
+              <PlusIcon aria-hidden /> New Promo Code
             </button>
           </Can>
         </div>

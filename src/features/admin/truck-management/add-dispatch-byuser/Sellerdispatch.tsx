@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  FiChevronLeft,
-  FiChevronRight,
-  FiDownload,
-  FiFilter,
-  FiRefreshCw,
-  FiRotateCcw,
-  FiSearch,
-} from "react-icons/fi";
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  FunnelIcon,
+  RefreshCwIcon,
+  RotateCcwIcon,
+  SearchIcon,
+} from "../../../../shared/components/icon";
 import DateRangeInput from "../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
@@ -198,7 +198,7 @@ const Sellerdispatch = () => {
               aria-expanded={filtersVisible}
               aria-controls="seller-dispatch-filters"
             >
-              <FiFilter aria-hidden />
+              <FunnelIcon aria-hidden />
               {filtersVisible ? "Hide Filters" : "Show Filters"}
             </button>
             <button
@@ -207,7 +207,7 @@ const Sellerdispatch = () => {
               onClick={handleExportToExcel}
               disabled={filteredRows.length === 0}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -249,7 +249,7 @@ const Sellerdispatch = () => {
               ariaLabel="Filter by delivery schedule"
             />
             <div className="seller-dispatch-filters__search">
-              <FiSearch aria-hidden />
+              <SearchIcon aria-hidden />
               <input
                 type="text"
                 value={keyword}
@@ -259,18 +259,18 @@ const Sellerdispatch = () => {
               />
             </div>
             <button type="button" className="seller-dispatch-filters__reset" onClick={handleResetFilters}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         )}
 
         {filteredRows.length === 0 ? (
           <div className="seller-dispatch-empty" role="status">
-            <FiSearch aria-hidden className="seller-dispatch-empty__icon" />
+            <SearchIcon aria-hidden className="seller-dispatch-empty__icon" />
             <h2>No Data Available</h2>
             <p>No seller trucks found based on your search. Try adjusting your search.</p>
             <button type="button" className="seller-dispatch-empty__clear" onClick={handleResetFilters}>
-              <FiRotateCcw aria-hidden /> Clear Filters
+              <RotateCcwIcon aria-hidden /> Clear Filters
             </button>
           </div>
         ) : (
@@ -294,7 +294,7 @@ const Sellerdispatch = () => {
                   onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                   aria-label="Previous page"
                 >
-                  <FiChevronLeft aria-hidden />
+                  <ChevronLeftIcon aria-hidden />
                 </button>
                 {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
                   <button
@@ -313,7 +313,7 @@ const Sellerdispatch = () => {
                   onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                   aria-label="Next page"
                 >
-                  <FiChevronRight aria-hidden />
+                  <ChevronRightIcon aria-hidden />
                 </button>
               </div>
             </div>

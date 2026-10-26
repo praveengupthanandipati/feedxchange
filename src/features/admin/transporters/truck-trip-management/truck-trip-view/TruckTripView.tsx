@@ -1,11 +1,12 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiEdit3, FiCheckCircle } from "react-icons/fi";
+import { ArrowLeftIcon, CircleCheckBigIcon, PenLineIcon } from "../../../../../shared/components/icon";
 import { useGetTripByIdQuery, useCompleteTripMutation } from "../../../../../core/store/truckTripApi";
 import CompleteTripModal, { type CompleteTripValues } from "./CompleteTripModal";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
-import "../truck-trip-list/TruckTrip.scss";
+import "../truck-trip-list/TruckTrip.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 interface DetailFieldProps {
@@ -71,7 +72,7 @@ const TruckTripView = () => {
     return (
       <div className="business-owner-detail">
         <Link to="/admin/truck-management/transporters/truck-trips" className="business-owner-detail__back">
-          <FiArrowLeft aria-hidden /> Back to Truck Trips List
+          <ArrowLeftIcon aria-hidden /> Back to Truck Trips List
         </Link>
         <div className="business-owner-detail__card">
           <p>{isLoading ? "Loading truck trip…" : `No truck trip found for id "${id}".`}</p>
@@ -83,7 +84,7 @@ const TruckTripView = () => {
   return (
     <div className="business-owner-detail">
       <Link to="/admin/truck-management/transporters/truck-trips" className="business-owner-detail__back">
-        <FiArrowLeft aria-hidden /> Back to Truck Trips List
+        <ArrowLeftIcon aria-hidden /> Back to Truck Trips List
       </Link>
 
       <div className="business-owner-detail__card">
@@ -102,7 +103,7 @@ const TruckTripView = () => {
                     setCompleteModalOpen(true);
                   }}
                 >
-                  <FiCheckCircle aria-hidden /> Complete Trip
+                  <CircleCheckBigIcon aria-hidden /> Complete Trip
                 </button>
               </Can>
             )}
@@ -112,7 +113,7 @@ const TruckTripView = () => {
                 className="truck-trip-btn truck-trip-btn--outline"
                 onClick={() => navigate(`/admin/truck-management/transporters/truck-trips/new?id=${trip.tripId}`)}
               >
-                <FiEdit3 aria-hidden /> Edit
+                <PenLineIcon aria-hidden /> Edit
               </button>
             </Can>
           </div>

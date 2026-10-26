@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiCalendar, FiX } from "react-icons/fi";
+import { CalendarIcon, XIcon } from "../icon";
 import Calendar, { formatDisplayDate } from "./Calendar";
 import { useAnchoredPanel } from "./useAnchoredPanel";
 import "./DateRangeInput.scss";
@@ -70,7 +70,7 @@ const DateRangeInput = ({ from, to, onChange, placeholder = "Select Date Range",
         <span className={hasValue ? "" : "is-placeholder"}>{displayValue || placeholder}</span>
         <span className="date-range-input__trigger-icons">
           {hasValue && (
-            <FiX
+            <XIcon
               className="date-range-input__clear"
               aria-label="Clear date range"
               role="button"
@@ -87,7 +87,7 @@ const DateRangeInput = ({ from, to, onChange, placeholder = "Select Date Range",
               }}
             />
           )}
-          <FiCalendar aria-hidden />
+          <CalendarIcon aria-hidden />
         </span>
       </button>
 

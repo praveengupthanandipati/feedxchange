@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import type { IconType } from "react-icons";
+import { type IconComponent } from "../../../../../shared/components/icon";
 import "./InfoPanel.scss";
 
 interface InfoPanelProps {
-  icon: IconType;
+  icon: IconComponent;
   title: string;
   description: string;
   action?: {

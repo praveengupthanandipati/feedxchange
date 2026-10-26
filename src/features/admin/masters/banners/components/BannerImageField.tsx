@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from "react";
-import { FiImage } from "react-icons/fi";
+import { ImageIcon } from "../../../../../shared/components/icon";
 import { IMAGE_TYPES } from "../banners.data";
 import { imageFileError, readAsDataUrl } from "../banners.utils";
 
@@ -40,7 +40,7 @@ const BannerImageField = ({ image, fileName, error, onChange }: BannerImageField
         Banner Image <span className="banner-panel__required" aria-hidden>*</span>
       </span>
       <div className="banner-panel__preview">
-        {image ? <img src={image} alt="Selected banner" /> : <FiImage aria-hidden className="banner-panel__preview-icon" />}
+        {image ? <img src={image} alt="Selected banner" /> : <ImageIcon aria-hidden className="banner-panel__preview-icon" />}
       </div>
       <div className="banner-panel__file">
         <button type="button" onClick={() => inputRef.current?.click()} aria-describedby="banner-image-label">

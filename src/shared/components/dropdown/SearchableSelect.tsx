@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiChevronDown, FiPlus, FiSearch, FiX } from "react-icons/fi";
+import { ChevronDownIcon, PlusIcon, SearchIcon, XIcon } from "../icon";
 import { useAnchoredPanel } from "./useAnchoredPanel";
 import "./SearchableSelect.scss";
 
@@ -135,7 +135,7 @@ const SearchableSelect = ({
         <span>{selectedLabel ?? placeholder}</span>
         <span className="searchable-select__trigger-icons">
           {clearable && value && (
-            <FiX
+            <XIcon
               className="searchable-select__clear"
               aria-label="Clear selection"
               role="button"
@@ -152,7 +152,7 @@ const SearchableSelect = ({
               }}
             />
           )}
-          <FiChevronDown className={open ? "is-open" : ""} aria-hidden />
+          <ChevronDownIcon className={open ? "is-open" : ""} aria-hidden />
         </span>
       </button>
 
@@ -160,7 +160,7 @@ const SearchableSelect = ({
         createPortal(
         <div className="searchable-select__panel" ref={panelRef} style={panelStyle}>
           <div className="searchable-select__search">
-            <FiSearch aria-hidden />
+            <SearchIcon aria-hidden />
             <input
               ref={inputRef}
               type="text"
@@ -182,7 +182,7 @@ const SearchableSelect = ({
                 aria-label="Add new item"
                 title={onAddNew ? "Add new" : "Save as new option"}
               >
-                <FiPlus aria-hidden />
+                <PlusIcon aria-hidden />
               </button>
             )}
           </div>

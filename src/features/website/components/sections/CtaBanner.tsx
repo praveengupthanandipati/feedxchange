@@ -1,4 +1,4 @@
-import { FiArrowRight } from "react-icons/fi";
+import { ArrowRightIcon } from "../../../../shared/components/icon";
 import { Link } from "react-router-dom";
 import { company } from "../../data/content";
 import { sitePaths } from "../../routes/paths";
@@ -18,7 +18,7 @@ const CtaBanner = ({ title = "Ready to grow your feed business?", text = `Join $
         </div>
         <div className="cta__actions">
           <Link to={sitePaths.join} className="btn-site btn-site--primary">
-            Join with us <FiArrowRight aria-hidden />
+            Join with us <ArrowRightIcon aria-hidden />
           </Link>
           <Link to={sitePaths.products} className="btn-site btn-site--ghost">
             Explore products

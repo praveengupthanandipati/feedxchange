@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
 import {
-  FiBriefcase,
-  FiFileText,
-  FiPhone,
-  FiMail,
-  FiSliders,
-  FiEdit3,
-} from "react-icons/fi";
-import type { IconType } from "react-icons";
+  type IconComponent,
+  BriefcaseIcon,
+  FileTextIcon,
+  MailIcon,
+  PenLineIcon,
+  PhoneIcon,
+  SlidersVerticalIcon,
+} from "../../../../../shared/components/icon";
 import { profileData } from "./profile.data";
 import "./Profile.scss";
 
@@ -31,7 +31,7 @@ const StatusBadge = ({ active, onLabel = "Enabled", offLabel = "Disabled" }: { a
 
 interface ProfileCardProps {
   accent: "navy" | "orange" | "info" | "success" | "danger";
-  icon: IconType;
+  icon: IconComponent;
   title: string;
   children: ReactNode;
 }
@@ -57,7 +57,7 @@ const Profile = () => {
       </div>
 
       <div className="profile-grid">
-        <ProfileCard accent="navy" icon={FiBriefcase} title="Business Details">
+        <ProfileCard accent="navy" icon={BriefcaseIcon} title="Business Details">
           <Field label="Seller" value={profileData.seller} />
           <Field label="Seller City" value={profileData.sellerCity} />
           <Field label="Group" value={profileData.group} />
@@ -70,7 +70,7 @@ const Profile = () => {
           <Field label="Prefered Courier" value={profileData.preferedCourier} />
         </ProfileCard>
 
-        <ProfileCard accent="orange" icon={FiFileText} title="Tax & Registration">
+        <ProfileCard accent="orange" icon={FileTextIcon} title="Tax & Registration">
           <Field label="TIN Number" value={profileData.tinNumber} />
           <Field label="PAN Number" value={profileData.panNumber} />
           <Field label="CST Number" value={profileData.cstNumber} />
@@ -80,7 +80,7 @@ const Profile = () => {
           <Field label="HSN Codes" value={profileData.hsnCodes} />
         </ProfileCard>
 
-        <ProfileCard accent="info" icon={FiPhone} title="Contact Information">
+        <ProfileCard accent="info" icon={PhoneIcon} title="Contact Information">
           <Field
             label="Mobile"
             value={<a href={`tel:${profileData.mobile}`}>{profileData.mobile}</a>}
@@ -93,13 +93,13 @@ const Profile = () => {
             label="Email"
             value={
               <a href={`mailto:${profileData.email}`}>
-                <FiMail aria-hidden /> {profileData.email}
+                <MailIcon aria-hidden /> {profileData.email}
               </a>
             }
           />
         </ProfileCard>
 
-        <ProfileCard accent="success" icon={FiSliders} title="Preferences & Settings">
+        <ProfileCard accent="success" icon={SlidersVerticalIcon} title="Preferences & Settings">
           <Field label="Brokerage Rate" value={`${profileData.brokerageRate}%`} />
           <Field label="Auto SMS For Contract" value={<StatusBadge active={profileData.autoSmsForContract} />} />
           <Field label="Auto SMS For Payment" value={<StatusBadge active={profileData.autoSmsForPayment} />} />
@@ -107,7 +107,7 @@ const Profile = () => {
           <Field label="Contract Entry" value={<StatusBadge active={profileData.contractEntry} onLabel="Yes" offLabel="No" />} />
         </ProfileCard>
 
-        <ProfileCard accent="danger" icon={FiEdit3} title="Notes & Remarks">
+        <ProfileCard accent="danger" icon={PenLineIcon} title="Notes & Remarks">
           <Field label="Remarks" value={profileData.remarks} />
           <Field label="Notes" value={profileData.notes} />
         </ProfileCard>

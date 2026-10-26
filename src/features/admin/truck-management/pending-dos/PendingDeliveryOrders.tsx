@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  FiEye,
-  FiEyeOff,
-  FiDownload,
-  FiSearch,
-  FiRefreshCw,
-  FiChevronLeft,
-  FiChevronRight,
-  FiAlertCircle,
-} from "react-icons/fi";
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleAlertIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  RefreshCwIcon,
+  SearchIcon,
+} from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
@@ -51,7 +51,7 @@ const PendingDoCards = ({ rows, onAddDo }: MobileCardsProps) => {
   if (rows.length === 0) {
     return (
       <div className="pending-dos-cards__empty" role="status">
-        <FiAlertCircle aria-hidden /> No pending DOs match the current filters.
+        <CircleAlertIcon aria-hidden /> No pending DOs match the current filters.
       </div>
     );
   }
@@ -222,7 +222,7 @@ const PendingDeliveryOrders = () => {
               aria-expanded={filtersVisible}
               aria-controls="pending-dos-filters"
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
@@ -230,7 +230,7 @@ const PendingDeliveryOrders = () => {
               className="pending-dos-btn pending-dos-btn--warning"
               onClick={handleExportToExcel}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -253,7 +253,7 @@ const PendingDeliveryOrders = () => {
             />
             <div className="pending-dos-filters__search-row">
               <div className="pending-dos-filters__search">
-                <FiSearch aria-hidden />
+                <SearchIcon aria-hidden />
                 <input
                   type="text"
                   value={keyword}
@@ -269,7 +269,7 @@ const PendingDeliveryOrders = () => {
                 title="Reset filters"
                 aria-label="Reset filters"
               >
-                <FiRefreshCw aria-hidden />
+                <RefreshCwIcon aria-hidden />
               </button>
             </div>
           </div>
@@ -305,7 +305,7 @@ const PendingDeliveryOrders = () => {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <button
@@ -324,7 +324,7 @@ const PendingDeliveryOrders = () => {
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

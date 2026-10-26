@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiPlus, FiTrash2, FiX } from "react-icons/fi";
+import { PlusIcon, Trash2Icon, XIcon } from "../../../../shared/components/icon";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import { apiErrorMessage, useUpdateInvoiceMutation, type Invoice } from "../../../../core/store/sellerInvoiceApi";
 import "./EditInvoiceOffcanvas.scss";
@@ -163,7 +163,7 @@ const EditInvoiceOffcanvas = ({ invoice, onClose, onSaved }: Props) => {
         <div className="edit-invoice-offcanvas__header">
           <h2 id="edit-invoice-title">Edit Invoice {invoice.invoiceNumber}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -272,7 +272,7 @@ const EditInvoiceOffcanvas = ({ invoice, onClose, onSaved }: Props) => {
                   <span>{d.isTdsTcs ? "TDS/TCS" : ""}</span>
                   <span>{d.remarks || "—"}</span>
                   <button type="button" aria-label="Remove deduction" onClick={() => set("deductions", form.deductions.filter((x) => x.key !== d.key))}>
-                    <FiTrash2 aria-hidden />
+                    <Trash2Icon aria-hidden />
                   </button>
                 </li>
               ))}
@@ -286,7 +286,7 @@ const EditInvoiceOffcanvas = ({ invoice, onClose, onSaved }: Props) => {
               <input type="checkbox" checked={draft.isTdsTcs} onChange={(e) => setDraft((d) => ({ ...d, isTdsTcs: e.target.checked }))} /> TDS/TCS
             </label>
             <button type="button" onClick={addDeduction}>
-              <FiPlus aria-hidden /> Add
+              <PlusIcon aria-hidden /> Add
             </button>
           </div>
 

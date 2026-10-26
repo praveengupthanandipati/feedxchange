@@ -1,6 +1,15 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiBell, FiEdit3, FiShare2, FiUser, FiPhone, FiCreditCard, FiUsers } from "react-icons/fi";
+import {
+  ArrowLeftIcon,
+  BellIcon,
+  CreditCardIcon,
+  PenLineIcon,
+  PhoneIcon,
+  Share2Icon,
+  UserIcon,
+  UsersIcon,
+} from "../../../../../shared/components/icon";
 import {
   useGetBusinessProfileByIdQuery,
   useGetAllBusinessLinesQuery,
@@ -16,17 +25,18 @@ import ContactsTab from "./ContactsTab";
 import BankDetailsTab from "./BankDetailsTab";
 import LinkedBusinessTab from "./LinkedBusinessTab";
 import "../BusinessList/Businessowners.scss";
-import "./BusinessOwnerDetail.scss";
+import "./BusinessOwnerDetail.scss";
+
 import Can from "../../../../../core/auth/Can";
 import { usePermission } from "../../../../../core/auth/AuthContext";
 import ProfilePreferencesPanel from "../../../notification-preferences/ProfilePreferencesPanel";
 
 const TABS = [
-  { id: "overview", label: "Overview", icon: FiUser },
-  { id: "contacts", label: "Contacts", icon: FiPhone },
-  { id: "bank", label: "Bank Details & Docs", icon: FiCreditCard },
-  { id: "linked", label: "Linked Business", icon: FiUsers },
-  { id: "notifications", label: "Notifications", icon: FiBell },
+  { id: "overview", label: "Overview", icon: UserIcon },
+  { id: "contacts", label: "Contacts", icon: PhoneIcon },
+  { id: "bank", label: "Bank Details & Docs", icon: CreditCardIcon },
+  { id: "linked", label: "Linked Business", icon: UsersIcon },
+  { id: "notifications", label: "Notifications", icon: BellIcon },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -89,7 +99,7 @@ const BusinessOwnerDetail = () => {
     return (
       <div className="business-owner-detail">
         <Link to="/admin/business-owners" className="business-owner-detail__back">
-          <FiArrowLeft aria-hidden /> Back to Business Owners
+          <ArrowLeftIcon aria-hidden /> Back to Business Owners
         </Link>
         <div className="business-owner-detail__card">
           <p>Loading business profile…</p>
@@ -102,7 +112,7 @@ const BusinessOwnerDetail = () => {
     return (
       <div className="business-owner-detail">
         <Link to="/admin/business-owners" className="business-owner-detail__back">
-          <FiArrowLeft aria-hidden /> Back to Business Owners
+          <ArrowLeftIcon aria-hidden /> Back to Business Owners
         </Link>
         <div className="business-owner-detail__card">
           <p>No business owner found for id "{id}".</p>
@@ -114,7 +124,7 @@ const BusinessOwnerDetail = () => {
   return (
     <div className="business-owner-detail">
       <Link to="/admin/business-owners" className="business-owner-detail__back">
-        <FiArrowLeft aria-hidden /> Back to Business Owners
+        <ArrowLeftIcon aria-hidden /> Back to Business Owners
       </Link>
 
       <div className="business-owner-detail__card">
@@ -134,7 +144,7 @@ const BusinessOwnerDetail = () => {
                 className="business-owners-btn business-owners-btn--outline"
                 onClick={() => navigate(`/admin/business-owners/profile?id=${profile.profileId}`)}
               >
-                <FiEdit3 aria-hidden /> Edit
+                <PenLineIcon aria-hidden /> Edit
               </button>
             </Can>
             <button
@@ -142,7 +152,7 @@ const BusinessOwnerDetail = () => {
               className="business-owners-btn business-owners-btn--primary"
               onClick={() => setShareProfileOpen(true)}
             >
-              <FiShare2 aria-hidden /> Share Profile
+              <Share2Icon aria-hidden /> Share Profile
             </button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { FiPlusCircle, FiEye, FiFileText } from "react-icons/fi";
+import { CirclePlusIcon, EyeIcon, FileTextIcon } from "../../../../../shared/components/icon";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import type { PendingSupplyRow } from "./pendingSupplies.data";
@@ -23,9 +23,9 @@ export function buildPendingSuppliesColumns({
           menuAlign="left"
           menuHeader="Interest of Payments"
           actions={[
-            { key: "create", label: "Create Interest", icon: FiPlusCircle, onClick: () => onCreateInterest(row) },
-            { key: "view", label: "View Interest", icon: FiEye, onClick: () => onViewInterest(row) },
-            { key: "detail", label: "View Interest Detail", icon: FiFileText, onClick: () => onViewInterestDetail(row) },
+            { key: "create", label: "Create Interest", icon: CirclePlusIcon, onClick: () => onCreateInterest(row) },
+            { key: "view", label: "View Interest", icon: EyeIcon, onClick: () => onViewInterest(row) },
+            { key: "detail", label: "View Interest Detail", icon: FileTextIcon, onClick: () => onViewInterestDetail(row) },
           ]}
         />
       ),

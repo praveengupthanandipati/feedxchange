@@ -2,20 +2,20 @@ import { useEffect, useMemo, useState, type SubmitEvent } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
-  FiAlertCircle,
-  FiCheck,
-  FiChevronLeft,
-  FiChevronRight,
-  FiEdit2,
-  FiEye,
-  FiEyeOff,
-  FiPrinter,
-  FiRefreshCw,
-  FiSave,
-  FiSearch,
-  FiTrash2,
-  FiX,
-} from "react-icons/fi";
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleAlertIcon,
+  EyeIcon,
+  EyeOffIcon,
+  PenIcon,
+  PrinterIcon,
+  RefreshCwIcon,
+  SaveIcon,
+  SearchIcon,
+  Trash2Icon,
+  XIcon,
+} from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import { formatDisplayDate } from "../../../../shared/components/dropdown/Calendar";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
@@ -130,7 +130,7 @@ const EditInterestModal = ({ record, onSave, onClose }: EditModalProps) => {
         <header>
           <h2 id="edit-interest-title">Edit {record.id}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
         <p className="view-interest-modal__parties">
@@ -165,10 +165,10 @@ const EditInterestModal = ({ record, onSave, onClose }: EditModalProps) => {
         )}
         <div className="view-interest-modal__actions">
           <button type="button" className="interest-btn interest-btn--ghost" onClick={onClose}>
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
           <button type="submit" className="interest-btn interest-btn--primary">
-            <FiSave aria-hidden /> Save
+            <SaveIcon aria-hidden /> Save
           </button>
         </div>
       </form>
@@ -230,16 +230,16 @@ const ViewInterest = () => {
   const actionButtons = (record: InterestRecord) => (
     <div className="view-interest__actions">
       <button type="button" className="view-interest__icon-btn view-interest__icon-btn--view" onClick={() => viewDetail(record)} aria-label={`View ${record.id}`} title="View">
-        <FiEye aria-hidden />
+        <EyeIcon aria-hidden />
       </button>
       <button type="button" className="view-interest__icon-btn view-interest__icon-btn--print" onClick={() => printRecord(record)} aria-label={`Print ${record.id}`} title="Print">
-        <FiPrinter aria-hidden />
+        <PrinterIcon aria-hidden />
       </button>
       <button type="button" className="view-interest__icon-btn view-interest__icon-btn--edit" onClick={() => setEditing(record)} aria-label={`Edit ${record.id}`} title="Edit">
-        <FiEdit2 aria-hidden />
+        <PenIcon aria-hidden />
       </button>
       <button type="button" className="view-interest__icon-btn view-interest__icon-btn--delete" onClick={() => setDeleting(record)} aria-label={`Delete ${record.id}`} title="Delete">
-        <FiTrash2 aria-hidden />
+        <Trash2Icon aria-hidden />
       </button>
     </div>
   );
@@ -256,10 +256,10 @@ const ViewInterest = () => {
         <RowActionsMenu
           menuAlign="left"
           actions={[
-            { key: "view", label: "View", icon: FiEye, onClick: () => viewDetail(row) },
-            { key: "print", label: "Print", icon: FiPrinter, onClick: () => printRecord(row) },
-            { key: "edit", label: "Edit", icon: FiEdit2, onClick: () => setEditing(row) },
-            { key: "delete", label: "Delete", icon: FiTrash2, onClick: () => setDeleting(row), danger: true, dividerBefore: true },
+            { key: "view", label: "View", icon: EyeIcon, onClick: () => viewDetail(row) },
+            { key: "print", label: "Print", icon: PrinterIcon, onClick: () => printRecord(row) },
+            { key: "edit", label: "Edit", icon: PenIcon, onClick: () => setEditing(row) },
+            { key: "delete", label: "Delete", icon: Trash2Icon, onClick: () => setDeleting(row), danger: true, dividerBefore: true },
           ]}
         />
       ),
@@ -283,7 +283,7 @@ const ViewInterest = () => {
           aria-expanded={filtersVisible}
           aria-controls="view-interest-filters"
         >
-          {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+          {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
           {filtersVisible ? "Hide" : "Show"}
         </button>
       </div>
@@ -295,10 +295,10 @@ const ViewInterest = () => {
           <DateRangeInput from={draft.from} to={draft.to} onChange={(from, to) => setDraft({ ...draft, from, to })} placeholder="Select Date Range" ariaLabel="Date of entry range" />
           <div className="view-interest__filter-actions">
             <button type="button" className="interest-btn interest-btn--primary" onClick={applyFilters}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="interest-btn interest-btn--danger" onClick={resetFilters}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         </div>
@@ -311,7 +311,7 @@ const ViewInterest = () => {
       </div>
 
       <div className="view-interest__search">
-        <FiSearch aria-hidden />
+        <SearchIcon aria-hidden />
         <input
           type="text"
           value={search}
@@ -326,7 +326,7 @@ const ViewInterest = () => {
 
       {message && (
         <p className="view-interest__message" role="status">
-          <FiCheck aria-hidden /> {message}
+          <CheckIcon aria-hidden /> {message}
         </p>
       )}
 
@@ -343,7 +343,7 @@ const ViewInterest = () => {
       <ul className="interest-cards">
         {paged.length === 0 && (
           <li className="interest-cards__empty">
-            <FiAlertCircle aria-hidden /> No interest records match the current filters.
+            <CircleAlertIcon aria-hidden /> No interest records match the current filters.
           </li>
         )}
         {paged.map((row) => (
@@ -372,7 +372,7 @@ const ViewInterest = () => {
         </p>
         <div className="interest-pagination__pages">
           <button type="button" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)} aria-label="Previous page">
-            <FiChevronLeft aria-hidden />
+            <ChevronLeftIcon aria-hidden />
           </button>
           {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => (
             <button
@@ -386,7 +386,7 @@ const ViewInterest = () => {
             </button>
           ))}
           <button type="button" disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)} aria-label="Next page">
-            <FiChevronRight aria-hidden />
+            <ChevronRightIcon aria-hidden />
           </button>
         </div>
       </div>

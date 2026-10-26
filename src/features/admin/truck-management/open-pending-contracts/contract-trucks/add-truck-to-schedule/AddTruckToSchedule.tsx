@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { FiArrowLeft, FiSave, FiX, FiCheckCircle, FiFileText, FiPlus, FiTrash2 } from "react-icons/fi";
+import {
+  ArrowLeftIcon,
+  CircleCheckBigIcon,
+  FileTextIcon,
+  PlusIcon,
+  SaveIcon,
+  Trash2Icon,
+  XIcon,
+} from "../../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../../shared/components/dropdown/SearchableSelect";
 import InfoPanel from "../InfoPanel";
 import ContractSummaryPanel from "../../../contract-trucks/ContractSummaryPanel";
@@ -241,7 +249,7 @@ const AddTruckToScheduleForm = ({
   if (!detail) {
     return (
       <InfoPanel
-        icon={FiFileText}
+        icon={FileTextIcon}
         title="Schedule Request Not Found"
         description="This schedule request could not be found. Go back to Manage Schedule and open Add Truck from an accepted request."
         action={{
@@ -257,10 +265,10 @@ const AddTruckToScheduleForm = ({
       {notify.element}
       {saved && (
         <div className="dispatch-form-success">
-          <FiCheckCircle aria-hidden />
+          <CircleCheckBigIcon aria-hidden />
           {rows.length > 1 ? "Trucks added" : "Truck added"} to this schedule and shared with the seller for loading.
           <button type="button" onClick={() => setSaved(false)} aria-label="Dismiss">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
       )}
@@ -372,12 +380,12 @@ const AddTruckToScheduleForm = ({
                       onClick={() => removeRow(row.id)}
                       aria-label="Remove truck"
                     >
-                      <FiTrash2 aria-hidden />
+                      <Trash2Icon aria-hidden />
                     </button>
                   )}
                   {index === rows.length - 1 && (
                     <button type="button" className="add-truck-rows__add" onClick={addRow} aria-label="Add truck">
-                      <FiPlus aria-hidden />
+                      <PlusIcon aria-hidden />
                     </button>
                   )}
                 </div>
@@ -396,7 +404,7 @@ const AddTruckToScheduleForm = ({
 
       <div className="assign-truck-drawer__footer">
         <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving}>
-          <FiSave aria-hidden />{" "}
+          <SaveIcon aria-hidden />{" "}
           {saving ? "Saving…" : rows.length > 1 ? "Add all trucks" : "Add truck"}
         </button>
       </div>
@@ -437,7 +445,7 @@ const AddTruckToSchedule = () => {
             }
             className="assign-transports-card__back"
           >
-            <FiArrowLeft aria-hidden /> Back to Manage Schedule
+            <ArrowLeftIcon aria-hidden /> Back to Manage Schedule
           </Link>
         </div>
 
@@ -452,7 +460,7 @@ const AddTruckToSchedule = () => {
           </>
         ) : (
           <InfoPanel
-            icon={FiFileText}
+            icon={FileTextIcon}
             title="No Schedule Selected"
             description="Open Manage Schedule for a contract and use Add Truck on an accepted request."
             action={{ label: "Go to Open & Pending Contracts", to: "/admin/truck-management/open-pending-contracts" }}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiMenu } from "react-icons/fi";
+import { MenuIcon } from "../../../shared/components/icon";
 import { useLocation } from "react-router-dom";
 import Logo from "../../../features/website/components/common/Logo";
 import DesktopNav from "./DesktopNav";
@@ -48,7 +48,7 @@ const Header = () => {
           <JoinButton />
           <WhatsAppButton />
           <button type="button" className="site-header__toggle" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} aria-controls="mobile-menu" aria-label="Open menu">
-            <FiMenu aria-hidden />
+            <MenuIcon aria-hidden />
           </button>
         </div>
       </div>

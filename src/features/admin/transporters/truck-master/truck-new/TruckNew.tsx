@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
+import { ArrowLeftIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import {
   useGetTruckDetailsByIdQuery,
@@ -164,7 +164,7 @@ const TruckNew = () => {
       <div className="new-contract__topbar">
         <h1>{isEditMode ? "Edit Truck" : "New Truck"}</h1>
         <Link to="/admin/truck-management/transporters/truck-master" className="new-contract__back">
-          <FiArrowLeft aria-hidden /> Trucks List
+          <ArrowLeftIcon aria-hidden /> Trucks List
         </Link>
       </div>
 

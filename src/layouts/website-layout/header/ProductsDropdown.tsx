@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type FocusEvent } from "react";
-import { FiArrowRight, FiChevronDown, FiPackage } from "react-icons/fi";
+import { ArrowRightIcon, ChevronDownIcon, PackageIcon } from "../../../shared/components/icon";
 import { Link, useLocation } from "react-router-dom";
 import { products, type NavItem } from "../../../features/website/data/content";
 import { productPath, sitePaths } from "../../../features/website/routes/paths";
@@ -59,7 +59,7 @@ const ProductsDropdown = ({ item }: { item: NavItem }) => {
         onClick={() => (open ? setOpen(false) : openNow())}
       >
         {item.label}
-        <FiChevronDown aria-hidden className="nav-dropdown__chevron" />
+        <ChevronDownIcon aria-hidden className="nav-dropdown__chevron" />
       </button>
 
       <div id={panelId} className="nav-dropdown__panel">
@@ -68,7 +68,7 @@ const ProductsDropdown = ({ item }: { item: NavItem }) => {
             <li key={product.slug}>
               <Link to={productPath(product.slug)} className="nav-dropdown__item" tabIndex={open ? 0 : -1}>
                 <span className="nav-dropdown__icon">
-                  <FiPackage aria-hidden />
+                  <PackageIcon aria-hidden />
                 </span>
                 <span>
                   <strong>{product.name}</strong>
@@ -79,7 +79,7 @@ const ProductsDropdown = ({ item }: { item: NavItem }) => {
           ))}
         </ul>
         <Link to={sitePaths.products} className="nav-dropdown__all" tabIndex={open ? 0 : -1}>
-          View all products <FiArrowRight aria-hidden />
+          View all products <ArrowRightIcon aria-hidden />
         </Link>
       </div>
     </li>

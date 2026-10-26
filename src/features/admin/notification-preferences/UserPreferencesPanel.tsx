@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { FiAlertTriangle, FiCheck, FiCheckCircle, FiMail, FiPauseCircle, FiPhone, FiPlayCircle } from "react-icons/fi";
+import {
+  CheckIcon,
+  CircleCheckBigIcon,
+  CirclePauseIcon,
+  CirclePlayIcon,
+  MailIcon,
+  PhoneIcon,
+  TriangleAlertIcon,
+} from "../../../shared/components/icon";
 import type { Subscription, UserPreferences } from "../../../core/store/notificationPreferencesApi";
 import type { ChannelCode } from "../../../core/store/notificationsApi";
 import { apiErrorMessage } from "../../../core/store/sellerInvoiceApi";
@@ -49,7 +57,7 @@ const UserPreferencesPanel = ({ prefs, banner, onSave, onPause, onResume, busy =
 
   return (
     <div className="pref-panel">
-      {toast && <div className="pref-toast pref-toast--ok" role="status"><FiCheckCircle aria-hidden /> {toast}</div>}
+      {toast && <div className="pref-toast pref-toast--ok" role="status"><CircleCheckBigIcon aria-hidden /> {toast}</div>}
 
       <section className="pref-person-card">
         <span className="pref-avatar pref-avatar--large" aria-hidden>{prefs.userName.slice(0, 1).toUpperCase()}</span>
@@ -57,15 +65,15 @@ const UserPreferencesPanel = ({ prefs, banner, onSave, onPause, onResume, busy =
           <h2>{prefs.userName}</h2>
           <p>{prefs.profileName ?? "FeedXchange"}</p>
           <div className="pref-drawer__reach">
-            <span className={prefs.email ? "" : "is-missing"}><FiMail aria-hidden /> {prefs.email ?? "No email"}</span>
-            <span className={prefs.mobile ? "" : "is-missing"}><FiPhone aria-hidden /> {prefs.mobile ?? "No mobile"}</span>
+            <span className={prefs.email ? "" : "is-missing"}><MailIcon aria-hidden /> {prefs.email ?? "No email"}</span>
+            <span className={prefs.mobile ? "" : "is-missing"}><PhoneIcon aria-hidden /> {prefs.mobile ?? "No mobile"}</span>
           </div>
         </div>
         <div className="pref-person-card__actions">
           {prefs.isPaused ? (
-            <button type="button" className="pref-btn" disabled={busy} onClick={() => void run(onResume, "Notifications resumed.", "Could not resume.")}><FiPlayCircle aria-hidden /> Resume</button>
+            <button type="button" className="pref-btn" disabled={busy} onClick={() => void run(onResume, "Notifications resumed.", "Could not resume.")}><CirclePlayIcon aria-hidden /> Resume</button>
           ) : (
-            <button type="button" className="pref-btn" disabled={busy} onClick={() => { setError(""); setPausing(true); }}><FiPauseCircle aria-hidden /> Pause</button>
+            <button type="button" className="pref-btn" disabled={busy} onClick={() => { setError(""); setPausing(true); }}><CirclePauseIcon aria-hidden /> Pause</button>
           )}
         </div>
       </section>
@@ -74,7 +82,7 @@ const UserPreferencesPanel = ({ prefs, banner, onSave, onPause, onResume, busy =
 
       {prefs.isPaused && (
         <div className="pref-banner pref-banner--paused" role="status">
-          <FiPauseCircle aria-hidden />
+          <CirclePauseIcon aria-hidden />
           <div>
             <strong>{pauseLabel(prefs.resumeOn)}</strong>
             <span>{prefs.pauseReason ?? "Only events that are always sent reach this person."}</span>
@@ -86,11 +94,11 @@ const UserPreferencesPanel = ({ prefs, banner, onSave, onPause, onResume, busy =
 
       <div className="pref-savebar">
         <span>{total === 0 ? "Not subscribed to anything" : `Subscribed to ${total} ${total === 1 ? "event" : "events"}`}</span>
-        {error && <p className="pref-error" role="alert"><FiAlertTriangle aria-hidden /> {error}</p>}
+        {error && <p className="pref-error" role="alert"><TriangleAlertIcon aria-hidden /> {error}</p>}
         <div>
           <button type="button" className="pref-btn" disabled={!dirty || busy} onClick={() => setValue(prefs.subscriptions)}>Discard</button>
           <button type="button" className="pref-btn pref-btn--primary" disabled={!dirty || busy} onClick={() => void run(() => onSave(value), "Preferences saved.", "Could not save.")}>
-            <FiCheck aria-hidden /> {busy ? "Saving…" : "Save"}
+            <CheckIcon aria-hidden /> {busy ? "Saving…" : "Save"}
           </button>
         </div>
       </div>

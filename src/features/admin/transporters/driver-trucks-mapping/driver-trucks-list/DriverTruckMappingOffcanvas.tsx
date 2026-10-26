@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
-import { FiX, FiTruck } from "react-icons/fi";
+import { TruckIcon, XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import type { DriverTruckMapping } from "../../../../../core/store/driverTruckMappingApi";
 import type { DriverOption, DriverTruckMappingFormValues, TruckOption } from "./driverTruckMapping.types";
@@ -108,7 +108,7 @@ const DriverTruckMappingOffcanvas = ({
       >
         <div className="driver-truck-mapping-offcanvas__header">
           <h2 id="driver-truck-mapping-offcanvas-title">
-            <FiTruck aria-hidden /> {mode === "create" ? "Create Map" : "Mapping Details"}
+            <TruckIcon aria-hidden /> {mode === "create" ? "Create Map" : "Mapping Details"}
           </h2>
           <button
             type="button"
@@ -116,7 +116,7 @@ const DriverTruckMappingOffcanvas = ({
             onClick={onClose}
             aria-label="Close"
           >
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 

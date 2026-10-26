@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../../shared/components/icon";
 import { EMPTY_FORM, type Banner, type BannerForm, type BannerStatus } from "../banners.data";
 import { toForm, validateBanner, type FormErrors } from "../banners.utils";
 import BannerImageField from "./BannerImageField";
@@ -84,7 +84,7 @@ const BannerOffcanvas = ({ banner, banners, onSave, onClose }: BannerOffcanvasPr
         <header className="banner-panel__header">
           <h2 id="banner-panel-title">{isEdit ? "Edit Banner" : "Create Banner"}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
 

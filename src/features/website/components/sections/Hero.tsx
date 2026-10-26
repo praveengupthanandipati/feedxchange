@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { FiCheckCircle } from "react-icons/fi";
+import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import heroBg from "../../assets/images/herobg.jpg";
 import { hero } from "../../data/content";
 import ProductSearch from "./ProductSearch";
@@ -14,10 +14,10 @@ const Hero = () => (
       <ProductSearch />
       <ul className="hero__points">
         <li>
-          <FiCheckCircle aria-hidden /> KYC-verified partners
+          <CircleCheckBigIcon aria-hidden /> KYC-verified partners
         </li>
         <li>
-          <FiCheckCircle aria-hidden /> No hidden commissions
+          <CircleCheckBigIcon aria-hidden /> No hidden commissions
         </li>
       </ul>
     </div>

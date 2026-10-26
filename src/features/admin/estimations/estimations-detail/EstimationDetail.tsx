@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FiAlertCircle } from "react-icons/fi";
+import { CircleAlertIcon } from "../../../../shared/components/icon";
 import { Link, useSearchParams } from "react-router-dom";
 import { EMPTY_DATES, estimationDetails, type DetailFilters as Filters } from "./estimationDetail.data";
 import { downloadEstimation, lineCommission, printEstimation, summariseByRate, type DetailTotals } from "./estimationDetail.utils";
@@ -50,7 +50,7 @@ const EstimationDetail = () => {
     return (
       <div className="estimation-detail">
         <p className="estimation-detail__notice" role="alert">
-          <FiAlertCircle aria-hidden /> Estimate not found. It may have been deleted.
+          <CircleAlertIcon aria-hidden /> Estimate not found. It may have been deleted.
         </p>
         <Link to={VIEW_PATH} className="estimation-detail__btn estimation-detail__btn--navy estimation-detail__btn--fit">
           Back to View Estimations
@@ -107,7 +107,7 @@ const EstimationDetail = () => {
 
       {notice && (
         <p className="estimation-detail__notice" role="alert">
-          <FiAlertCircle aria-hidden /> {notice}
+          <CircleAlertIcon aria-hidden /> {notice}
         </p>
       )}
 

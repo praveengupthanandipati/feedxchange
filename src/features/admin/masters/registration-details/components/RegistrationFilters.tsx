@@ -1,4 +1,4 @@
-import { FiDownload, FiRotateCcw, FiSearch } from "react-icons/fi";
+import { DownloadIcon, RotateCcwIcon, SearchIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import { STATUS_OPTIONS } from "../registrationDetails.data";
 
@@ -18,7 +18,7 @@ const RegistrationFilters = ({ search, status, resultCount, onSearchChange, onSt
     <div className="registrations__filter registrations__filter--search">
       <label htmlFor="registrations-search">Search</label>
       <div className="registrations__search">
-        <FiSearch aria-hidden />
+        <SearchIcon aria-hidden />
         <input
           id="registrations-search"
           type="search"
@@ -42,10 +42,10 @@ const RegistrationFilters = ({ search, status, resultCount, onSearchChange, onSt
 
     <div className="registrations__filter-actions">
       <button type="button" className="registrations__btn registrations__btn--success" onClick={onExport} disabled={resultCount === 0}>
-        <FiDownload aria-hidden /> Export
+        <DownloadIcon aria-hidden /> Export
       </button>
       <button type="button" className="registrations__btn registrations__btn--outline" onClick={onReset} disabled={!search && !status}>
-        <FiRotateCcw aria-hidden /> Reset
+        <RotateCcwIcon aria-hidden /> Reset
       </button>
     </div>
   </div>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FiSearch, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import PaymentDetailsOffcanvas from "./PaymentDetailsOffcanvas";
 import { buildPendingPaymentsColumns } from "./pendingPayments.columns";
@@ -38,7 +38,7 @@ const PendingPayments = () => {
   return (
     <>
       <div className="pending-payments-search">
-        <FiSearch aria-hidden />
+        <SearchIcon aria-hidden />
         <input
           type="text"
           value={keyword}
@@ -72,7 +72,7 @@ const PendingPayments = () => {
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
             aria-label="Previous page"
           >
-            <FiChevronLeft aria-hidden />
+            <ChevronLeftIcon aria-hidden />
           </button>
           {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
             <button
@@ -90,7 +90,7 @@ const PendingPayments = () => {
             onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
             aria-label="Next page"
           >
-            <FiChevronRight aria-hidden />
+            <ChevronRightIcon aria-hidden />
           </button>
         </div>
       </div>

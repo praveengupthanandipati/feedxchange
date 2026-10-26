@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
+import { ArrowLeftIcon } from "../icon";
 
 export interface WizardStepDef {
   path: string;
@@ -29,7 +29,7 @@ const WizardLayout = ({ title, backTo, backLabel, steps, unlocked, lockedMessage
           <h1>{title}</h1>
         </div>
         <Link to={backTo} className="new-business__back">
-          <FiArrowLeft aria-hidden /> {backLabel}
+          <ArrowLeftIcon aria-hidden /> {backLabel}
         </Link>
       </div>
 

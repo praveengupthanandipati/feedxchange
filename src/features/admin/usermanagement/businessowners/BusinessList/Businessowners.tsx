@@ -1,6 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus, FiSearch, FiX, FiBriefcase, FiMapPin, FiPhone, FiTag } from "react-icons/fi";
+import {
+  BriefcaseIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  MapPinIcon,
+  PhoneIcon,
+  PlusIcon,
+  SearchIcon,
+  TagIcon,
+  XIcon,
+} from "../../../../../shared/components/icon";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
@@ -193,7 +204,7 @@ const BusinessOwnersFilters = ({
       />
 
       <div className="business-owners-filters__search">
-        <FiSearch aria-hidden />
+        <SearchIcon aria-hidden />
         <input
           type="text"
           value={keyword}
@@ -209,7 +220,7 @@ const BusinessOwnersFilters = ({
         title="Clear filters"
         aria-label="Clear filters"
       >
-        <FiX aria-hidden />
+        <XIcon aria-hidden />
       </button>
     </div>
   );
@@ -361,7 +372,7 @@ const Businessowners = () => {
               className="business-owners-btn business-owners-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide Filters" : "Show Filters"}
             </button>
             <button
@@ -369,7 +380,7 @@ const Businessowners = () => {
               className="business-owners-btn business-owners-btn--warning"
               onClick={handleExport}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["profiles.business.manage"]}>
               <button
@@ -377,7 +388,7 @@ const Businessowners = () => {
                 className="business-owners-btn business-owners-btn--primary"
                 onClick={() => navigate("/admin/business-owners/profile")}
               >
-                <FiPlus aria-hidden /> New
+                <PlusIcon aria-hidden /> New
               </button>
             </Can>
           </div>
@@ -410,7 +421,7 @@ const Businessowners = () => {
             {pagedRows.map((owner) => (
               <article className="business-owner-card" key={owner.profileId}>
                 <div className="business-owner-card__topline">
-                  <span className="business-owner-card__icon"><FiBriefcase aria-hidden /></span>
+                  <span className="business-owner-card__icon"><BriefcaseIcon aria-hidden /></span>
                   <StatusBadge status={owner.status} />
                   <div className="business-owner-card__actions">
                     <RowActionsMenu
@@ -430,9 +441,9 @@ const Businessowners = () => {
                 )}
 
                 <div className="business-owner-card__details">
-                  <span><FiTag aria-hidden /> {owner.businessTypeName || owner.businessUnitTypeName || "Business type not specified"}</span>
-                  <span><FiPhone aria-hidden /> {owner.mobileNumber || "Phone not provided"}</span>
-                  <span><FiMapPin aria-hidden /> {[owner.location, owner.stateName].filter(Boolean).join(", ") || "Location not provided"}</span>
+                  <span><TagIcon aria-hidden /> {owner.businessTypeName || owner.businessUnitTypeName || "Business type not specified"}</span>
+                  <span><PhoneIcon aria-hidden /> {owner.mobileNumber || "Phone not provided"}</span>
+                  <span><MapPinIcon aria-hidden /> {[owner.location, owner.stateName].filter(Boolean).join(", ") || "Location not provided"}</span>
                 </div>
               </article>
             ))}

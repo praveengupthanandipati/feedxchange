@@ -1,6 +1,17 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiBell, FiChevronLeft, FiChevronRight, FiEye, FiMail, FiMessageCircle, FiRefreshCw, FiSearch, FiSmartphone, FiX } from "react-icons/fi";
+import {
+  BellIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  EyeIcon,
+  MailIcon,
+  MessageCircleIcon,
+  RefreshCwIcon,
+  SearchIcon,
+  SmartphoneIcon,
+  XIcon,
+} from "../../../shared/components/icon";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
 import {
@@ -22,7 +33,7 @@ const CHANNELS: { value: string; label: string }[] = [
   { value: "", label: "All channels" }, { value: "EMAIL", label: "Email" }, { value: "WHATSAPP", label: "WhatsApp" }, { value: "SMS", label: "SMS" }, { value: "APP", label: "In-app" },
 ];
 const STATUSES = ["", "Queued", "Submitted", "Delivered", "Read", "Failed", "RetryScheduled"];
-const CHANNEL_ICON: Record<ChannelCode, typeof FiMail> = { EMAIL: FiMail, WHATSAPP: FiMessageCircle, SMS: FiSmartphone, APP: FiBell };
+const CHANNEL_ICON: Record<ChannelCode, typeof MailIcon> = { EMAIL: MailIcon, WHATSAPP: MessageCircleIcon, SMS: SmartphoneIcon, APP: BellIcon };
 const CHANNEL_LABEL: Record<ChannelCode, string> = { EMAIL: "Email", WHATSAPP: "WhatsApp", SMS: "SMS", APP: "In-app" };
 
 interface Filters {
@@ -130,19 +141,19 @@ const NotificationHistoryPanel = () => {
         </div>
         {lookupFailed && (
           <p className="nc-error nc-error--inline" role="alert">
-            <FiX aria-hidden /> {apiErrorMessage(sellersError, "The seller, buyer and contract lists could not be loaded. Check that the API is up to date and that you have the notification history permission.")}
+            <XIcon aria-hidden /> {apiErrorMessage(sellersError, "The seller, buyer and contract lists could not be loaded. Check that the API is up to date and that you have the notification history permission.")}
           </p>
         )}
         <div className="nc-filters__actions">
           <p>{canSearch ? "Ready to search." : "Choose a contract, or a seller and buyer, to see what was sent."}</p>
-          <button type="button" className="nc-btn" onClick={reset}><FiRefreshCw aria-hidden /> Reset</button>
-          <button type="submit" className="nc-btn nc-btn--primary" disabled={!canSearch}><FiSearch aria-hidden /> Search</button>
+          <button type="button" className="nc-btn" onClick={reset}><RefreshCwIcon aria-hidden /> Reset</button>
+          <button type="submit" className="nc-btn nc-btn--primary" disabled={!canSearch}><SearchIcon aria-hidden /> Search</button>
         </div>
       </form>
 
       {!applied && (
         <div className="nc-empty">
-          <span aria-hidden><FiSearch /></span>
+          <span aria-hidden><SearchIcon /></span>
           <h3>Find what was sent</h3>
           <p>Pick a seller and buyer, or a single contract. Only the matching messages are loaded.</p>
         </div>
@@ -155,7 +166,7 @@ const NotificationHistoryPanel = () => {
             {contractNumber && <Link to={`/admin/contracts/${encodeURIComponent(contractNumber)}/notifications`} className="nc-link">Open contract {contractNumber} to resend</Link>}
           </header>
 
-          {isError && <p className="nc-error" role="alert"><FiX aria-hidden /> {apiErrorMessage(error, "Could not load the notifications.")}</p>}
+          {isError && <p className="nc-error" role="alert"><XIcon aria-hidden /> {apiErrorMessage(error, "Could not load the notifications.")}</p>}
 
           {!isError && !isFetching && items.length === 0 && <div className="nc-none">Nothing was sent for these filters.</div>}
 
@@ -167,7 +178,7 @@ const NotificationHistoryPanel = () => {
                 </thead>
                 <tbody>
                   {items.map((d) => {
-                    const Icon = CHANNEL_ICON[d.channelCode] ?? FiMail;
+                    const Icon = CHANNEL_ICON[d.channelCode] ?? MailIcon;
                     return (
                       <tr key={d.deliveryId}>
                         <td className="nc-nowrap">{formatApiDateTime(d.createdAt)}</td>
@@ -186,7 +197,7 @@ const NotificationHistoryPanel = () => {
                           <StatusPill status={d.status} />
                           {d.failureReason && <small className="nc-danger">{d.failureReason}</small>}
                         </td>
-                        <td><button type="button" className="nc-icon-btn" onClick={() => setViewId(d.deliveryId)} aria-label={`View message to ${d.recipientName ?? d.recipientRole}`} title="View message"><FiEye aria-hidden /></button></td>
+                        <td><button type="button" className="nc-icon-btn" onClick={() => setViewId(d.deliveryId)} aria-label={`View message to ${d.recipientName ?? d.recipientRole}`} title="View message"><EyeIcon aria-hidden /></button></td>
                       </tr>
                     );
                   })}
@@ -199,9 +210,9 @@ const NotificationHistoryPanel = () => {
             <footer className="nc-pager">
               <span>Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}</span>
               <div>
-                <button type="button" className="nc-icon-btn" disabled={page <= 1 || isFetching} onClick={() => setPage(page - 1)} aria-label="Previous page"><FiChevronLeft aria-hidden /></button>
+                <button type="button" className="nc-icon-btn" disabled={page <= 1 || isFetching} onClick={() => setPage(page - 1)} aria-label="Previous page"><ChevronLeftIcon aria-hidden /></button>
                 <span>{page} / {pages}</span>
-                <button type="button" className="nc-icon-btn" disabled={page >= pages || isFetching} onClick={() => setPage(page + 1)} aria-label="Next page"><FiChevronRight aria-hidden /></button>
+                <button type="button" className="nc-icon-btn" disabled={page >= pages || isFetching} onClick={() => setPage(page + 1)} aria-label="Next page"><ChevronRightIcon aria-hidden /></button>
               </div>
             </footer>
           )}

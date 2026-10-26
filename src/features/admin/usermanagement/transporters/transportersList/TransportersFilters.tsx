@@ -1,4 +1,4 @@
-import { FiSearch } from "react-icons/fi";
+import { SearchIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 
 interface FilterOption {
@@ -65,7 +65,7 @@ const TransportersFilters = ({
       />
 
       <div className="transporters-filters__search">
-        <FiSearch aria-hidden />
+        <SearchIcon aria-hidden />
         <input
           type="text"
           value={keyword}

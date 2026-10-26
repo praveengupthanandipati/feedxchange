@@ -1,4 +1,4 @@
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { SquarePenIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import type { MasterUser, UserStatus } from "../users.data";
 
@@ -27,8 +27,8 @@ export const UserActions = ({ user, onEdit, onDelete, menuAlign = "left" }: User
   <RowActionsMenu
     menuAlign={menuAlign}
     actions={[
-      { key: "edit", label: "Edit", icon: FiEdit, onClick: () => onEdit(user) },
-      { key: "delete", label: "Delete", icon: FiTrash2, onClick: () => onDelete(user), danger: true, dividerBefore: true },
+      { key: "edit", label: "Edit", icon: SquarePenIcon, onClick: () => onEdit(user) },
+      { key: "delete", label: "Delete", icon: Trash2Icon, onClick: () => onDelete(user), danger: true, dividerBefore: true },
     ]}
   />
 );

@@ -1,4 +1,4 @@
-import { FiSearch } from "react-icons/fi";
+import { SearchIcon } from "../../../../../shared/components/icon";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import { money, type PendingPaymentRow } from "../pendingPayments.data";
 
@@ -22,7 +22,7 @@ export function buildDetailsColumns({ onViewInvoice }: ColumnHandlers): TableCol
             aria-label={`View invoice details for ${row.invoiceNum}`}
             title="View Invoice Details"
           >
-            <FiSearch aria-hidden />
+            <SearchIcon aria-hidden />
           </button>
         </span>
       ),

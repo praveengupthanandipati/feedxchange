@@ -1,4 +1,4 @@
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { SquarePenIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import type { Banner } from "../banners.data";
 
@@ -12,8 +12,8 @@ const BannerActions = ({ banner, onEdit, onDelete }: BannerActionHandlers & { ba
   <RowActionsMenu
     menuAlign="left"
     actions={[
-      { key: "edit", label: "Edit", icon: FiEdit, onClick: () => onEdit(banner) },
-      { key: "delete", label: "Delete", icon: FiTrash2, onClick: () => onDelete(banner), danger: true, dividerBefore: true },
+      { key: "edit", label: "Edit", icon: SquarePenIcon, onClick: () => onEdit(banner) },
+      { key: "delete", label: "Delete", icon: Trash2Icon, onClick: () => onDelete(banner), danger: true, dividerBefore: true },
     ]}
   />
 );

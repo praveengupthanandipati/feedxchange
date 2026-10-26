@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FiTruck, FiSave, FiSend, FiCheckCircle, FiAlertTriangle, FiX } from "react-icons/fi";
+import { CircleCheckBigIcon, SaveIcon, SendIcon, TriangleAlertIcon, TruckIcon, XIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import { buildTransporterAssignmentColumns } from "./transporterAssignment.columns";
@@ -274,14 +274,14 @@ const TransporterAssignmentPanel = ({ scheduleRow, summary, contractId }: Transp
     <div className="transporter-assignment-panel">
       {sendSuccessToast && (
         <div className="transporter-assignment-panel__toast" role="status">
-          <FiCheckCircle aria-hidden />
+          <CircleCheckBigIcon aria-hidden />
           Request sent successfully.
         </div>
       )}
 
       <div className="transporter-assignment-panel__header">
         <h3>
-          <FiTruck aria-hidden /> Add / View Transporters
+          <TruckIcon aria-hidden /> Add / View Transporters
         </h3>
         <div className="transporter-assignment-panel__header-actions">
           <button
@@ -290,7 +290,7 @@ const TransporterAssignmentPanel = ({ scheduleRow, summary, contractId }: Transp
             onClick={handleSaveAll}
             disabled={!hasSelection}
           >
-            <FiSave aria-hidden /> Save All
+            <SaveIcon aria-hidden /> Save All
           </button>
           <button
             type="button"
@@ -298,14 +298,14 @@ const TransporterAssignmentPanel = ({ scheduleRow, summary, contractId }: Transp
             onClick={handleSendRequest}
             disabled={!hasSelection}
           >
-            <FiSend aria-hidden /> Send Request
+            <SendIcon aria-hidden /> Send Request
           </button>
         </div>
       </div>
 
       {saveWarning && (
         <div className="transporter-assignment-panel__warning">
-          <FiAlertTriangle aria-hidden />
+          <TriangleAlertIcon aria-hidden />
           <span>
             Please <strong>Save</strong> all selected rows before sending the request.
           </span>
@@ -314,7 +314,7 @@ const TransporterAssignmentPanel = ({ scheduleRow, summary, contractId }: Transp
             onClick={() => setSaveWarning(false)}
             aria-label="Dismiss warning"
           >
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
       )}
@@ -353,7 +353,7 @@ const TransporterAssignmentPanel = ({ scheduleRow, summary, contractId }: Transp
           className="transporter-assignment-panel__approved-link"
           onClick={() => setApprovedTrucksOpen(true)}
         >
-          <FiCheckCircle aria-hidden /> View All Approved Trucks: {approvedTruckRows.length}
+          <CircleCheckBigIcon aria-hidden /> View All Approved Trucks: {approvedTruckRows.length}
         </button>
       </div>
 

@@ -1,4 +1,4 @@
-import { FiChevronDown, FiChevronRight } from "react-icons/fi";
+import { ChevronDownIcon, ChevronRightIcon } from "../../../../../shared/components/icon";
 
 interface ExpandButtonProps {
   expanded: boolean;
@@ -14,7 +14,7 @@ const ExpandButton = ({ expanded, contractNo, onToggle }: ExpandButtonProps) => 
     aria-expanded={expanded}
     aria-label={expanded ? `Hide invoices for contract ${contractNo}` : `Show invoices for contract ${contractNo}`}
   >
-    {expanded ? <FiChevronDown aria-hidden /> : <FiChevronRight aria-hidden />}
+    {expanded ? <ChevronDownIcon aria-hidden /> : <ChevronRightIcon aria-hidden />}
   </button>
 );
 

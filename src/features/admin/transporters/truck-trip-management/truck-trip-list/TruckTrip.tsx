@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
+import { DownloadIcon, EyeIcon, EyeOffIcon, PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import SuccessToast from "../../../../../shared/components/toast/SuccessToast";
@@ -9,7 +9,8 @@ import TruckTripFilters from "./TruckTripFilters";
 import Pagination from "./Pagination";
 import { buildTruckTripColumns } from "./truckTrip.columns";
 import { useGetAllTripsQuery, type TruckTrip } from "../../../../../core/store/truckTripApi";
-import "./TruckTrip.scss";
+import "./TruckTrip.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 const PAGE_SIZE = 10;
@@ -139,11 +140,11 @@ const TruckTripPage = () => {
               className="truck-trip-btn truck-trip-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button type="button" className="truck-trip-btn truck-trip-btn--warning" onClick={handleExport}>
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["truck-trips.manage"]}>
               <button
@@ -151,7 +152,7 @@ const TruckTripPage = () => {
                 className="truck-trip-btn truck-trip-btn--primary"
                 onClick={() => navigate("/admin/truck-management/transporters/truck-trips/new")}
               >
-                <FiPlus aria-hidden /> New Trip
+                <PlusIcon aria-hidden /> New Trip
               </button>
             </Can>
           </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
+import { ArrowLeftIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import { useGetBusinessProfileSummaryQuery } from "../../../../../core/store/businessProfilesApi";
 import { useGetAllActiveTruckDetailsQuery } from "../../../../../core/store/trucksApi";
@@ -226,7 +226,7 @@ const TruckNewTrip = () => {
       <div className="new-contract__topbar">
         <h1>{isEditMode ? "Edit Truck Trip" : "New Truck Trip"}</h1>
         <Link to="/admin/truck-management/transporters/truck-trips" className="new-contract__back">
-          <FiArrowLeft aria-hidden /> Truck Trips List
+          <ArrowLeftIcon aria-hidden /> Truck Trips List
         </Link>
       </div>
 

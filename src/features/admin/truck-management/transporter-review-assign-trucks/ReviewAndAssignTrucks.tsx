@@ -1,16 +1,16 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
-  FiEye,
-  FiEyeOff,
-  FiEdit2,
-  FiCheck,
-  FiX,
-  FiShare2,
-  FiPlus,
-  FiChevronDown,
-  FiChevronUp,
-} from "react-icons/fi";
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  EyeIcon,
+  EyeOffIcon,
+  PenIcon,
+  PlusIcon,
+  Share2Icon,
+  XIcon,
+} from "../../../../shared/components/icon";
 import Table from "../../../../shared/components/table/Table";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import { getContractSummary } from "../assign-transports/assignTransports.data";
@@ -117,7 +117,7 @@ const ReviewAndAssignTrucks = () => {
             className="review-assign-trucks-btn review-assign-trucks-btn--info"
             onClick={() => setDetailsVisible((prev) => !prev)}
           >
-            {detailsVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+            {detailsVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {detailsVisible ? "Hide" : "Show"}
           </button>
         </div>
@@ -166,17 +166,17 @@ const ReviewAndAssignTrucks = () => {
                   <div className="review-assign-trucks-field__edit">
                     <input value={draftValue} onChange={(event) => setDraftValue(event.target.value)} autoFocus />
                     <button type="button" onClick={confirmEdit} aria-label="Confirm quantity">
-                      <FiCheck aria-hidden />
+                      <CheckIcon aria-hidden />
                     </button>
                     <button type="button" onClick={cancelEdit} aria-label="Cancel editing quantity">
-                      <FiX aria-hidden />
+                      <XIcon aria-hidden />
                     </button>
                   </div>
                 ) : (
                   <div className="review-assign-trucks-field__value">
                     <strong>{quantityFreight.qty}</strong>
                     <button type="button" onClick={() => startEditing("qty")} aria-label="Edit quantity">
-                      <FiEdit2 aria-hidden />
+                      <PenIcon aria-hidden />
                     </button>
                   </div>
                 )}
@@ -191,17 +191,17 @@ const ReviewAndAssignTrucks = () => {
                   <div className="review-assign-trucks-field__edit">
                     <input value={draftValue} onChange={(event) => setDraftValue(event.target.value)} autoFocus />
                     <button type="button" onClick={confirmEdit} aria-label="Confirm freight">
-                      <FiCheck aria-hidden />
+                      <CheckIcon aria-hidden />
                     </button>
                     <button type="button" onClick={cancelEdit} aria-label="Cancel editing freight">
-                      <FiX aria-hidden />
+                      <XIcon aria-hidden />
                     </button>
                   </div>
                 ) : (
                   <div className="review-assign-trucks-field__value">
                     <strong>{quantityFreight.freight}</strong>
                     <button type="button" onClick={() => startEditing("freight")} aria-label="Edit freight">
-                      <FiEdit2 aria-hidden />
+                      <PenIcon aria-hidden />
                     </button>
                   </div>
                 )}
@@ -217,14 +217,14 @@ const ReviewAndAssignTrucks = () => {
                 className="review-assign-trucks-btn review-assign-trucks-btn--accept"
                 onClick={() => setRequestStatus("Accepted")}
               >
-                <FiCheck aria-hidden /> Accept
+                <CheckIcon aria-hidden /> Accept
               </button>
               <button
                 type="button"
                 className="review-assign-trucks-btn review-assign-trucks-btn--reject"
                 onClick={() => setRequestStatus("Rejected")}
               >
-                <FiX aria-hidden /> Reject
+                <XIcon aria-hidden /> Reject
               </button>
               {requestStatus !== "Pending" && (
                 <span
@@ -281,7 +281,7 @@ const ReviewAndAssignTrucks = () => {
                 className="review-assign-trucks-history__toggle"
                 onClick={() => setHistoryExpanded((prev) => !prev)}
               >
-                {historyExpanded ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
+                {historyExpanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
                 {historyExpanded ? "Show less" : "View all"}
               </button>
             )}
@@ -297,14 +297,14 @@ const ReviewAndAssignTrucks = () => {
                 className="review-assign-trucks-btn review-assign-trucks-btn--share"
                 onClick={handleShare}
               >
-                <FiShare2 aria-hidden /> Share
+                <Share2Icon aria-hidden /> Share
               </button>
               <button
                 type="button"
                 className="review-assign-trucks-btn review-assign-trucks-btn--add"
                 onClick={handleOpenAddTrucks}
               >
-                <FiPlus aria-hidden /> Add Trucks
+                <PlusIcon aria-hidden /> Add Trucks
               </button>
             </div>
           </div>

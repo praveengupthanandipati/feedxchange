@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { FiEye, FiEyeOff, FiDownload, FiCheck, FiRefreshCw } from "react-icons/fi";
+import { CheckIcon, DownloadIcon, EyeIcon, EyeOffIcon, RefreshCwIcon } from "../../../../shared/components/icon";
 import DateRangeInput from "../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import AccountSummaryTab from "./account-summary-tab/AccountSummaryTab";
@@ -51,11 +51,11 @@ const ContractSummary = () => {
               className="contract-summary-btn contract-summary-btn--info"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button type="button" className="contract-summary-btn contract-summary-btn--warning" onClick={handleExport}>
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -86,10 +86,10 @@ const ContractSummary = () => {
             </div>
 
             <button type="button" className="contract-summary-filters__apply" onClick={handleApply}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="contract-summary-filters__reset" onClick={handleReset}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         )}

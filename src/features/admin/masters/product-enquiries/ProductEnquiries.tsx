@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { FiCheckCircle } from "react-icons/fi";
+import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import { productEnquiries, type EnquiryUpdate, type ProductEnquiry } from "./productEnquiries.data";
 import { exportEnquiries, matchesSearch } from "./productEnquiries.utils";
 import EnquiriesFilters from "./components/EnquiriesFilters";
@@ -71,7 +71,7 @@ const ProductEnquiries = () => {
 
       {message && (
         <p className="product-enquiries__message" role="status">
-          <FiCheckCircle aria-hidden /> {message}
+          <CircleCheckBigIcon aria-hidden /> {message}
         </p>
       )}
 

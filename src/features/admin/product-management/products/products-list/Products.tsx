@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
+import { DownloadIcon, EyeIcon, EyeOffIcon, PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
@@ -10,7 +10,8 @@ import ProductsFilters from "./ProductsFilters";
 import Pagination from "./Pagination";
 import { buildProductColumns, getProductStatus } from "./products.columns";
 import { useGetProductsQuery, useDeleteProductMutation, type Product } from "../../../../../core/store/productsApi";
-import "./Products.scss";
+import "./Products.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 const PAGE_SIZE = 10;
@@ -164,7 +165,7 @@ const Products = () => {
               className="products-list-btn products-list-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide Filters" : "Show Filters"}
             </button>
             <button
@@ -172,7 +173,7 @@ const Products = () => {
               className="products-list-btn products-list-btn--warning"
               onClick={handleExport}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["products.manage"]}>
               <button
@@ -180,7 +181,7 @@ const Products = () => {
                 className="products-list-btn products-list-btn--primary"
                 onClick={() => navigate("new")}
               >
-                <FiPlus aria-hidden /> New
+                <PlusIcon aria-hidden /> New
               </button>
             </Can>
           </div>

@@ -1,4 +1,4 @@
-import { FiEdit2, FiTrash2, FiPhone, FiExternalLink, FiFile } from "react-icons/fi";
+import { ExternalLinkIcon, FileIcon, PenIcon, PhoneIcon, Trash2Icon } from "../../../../shared/components/icon";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import type { TruckDetailRow } from "./reviewAndAssignTrucks.data";
 
@@ -29,7 +29,7 @@ export function buildTruckDetailColumns({ onEdit, onDelete }: ColumnHandlers): T
       header: "Driver Phone",
       render: (row) => (
         <span className="review-assign-trucks-table__phone">
-          <FiPhone aria-hidden /> {row.driverPhone || "-"}
+          <PhoneIcon aria-hidden /> {row.driverPhone || "-"}
         </span>
       ),
     },
@@ -49,7 +49,7 @@ export function buildTruckDetailColumns({ onEdit, onDelete }: ColumnHandlers): T
             target="_blank"
             rel="noreferrer"
           >
-            <FiExternalLink aria-hidden /> Track
+            <ExternalLinkIcon aria-hidden /> Track
           </a>
         ) : (
           <span>—</span>
@@ -63,7 +63,7 @@ export function buildTruckDetailColumns({ onEdit, onDelete }: ColumnHandlers): T
           <span>—</span>
         ) : (
           <span className="review-assign-trucks-table__docs">
-            <FiFile aria-hidden /> {row.documents.length} file{row.documents.length > 1 ? "s" : ""}
+            <FileIcon aria-hidden /> {row.documents.length} file{row.documents.length > 1 ? "s" : ""}
           </span>
         ),
     },
@@ -79,7 +79,7 @@ export function buildTruckDetailColumns({ onEdit, onDelete }: ColumnHandlers): T
             aria-label="Edit truck"
             title="Edit"
           >
-            <FiEdit2 aria-hidden />
+            <PenIcon aria-hidden />
           </button>
           <button
             type="button"
@@ -88,7 +88,7 @@ export function buildTruckDetailColumns({ onEdit, onDelete }: ColumnHandlers): T
             aria-label="Delete truck"
             title="Delete"
           >
-            <FiTrash2 aria-hidden />
+            <Trash2Icon aria-hidden />
           </button>
         </div>
       ),

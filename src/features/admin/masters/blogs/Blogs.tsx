@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { FiCheckCircle } from "react-icons/fi";
+import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import { initialBlogs, type Blog, type BlogForm } from "./blogs.data";
 import { matchesSearch } from "./blogs.utils";
@@ -84,7 +84,7 @@ const Blogs = () => {
 
       {message && (
         <p className="blogs__message" role="status">
-          <FiCheckCircle aria-hidden /> {message}
+          <CircleCheckBigIcon aria-hidden /> {message}
         </p>
       )}
 

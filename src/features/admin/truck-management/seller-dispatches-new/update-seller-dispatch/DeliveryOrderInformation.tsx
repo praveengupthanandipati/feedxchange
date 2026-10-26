@@ -1,5 +1,5 @@
 import { useState, type SubmitEvent } from "react";
-import { FiEdit2, FiSave, FiX } from "react-icons/fi";
+import { PenIcon, SaveIcon, XIcon } from "../../../../../shared/components/icon";
 import { formatDisplayDate } from "../../../../../shared/components/dropdown/Calendar";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import type { DeliveryOrderInfo } from "./updateSellerDispatch.data";
@@ -38,7 +38,7 @@ const DeliveryOrderInformation = ({ initialValue }: DeliveryOrderInformationProp
         <h2>Default Delivery Order Information</h2>
         {!editing && (
           <button type="button" className="do-info__btn do-info__btn--primary" onClick={startEditing}>
-            <FiEdit2 aria-hidden /> Edit Info
+            <PenIcon aria-hidden /> Edit Info
           </button>
         )}
       </header>
@@ -84,10 +84,10 @@ const DeliveryOrderInformation = ({ initialValue }: DeliveryOrderInformationProp
 
           <div className="do-info__actions">
             <button type="submit" className="do-info__btn do-info__btn--primary">
-              <FiSave aria-hidden /> Save
+              <SaveIcon aria-hidden /> Save
             </button>
             <button type="button" className="do-info__btn do-info__btn--ghost" onClick={() => setEditing(false)}>
-              <FiX aria-hidden /> Cancel
+              <XIcon aria-hidden /> Cancel
             </button>
           </div>
         </form>

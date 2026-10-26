@@ -2,15 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import { useNavigate } from "react-router-dom";
 import {
-  FiSearch,
-  FiEye,
-  FiEyeOff,
-  FiDownload,
-  FiPlus,
-  FiX,
-  FiChevronLeft,
-  FiChevronRight,
-} from "react-icons/fi";
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  PlusIcon,
+  SearchIcon,
+  XIcon,
+} from "../../../shared/components/icon";
 import Table from "../../../shared/components/table/Table";
 import type { TableColumn } from "../../../shared/components/table/table.types";
 import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
@@ -438,7 +438,7 @@ const filteredRows = useMemo(() => {
               className="contracts-btn contracts-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
@@ -446,7 +446,7 @@ const filteredRows = useMemo(() => {
               className="contracts-btn contracts-btn--warning"
               onClick={handleExport}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["contracts.manage"]}>
               <button
@@ -454,7 +454,7 @@ const filteredRows = useMemo(() => {
                 className="contracts-btn contracts-btn--primary"
                 onClick={() => navigate("new")}
               >
-                <FiPlus aria-hidden /> New
+                <PlusIcon aria-hidden /> New
               </button>
             </Can>
           </div>
@@ -470,7 +470,7 @@ const filteredRows = useMemo(() => {
             />
 
             <div className="contracts-filters__search">
-              <FiSearch aria-hidden />
+              <SearchIcon aria-hidden />
               <input
                 type="text"
                 value={keyword}
@@ -512,7 +512,7 @@ const filteredRows = useMemo(() => {
               title="Clear filters"
               aria-label="Clear filters"
             >
-              <FiX aria-hidden />
+              <XIcon aria-hidden />
             </button>
           </div>
         )}
@@ -549,7 +549,7 @@ const filteredRows = useMemo(() => {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <button
@@ -567,7 +567,7 @@ const filteredRows = useMemo(() => {
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

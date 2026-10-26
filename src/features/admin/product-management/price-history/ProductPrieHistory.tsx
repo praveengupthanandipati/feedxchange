@@ -11,7 +11,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { FiUsers, FiMapPin, FiTag, FiTrendingUp, FiTrendingDown, FiBarChart2, FiActivity } from "react-icons/fi";
+import {
+  ActivityIcon,
+  ChartNoAxesColumnIcon,
+  MapPinIcon,
+  TagIcon,
+  TrendingDownIcon,
+  TrendingUpIcon,
+  UsersIcon,
+} from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import {
   sellers,
@@ -112,7 +120,7 @@ const ProductPrieHistory = () => {
       <div className="price-history-layout">
         <aside className="price-history-sellers">
           <div className="price-history-sellers__header">
-            <FiUsers aria-hidden /> Premium Sellers
+            <UsersIcon aria-hidden /> Premium Sellers
           </div>
           <ul className="price-history-sellers__list">
             {sellers.map((seller) => (
@@ -129,7 +137,7 @@ const ProductPrieHistory = () => {
                   <span className="price-history-sellers__info">
                     <strong>{seller.name}</strong>
                     <span>
-                      <FiMapPin aria-hidden /> {seller.city}
+                      <MapPinIcon aria-hidden /> {seller.city}
                     </span>
                   </span>
                 </button>
@@ -142,14 +150,14 @@ const ProductPrieHistory = () => {
           <div className="price-history-stats">
             <div className="price-history-stat">
               <span className="price-history-stat__icon">
-                <FiTag aria-hidden />
+                <TagIcon aria-hidden />
               </span>
               <strong>{formatINR(currentPrice)}</strong>
               <span>Current Price</span>
             </div>
             <div className="price-history-stat">
               <span className="price-history-stat__icon">
-                {dailyChangePercent >= 0 ? <FiTrendingUp aria-hidden /> : <FiTrendingDown aria-hidden />}
+                {dailyChangePercent >= 0 ? <TrendingUpIcon aria-hidden /> : <TrendingDownIcon aria-hidden />}
               </span>
               <strong className={dailyChangePercent >= 0 ? "is-up" : "is-down"}>
                 {dailyChangePercent >= 0 ? "+" : ""}
@@ -159,7 +167,7 @@ const ProductPrieHistory = () => {
             </div>
             <div className="price-history-stat">
               <span className="price-history-stat__icon">
-                <FiBarChart2 aria-hidden />
+                <ChartNoAxesColumnIcon aria-hidden />
               </span>
               <strong>{formatINR(avgPrice)}</strong>
               <span>Avg. Price</span>
@@ -169,7 +177,7 @@ const ProductPrieHistory = () => {
           <div className="price-history-analytics">
             <div className="price-history-analytics__header">
               <h2>
-                <FiActivity aria-hidden /> Price Analytics
+                <ActivityIcon aria-hidden /> Price Analytics
                 <span className="price-history-analytics__seller"> — {selectedSeller.name}</span>
               </h2>
               <div className="price-history-analytics__filter">

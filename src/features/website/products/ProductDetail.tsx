@@ -1,5 +1,5 @@
 import { FaWhatsapp } from "react-icons/fa";
-import { FiArrowRight, FiCheck } from "react-icons/fi";
+import { ArrowRightIcon, CheckIcon } from "../../../shared/components/icon";
 import { Link, useParams } from "react-router-dom";
 import ProductCard from "../components/common/ProductCard";
 import SectionHead from "../components/common/SectionHead";
@@ -28,19 +28,19 @@ const ProductDetail = () => {
             <ul className="check-list">
               <li>
                 <span aria-hidden>
-                  <FiCheck />
+                  <CheckIcon />
                 </span>
                 Sourced from KYC-verified sellers
               </li>
               <li>
                 <span aria-hidden>
-                  <FiCheck />
+                  <CheckIcon />
                 </span>
                 Specification sheet with every lot
               </li>
               <li>
                 <span aria-hidden>
-                  <FiCheck />
+                  <CheckIcon />
                 </span>
                 Transport and tracking available
               </li>
@@ -58,7 +58,7 @@ const ProductDetail = () => {
               ))}
             </dl>
             <Link to={sitePaths.join} className="btn-site btn-site--primary btn-site--block">
-              Request a quote <FiArrowRight aria-hidden />
+              Request a quote <ArrowRightIcon aria-hidden />
             </Link>
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="btn-site btn-site--outline btn-site--block">
               <FaWhatsapp aria-hidden /> Ask on WhatsApp

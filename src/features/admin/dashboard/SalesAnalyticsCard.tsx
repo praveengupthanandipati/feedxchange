@@ -8,7 +8,7 @@ import {
   YAxis,
   CartesianGrid,
 } from "recharts";
-import { FiChevronDown } from "react-icons/fi";
+import { ChevronDownIcon } from "../../../shared/components/icon";
 import { salesAnalytics } from "./dashboard.data";
 
 const SERIES = [
@@ -23,7 +23,7 @@ const SalesAnalyticsCard = () => {
       <div className="dashboard-card__header">
         <h2 className="dashboard-card__title">Sales Analytics</h2>
         <button type="button" className="dashboard-card__sort">
-          Sort By: <strong>Yearly</strong> <FiChevronDown aria-hidden />
+          Sort By: <strong>Yearly</strong> <ChevronDownIcon aria-hidden />
         </button>
       </div>
 

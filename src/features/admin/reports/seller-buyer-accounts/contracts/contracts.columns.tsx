@@ -1,4 +1,4 @@
-import { FiSearch, FiChevronRight, FiChevronDown } from "react-icons/fi";
+import { ChevronDownIcon, ChevronRightIcon, SearchIcon } from "../../../../../shared/components/icon";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import { money, type ContractRow } from "./contracts.data";
 
@@ -38,7 +38,7 @@ export function buildContractColumns({
             aria-label={`View contract ${row.contractNumber}`}
             title="View Contract"
           >
-            <FiSearch aria-hidden />
+            <SearchIcon aria-hidden />
           </button>
           <button
             type="button"
@@ -118,7 +118,7 @@ export function buildContractColumns({
           aria-label={expandedRowKey === row.id ? "Collapse invoice details" : "Expand invoice details"}
           title={expandedRowKey === row.id ? "Collapse" : "Expand"}
         >
-          {expandedRowKey === row.id ? <FiChevronDown aria-hidden /> : <FiChevronRight aria-hidden />}
+          {expandedRowKey === row.id ? <ChevronDownIcon aria-hidden /> : <ChevronRightIcon aria-hidden />}
         </button>
       ),
     },

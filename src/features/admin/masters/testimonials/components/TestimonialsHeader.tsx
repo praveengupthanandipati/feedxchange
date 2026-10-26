@@ -1,4 +1,4 @@
-import { FiPlus, FiSearch } from "react-icons/fi";
+import { PlusIcon, SearchIcon } from "../../../../../shared/components/icon";
 
 interface TestimonialsHeaderProps {
   search: string;
@@ -11,11 +11,11 @@ const TestimonialsHeader = ({ search, onSearchChange, onNew }: TestimonialsHeade
     <div className="testimonials__header">
       <h1>Testimonials</h1>
       <button type="button" className="testimonials__btn testimonials__btn--navy" onClick={onNew}>
-        <FiPlus aria-hidden /> New
+        <PlusIcon aria-hidden /> New
       </button>
     </div>
     <div className="testimonials__search">
-      <FiSearch aria-hidden />
+      <SearchIcon aria-hidden />
       <input
         type="search"
         autoComplete="off"

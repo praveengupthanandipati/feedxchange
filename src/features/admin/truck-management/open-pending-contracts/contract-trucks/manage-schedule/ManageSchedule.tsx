@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useSearchParams } from "react-router-dom";
-import { FiArrowLeft, FiFileText, FiCheck, FiX, FiClock, FiPlus, FiSlash } from "react-icons/fi";
+import { ArrowLeftIcon, BanIcon, CheckIcon, ClockIcon, FileTextIcon, PlusIcon, XIcon } from "../../../../../../shared/components/icon";
 import InfoPanel from "../InfoPanel";
 import ContractSummaryPanel from "../../../contract-trucks/ContractSummaryPanel";
 import PendingContractSelector from "../../../contract-trucks/PendingContractSelector";
@@ -263,7 +263,7 @@ const ScheduleRequestRow = ({
                   onClick={handleReject}
                   disabled={updating}
                 >
-                  <FiX aria-hidden /> Reject
+                  <XIcon aria-hidden /> Reject
                 </button>
               </span>
             </>
@@ -298,7 +298,7 @@ const ScheduleRequestRow = ({
                   onClick={handleAccept}
                   disabled={updating}
                 >
-                  <FiCheck aria-hidden /> Accept
+                  <CheckIcon aria-hidden /> Accept
                 </button>
                 <button
                   type="button"
@@ -306,7 +306,7 @@ const ScheduleRequestRow = ({
                   onClick={handleReject}
                   disabled={updating}
                 >
-                  <FiX aria-hidden /> Reject
+                  <XIcon aria-hidden /> Reject
                 </button>
               </span>
             </>
@@ -336,7 +336,7 @@ const ScheduleRequestRow = ({
                   )}&transporterId=${detail.transporterProfileId}&dispatchScheduleTransporterId=${detail.dispatchScheduleTransporterId}`}
                   className="review-assign-trucks-btn review-assign-trucks-btn--add"
                 >
-                  <FiPlus aria-hidden /> Add Truck
+                  <PlusIcon aria-hidden /> Add Truck
                 </Link>
                 <button
                   type="button"
@@ -344,7 +344,7 @@ const ScheduleRequestRow = ({
                   onClick={handleCancel}
                   disabled={cancelling}
                 >
-                  <FiSlash aria-hidden /> {cancelling ? "Cancelling…" : "Cancel"}
+                  <BanIcon aria-hidden /> {cancelling ? "Cancelling…" : "Cancel"}
                 </button>
               </span>
             </>
@@ -534,7 +534,7 @@ const ManageScheduleContent = ({ contractNumber }: { contractNumber: string }) =
   if (transporterEntries.length === 0) {
     return (
       <InfoPanel
-        icon={FiClock}
+        icon={ClockIcon}
         title="No Schedule Requests Yet"
         description="This contract has no scheduled transporters to review yet. Use Schedule Dispatch to notify transporters first."
       />
@@ -630,7 +630,7 @@ const ManageSchedule = () => {
             )}
           </h1>
           <Link to="/admin/truck-management/open-pending-contracts" className="assign-transports-card__back">
-            <FiArrowLeft aria-hidden /> Back to Open &amp; Pending Contracts
+            <ArrowLeftIcon aria-hidden /> Back to Open &amp; Pending Contracts
           </Link>
         </div>
 
@@ -646,7 +646,7 @@ const ManageSchedule = () => {
           </>
         ) : (
           <InfoPanel
-            icon={FiFileText}
+            icon={FileTextIcon}
             title="No Contract Selected"
             description="Open a contract from the Open & Pending Contracts list and use Manage Schedule there."
             action={{ label: "Go to Open & Pending Contracts", to: "/admin/truck-management/open-pending-contracts" }}

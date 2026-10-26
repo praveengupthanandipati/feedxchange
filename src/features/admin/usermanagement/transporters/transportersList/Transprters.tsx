@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus, FiTruck, FiMapPin, FiPhone, FiTag } from "react-icons/fi";
+import {
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  MapPinIcon,
+  PhoneIcon,
+  PlusIcon,
+  TagIcon,
+  TruckIcon,
+} from "../../../../../shared/components/icon";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
@@ -171,7 +180,7 @@ const Transprters = () => {
               className="transporters-btn transporters-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
@@ -179,7 +188,7 @@ const Transprters = () => {
               className="transporters-btn transporters-btn--warning"
               onClick={handleExport}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["profiles.transporter.manage"]}>
               <button
@@ -187,7 +196,7 @@ const Transprters = () => {
                 className="transporters-btn transporters-btn--primary"
                 onClick={() => navigate("/admin/transporters/profile")}
               >
-                <FiPlus aria-hidden /> New
+                <PlusIcon aria-hidden /> New
               </button>
             </Can>
           </div>
@@ -219,7 +228,7 @@ const Transprters = () => {
             {pagedRows.map((transporter) => (
               <article className="transporter-profile-card" key={transporter.profileId}>
                 <div className="transporter-profile-card__topline">
-                  <span className="transporter-profile-card__icon"><FiTruck aria-hidden /></span>
+                  <span className="transporter-profile-card__icon"><TruckIcon aria-hidden /></span>
                   <StatusBadge status={transporter.status} />
                   <div className="transporter-profile-card__actions">
                     <RowActionsMenu
@@ -239,9 +248,9 @@ const Transprters = () => {
                 )}
 
                 <div className="transporter-profile-card__details">
-                  <span><FiTag aria-hidden /> {transporter.transporterTypeName || transporter.transporterSubTypeName || "Transporter type not specified"}</span>
-                  <span><FiPhone aria-hidden /> {transporter.mobileNumber || "Phone not provided"}</span>
-                  <span><FiMapPin aria-hidden /> {[transporter.location, transporter.stateName].filter(Boolean).join(", ") || "Location not provided"}</span>
+                  <span><TagIcon aria-hidden /> {transporter.transporterTypeName || transporter.transporterSubTypeName || "Transporter type not specified"}</span>
+                  <span><PhoneIcon aria-hidden /> {transporter.mobileNumber || "Phone not provided"}</span>
+                  <span><MapPinIcon aria-hidden /> {[transporter.location, transporter.stateName].filter(Boolean).join(", ") || "Location not provided"}</span>
                 </div>
               </article>
             ))}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiSearch, FiTrash2 } from "react-icons/fi";
+import { SearchIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
@@ -144,7 +144,7 @@ const BankDetailsSection = ({
                         aria-label="Look up IFSC code"
                         title="Look up bank details for this IFSC code"
                       >
-                        <FiSearch aria-hidden />
+                        <SearchIcon aria-hidden />
                       </button>
                     </div>
                     {entry.ifscError && (
@@ -180,7 +180,7 @@ const BankDetailsSection = ({
                     onClick={() => setPendingDeleteId(entry.id)}
                     aria-label="Remove bank account"
                   >
-                    <FiTrash2 aria-hidden />
+                    <Trash2Icon aria-hidden />
                   </button>
                 </div>
 

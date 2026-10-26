@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiEdit3, FiShare2, FiMail, FiDownload } from "react-icons/fi";
+import { ArrowLeftIcon, DownloadIcon, MailIcon, PenLineIcon, Share2Icon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
@@ -11,7 +11,8 @@ import { mapPromoterProfileDetail, toRecipientOptions } from "./promoterDetail.d
 import type { DocumentRow, RegionRow } from "./promoterDetail.data";
 import "../promoterslist/Promoters.scss";
 import "../../businessowners/BusinessList/Businessowners.scss";
-import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
+import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 interface DetailFieldProps {
@@ -68,7 +69,7 @@ const Promoterview = () => {
           aria-label={`Download ${row.fileName}`}
           title={`Download ${row.fileName}`}
         >
-          <FiDownload aria-hidden /> Download
+          <DownloadIcon aria-hidden /> Download
         </a>
       ),
     },
@@ -78,7 +79,7 @@ const Promoterview = () => {
     return (
       <div className="business-owner-detail">
         <Link to="/admin/promoters" className="business-owner-detail__back">
-          <FiArrowLeft aria-hidden /> Back to Promoters
+          <ArrowLeftIcon aria-hidden /> Back to Promoters
         </Link>
         <div className="business-owner-detail__card">
           <p>Loading promoter profile…</p>
@@ -91,7 +92,7 @@ const Promoterview = () => {
     return (
       <div className="business-owner-detail">
         <Link to="/admin/promoters" className="business-owner-detail__back">
-          <FiArrowLeft aria-hidden /> Back to Promoters
+          <ArrowLeftIcon aria-hidden /> Back to Promoters
         </Link>
         <div className="business-owner-detail__card">
           <p>No promoter found for id "{id}".</p>
@@ -103,7 +104,7 @@ const Promoterview = () => {
   return (
     <div className="business-owner-detail">
       <Link to="/admin/promoters" className="business-owner-detail__back">
-        <FiArrowLeft aria-hidden /> Back to Promoters
+        <ArrowLeftIcon aria-hidden /> Back to Promoters
       </Link>
 
       <div className="business-owner-detail__card">
@@ -121,11 +122,11 @@ const Promoterview = () => {
                 className="promoters-btn promoters-btn--outline"
                 onClick={() => navigate(`/admin/promoters/profile?id=${id}`)}
               >
-                <FiEdit3 aria-hidden /> Edit
+                <PenLineIcon aria-hidden /> Edit
               </button>
             </Can>
             <button type="button" className="promoters-btn promoters-btn--primary" onClick={() => setShareProfileOpen(true)}>
-              <FiShare2 aria-hidden /> Share Profile
+              <Share2Icon aria-hidden /> Share Profile
             </button>
           </div>
         </div>
@@ -140,7 +141,7 @@ const Promoterview = () => {
                   className="promoters-btn promoters-btn--outline"
                   onClick={() => setMessageOpen(true)}
                 >
-                  <FiMail aria-hidden /> Message
+                  <MailIcon aria-hidden /> Message
                 </button>
               </div>
               <div className="business-owner-detail__grid">

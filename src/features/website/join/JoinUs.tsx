@@ -1,4 +1,4 @@
-import { FiCheck } from "react-icons/fi";
+import { CheckIcon } from "../../../shared/components/icon";
 import ContactForm from "../components/contact/ContactForm";
 import SectionHead from "../components/common/SectionHead";
 import PageHero from "../components/sections/PageHero";
@@ -20,7 +20,7 @@ const JoinUs = () => {
               {reasons.map((reason) => (
                 <li key={reason}>
                   <span aria-hidden>
-                    <FiCheck />
+                    <CheckIcon />
                   </span>
                   {reason}
                 </li>

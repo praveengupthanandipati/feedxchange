@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../../shared/components/icon";
 import { money, type PendingPaymentRow } from "../pendingPayments.data";
 import "./InvoiceDetailsOffcanvas.scss";
 
@@ -59,7 +59,7 @@ const InvoiceDetailsOffcanvas = ({ open, row, onClose }: InvoiceDetailsOffcanvas
         <div className="invoice-details-offcanvas__header">
           <h2 id="invoice-details-offcanvas-title">Invoice Details</h2>
           <button type="button" className="invoice-details-offcanvas__close" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 

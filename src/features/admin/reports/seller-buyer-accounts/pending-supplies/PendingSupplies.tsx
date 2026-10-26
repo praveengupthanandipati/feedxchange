@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FiSearch, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import { buildPendingSuppliesColumns } from "./pendingSupplies.columns";
 import { pendingSupplyRows, totalPendingQuantity, type PendingSupplyRow } from "./pendingSupplies.data";
@@ -48,7 +48,7 @@ const PendingSupplies = () => {
       </p>
 
       <div className="pending-supplies-search">
-        <FiSearch aria-hidden />
+        <SearchIcon aria-hidden />
         <input
           type="text"
           value={keyword}
@@ -82,7 +82,7 @@ const PendingSupplies = () => {
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
             aria-label="Previous page"
           >
-            <FiChevronLeft aria-hidden />
+            <ChevronLeftIcon aria-hidden />
           </button>
           {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
             <button
@@ -100,7 +100,7 @@ const PendingSupplies = () => {
             onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
             aria-label="Next page"
           >
-            <FiChevronRight aria-hidden />
+            <ChevronRightIcon aria-hidden />
           </button>
         </div>
       </div>

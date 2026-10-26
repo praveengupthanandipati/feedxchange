@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { FiChevronUp, FiChevronDown, FiAlertCircle } from "react-icons/fi";
+import { ChevronDownIcon, ChevronUpIcon, CircleAlertIcon } from "../icon";
 import InfoTooltip from "../tooltip/InfoTooltip";
 import type { SortDirection, TableColumn } from "./table.types";
 import "./Table.scss";
@@ -150,10 +150,10 @@ function Table<T>({
                   {column.headerTooltip && <InfoTooltip text={column.headerTooltip} />}
                   {column.sortable && (
                     <span className="table__sort-icons">
-                      <FiChevronUp
+                      <ChevronUpIcon
                         className={sortKey === column.key && sortDirection === "asc" ? "is-active" : ""}
                       />
-                      <FiChevronDown
+                      <ChevronDownIcon
                         className={sortKey === column.key && sortDirection === "desc" ? "is-active" : ""}
                       />
                     </span>
@@ -171,7 +171,7 @@ function Table<T>({
                 colSpan={columns.length + (selectable ? 1 : 0)}
               >
                 <div className="table__empty-alert" role="status">
-                  <FiAlertCircle aria-hidden />
+                  <CircleAlertIcon aria-hidden />
                   {emptyMessage}
                 </div>
               </td>

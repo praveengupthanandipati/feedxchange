@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import {
-  FiTruck,
-  FiShare2,
-  FiChevronDown,
-  FiChevronUp,
-  FiMapPin,
-  FiPhone,
-  FiRefreshCw,
-} from "react-icons/fi";
+  ChevronDownIcon,
+  ChevronUpIcon,
+  MapPinIcon,
+  PhoneIcon,
+  RefreshCwIcon,
+  Share2Icon,
+  TruckIcon,
+} from "../../../../shared/components/icon";
 import type { ContractTruckDetail } from "./useContractTruckDetails";
 import ChainViewButton from "./ChainViewButton";
 
@@ -74,7 +74,7 @@ const TruckList = ({
               aria-expanded={expanded}
             >
               <span className="truck-tracking-drawer__truck-title">
-                <FiTruck aria-hidden />
+                <TruckIcon aria-hidden />
                 <strong>{truck.truckNumber}</strong>
                 <span>(Final Qty: {truck.finalQty})</span>
               </span>
@@ -96,11 +96,11 @@ const TruckList = ({
                       }
                     }}
                   >
-                    <FiShare2 aria-hidden />
+                    <Share2Icon aria-hidden />
                   </span>
                 )}
                 <span className="truck-tracking-drawer__status-badge">{truck.status}</span>
-                {expanded ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
+                {expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
               </span>
             </button>
 
@@ -112,7 +112,7 @@ const TruckList = ({
                 </div>
                 <div>
                   <span>
-                    <FiMapPin aria-hidden /> Transporter Location:
+                    <MapPinIcon aria-hidden /> Transporter Location:
                   </span>
                   <p>{truck.transporterLocation}</p>
                 </div>
@@ -127,7 +127,7 @@ const TruckList = ({
                 </div>
                 <div>
                   <span>
-                    <FiPhone aria-hidden /> Driver Phone:
+                    <PhoneIcon aria-hidden /> Driver Phone:
                   </span>
                   <p>{truck.driverPhone}</p>
                 </div>
@@ -146,13 +146,13 @@ const TruckList = ({
                 </div>
                 <div>
                   <span>
-                    <FiMapPin aria-hidden /> Start Location:
+                    <MapPinIcon aria-hidden /> Start Location:
                   </span>
                   <p>{truck.startLocation}</p>
                 </div>
                 <div>
                   <span>
-                    <FiMapPin aria-hidden /> Destination:
+                    <MapPinIcon aria-hidden /> Destination:
                   </span>
                   <p>{truck.destination}</p>
                 </div>
@@ -173,7 +173,7 @@ const TruckList = ({
                         onClick={() => onReassign(truck)}
                         title="Move this truck onto another contract"
                       >
-                        <FiRefreshCw aria-hidden /> Reassign
+                        <RefreshCwIcon aria-hidden /> Reassign
                       </button>
                     )}
                   </div>

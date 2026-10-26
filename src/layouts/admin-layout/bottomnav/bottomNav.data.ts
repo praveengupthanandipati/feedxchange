@@ -1,10 +1,9 @@
-import type { IconType } from "react-icons";
-import { FiFileText, FiHome, FiPieChart, FiSettings } from "react-icons/fi";
+import { type IconComponent, ChartPieIcon, FileTextIcon, HouseIcon, SettingsIcon } from "../../../shared/components/icon";
 
 export interface BottomNavItem {
   id: string;
   label: string;
-  icon: IconType;
+  icon: IconComponent;
   /** Where the tab goes. */
   path: string;
   /** Path prefixes that light the tab up (e.g. every /contracts/... screen). */
@@ -14,10 +13,10 @@ export interface BottomNavItem {
 }
 
 export const bottomNavItems: BottomNavItem[] = [
-  { id: "dashboard", label: "Dashboard", icon: FiHome, path: "/admin/dashboard", match: ["/admin/dashboard"], permissions: ["dashboard"] },
-  { id: "contracts", label: "Contracts", icon: FiFileText, path: "/admin/contracts", match: ["/admin/contracts"], permissions: ["contracts.view"] },
-  { id: "reports", label: "Reports", icon: FiPieChart, path: "/admin/reports/overview", match: ["/admin/reports"], permissions: ["reports"] },
-  { id: "settings", label: "Settings", icon: FiSettings, path: "/admin/settings", match: ["/admin/settings"] },
+  { id: "dashboard", label: "Dashboard", icon: HouseIcon, path: "/admin/dashboard", match: ["/admin/dashboard"], permissions: ["dashboard"] },
+  { id: "contracts", label: "Contracts", icon: FileTextIcon, path: "/admin/contracts", match: ["/admin/contracts"], permissions: ["contracts.view"] },
+  { id: "reports", label: "Reports", icon: ChartPieIcon, path: "/admin/reports/overview", match: ["/admin/reports"], permissions: ["reports"] },
+  { id: "settings", label: "Settings", icon: SettingsIcon, path: "/admin/settings", match: ["/admin/settings"] },
 ];
 
 /** True when `pathname` is the tab's screen or one beneath it. "/admin" counts as the Dashboard. */

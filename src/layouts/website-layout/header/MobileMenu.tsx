@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { FiChevronDown, FiMail, FiPhone, FiX } from "react-icons/fi";
+import { ChevronDownIcon, MailIcon, PhoneIcon, XIcon } from "../../../shared/components/icon";
 import { NavLink, useLocation } from "react-router-dom";
 import { company, navItems } from "../../../features/website/data/content";
 import { sitePaths } from "../../../features/website/routes/paths";
@@ -33,7 +33,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
         <div className="mobile-menu__head">
           <Logo />
           <button ref={closeRef} type="button" className="mobile-menu__close" onClick={onClose} aria-label="Close menu">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -51,7 +51,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                       onClick={() => setProductsOpen((prev) => !prev)}
                     >
                       {item.label}
-                      <FiChevronDown aria-hidden className="mobile-menu__chevron" />
+                      <ChevronDownIcon aria-hidden className="mobile-menu__chevron" />
                     </button>
                     {/* Height animates smoothly via grid-template-rows 0fr → 1fr. */}
                     <div id="mobile-products" className={`mobile-menu__sub ${productsOpen ? "is-open" : ""}`}>
@@ -88,10 +88,10 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
           </div>
           <LoginLink className="site-login--block" />
           <a href={`tel:${company.phone.replace(/\s/g, "")}`}>
-            <FiPhone aria-hidden /> {company.phone}
+            <PhoneIcon aria-hidden /> {company.phone}
           </a>
           <a href={`mailto:${company.email}`}>
-            <FiMail aria-hidden /> {company.email}
+            <MailIcon aria-hidden /> {company.email}
           </a>
         </div>
       </aside>

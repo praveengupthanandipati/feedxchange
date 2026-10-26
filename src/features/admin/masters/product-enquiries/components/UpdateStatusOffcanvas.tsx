@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import { ASSIGNEE_OPTIONS, STATUS_OPTIONS, type EnquiryStatus, type EnquiryUpdate, type ProductEnquiry } from "../productEnquiries.data";
 
@@ -49,7 +49,7 @@ const UpdateStatusOffcanvas = ({ enquiry, onSave, onClose }: UpdateStatusOffcanv
             </p>
           </div>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
 

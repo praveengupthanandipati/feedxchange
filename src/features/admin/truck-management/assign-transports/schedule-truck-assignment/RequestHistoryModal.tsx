@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { FiX, FiRotateCcw } from "react-icons/fi";
+import { RotateCcwIcon, XIcon } from "../../../../../shared/components/icon";
 import { transporterRequestHistory } from "./transporterAssignment.data";
 import "./RequestHistoryModal.scss";
 
@@ -31,7 +31,7 @@ const RequestHistoryModal = ({ open, transporterName, onClose }: RequestHistoryM
       >
         <div className="request-history-modal__header">
           <h2 id="request-history-modal-title">
-            <FiRotateCcw aria-hidden /> Request History of{transporterName ? ` ${transporterName}` : ""}
+            <RotateCcwIcon aria-hidden /> Request History of{transporterName ? ` ${transporterName}` : ""}
           </h2>
           <button
             type="button"
@@ -39,7 +39,7 @@ const RequestHistoryModal = ({ open, transporterName, onClose }: RequestHistoryM
             onClick={onClose}
             aria-label="Close"
           >
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 

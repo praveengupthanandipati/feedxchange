@@ -3,7 +3,7 @@ import DatePickerInput from "../../../../shared/components/dropdown/DatePickerIn
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
-import { FiLink, FiEye, FiEyeOff, FiX } from "react-icons/fi";
+import { EyeIcon, EyeOffIcon, LinkIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
@@ -172,7 +172,7 @@ const GetContractsDrawer = ({
             onClick={onClose}
             aria-label="Close"
           >
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -461,7 +461,7 @@ const ContractchangeStatus = () => {
                 aria-label="Get contracts"
                 title="Get contracts"
               >
-                <FiLink aria-hidden />
+                <LinkIcon aria-hidden />
               </button>
             </div>
           </div>
@@ -493,7 +493,7 @@ const ContractchangeStatus = () => {
               className="new-contract__summary-toggle"
               onClick={() => setDetailsVisible((prev) => !prev)}
             >
-              {detailsVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {detailsVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {detailsVisible ? "Hide" : "Show"}
             </button>
           </div>

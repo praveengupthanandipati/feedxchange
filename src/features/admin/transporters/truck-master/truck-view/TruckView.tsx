@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiEdit3 } from "react-icons/fi";
+import { ArrowLeftIcon, PenLineIcon } from "../../../../../shared/components/icon";
 import { useGetTruckDetailsByIdQuery } from "../../../../../core/store/trucksApi";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
-import "../trucks-list/Trucks.scss";
+import "../trucks-list/Trucks.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 interface DetailFieldProps {
@@ -33,7 +34,7 @@ const TruckView = () => {
     return (
       <div className="business-owner-detail">
         <Link to="/admin/truck-management/transporters/truck-master" className="business-owner-detail__back">
-          <FiArrowLeft aria-hidden /> Back to Trucks List
+          <ArrowLeftIcon aria-hidden /> Back to Trucks List
         </Link>
         <div className="business-owner-detail__card">
           <p>
@@ -51,7 +52,7 @@ const TruckView = () => {
   return (
     <div className="business-owner-detail">
       <Link to="/admin/truck-management/transporters/truck-master" className="business-owner-detail__back">
-        <FiArrowLeft aria-hidden /> Back to Trucks List
+        <ArrowLeftIcon aria-hidden /> Back to Trucks List
       </Link>
 
       <div className="business-owner-detail__card">
@@ -66,7 +67,7 @@ const TruckView = () => {
                 className="trucks-btn trucks-btn--outline"
                 onClick={() => navigate(`/admin/truck-management/transporters/truck-master/new?id=${truck.truckId}`)}
               >
-                <FiEdit3 aria-hidden /> Edit
+                <PenLineIcon aria-hidden /> Edit
               </button>
             </Can>
           </div>

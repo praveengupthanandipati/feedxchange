@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FiPlus } from "react-icons/fi";
+import { PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import { buildScheduleTruckColumns } from "./scheduleTruckAssignment.columns";
@@ -74,7 +74,7 @@ const ScheduleTruckAssignment = ({
           className="schedule-truck-assignment__add-btn"
           onClick={handleOpenNew}
         >
-          <FiPlus aria-hidden /> Schedule New Request
+          <PlusIcon aria-hidden /> Schedule New Request
         </button>
       </div>
 

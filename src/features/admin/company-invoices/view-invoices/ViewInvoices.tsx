@@ -1,24 +1,24 @@
 import { useEffect, useMemo, useState, type SubmitEvent } from "react";
 import { createPortal } from "react-dom";
 import {
-  FiAlertCircle,
-  FiCheck,
-  FiCheckCircle,
-  FiChevronDown,
-  FiChevronLeft,
-  FiChevronRight,
-  FiChevronUp,
-  FiDownload,
-  FiEdit,
-  FiEye,
-  FiEyeOff,
-  FiMinus,
-  FiPlus,
-  FiRefreshCw,
-  FiSave,
-  FiTrash2,
-  FiX,
-} from "react-icons/fi";
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+  CircleAlertIcon,
+  CircleCheckBigIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  MinusIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  SaveIcon,
+  SquarePenIcon,
+  Trash2Icon,
+  XIcon,
+} from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import { formatDisplayDate } from "../../../../shared/components/dropdown/Calendar";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
@@ -161,7 +161,7 @@ const ViewInvoiceModal = ({ invoice, onClose }: { invoice: CompanyInvoice; onClo
         <header>
           <h2 id="view-invoice-title">{invoice.invoiceNo}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
         <dl className="invoices-modal__facts">
@@ -200,7 +200,7 @@ const EditInvoiceModal = ({ invoice, onSave, onClose }: { invoice: CompanyInvoic
         <header>
           <h2 id="edit-invoice-title">Edit {invoice.invoiceNo}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
         <p className="invoices-modal__sub">{invoice.company} · {invoice.partyName}</p>
@@ -229,10 +229,10 @@ const EditInvoiceModal = ({ invoice, onSave, onClose }: { invoice: CompanyInvoic
         {error && <p className="invoices-modal__error" role="alert">{error}</p>}
         <div className="invoices-modal__actions">
           <button type="button" className="view-invoices__btn view-invoices__btn--ghost" onClick={onClose}>
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
           <button type="submit" className="view-invoices__btn view-invoices__btn--navy">
-            <FiSave aria-hidden /> Update
+            <SaveIcon aria-hidden /> Update
           </button>
         </div>
       </form>
@@ -327,16 +327,16 @@ const ViewInvoices = () => {
   const actionButtons = (invoice: CompanyInvoice) => (
     <div className="view-invoices__actions">
       <button type="button" className="view-invoices__icon-btn view-invoices__icon-btn--download" onClick={() => downloadInvoice(invoice)} aria-label={`Download ${invoice.invoiceNo}`} title="Download PDF">
-        <FiDownload aria-hidden />
+        <DownloadIcon aria-hidden />
       </button>
       <button type="button" className="view-invoices__icon-btn view-invoices__icon-btn--view" onClick={() => setViewing(invoice)} aria-label={`View ${invoice.invoiceNo}`} title="View">
-        <FiEye aria-hidden />
+        <EyeIcon aria-hidden />
       </button>
       <button type="button" className="view-invoices__icon-btn view-invoices__icon-btn--edit" onClick={() => setEditing(invoice)} aria-label={`Edit ${invoice.invoiceNo}`} title="Edit">
-        <FiEdit aria-hidden />
+        <SquarePenIcon aria-hidden />
       </button>
       <button type="button" className="view-invoices__icon-btn view-invoices__icon-btn--delete" onClick={() => setDeleting(invoice)} aria-label={`Delete ${invoice.invoiceNo}`} title="Delete">
-        <FiTrash2 aria-hidden />
+        <Trash2Icon aria-hidden />
       </button>
     </div>
   );
@@ -353,10 +353,10 @@ const ViewInvoices = () => {
         <RowActionsMenu
           menuAlign="left"
           actions={[
-            { key: "download", label: "Download", icon: FiDownload, onClick: () => downloadInvoice(row) },
-            { key: "view", label: "View", icon: FiEye, onClick: () => setViewing(row) },
-            { key: "edit", label: "Edit", icon: FiEdit, onClick: () => setEditing(row) },
-            { key: "delete", label: "Delete", icon: FiTrash2, onClick: () => setDeleting(row), danger: true, dividerBefore: true },
+            { key: "download", label: "Download", icon: DownloadIcon, onClick: () => downloadInvoice(row) },
+            { key: "view", label: "View", icon: EyeIcon, onClick: () => setViewing(row) },
+            { key: "edit", label: "Edit", icon: SquarePenIcon, onClick: () => setEditing(row) },
+            { key: "delete", label: "Delete", icon: Trash2Icon, onClick: () => setDeleting(row), danger: true, dividerBefore: true },
           ]}
         />
       ),
@@ -379,7 +379,7 @@ const ViewInvoices = () => {
           aria-expanded={expandedKeys.includes(row.id)}
           aria-label={expandedKeys.includes(row.id) ? `Hide contracts on ${row.invoiceNo}` : `Show contracts on ${row.invoiceNo}`}
         >
-          {expandedKeys.includes(row.id) ? <FiMinus aria-hidden /> : <FiPlus aria-hidden />}
+          {expandedKeys.includes(row.id) ? <MinusIcon aria-hidden /> : <PlusIcon aria-hidden />}
         </button>
       ),
     },
@@ -391,14 +391,14 @@ const ViewInvoices = () => {
         <h1>View Invoices</h1>
         <div className="view-invoices__header-actions">
           <button type="button" className="view-invoices__btn view-invoices__btn--info" onClick={() => setFiltersVisible((prev) => !prev)} aria-expanded={filtersVisible} aria-controls="view-invoices-filters">
-            {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+            {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {filtersVisible ? "Hide" : "Show"}
           </button>
           <button type="button" className="view-invoices__btn view-invoices__btn--warning" onClick={handleExport} disabled={filtered.length === 0}>
-            <FiDownload aria-hidden /> Export
+            <DownloadIcon aria-hidden /> Export
           </button>
           <button type="button" className="view-invoices__btn view-invoices__btn--warning" onClick={() => setExpandedKeys(allExpanded ? [] : paged.map((invoice) => invoice.id))} disabled={paged.length === 0}>
-            {allExpanded ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
+            {allExpanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
             {allExpanded ? "Collapse All" : "Toggle All"}
           </button>
         </div>
@@ -428,10 +428,10 @@ const ViewInvoices = () => {
           )}
           <div className="view-invoices__filter-actions">
             <button type="button" className="view-invoices__btn view-invoices__btn--navy" onClick={handleApply}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="view-invoices__btn view-invoices__btn--danger" onClick={handleReset}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         </div>
@@ -439,7 +439,7 @@ const ViewInvoices = () => {
 
       {(message || hasChanges) && (
         <p className={`view-invoices__message ${hasChanges ? "is-pending" : ""}`} role="status">
-          {hasChanges ? <FiAlertCircle aria-hidden /> : <FiCheckCircle aria-hidden />}
+          {hasChanges ? <CircleAlertIcon aria-hidden /> : <CircleCheckBigIcon aria-hidden />}
           {hasChanges ? "You have unsaved changes — Save to keep them or Cancel to discard." : message}
         </p>
       )}
@@ -484,7 +484,7 @@ const ViewInvoices = () => {
         </p>
         <div className="view-invoices__pages">
           <button type="button" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)} aria-label="Previous page">
-            <FiChevronLeft aria-hidden />
+            <ChevronLeftIcon aria-hidden />
           </button>
           {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => (
             <button key={number} type="button" className={number === currentPage ? "is-active" : ""} onClick={() => setPage(number)} aria-current={number === currentPage ? "page" : undefined}>
@@ -492,17 +492,17 @@ const ViewInvoices = () => {
             </button>
           ))}
           <button type="button" disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)} aria-label="Next page">
-            <FiChevronRight aria-hidden />
+            <ChevronRightIcon aria-hidden />
           </button>
         </div>
       </div>
 
       <div className="view-invoices__footer">
         <button type="button" className="view-invoices__btn view-invoices__btn--navy view-invoices__btn--wide" onClick={handleSave} disabled={!hasChanges}>
-          <FiSave aria-hidden /> Save
+          <SaveIcon aria-hidden /> Save
         </button>
         <button type="button" className="view-invoices__btn view-invoices__btn--warning view-invoices__btn--wide" onClick={handleCancel} disabled={!hasChanges}>
-          <FiX aria-hidden /> Cancel
+          <XIcon aria-hidden /> Cancel
         </button>
       </div>
 

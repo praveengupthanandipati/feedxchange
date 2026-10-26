@@ -1,4 +1,4 @@
-import { FiRefreshCw, FiSearch } from "react-icons/fi";
+import { RefreshCwIcon, SearchIcon } from "../../../../../shared/components/icon";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import SearchableSelect, { type SearchableSelectOption } from "../../../../../shared/components/dropdown/SearchableSelect";
 import type { DetailFilters as Filters } from "../estimationDetail.data";
@@ -27,10 +27,10 @@ const DetailFilters = ({ value, estimateOptions, onChange, onShow, onReset }: De
       <DatePickerInput value={value.to} onChange={(to) => onChange({ ...value, to })} min={value.from || undefined} placeholder="To Date" ariaLabel="To Date" />
       <div className="estimation-detail__filter-actions">
         <button type="button" className="estimation-detail__btn estimation-detail__btn--navy" onClick={onShow}>
-          <FiSearch aria-hidden /> Show
+          <SearchIcon aria-hidden /> Show
         </button>
         <button type="button" className="estimation-detail__btn estimation-detail__btn--warning" onClick={onReset}>
-          <FiRefreshCw aria-hidden /> Reset
+          <RefreshCwIcon aria-hidden /> Reset
         </button>
       </div>
     </div>

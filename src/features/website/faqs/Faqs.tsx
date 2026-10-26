@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiPlus } from "react-icons/fi";
+import { PlusIcon } from "../../../shared/components/icon";
 import CtaBanner from "../components/sections/CtaBanner";
 import PageHero from "../components/sections/PageHero";
 import { faqs } from "../data/content";
@@ -23,7 +23,7 @@ const Faqs = () => {
                   <h2>
                     <button type="button" aria-expanded={open} aria-controls={`faq-answer-${index}`} id={`faq-question-${index}`} onClick={() => setOpenIndex(open ? null : index)}>
                       {faq.question}
-                      <FiPlus aria-hidden />
+                      <PlusIcon aria-hidden />
                     </button>
                   </h2>
                   <div id={`faq-answer-${index}`} role="region" aria-labelledby={`faq-question-${index}`} className="faq-item__answer">

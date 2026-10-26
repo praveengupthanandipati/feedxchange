@@ -1,9 +1,9 @@
-import type { IconType } from "react-icons";
+import { type IconComponent } from "../../../../../shared/components/icon";
 
 export type TileTone = "navy" | "blue" | "green" | "orange" | "red";
 
 interface InfoTileProps {
-  icon: IconType;
+  icon: IconComponent;
   label: string;
   value: string;
   tone: TileTone;

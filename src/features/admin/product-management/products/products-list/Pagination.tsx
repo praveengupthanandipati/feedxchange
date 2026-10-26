@@ -1,4 +1,4 @@
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon } from "../../../../../shared/components/icon";
 
 interface PaginationProps {
   currentPage: number;
@@ -30,7 +30,7 @@ const Pagination = ({
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           aria-label="Previous page"
         >
-          <FiChevronLeft aria-hidden />
+          <ChevronLeftIcon aria-hidden />
         </button>
         {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
           <button
@@ -48,7 +48,7 @@ const Pagination = ({
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           aria-label="Next page"
         >
-          <FiChevronRight aria-hidden />
+          <ChevronRightIcon aria-hidden />
         </button>
       </div>
     </div>

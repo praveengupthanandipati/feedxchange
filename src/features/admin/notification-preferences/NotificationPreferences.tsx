@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { FiBriefcase, FiSearch, FiUser, FiUsers, FiZap } from "react-icons/fi";
+import { BriefcaseIcon, SearchIcon, UserIcon, UsersIcon, ZapIcon } from "../../../shared/components/icon";
 import { usePermission } from "../../../core/auth/AuthContext";
 import {
   useFindPreferenceProfilesQuery,
@@ -45,19 +45,19 @@ const BusinessTab = () => {
       {!single && (
         <aside className="pref-finder" aria-label="Find a business">
           <label className="pref-search">
-            <FiSearch aria-hidden />
+            <SearchIcon aria-hidden />
             <input type="search" value={search} placeholder="Find a business" onChange={(e) => setSearch(e.target.value)} aria-label="Find a business" />
           </label>
           <ul className="pref-finder__list">
             {found.map((p) => (
               <li key={p.profileId}>
                 <button type="button" className={`pref-finder__item ${p.profileId === selected ? "is-selected" : ""}`} onClick={() => setParams({ profile: String(p.profileId) })}>
-                  <span className="pref-avatar" aria-hidden><FiBriefcase /></span>
+                  <span className="pref-avatar" aria-hidden><BriefcaseIcon /></span>
                   <span>
                     <strong>{p.name}</strong>
                     <small>{p.contactCount} {p.contactCount === 1 ? "contact" : "contacts"}</small>
                   </span>
-                  {p.dispatchMode === "Auto" && <span className="pref-badge pref-badge--on" title="Automatic notifications are on"><FiZap aria-hidden /> Auto</span>}
+                  {p.dispatchMode === "Auto" && <span className="pref-badge pref-badge--on" title="Automatic notifications are on"><ZapIcon aria-hidden /> Auto</span>}
                 </button>
               </li>
             ))}
@@ -86,7 +86,7 @@ const UsersTab = () => {
     <div className="pref-layout">
       <aside className="pref-finder" aria-label="Find a user">
         <label className="pref-search">
-          <FiSearch aria-hidden />
+          <SearchIcon aria-hidden />
           <input type="search" value={search} placeholder="Find a user" onChange={(e) => setSearch(e.target.value)} aria-label="Find a user" />
         </label>
         <ul className="pref-finder__list">
@@ -136,8 +136,8 @@ const NotificationPreferences = () => {
 
       {canUsers && (
         <div className="pref-tabs" role="tablist" aria-label="Whose preferences">
-          <button type="button" role="tab" aria-selected={tab === "business"} className={tab === "business" ? "is-active" : ""} onClick={() => setTab("business")}><FiUsers aria-hidden /> Business contacts</button>
-          <button type="button" role="tab" aria-selected={tab === "users"} className={tab === "users" ? "is-active" : ""} onClick={() => setTab("users")}><FiUser aria-hidden /> System users</button>
+          <button type="button" role="tab" aria-selected={tab === "business"} className={tab === "business" ? "is-active" : ""} onClick={() => setTab("business")}><UsersIcon aria-hidden /> Business contacts</button>
+          <button type="button" role="tab" aria-selected={tab === "users"} className={tab === "users" ? "is-active" : ""} onClick={() => setTab("users")}><UserIcon aria-hidden /> System users</button>
         </div>
       )}
 

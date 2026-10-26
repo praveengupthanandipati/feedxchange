@@ -1,16 +1,16 @@
 import { useMemo, useState } from "react";
 import {
-  FiCheck,
-  FiCheckCircle,
-  FiChevronDown,
-  FiChevronUp,
-  FiDownload,
-  FiEye,
-  FiEyeOff,
-  FiRefreshCw,
-  FiSave,
-  FiX,
-} from "react-icons/fi";
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CircleCheckBigIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  RefreshCwIcon,
+  SaveIcon,
+  XIcon,
+} from "../../../../shared/components/icon";
 import { formatDisplayDate } from "../../../../shared/components/dropdown/Calendar";
 import DateRangeInput from "../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
@@ -209,14 +209,14 @@ const GenerateInvoice = () => {
             aria-expanded={filtersVisible}
             aria-controls="generate-invoice-filters"
           >
-            {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+            {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {filtersVisible ? "Hide" : "Show"}
           </button>
           <button type="button" className="generate-invoice__btn generate-invoice__btn--warning" onClick={handleExport} disabled={rows.length === 0}>
-            <FiDownload aria-hidden /> Export
+            <DownloadIcon aria-hidden /> Export
           </button>
           <button type="button" className="generate-invoice__btn generate-invoice__btn--warning" onClick={() => toggleAll(!allSelected)} disabled={rows.length === 0}>
-            {allSelected ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
+            {allSelected ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
             {allSelected ? "Clear All" : "Toggle All"}
           </button>
         </div>
@@ -229,10 +229,10 @@ const GenerateInvoice = () => {
           <SearchableSelect options={partyOptions} value={draft.party} onChange={(party) => setDraft({ ...draft, party })} placeholder="Select Party" ariaLabel="Select Party" clearable />
           <div className="generate-invoice__filter-actions">
             <button type="button" className="generate-invoice__btn generate-invoice__btn--navy" onClick={handleApplyFilters}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="generate-invoice__btn generate-invoice__btn--danger" onClick={handleResetFilters}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         </div>
@@ -258,7 +258,7 @@ const GenerateInvoice = () => {
 
       {message && (
         <p className={`generate-invoice__message generate-invoice__message--${message.type}`} role={message.type === "error" ? "alert" : "status"}>
-          {message.type === "success" ? <FiCheckCircle aria-hidden /> : <FiX aria-hidden />} {message.text}
+          {message.type === "success" ? <CircleCheckBigIcon aria-hidden /> : <XIcon aria-hidden />} {message.text}
         </p>
       )}
 
@@ -363,10 +363,10 @@ const GenerateInvoice = () => {
 
       <div className="generate-invoice__footer">
         <button type="button" className="generate-invoice__btn generate-invoice__btn--navy generate-invoice__btn--wide" onClick={handleSave}>
-          <FiSave aria-hidden /> Save
+          <SaveIcon aria-hidden /> Save
         </button>
         <button type="button" className="generate-invoice__btn generate-invoice__btn--warning generate-invoice__btn--wide" onClick={handleCancel}>
-          <FiX aria-hidden /> Cancel
+          <XIcon aria-hidden /> Cancel
         </button>
       </div>
     </div>

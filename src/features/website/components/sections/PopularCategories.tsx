@@ -1,12 +1,11 @@
-import type { IconType } from "react-icons";
-import { FiArrowUpRight, FiPackage } from "react-icons/fi";
+import { type IconComponent, ArrowUpRightIcon, PackageIcon } from "../../../../shared/components/icon";
 import { GiBeanstalk, GiBowlOfRice, GiChemicalTank, GiCorn, GiGrain, GiOilDrum } from "react-icons/gi";
 import { Link } from "react-router-dom";
 import { navItems, products } from "../../data/content";
 import SectionHead from "../common/SectionHead";
 
 /** Icon per category, keyed by the last part of its URL (the product slug). */
-const ICONS: Record<string, IconType> = {
+const ICONS: Record<string, IconComponent> = {
   "distilled-products": GiChemicalTank,
   "crude-oil": GiOilDrum,
   doc: GiGrain,
@@ -31,7 +30,7 @@ const PopularCategories = () => {
         <ul className="site-categories__grid">
           {categories.map((category, index) => {
             const slug = slugOf(category.to);
-            const Icon = ICONS[slug] ?? FiPackage;
+            const Icon = ICONS[slug] ?? PackageIcon;
             const summary = products.find((product) => product.slug === slug)?.summary;
             return (
               <li key={category.to} data-reveal data-reveal-delay={(index % 3) * 90}>
@@ -43,7 +42,7 @@ const PopularCategories = () => {
                     <strong>{category.label}</strong>
                     {summary && <small>{summary}</small>}
                   </span>
-                  <FiArrowUpRight aria-hidden className="category-tile__go" />
+                  <ArrowUpRightIcon aria-hidden className="category-tile__go" />
                 </Link>
               </li>
             );

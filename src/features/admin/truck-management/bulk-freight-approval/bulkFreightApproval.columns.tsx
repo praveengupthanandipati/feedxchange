@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FiExternalLink } from "react-icons/fi";
+import { ExternalLinkIcon } from "../../../../shared/components/icon";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import InfoTooltip from "../../../../shared/components/tooltip/InfoTooltip";
 import type { BulkFreightRow } from "./bulkFreightApproval.data";
@@ -25,7 +25,7 @@ export function buildBulkFreightColumns(): TableColumn<BulkFreightRow>[] {
             aria-label={`Assign transport for contract ${row.contractNumber}`}
             title="Assign Transport"
           >
-            <FiExternalLink aria-hidden />
+            <ExternalLinkIcon aria-hidden />
           </Link>
           <span className="bulk-freight-table__contract-text">{row.contractNumber}</span>
         </span>

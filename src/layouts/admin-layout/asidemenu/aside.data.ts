@@ -1,24 +1,24 @@
 import {
-  FiHome,
-  FiFileText,
-  FiActivity,
-  FiGrid,
-  FiBell,
-  FiMessageSquare,
-  FiBriefcase,
-  FiTruck,
-  FiPieChart,
-  FiUsers,
-  FiTag,
-  FiUserPlus,
-  FiPackage,
-  FiSend,
-  FiFolder,
-  FiSettings,
-  FiPercent,
-  FiCopy,
-  FiLayers,
-} from "react-icons/fi";
+  ActivityIcon,
+  BellIcon,
+  BriefcaseIcon,
+  ChartPieIcon,
+  CopyIcon,
+  FileTextIcon,
+  FolderIcon,
+  HouseIcon,
+  LayersIcon,
+  LayoutGridIcon,
+  MessageSquareIcon,
+  PackageIcon,
+  PercentIcon,
+  SendIcon,
+  SettingsIcon,
+  TagIcon,
+  TruckIcon,
+  UserPlusIcon,
+  UsersIcon,
+} from "../../../shared/components/icon";
 import type { AsideNavSection } from "./aside.types";
 
 /**
@@ -33,7 +33,7 @@ export const interestOfPaymentsSection: AsideNavSection = {
     {
       id: "interest-of-payments",
       label: "Interest of Payments",
-      icon: FiPercent,
+      icon: PercentIcon,
       path: "/admin/interest-payments/overview",
       children: [
         { id: "interest-create", label: "Create Interest", path: "/admin/interest-payments/create" },
@@ -52,7 +52,7 @@ export const companyInvoicesSection: AsideNavSection = {
     {
       id: "company-invoices",
       label: "Company Invoices",
-      icon: FiCopy,
+      icon: CopyIcon,
       path: "/admin/company-invoices/overview",
       children: [
         { id: "company-invoices-generate", label: "Generate Invoice", path: "/admin/company-invoices/generate" },
@@ -70,7 +70,7 @@ export const estimationsSection: AsideNavSection = {
     {
       id: "estimations",
       label: "Estimations",
-      icon: FiPercent,
+      icon: PercentIcon,
       path: "/admin/estimations/overview",
       children: [
         { id: "estimations-commission", label: "Commission Estimation", path: "/admin/estimations/commission" },
@@ -89,7 +89,7 @@ export const mastersSection: AsideNavSection = {
     {
       id: "masters",
       label: "Masters",
-      icon: FiLayers,
+      icon: LayersIcon,
       path: "/admin/masters/overview",
       collapsedByDefault: true,
       children: [
@@ -118,9 +118,9 @@ export const asideNavSections: AsideNavSection[] = [
     id: "your-company",
     title: "FeedxChange",
     items: [
-      { id: "dashboard", permissions: ["dashboard"], label: "Dashboard", icon: FiHome, path: "/admin/dashboard" },
-      { id: "contract", permissions: ["contracts.view"], label: "Contracts", icon: FiFileText, path: "/admin/contracts" },
-      { id: "contract-status", permissions: ["contract-status"], label: "Contract Status", icon: FiActivity, path: "/admin/contract-status" },
+      { id: "dashboard", permissions: ["dashboard"], label: "Dashboard", icon: HouseIcon, path: "/admin/dashboard" },
+      { id: "contract", permissions: ["contracts.view"], label: "Contracts", icon: FileTextIcon, path: "/admin/contracts" },
+      { id: "contract-status", permissions: ["contract-status"], label: "Contract Status", icon: ActivityIcon, path: "/admin/contract-status" },
       // {
       //   id: "task",
       //   label: "Task",
@@ -130,8 +130,8 @@ export const asideNavSections: AsideNavSection[] = [
       //     { id: "task-board", label: "Task Board", path: "/admin/task/board" },
       //   ],
       // },
-      // { id: "performance", label: "Performance", icon: FiTrendingUp, path: "/admin/performance" },
-      // { id: "projects", label: "Projects", icon: FiFolder, path: "/admin/projects" },
+      // { id: "performance", label: "Performance", icon: TrendingUpIcon, path: "/admin/performance" },
+      // { id: "projects", label: "Projects", icon: FolderIcon, path: "/admin/projects" },
     ],
   },
   {
@@ -141,13 +141,13 @@ export const asideNavSections: AsideNavSection[] = [
       //{
       //      id: "pending-contracts",
       //  label: "Pending Contracts",
-      // icon: FiFileText,
+      // icon: FileTextIcon,
       //  path: "/admin/truck-management/pending-contracts",
       //  },
       {
         id: "contract-dispatch-management", permissions: ["pending-contracts"],
         label: "Pending Contracts",
-        icon: FiSend,
+        icon: SendIcon,
         path: "/admin/truck-management/open-pending-contracts",
         children: [
           {
@@ -187,19 +187,19 @@ export const asideNavSections: AsideNavSection[] = [
       {
         id: "pending-delivery-orders", permissions: ["pending-delivery-orders"],
         label: "Pending Delivery Orders",
-        icon: FiPackage,
+        icon: PackageIcon,
         path: "/admin/truck-management/pending-delivery-orders",
       },
       {
         id: "add-dispatch-by-user", permissions: ["dispatch-by-user.manage"],
         label: "Add Dispatch By User",
-        icon: FiUserPlus,
+        icon: UserPlusIcon,
         path: "/admin/truck-management/add-dispatch-by-user",
       },
       {
         id: "truck-transporters",
         label: "Transporters",
-        icon: FiTruck,
+        icon: TruckIcon,
         path: "/admin/truck-management/transporters/overview",
         children: [
           {
@@ -232,7 +232,7 @@ export const asideNavSections: AsideNavSection[] = [
       {
         id: "seller-dispatches-new", permissions: ["dispatch-by-admin.view"],
         label: "Seller Dispatches New",
-        icon: FiSend,
+        icon: SendIcon,
         path: "/admin/truck-management/seller-dispatches-new",
       },
     ],
@@ -244,7 +244,7 @@ export const asideNavSections: AsideNavSection[] = [
       {
         id: "payments",
         label: "Payments",
-        icon: FiFolder,
+        icon: FolderIcon,
         children: [
           { id: "payments-seller-invoice", permissions: ["seller-invoice.view"], label: "Seller Invoice", path: "/admin/payments/seller-invoice" },
           { id: "payments-seller-invoice-edit", permissions: ["seller-invoice.view"], label: "Edit Seller Invoices", path: "/admin/payments/seller-invoice-edit" },
@@ -262,7 +262,7 @@ export const asideNavSections: AsideNavSection[] = [
       {
         id: "business-owners", permissions: ["profiles.business.view"],
         label: "Business Owners",
-        icon: FiBriefcase,
+        icon: BriefcaseIcon,
         path: "/admin/business-owners",
         children: [
           { id: "business-owners-profile", permissions: ["profiles.business.manage"], label: "Business Profile", path: "/admin/business-owners/profile" },
@@ -275,7 +275,7 @@ export const asideNavSections: AsideNavSection[] = [
       {
         id: "transporters", permissions: ["profiles.transporter.view"],
         label: "Transporters",
-        icon: FiTruck,
+        icon: TruckIcon,
         path: "/admin/transporters",
         children: [
           { id: "transporters-profile", permissions: ["profiles.transporter.manage"], label: "Transporter Profile", path: "/admin/transporters/profile" },
@@ -288,13 +288,13 @@ export const asideNavSections: AsideNavSection[] = [
       {
         id: "promoters-dashboard", permissions: ["profiles.promoter-dashboard"],
         label: "Promoters Dashboard",
-        icon: FiPieChart,
+        icon: ChartPieIcon,
         path: "/admin/promoter-dashboard",
       },
       {
         id: "promoters", permissions: ["profiles.promoter.view"],
         label: "Promoters",
-        icon: FiUsers,
+        icon: UsersIcon,
         path: "/admin/promoters",
         children: [
           { id: "promoters-profile", permissions: ["profiles.promoter.manage"], label: "Promoter Profile", path: "/admin/promoters/profile" },
@@ -302,11 +302,11 @@ export const asideNavSections: AsideNavSection[] = [
           { id: "promoters-profile-settings", permissions: ["profiles.promoter.manage"], label: "Profile Settings", path: "/admin/promoters/profile-settings" },
         ],
       },
-      { id: "promocodes", permissions: ["promocodes.view"], label: "Promocodes", icon: FiTag, path: "/admin/promocodes" },
+      { id: "promocodes", permissions: ["promocodes.view"], label: "Promocodes", icon: TagIcon, path: "/admin/promocodes" },
       {
         id: "referred-profiles", permissions: ["profiles.referred"],
         label: "Referred Profiles",
-        icon: FiUserPlus,
+        icon: UserPlusIcon,
         path: "/admin/referred-profiles",
       },
     ],
@@ -319,11 +319,11 @@ export const asideNavSections: AsideNavSection[] = [
     id: "our-features",
     title: "Product Management",
     items: [
-      { id: "categories", permissions: ["categories.view"], label: "Categories", icon: FiMessageSquare, path: "/admin/categories" },
+      { id: "categories", permissions: ["categories.view"], label: "Categories", icon: MessageSquareIcon, path: "/admin/categories" },
       {
         id: "apps",
         label: "Products",
-        icon: FiGrid,
+        icon: LayoutGridIcon,
         path: "/admin/product-management/overview",
         children: [
           { id: "products-products", permissions: ["products.view"], label: "Products", path: "/admin/products" },
@@ -337,7 +337,7 @@ export const asideNavSections: AsideNavSection[] = [
         ],
       },
 
-      { id: "notifications", permissions: ["subscriptions.view", "notifications.history"], label: "Notifications", icon: FiBell, path: "/admin/notifications" },
+      { id: "notifications", permissions: ["subscriptions.view", "notifications.history"], label: "Notifications", icon: BellIcon, path: "/admin/notifications" },
 
     ],
   },
@@ -348,7 +348,7 @@ export const asideNavSections: AsideNavSection[] = [
       {
         id: "reports",
         label: "Reports",
-        icon: FiFileText,
+        icon: FileTextIcon,
         path: "/admin/reports/overview",
         children: [
           { id: "reports-seller-invoice", permissions: ["reports"], label: "Seller Invoice Reports", path: "/admin/reports/seller-invoice-reports" },
@@ -372,7 +372,7 @@ export const asideNavSections: AsideNavSection[] = [
       {
         id: "menu-management",
         label: "Menu Management",
-        icon: FiSettings,
+        icon: SettingsIcon,
         path: "/admin/menu-management/overview",
         permissions: ["roles-permissions"],
         children: [

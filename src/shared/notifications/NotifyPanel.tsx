@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiBell, FiCheck, FiMail, FiMessageCircle, FiSearch, FiSmartphone } from "react-icons/fi";
+import { BellIcon, CheckIcon, MailIcon, MessageCircleIcon, SearchIcon, SmartphoneIcon } from "../components/icon";
 import {
   useGetNotificationChannelsQuery,
   useGetNotificationEventsQuery,
@@ -67,7 +67,7 @@ const unavailableReason = (c: RecipientCandidate, channel: ChannelCode): string 
   return null;
 };
 
-const CHANNEL_ICON = { EMAIL: FiMail, WHATSAPP: FiMessageCircle, SMS: FiSmartphone, APP: FiBell } as const;
+const CHANNEL_ICON = { EMAIL: MailIcon, WHATSAPP: MessageCircleIcon, SMS: SmartphoneIcon, APP: BellIcon } as const;
 const CHANNEL_SHORT: Record<ChannelCode, string> = { EMAIL: "Email", WHATSAPP: "WhatsApp", SMS: "SMS", APP: "In-app" };
 const roleLabel = (role: string) => (role === "SELECTED" ? "Added by you" : role.charAt(0) + role.slice(1).toLowerCase());
 
@@ -262,7 +262,7 @@ const NotifyPanel = ({
     return (
       <div className="fx-notify fx-notify--done">
         <div className="fx-done">
-          <span className="fx-done__icon" aria-hidden><FiCheck /></span>
+          <span className="fx-done__icon" aria-hidden><CheckIcon /></span>
           <div>
             <strong>{sent.duplicate ? "This notification was already sent" : `Notification queued for ${people} ${people === 1 ? "person" : "people"}`}</strong>
             <p>{sent.deliveries.length} {sent.deliveries.length === 1 ? "message" : "messages"} will go out shortly. Delivery status updates in the notification history.</p>
@@ -275,7 +275,7 @@ const NotifyPanel = ({
           </div>
           {sent.deliveries.map((d) => {
             const code = d.channelCode.toUpperCase() as ChannelCode;
-            const Icon = CHANNEL_ICON[code] ?? FiMail;
+            const Icon = CHANNEL_ICON[code] ?? MailIcon;
             const tone = /fail|bounce|reject/i.test(d.status) ? "bad" : /deliver|sent|read|submit/i.test(d.status) ? "ok" : "wait";
             return (
               <div key={d.deliveryId} className="fx-list__row fx-list__row--three">
@@ -319,7 +319,7 @@ const NotifyPanel = ({
         <div className="fx-notify__tools">
           {candidates.length > 8 && (
             <label className="fx-notify__search">
-              <FiSearch aria-hidden />
+              <SearchIcon aria-hidden />
               <input type="search" value={filter} placeholder="Search people" onChange={(e) => setFilter(e.target.value)} aria-label="Search people" />
             </label>
           )}

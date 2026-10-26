@@ -1,8 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  FiAlertTriangle, FiBellOff, FiCheckCircle, FiChevronDown, FiChevronUp, FiClock, FiCopy, FiEdit2, FiInfo, FiPauseCircle, FiPlayCircle, FiX, FiZap,
-} from "react-icons/fi";
+  BellOffIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CircleCheckBigIcon,
+  CirclePauseIcon,
+  CirclePlayIcon,
+  ClockIcon,
+  CopyIcon,
+  InfoIcon,
+  PenIcon,
+  TriangleAlertIcon,
+  XIcon,
+  ZapIcon,
+} from "../../../shared/components/icon";
 import { usePermission } from "../../../core/auth/AuthContext";
 import {
   useCopyPreferencesMutation,
@@ -100,7 +112,7 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
     <div className="pref-panel">
       {toast && (
         <div className={`pref-toast pref-toast--${toast.kind}`} role="status">
-          {toast.kind === "ok" ? <FiCheckCircle aria-hidden /> : <FiAlertTriangle aria-hidden />} {toast.text}
+          {toast.kind === "ok" ? <CircleCheckBigIcon aria-hidden /> : <TriangleAlertIcon aria-hidden />} {toast.text}
         </div>
       )}
 
@@ -113,7 +125,7 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
 
       {/* ------------------------------------------------ automation */}
       <section className={`pref-auto ${auto ? "is-on" : ""}`} aria-label="Automatic notifications">
-        <div className="pref-auto__icon" aria-hidden>{auto ? <FiZap /> : <FiBellOff />}</div>
+        <div className="pref-auto__icon" aria-hidden>{auto ? <ZapIcon /> : <BellOffIcon />}</div>
         <div className="pref-auto__text">
           <h3>Automatic notifications <span className={`pref-badge ${auto ? "pref-badge--on" : ""}`}>{auto ? "On" : "Off"}</span></h3>
           <p>
@@ -137,7 +149,7 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
       </section>
 
       {!canSwitchMode && !auto && (
-        <p className="pref-hint"><FiInfo aria-hidden /> Contacts' preferences can be prepared now. Ask a FeedXchange administrator to switch automatic notifications on when you are ready.</p>
+        <p className="pref-hint"><InfoIcon aria-hidden /> Contacts' preferences can be prepared now. Ask a FeedXchange administrator to switch automatic notifications on when you are ready.</p>
       )}
 
       {/* ------------------------------------------------ settings */}
@@ -162,11 +174,11 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
           <span className="pref-field__label">Everyone</span>
           {profile.isPaused ? (
             <button type="button" className="pref-btn" disabled={!canManage || settingsBusy} onClick={() => void changeSettings({ isPaused: false, pausedUntil: null })}>
-              <FiPlayCircle aria-hidden /> Resume all
+              <CirclePlayIcon aria-hidden /> Resume all
             </button>
           ) : (
             <button type="button" className="pref-btn" disabled={!canManage || settingsBusy} onClick={() => { setDialogError(""); setPausing("profile"); }}>
-              <FiPauseCircle aria-hidden /> Pause all
+              <CirclePauseIcon aria-hidden /> Pause all
             </button>
           )}
           <small>{profile.isPaused ? pauseLabel(profile.pausedUntil) : "Stop all notifications for this business for a while."}</small>
@@ -177,9 +189,9 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
       {profile.warnings.length > 0 && (
         <section className="pref-warnings" aria-label="Gaps to fix">
           <button type="button" className="pref-warnings__head" onClick={() => setShowWarnings((v) => !v)} aria-expanded={showWarnings}>
-            <FiAlertTriangle aria-hidden />
+            <TriangleAlertIcon aria-hidden />
             <strong>{profile.warnings.length} {profile.warnings.length === 1 ? "gap" : "gaps"} worth a look</strong>
-            {showWarnings ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
+            {showWarnings ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
           </button>
           {showWarnings && <ul>{profile.warnings.map((w) => <li key={w}>{w}</li>)}</ul>}
         </section>
@@ -194,7 +206,7 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
 
         {profile.contacts.length === 0 ? (
           <div className="pref-empty">
-            <FiInfo aria-hidden />
+            <InfoIcon aria-hidden />
             <p>This business has no contacts yet. Add contacts to its profile, then choose what each one hears about.</p>
           </div>
         ) : (
@@ -232,25 +244,25 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
                       </td>
                       <td>
                         {c.isPaused
-                          ? <span className="pref-status pref-status--paused" title={c.pauseReason ?? undefined}><FiClock aria-hidden /> {pauseLabel(c.resumeOn)}</span>
+                          ? <span className="pref-status pref-status--paused" title={c.pauseReason ?? undefined}><ClockIcon aria-hidden /> {pauseLabel(c.resumeOn)}</span>
                           : <span className="pref-status pref-status--active">Active</span>}
                       </td>
                       <td>
                         <div className="pref-actions">
                           <button type="button" className="pref-btn pref-btn--small" onClick={() => setEditing(c)}>
-                            <FiEdit2 aria-hidden /> {canManage ? "Edit" : "View"}
+                            <PenIcon aria-hidden /> {canManage ? "Edit" : "View"}
                           </button>
                           {canManage && (
                             c.isPaused ? (
                               <button type="button" className="pref-icon-btn" aria-label={`Resume ${c.contactName}`} title="Resume" onClick={async () => {
                                 try { await resumeContact({ contactId: c.contactId, profileId }).unwrap(); ok(`${c.contactName} will be notified again.`); } catch (e) { fail(e, "Could not resume."); }
-                              }}><FiPlayCircle aria-hidden /></button>
+                              }}><CirclePlayIcon aria-hidden /></button>
                             ) : (
-                              <button type="button" className="pref-icon-btn" aria-label={`Pause ${c.contactName}`} title="Pause" onClick={() => { setDialogError(""); setPausing(c); }}><FiPauseCircle aria-hidden /></button>
+                              <button type="button" className="pref-icon-btn" aria-label={`Pause ${c.contactName}`} title="Pause" onClick={() => { setDialogError(""); setPausing(c); }}><CirclePauseIcon aria-hidden /></button>
                             )
                           )}
                           {canManage && profile.contacts.length > 1 && n > 0 && (
-                            <button type="button" className="pref-icon-btn" aria-label={`Copy ${c.contactName}'s choices to other contacts`} title="Copy to other contacts" onClick={() => { setCopying(c); setCopyTargets([]); }}><FiCopy aria-hidden /></button>
+                            <button type="button" className="pref-icon-btn" aria-label={`Copy ${c.contactName}'s choices to other contacts`} title="Copy to other contacts" onClick={() => { setCopying(c); setCopyTargets([]); }}><CopyIcon aria-hidden /></button>
                           )}
                         </div>
                       </td>
@@ -266,8 +278,8 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
       {/* ------------------------------------------------ activity */}
       <section className="pref-activity" aria-label="Recent activity">
         <button type="button" className="pref-warnings__head pref-warnings__head--plain" onClick={() => setShowActivity((v) => !v)} aria-expanded={showActivity}>
-          <FiClock aria-hidden /> <strong>Recent changes</strong> <span>{audit.length}</span>
-          {showActivity ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
+          <ClockIcon aria-hidden /> <strong>Recent changes</strong> <span>{audit.length}</span>
+          {showActivity ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
         </button>
         {showActivity && (
           audit.length === 0 ? <p className="pref-hint">Nothing has changed yet.</p> : (
@@ -315,12 +327,12 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
         <div className="pref-modal__backdrop" onMouseDown={() => setCopying(null)}>
           <div className="pref-modal" role="dialog" aria-modal="true" aria-labelledby="copy-title" onMouseDown={(e) => e.stopPropagation()}>
             <header className="pref-modal__header">
-              <span className="pref-modal__icon" aria-hidden><FiCopy /></span>
+              <span className="pref-modal__icon" aria-hidden><CopyIcon /></span>
               <div>
                 <h2 id="copy-title">Copy {copying.contactName}'s choices</h2>
                 <p>The selected contacts get the same events and channels. Their current choices are replaced.</p>
               </div>
-              <button type="button" className="pref-modal__close" onClick={() => setCopying(null)} aria-label="Close"><FiX aria-hidden /></button>
+              <button type="button" className="pref-modal__close" onClick={() => setCopying(null)} aria-label="Close"><XIcon aria-hidden /></button>
             </header>
             <div className="pref-modal__body">
               <ul className="pref-checklist">

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiChevronLeft, FiLogOut, FiX } from "react-icons/fi";
+import { ChevronLeftIcon, LogOutIcon, XIcon } from "../../../shared/components/icon";
 import logo from "../../../shared/assets/img/logo.png";
 import favIcon from "../../../shared/assets/img/fav.png";
 import { asideNavSections } from "./aside.data";
@@ -84,7 +84,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-expanded={!collapsed}
         >
-          <FiChevronLeft className={collapsed ? "is-rotated" : ""} />
+          <ChevronLeftIcon className={collapsed ? "is-rotated" : ""} />
         </button>
         <button
           type="button"
@@ -92,7 +92,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           onClick={onCloseMobile}
           aria-label="Close menu"
         >
-          <FiX aria-hidden />
+          <XIcon aria-hidden />
         </button>
       </div>
 
@@ -133,7 +133,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           }}
         >
           {!collapsed && <span>Logout</span>}
-          <FiLogOut aria-hidden />
+          <LogOutIcon aria-hidden />
         </button>
       </div>
     </aside>

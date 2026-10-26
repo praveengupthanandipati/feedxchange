@@ -1,5 +1,5 @@
 import type { ChangeEvent } from "react";
-import { FiEye } from "react-icons/fi";
+import { EyeIcon } from "../../../../shared/components/icon";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import RowActionsMenu from "../../../../shared/components/table/RowActionsMenu";
 import type { PriceTrackingRow } from "./priceTracking.data";
@@ -97,7 +97,7 @@ export function buildPriceTrackingColumns(
             onClick={() => handlers.onView(row)}
             aria-label={`View ${row.productName}`}
           >
-            <FiEye aria-hidden />
+            <EyeIcon aria-hidden />
           </button>
           <StatusBadge status={row.status} />
         </div>

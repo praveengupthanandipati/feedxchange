@@ -1,4 +1,4 @@
-import { FiArrowRight, FiClock } from "react-icons/fi";
+import { ArrowRightIcon, ClockIcon } from "../../../shared/components/icon";
 import PageHero from "../components/sections/PageHero";
 import { blogPosts } from "../data/content";
 import { usePageTitle } from "../hooks/usePageTitle";
@@ -23,14 +23,14 @@ const Blogs = () => {
                     <time>{post.date}</time>
                     <span aria-hidden>·</span>
                     <span>
-                      <FiClock aria-hidden /> {post.readTime}
+                      <ClockIcon aria-hidden /> {post.readTime}
                     </span>
                   </p>
                   <h2>{post.title}</h2>
                   <p>{post.excerpt}</p>
                   {/* TODO: link to the full post once blog detail pages exist. */}
                   <span className="product-card__more">
-                    Read more <FiArrowRight aria-hidden />
+                    Read more <ArrowRightIcon aria-hidden />
                   </span>
                 </div>
               </li>

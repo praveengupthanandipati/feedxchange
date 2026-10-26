@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { FiArrowLeft, FiSave, FiX, FiCheckCircle, FiFileText } from "react-icons/fi";
+import { ArrowLeftIcon, CircleCheckBigIcon, FileTextIcon, SaveIcon, XIcon } from "../../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../../shared/components/dropdown/SearchableSelect";
 import DatePickerInput from "../../../../../../shared/components/dropdown/DatePickerInput";
 import InfoPanel from "../InfoPanel";
@@ -232,10 +232,10 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       {notify.element}
       {saved && (
         <div className="dispatch-form-success">
-          <FiCheckCircle aria-hidden />
+          <CircleCheckBigIcon aria-hidden />
           Truck assigned and shared with the seller for loading.
           <button type="button" onClick={() => setSaved(false)} aria-label="Dismiss">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
       )}
@@ -447,10 +447,10 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
 
       <div className="assign-truck-drawer__footer">
         <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving}>
-          <FiSave aria-hidden /> {saving ? "Saving…" : "Save & Send"}
+          <SaveIcon aria-hidden /> {saving ? "Saving…" : "Save & Send"}
         </button>
         <button type="button" className="assign-truck-drawer__cancel" onClick={handleReset} disabled={saving}>
-          <FiX aria-hidden /> Reset
+          <XIcon aria-hidden /> Reset
         </button>
       </div>
     </div>
@@ -479,7 +479,7 @@ const AddInstantTruck = () => {
             )}
           </h1>
           <Link to="/admin/truck-management/open-pending-contracts" className="assign-transports-card__back">
-            <FiArrowLeft aria-hidden /> Back to Open &amp; Pending Contracts
+            <ArrowLeftIcon aria-hidden /> Back to Open &amp; Pending Contracts
           </Link>
         </div>
 
@@ -502,7 +502,7 @@ const AddInstantTruck = () => {
           </>
         ) : (
           <InfoPanel
-            icon={FiFileText}
+            icon={FileTextIcon}
             title="No Contract Selected"
             description="Open a contract from the Open & Pending Contracts list and use Add Instant Truck there."
             action={{ label: "Go to Open & Pending Contracts", to: "/admin/truck-management/open-pending-contracts" }}

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FiTruck } from "react-icons/fi";
+import { TruckIcon } from "../../../../shared/components/icon";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import InfoTooltip from "../../../../shared/components/tooltip/InfoTooltip";
 import type { PendingContractRow } from "./pendingContracts.data";
@@ -33,7 +33,7 @@ export function buildPendingContractColumns({
           aria-label={`View truck tracking details for ${row.id}`}
           title="View Truck Tracking Details"
         >
-          <FiTruck aria-hidden />
+          <TruckIcon aria-hidden />
         </button>
         <Link to={`/admin/contracts/${row.id}`} className="pending-contracts-table__id-text">
           {row.id}

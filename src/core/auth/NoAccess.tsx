@@ -1,4 +1,4 @@
-import { FiLock } from "react-icons/fi";
+import { LockIcon } from "../../shared/components/icon";
 import { useAuth } from "./AuthContext";
 
 interface NoAccessProps {
@@ -11,7 +11,7 @@ const NoAccess = ({ noRole = false }: NoAccessProps) => {
 
   return (
     <div className="d-flex flex-column align-items-center justify-content-center text-center py-5" role="alert">
-      <FiLock size={44} aria-hidden className="mb-3 text-secondary" />
+      <LockIcon size={44} aria-hidden className="mb-3 text-secondary" />
       <h2 className="h4 mb-2">{noRole ? "No access assigned" : "You don't have access to this page"}</h2>
       <p className="text-secondary mb-4" style={{ maxWidth: 460 }}>
         {noRole

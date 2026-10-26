@@ -1,4 +1,4 @@
-import { FiDownload, FiEye, FiEyeOff } from "react-icons/fi";
+import { DownloadIcon, EyeIcon, EyeOffIcon } from "../../../../../shared/components/icon";
 
 interface EnquiriesHeaderProps {
   filtersVisible: boolean;
@@ -18,11 +18,11 @@ const EnquiriesHeader = ({ filtersVisible, onToggleFilters, onExport, canExport 
         aria-expanded={filtersVisible}
         aria-controls="product-enquiries-filters"
       >
-        {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+        {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
         {filtersVisible ? "Hide" : "Show"}
       </button>
       <button type="button" className="product-enquiries__btn product-enquiries__btn--warning" onClick={onExport} disabled={!canExport}>
-        <FiDownload aria-hidden /> Export
+        <DownloadIcon aria-hidden /> Export
       </button>
     </div>
   </div>

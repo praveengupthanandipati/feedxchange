@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from "react";
-import { FiDownload, FiEdit2, FiSave, FiX } from "react-icons/fi";
+import { DownloadIcon, PenIcon, SaveIcon, XIcon } from "../../../../../shared/components/icon";
 import { formatDisplayDate } from "../../../../../shared/components/dropdown/Calendar";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import DetailSection from "./DetailSection";
@@ -121,7 +121,7 @@ const DispatchInvoiceDetails = ({ initialValue }: { initialValue: DispatchInvoic
       actions={
         !editing && (
           <button type="button" className="do-info__btn do-info__btn--primary" onClick={startEditing}>
-            <FiEdit2 aria-hidden /> Edit
+            <PenIcon aria-hidden /> Edit
           </button>
         )
       }
@@ -180,10 +180,10 @@ const DispatchInvoiceDetails = ({ initialValue }: { initialValue: DispatchInvoic
 
           <div className="do-info__actions">
             <button type="submit" className="do-info__btn do-info__btn--primary">
-              <FiSave aria-hidden /> Save
+              <SaveIcon aria-hidden /> Save
             </button>
             <button type="button" className="do-info__btn do-info__btn--ghost" onClick={() => setEditing(false)}>
-              <FiX aria-hidden /> Cancel
+              <XIcon aria-hidden /> Cancel
             </button>
           </div>
         </form>
@@ -199,11 +199,11 @@ const DispatchInvoiceDetails = ({ initialValue }: { initialValue: DispatchInvoic
             <dd>
               {saved.fileUrl ? (
                 <a href={saved.fileUrl} download={downloadName} className="invoice__download">
-                  <FiDownload aria-hidden /> {downloadName}
+                  <DownloadIcon aria-hidden /> {downloadName}
                 </a>
               ) : downloadName ? (
                 <button type="button" className="invoice__download" onClick={handleGeneratedDownload}>
-                  <FiDownload aria-hidden /> {downloadName}
+                  <DownloadIcon aria-hidden /> {downloadName}
                 </button>
               ) : (
                 "--"

@@ -1,22 +1,22 @@
 // Test content for the website. Replace with real copy (or a CMS) before launch.
-import type { IconType } from "react-icons";
 import {
-  FiBarChart2,
-  FiCreditCard,
-  FiEye,
-  FiFacebook,
-  FiFileText,
-  FiGrid,
-  FiInstagram,
-  FiLink,
-  FiLinkedin,
-  FiPackage,
-  FiShield,
-  FiTrendingUp,
-  FiTruck,
-  FiTwitter,
-  FiUserCheck,
-} from "react-icons/fi";
+  type IconComponent,
+  ChartNoAxesColumnIcon,
+  CreditCardIcon,
+  EyeIcon,
+  FacebookIcon,
+  FileTextIcon,
+  InstagramIcon,
+  LayoutGridIcon,
+  LinkIcon,
+  LinkedinIcon,
+  PackageIcon,
+  ShieldIcon,
+  TrendingUpIcon,
+  TruckIcon,
+  TwitterIcon,
+  UserCheckIcon,
+} from "../../../shared/components/icon";
 import { productPath, sitePaths } from "../routes/paths";
 
 export interface NavLinkItem {
@@ -165,18 +165,18 @@ export const partners = [
 ];
 
 export interface Service {
-  icon: IconType;
+  icon: IconComponent;
   title: string;
   text: string;
 }
 
 export const services: Service[] = [
-  { icon: FiBarChart2, title: "Live Market Pricing", text: "Daily prices for maize, DDGS, soybean meal and more, with history and trends to time every purchase." },
-  { icon: FiFileText, title: "Digital Contracts", text: "Create, sign and track contracts online, with every amendment and approval kept in one audit trail." },
-  { icon: FiTruck, title: "Logistics & Dispatch", text: "Schedule trucks, assign transporters and follow each load from the mill gate to your warehouse." },
-  { icon: FiCreditCard, title: "Secure Payments", text: "Invoices, payment advice and allocations reconciled automatically, so both sides always agree." },
-  { icon: FiShield, title: "Verified Partners", text: "Every buyer, seller and transporter is KYC-checked before they can trade on the platform." },
-  { icon: FiPackage, title: "Quality Assurance", text: "Specification checks and lab reports attached to each consignment, before it leaves the seller." },
+  { icon: ChartNoAxesColumnIcon, title: "Live Market Pricing", text: "Daily prices for maize, DDGS, soybean meal and more, with history and trends to time every purchase." },
+  { icon: FileTextIcon, title: "Digital Contracts", text: "Create, sign and track contracts online, with every amendment and approval kept in one audit trail." },
+  { icon: TruckIcon, title: "Logistics & Dispatch", text: "Schedule trucks, assign transporters and follow each load from the mill gate to your warehouse." },
+  { icon: CreditCardIcon, title: "Secure Payments", text: "Invoices, payment advice and allocations reconciled automatically, so both sides always agree." },
+  { icon: ShieldIcon, title: "Verified Partners", text: "Every buyer, seller and transporter is KYC-checked before they can trade on the platform." },
+  { icon: PackageIcon, title: "Quality Assurance", text: "Specification checks and lab reports attached to each consignment, before it leaves the seller." },
 ];
 
 export const reasons = [
@@ -309,9 +309,9 @@ export const clientele: Clientele[] = [
 
 /** The three ideas in "Our Legacy: Trust, Transparency, and Direct Access". */
 export const pillars: Service[] = [
-  { icon: FiShield, title: "Trust", text: "Unwavering commitment to the success of both our buyers and suppliers." },
-  { icon: FiEye, title: "Transparency", text: "Known across the industry for our transparent nature and fair mediation." },
-  { icon: FiLink, title: "Direct Access", text: "High-quality raw materials directly from the manufacturers at the best possible prices." },
+  { icon: ShieldIcon, title: "Trust", text: "Unwavering commitment to the success of both our buyers and suppliers." },
+  { icon: EyeIcon, title: "Transparency", text: "Known across the industry for our transparent nature and fair mediation." },
+  { icon: LinkIcon, title: "Direct Access", text: "High-quality raw materials directly from the manufacturers at the best possible prices." },
 ];
 
 export interface TeamMember {
@@ -359,16 +359,16 @@ export const milestones: Step[] = [
 ];
 
 export const platformFeatures: Service[] = [
-  { icon: FiBarChart2, title: "Digital Transparency", text: "Real-time digital access to the pricing of animal feed ingredients." },
-  { icon: FiTrendingUp, title: "Smart Tracking", text: "Advanced price tracking mechanisms to help you make informed buying decisions." },
-  { icon: FiGrid, title: "Personalized Dashboards", text: "Secure login access for customers to effortlessly view, manage, and track all contracts executed through us." },
+  { icon: ChartNoAxesColumnIcon, title: "Digital Transparency", text: "Real-time digital access to the pricing of animal feed ingredients." },
+  { icon: TrendingUpIcon, title: "Smart Tracking", text: "Advanced price tracking mechanisms to help you make informed buying decisions." },
+  { icon: LayoutGridIcon, title: "Personalized Dashboards", text: "Secure login access for customers to effortlessly view, manage, and track all contracts executed through us." },
   {
-    icon: FiTruck,
+    icon: TruckIcon,
     title: "Integrated Logistics",
     text: "Real-time visibility into the vehicles loaded against your contracts, with an ecosystem that seamlessly connects buyers, sellers, and enrolled transporters.",
   },
   {
-    icon: FiUserCheck,
+    icon: UserCheckIcon,
     title: "Verified Trading",
     text: "A secure environment where KYC and bank details are transparently shared between transacting parties to ensure trust and smooth financial settlements.",
   },
@@ -422,9 +422,9 @@ export const blogPosts: BlogPost[] = [
   { title: "Tracking trucks from mill gate to warehouse", excerpt: "How live tracking and instant notifications keep buyers informed and drivers accountable.", date: "20 Aug 2026", readTime: "3 min read", category: "Logistics" },
 ];
 
-export const socialLinks: { label: string; icon: IconType; href: string }[] = [
-  { label: "LinkedIn", icon: FiLinkedin, href: "https://www.linkedin.com/" },
-  { label: "Twitter", icon: FiTwitter, href: "https://twitter.com/" },
-  { label: "Facebook", icon: FiFacebook, href: "https://www.facebook.com/" },
-  { label: "Instagram", icon: FiInstagram, href: "https://www.instagram.com/" },
+export const socialLinks: { label: string; icon: IconComponent; href: string }[] = [
+  { label: "LinkedIn", icon: LinkedinIcon, href: "https://www.linkedin.com/" },
+  { label: "Twitter", icon: TwitterIcon, href: "https://twitter.com/" },
+  { label: "Facebook", icon: FacebookIcon, href: "https://www.facebook.com/" },
+  { label: "Instagram", icon: InstagramIcon, href: "https://www.instagram.com/" },
 ];

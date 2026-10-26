@@ -1,20 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  FiX,
-  FiCheckCircle,
-  FiCalendar,
-  FiMapPin,
-  FiUser,
-  FiPackage,
-  FiCreditCard,
-  FiSearch,
-  FiExternalLink,
-  FiDownload,
-  FiTrash2,
-  FiChevronLeft,
-  FiChevronRight,
-} from "react-icons/fi";
+  CalendarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleCheckBigIcon,
+  CreditCardIcon,
+  DownloadIcon,
+  ExternalLinkIcon,
+  MapPinIcon,
+  PackageIcon,
+  SearchIcon,
+  Trash2Icon,
+  UserIcon,
+  XIcon,
+} from "../../../../../shared/components/icon";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
@@ -89,7 +89,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
       >
         <div className="approved-trucks-offcanvas__header">
           <h2 id="approved-trucks-offcanvas-title">
-            <FiCheckCircle aria-hidden /> All Approved Trucks
+            <CircleCheckBigIcon aria-hidden /> All Approved Trucks
           </h2>
           <button
             type="button"
@@ -97,7 +97,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
             onClick={onClose}
             aria-label="Close"
           >
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -106,7 +106,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
             <div className="approved-trucks-offcanvas__stats">
               <div className="approved-trucks-offcanvas__stat approved-trucks-offcanvas__stat--navy">
                 <span className="approved-trucks-offcanvas__stat-icon">
-                  <FiCalendar aria-hidden />
+                  <CalendarIcon aria-hidden />
                 </span>
                 <span className="approved-trucks-offcanvas__stat-body">
                   <span>Schedule Date &amp; Time</span>
@@ -115,7 +115,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
               </div>
               <div className="approved-trucks-offcanvas__stat approved-trucks-offcanvas__stat--info">
                 <span className="approved-trucks-offcanvas__stat-icon">
-                  <FiMapPin aria-hidden />
+                  <MapPinIcon aria-hidden />
                 </span>
                 <span className="approved-trucks-offcanvas__stat-body">
                   <span>Loading Address</span>
@@ -124,7 +124,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
               </div>
               <div className="approved-trucks-offcanvas__stat approved-trucks-offcanvas__stat--success">
                 <span className="approved-trucks-offcanvas__stat-icon">
-                  <FiUser aria-hidden />
+                  <UserIcon aria-hidden />
                 </span>
                 <span className="approved-trucks-offcanvas__stat-body">
                   <span>Delivery Address</span>
@@ -133,7 +133,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
               </div>
               <div className="approved-trucks-offcanvas__stat approved-trucks-offcanvas__stat--warning">
                 <span className="approved-trucks-offcanvas__stat-icon">
-                  <FiPackage aria-hidden />
+                  <PackageIcon aria-hidden />
                 </span>
                 <span className="approved-trucks-offcanvas__stat-body">
                   <span>Qty</span>
@@ -142,7 +142,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
               </div>
               <div className="approved-trucks-offcanvas__stat approved-trucks-offcanvas__stat--danger">
                 <span className="approved-trucks-offcanvas__stat-icon">
-                  <FiCreditCard aria-hidden />
+                  <CreditCardIcon aria-hidden />
                 </span>
                 <span className="approved-trucks-offcanvas__stat-body">
                   <span>Freight</span>
@@ -153,7 +153,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
           )}
 
           <div className="approved-trucks-offcanvas__search">
-            <FiSearch aria-hidden />
+            <SearchIcon aria-hidden />
             <input
               type="text"
               value={keyword}
@@ -202,14 +202,14 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
                           target="_blank"
                           rel="noreferrer"
                         >
-                          <FiExternalLink aria-hidden /> Track
+                          <ExternalLinkIcon aria-hidden /> Track
                         </a>
                       </td>
                       <td>
                         <RowActionsMenu
                           actions={[
-                            { key: "download", label: "Download", icon: FiDownload, onClick: () => handleDownload(row) },
-                            { key: "delete", label: "Delete", icon: FiTrash2, onClick: () => setRowPendingDelete(row), danger: true },
+                            { key: "download", label: "Download", icon: DownloadIcon, onClick: () => handleDownload(row) },
+                            { key: "delete", label: "Delete", icon: Trash2Icon, onClick: () => setRowPendingDelete(row), danger: true },
                           ]}
                         />
                       </td>
@@ -236,7 +236,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 aria-label="Previous page"
               >
-                <FiChevronLeft aria-hidden />
+                <ChevronLeftIcon aria-hidden />
               </button>
               {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
                 <button
@@ -254,7 +254,7 @@ const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksO
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                 aria-label="Next page"
               >
-                <FiChevronRight aria-hidden />
+                <ChevronRightIcon aria-hidden />
               </button>
             </div>
           </div>

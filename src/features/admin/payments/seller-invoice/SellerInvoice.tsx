@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
-import { FiCheck, FiCheckCircle, FiPlus, FiX } from "react-icons/fi";
+import { CheckIcon, CircleCheckBigIcon, PlusIcon, XIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import ContractDetailsOffcanvas from "./ContractDetailsOffcanvas";
 import SelectPartiesOffcanvas from "./SelectPartiesOffcanvas";
@@ -145,7 +145,7 @@ const SellerInvoice = () => {
       {notify.element}
       {saveToast && (
         <div className="seller-invoice-page__toast" role="status">
-          <FiCheckCircle aria-hidden />
+          <CircleCheckBigIcon aria-hidden />
           {saveToast}
         </div>
       )}
@@ -185,7 +185,7 @@ const SellerInvoice = () => {
       </div>
 
       <button type="button" className="si-add-invoice" onClick={() => setRows((prev) => [...prev, createEmptySellerInvoiceRow()])}>
-        <FiPlus aria-hidden /> Add another invoice
+        <PlusIcon aria-hidden /> Add another invoice
       </button>
 
       {(serverError || problems.length > 0) && (
@@ -211,10 +211,10 @@ const SellerInvoice = () => {
         </p>
         <div className="si-footer__actions">
           <button type="button" className="si-btn si-btn--secondary" onClick={resetForm} disabled={saving}>
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
           <button type="button" className="si-btn si-btn--primary" onClick={() => void handleSaveInvoices()} disabled={saving}>
-            <FiCheck aria-hidden /> {saving ? "Saving…" : "Save Invoices"}
+            <CheckIcon aria-hidden /> {saving ? "Saving…" : "Save Invoices"}
           </button>
         </div>
       </div>

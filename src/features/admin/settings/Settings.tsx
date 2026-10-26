@@ -1,4 +1,4 @@
-import { FiBell, FiChevronRight, FiLogOut } from "react-icons/fi";
+import { BellIcon, ChevronRightIcon, LogOutIcon } from "../../../shared/components/icon";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../core/auth/AuthContext";
 import "./Settings.scss";
@@ -30,9 +30,9 @@ const Settings = () => {
       <ul className="settings__list">
         <li>
           <Link to="/admin/notifications" className="settings__row">
-            <FiBell aria-hidden />
+            <BellIcon aria-hidden />
             <span>Notifications</span>
-            <FiChevronRight aria-hidden className="settings__chevron" />
+            <ChevronRightIcon aria-hidden className="settings__chevron" />
           </Link>
         </li>
         <li>
@@ -44,7 +44,7 @@ const Settings = () => {
               navigate("/", { replace: true });
             }}
           >
-            <FiLogOut aria-hidden />
+            <LogOutIcon aria-hidden />
             <span>Log out</span>
           </button>
         </li>

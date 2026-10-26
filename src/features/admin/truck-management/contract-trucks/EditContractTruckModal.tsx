@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiEdit2, FiX } from "react-icons/fi";
+import { PenIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import DriverSelectFields from "./DriverSelectFields";
@@ -212,7 +212,7 @@ const EditContractTruckModal = ({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="confirm-dialog__icon edit-contract-truck-modal__icon">
-          <FiEdit2 aria-hidden />
+          <PenIcon aria-hidden />
         </div>
         <h2 id="edit-contract-truck-title" className="confirm-dialog__title">
           Edit Truck {truck.registrationNumber}
@@ -378,7 +378,7 @@ const EditContractTruckModal = ({
         </form>
 
         <button type="button" className="edit-contract-truck-modal__close" onClick={onClose} aria-label="Close">
-          <FiX aria-hidden />
+          <XIcon aria-hidden />
         </button>
       </div>
       {notify.element}

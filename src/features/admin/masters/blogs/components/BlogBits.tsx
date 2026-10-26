@@ -1,4 +1,4 @@
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { SquarePenIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import type { Blog, BlogStatus } from "../blogs.data";
 
@@ -24,8 +24,8 @@ export const BlogActions = ({ blog, onEdit, onDelete }: BlogActionHandlers & { b
   <RowActionsMenu
     menuAlign="left"
     actions={[
-      { key: "edit", label: "Edit", icon: FiEdit, onClick: () => onEdit(blog) },
-      { key: "delete", label: "Delete", icon: FiTrash2, onClick: () => onDelete(blog), danger: true, dividerBefore: true },
+      { key: "edit", label: "Edit", icon: SquarePenIcon, onClick: () => onEdit(blog) },
+      { key: "delete", label: "Delete", icon: Trash2Icon, onClick: () => onDelete(blog), danger: true, dividerBefore: true },
     ]}
   />
 );

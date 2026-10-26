@@ -1,4 +1,4 @@
-import { FiCheck, FiRefreshCw } from "react-icons/fi";
+import { CheckIcon, RefreshCwIcon } from "../../../../../shared/components/icon";
 import DateRangeInput from "../../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect, { type SearchableSelectOption } from "../../../../../shared/components/dropdown/SearchableSelect";
 import { ACTION_TYPE_OPTIONS, type EstimationFilters as Filters } from "../commissionEstimation.data";
@@ -25,10 +25,10 @@ const EstimationFilters = ({ value, partyOptions, onChange, onApply, onReset }: 
     />
     <div className="commission-estimations__filter-actions">
       <button type="button" className="commission-estimations__btn commission-estimations__btn--navy" onClick={onApply}>
-        <FiCheck aria-hidden /> Apply
+        <CheckIcon aria-hidden /> Apply
       </button>
       <button type="button" className="commission-estimations__btn commission-estimations__btn--danger" onClick={onReset}>
-        <FiRefreshCw aria-hidden /> Reset
+        <RefreshCwIcon aria-hidden /> Reset
       </button>
     </div>
   </div>

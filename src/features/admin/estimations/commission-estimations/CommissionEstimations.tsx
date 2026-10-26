@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FiCheckCircle, FiX } from "react-icons/fi";
+import { CircleCheckBigIcon, XIcon } from "../../../../shared/components/icon";
 import { Link } from "react-router-dom";
 import {
   EMPTY_BULK,
@@ -211,7 +211,7 @@ const CommissionEstimations = () => {
 
       {message && (
         <p className={`commission-estimations__message commission-estimations__message--${message.type}`} role={message.type === "error" ? "alert" : "status"}>
-          {message.type === "success" ? <FiCheckCircle aria-hidden /> : <FiX aria-hidden />} {message.text}
+          {message.type === "success" ? <CircleCheckBigIcon aria-hidden /> : <XIcon aria-hidden />} {message.text}
           {message.saved && (
             <Link to="/admin/estimations/view" className="commission-estimations__message-link">
               View Estimations

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { FiCheckCircle } from "react-icons/fi";
+import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import { initialBanners, type Banner, type BannerForm } from "./banners.data";
 import { matchesSearch } from "./banners.utils";
@@ -70,7 +70,7 @@ const Banners = () => {
 
       {message && (
         <p className="banners__message" role="status">
-          <FiCheckCircle aria-hidden /> {message}
+          <CircleCheckBigIcon aria-hidden /> {message}
         </p>
       )}
 

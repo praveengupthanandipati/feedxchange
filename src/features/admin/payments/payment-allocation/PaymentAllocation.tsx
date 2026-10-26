@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  FiCheck,
-  FiCheckCircle,
-  FiChevronLeft,
-  FiChevronRight,
-  FiFileText,
-  FiInfo,
-  FiLayers,
-  FiX,
-} from "react-icons/fi";
-import type { IconType } from "react-icons";
+  type IconComponent,
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleCheckBigIcon,
+  FileTextIcon,
+  InfoIcon,
+  LayersIcon,
+  XIcon,
+} from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
 import { buildContractColumns, buildInvoiceColumns } from "./paymentAllocation.columns";
@@ -33,10 +33,10 @@ import "./PaymentAllocation.scss";
 
 const PAGE_SIZE = 8;
 
-const modeIcons: Record<AllocationMode, IconType> = {
-  general: FiLayers,
-  invoices: FiFileText,
-  contracts: FiFileText,
+const modeIcons: Record<AllocationMode, IconComponent> = {
+  general: LayersIcon,
+  invoices: FileTextIcon,
+  contracts: FileTextIcon,
 };
 
 const PaymentAllocation = () => {
@@ -149,7 +149,7 @@ const PaymentAllocation = () => {
     <div className="payment-allocation-page">
       {saveToast && (
         <div className="payment-allocation-page__toast" role="status">
-          <FiCheckCircle aria-hidden />
+          <CircleCheckBigIcon aria-hidden />
           Payment allocation saved successfully.
         </div>
       )}
@@ -213,7 +213,7 @@ const PaymentAllocation = () => {
 
         {isGeneral && (
           <p className="payment-allocation-card__hint" role="status">
-            <FiInfo aria-hidden />
+            <InfoIcon aria-hidden />
             General payments are not tied to a specific invoice or contract. Choose Pending Invoices or Pending
             Contracts to allocate a receipt.
           </p>
@@ -258,7 +258,7 @@ const PaymentAllocation = () => {
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 aria-label="Previous page"
               >
-                <FiChevronLeft aria-hidden />
+                <ChevronLeftIcon aria-hidden />
               </button>
               {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
                 <button
@@ -276,7 +276,7 @@ const PaymentAllocation = () => {
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                 aria-label="Next page"
               >
-                <FiChevronRight aria-hidden />
+                <ChevronRightIcon aria-hidden />
               </button>
             </div>
           </div>
@@ -285,7 +285,7 @@ const PaymentAllocation = () => {
 
       <div className="payment-allocation-actions">
         <button type="button" className="payment-allocation-actions__cancel" onClick={clearEntries}>
-          <FiX aria-hidden /> Cancel
+          <XIcon aria-hidden /> Cancel
         </button>
         <button
           type="button"
@@ -294,7 +294,7 @@ const PaymentAllocation = () => {
           disabled={isGeneral}
           title={isGeneral ? "Nothing to allocate for General payments" : undefined}
         >
-          <FiCheck aria-hidden /> Save
+          <CheckIcon aria-hidden /> Save
         </button>
       </div>
 

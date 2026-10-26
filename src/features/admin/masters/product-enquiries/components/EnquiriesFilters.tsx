@@ -1,4 +1,4 @@
-import { FiSearch } from "react-icons/fi";
+import { SearchIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import { STATUS_OPTIONS } from "../productEnquiries.data";
 
@@ -13,7 +13,7 @@ interface EnquiriesFiltersProps {
 const EnquiriesFilters = ({ search, status, onSearchChange, onStatusChange }: EnquiriesFiltersProps) => (
   <div id="product-enquiries-filters" className="product-enquiries__filters">
     <div className="product-enquiries__search">
-      <FiSearch aria-hidden />
+      <SearchIcon aria-hidden />
       <input
         type="search"
         autoComplete="off"

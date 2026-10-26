@@ -1,17 +1,17 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  FiAlertCircle,
-  FiCheck,
-  FiChevronLeft,
-  FiChevronRight,
-  FiDownload,
-  FiEdit2,
-  FiEye,
-  FiEyeOff,
-  FiRefreshCw,
-  FiSearch,
-} from "react-icons/fi";
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleAlertIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  PenIcon,
+  RefreshCwIcon,
+  SearchIcon,
+} from "../../../../../shared/components/icon";
 import { formatDisplayDate } from "../../../../../shared/components/dropdown/Calendar";
 import DateRangeInput from "../../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
@@ -99,7 +99,7 @@ const SellerDispatches = () => {
       className="seller-dispatches__update-btn"
       aria-label={`Update dispatch for ${row.contractNo}`}
     >
-      <FiEdit2 aria-hidden /> Update
+      <PenIcon aria-hidden /> Update
     </Link>
   );
 
@@ -163,11 +163,11 @@ const SellerDispatches = () => {
             aria-expanded={filtersVisible}
             aria-controls="seller-dispatches-filters"
           >
-            {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+            {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {filtersVisible ? "Hide" : "Show"}
           </button>
           <button type="button" className="seller-dispatches__btn seller-dispatches__btn--warning" onClick={handleExport}>
-            <FiDownload aria-hidden /> Export
+            <DownloadIcon aria-hidden /> Export
           </button>
         </div>
       </div>
@@ -203,7 +203,7 @@ const SellerDispatches = () => {
             ariaLabel="DO date range"
           />
           <div className="seller-dispatches__search">
-            <FiSearch aria-hidden />
+            <SearchIcon aria-hidden />
             <input
               type="text"
               placeholder="Global Search..."
@@ -215,10 +215,10 @@ const SellerDispatches = () => {
           </div>
           <div className="seller-dispatches__filter-actions">
             <button type="button" className="seller-dispatches__btn seller-dispatches__btn--navy" onClick={handleApply}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="seller-dispatches__btn seller-dispatches__btn--warning" onClick={handleReset}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         </div>
@@ -236,7 +236,7 @@ const SellerDispatches = () => {
       <ul className="seller-dispatches__cards">
         {pagedRows.length === 0 && (
           <li className="seller-dispatches__cards-empty">
-            <FiAlertCircle aria-hidden /> No seller dispatches match the current filters.
+            <CircleAlertIcon aria-hidden /> No seller dispatches match the current filters.
           </li>
         )}
         {pagedRows.map((row) => (
@@ -270,7 +270,7 @@ const SellerDispatches = () => {
         </p>
         <div className="seller-dispatches__pages">
           <button type="button" disabled={page === 1} onClick={() => setCurrentPage(page - 1)} aria-label="Previous page">
-            <FiChevronLeft aria-hidden />
+            <ChevronLeftIcon aria-hidden />
           </button>
           {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => (
             <button
@@ -284,7 +284,7 @@ const SellerDispatches = () => {
             </button>
           ))}
           <button type="button" disabled={page === totalPages} onClick={() => setCurrentPage(page + 1)} aria-label="Next page">
-            <FiChevronRight aria-hidden />
+            <ChevronRightIcon aria-hidden />
           </button>
         </div>
       </div>

@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FiMaximize,
-  FiMinimize2,
-  FiChevronDown,
-  FiUser,
-  FiSettings,
-  FiLogOut,
-  FiMenu,
-} from "react-icons/fi";
+  ChevronDownIcon,
+  LogOutIcon,
+  MaximizeIcon,
+  MenuIcon,
+  Minimize2Icon,
+  SettingsIcon,
+  UserIcon,
+} from "../../../shared/components/icon";
 import NotificationBell from "../../../shared/notifications/NotificationBell";
 import { useAuth } from "../../../core/auth/AuthContext";
 import "./Header.scss";
@@ -92,7 +92,7 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
         onClick={onToggleMobileNav}
         aria-label="Open navigation menu"
       >
-        <FiMenu aria-hidden />
+        <MenuIcon aria-hidden />
       </button>
 
       <h1 className="header__title">{title}</h1>
@@ -107,7 +107,7 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
           aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           title={isFullscreen ? "Minimize" : "Maximize"}
         >
-          {isFullscreen ? <FiMinimize2 aria-hidden /> : <FiMaximize aria-hidden />}
+          {isFullscreen ? <Minimize2Icon aria-hidden /> : <MaximizeIcon aria-hidden />}
         </button>
 
         <div className="header__user" ref={userMenuRef}>
@@ -119,7 +119,7 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
             aria-haspopup="true"
           >
             <span className="header__avatar">{USER_INITIALS}</span>
-            <FiChevronDown
+            <ChevronDownIcon
               className={`header__chevron ${openMenu === "user" ? "is-open" : ""}`}
               aria-hidden
             />
@@ -133,13 +133,13 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
               </li>
               <li>
                 <button type="button" className="header__dropdown-item">
-                  <FiUser aria-hidden />
+                  <UserIcon aria-hidden />
                   <span>Profile</span>
                 </button>
               </li>
               <li>
                 <button type="button" className="header__dropdown-item">
-                  <FiSettings aria-hidden />
+                  <SettingsIcon aria-hidden />
                   <span>Settings</span>
                 </button>
               </li>
@@ -149,7 +149,7 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
                   className="header__dropdown-item header__dropdown-item--danger"
                   onClick={handleLogout}
                 >
-                  <FiLogOut aria-hidden />
+                  <LogOutIcon aria-hidden />
                   <span>Logout</span>
                 </button>
               </li>

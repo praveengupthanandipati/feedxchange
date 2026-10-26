@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FiAlertCircle, FiCheckCircle, FiRotateCcw } from "react-icons/fi";
+import { CircleAlertIcon, CircleCheckBigIcon, RotateCcwIcon } from "../../../../shared/components/icon";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
@@ -193,7 +193,7 @@ const Refunds = () => {
       render: (r) =>
         r.status === "Active" ? (
           <button type="button" className="refunds-table__link-btn" onClick={() => setCancelling(r)} aria-label={`Cancel refund of ${money(r.amount)}`}>
-            <FiRotateCcw aria-hidden /> Cancel
+            <RotateCcwIcon aria-hidden /> Cancel
           </button>
         ) : (
           "—"
@@ -205,7 +205,7 @@ const Refunds = () => {
     <div className="refunds-page">
       {toast && (
         <div className={`refunds-page__toast${toast.kind === "error" ? " refunds-page__toast--error" : ""}`} role="status">
-          {toast.kind === "ok" ? <FiCheckCircle aria-hidden /> : <FiAlertCircle aria-hidden />}
+          {toast.kind === "ok" ? <CircleCheckBigIcon aria-hidden /> : <CircleAlertIcon aria-hidden />}
           {toast.text}
         </div>
       )}

@@ -1,4 +1,4 @@
-import { FiPlus } from "react-icons/fi";
+import { PlusIcon } from "../../../../../shared/components/icon";
 
 interface EmptyRowsStateProps {
   onAdd: () => void;
@@ -9,7 +9,7 @@ const EmptyRowsState = ({ onAdd, message = "No Data showing" }: EmptyRowsStatePr
   <div className="empty-rows">
     <p className="empty-rows__message">{message}</p>
     <button type="button" className="empty-rows__add" onClick={onAdd}>
-      <FiPlus aria-hidden /> Add
+      <PlusIcon aria-hidden /> Add
     </button>
   </div>
 );

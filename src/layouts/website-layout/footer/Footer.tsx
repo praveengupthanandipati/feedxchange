@@ -1,5 +1,5 @@
 import { useState, type SubmitEvent } from "react";
-import { FiClock, FiMail, FiMapPin, FiPhone, FiSend } from "react-icons/fi";
+import { ClockIcon, MailIcon, MapPinIcon, PhoneIcon, SendIcon } from "../../../shared/components/icon";
 import { Link } from "react-router-dom";
 import { company, footerColumns, socialLinks } from "../../../features/website/data/content";
 import Logo from "../../../features/website/components/common/Logo";
@@ -52,16 +52,16 @@ const Footer = () => {
           <h3>Get in touch</h3>
           <ul>
             <li>
-              <FiMapPin aria-hidden /> <span>{company.address}</span>
+              <MapPinIcon aria-hidden /> <span>{company.address}</span>
             </li>
             <li>
-              <FiPhone aria-hidden /> <a href={`tel:${company.phone.replace(/\s/g, "")}`}>{company.phone}</a>
+              <PhoneIcon aria-hidden /> <a href={`tel:${company.phone.replace(/\s/g, "")}`}>{company.phone}</a>
             </li>
             <li>
-              <FiMail aria-hidden /> <a href={`mailto:${company.email}`}>{company.email}</a>
+              <MailIcon aria-hidden /> <a href={`mailto:${company.email}`}>{company.email}</a>
             </li>
             <li>
-              <FiClock aria-hidden /> <span>{company.hours}</span>
+              <ClockIcon aria-hidden /> <span>{company.hours}</span>
             </li>
           </ul>
         </div>
@@ -88,7 +88,7 @@ const Footer = () => {
               aria-describedby="footer-email-status"
             />
             <button type="submit" aria-label="Subscribe">
-              <FiSend aria-hidden />
+              <SendIcon aria-hidden />
             </button>
           </div>
           <small id="footer-email-status" className={`site-footer__status is-${status}`} aria-live="polite">

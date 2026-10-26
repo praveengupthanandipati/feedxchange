@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FiSearch, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import { buildOverDuePayColumns } from "./overDuePay.columns";
 import { overDuePayRows } from "./overDuePay.data";
@@ -31,7 +31,7 @@ const OverDuePay = () => {
   return (
     <>
       <div className="seller-buyer-accounts-search">
-        <FiSearch aria-hidden />
+        <SearchIcon aria-hidden />
         <input
           type="text"
           value={keyword}
@@ -65,7 +65,7 @@ const OverDuePay = () => {
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
             aria-label="Previous page"
           >
-            <FiChevronLeft aria-hidden />
+            <ChevronLeftIcon aria-hidden />
           </button>
           {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
             <button
@@ -83,7 +83,7 @@ const OverDuePay = () => {
             onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
             aria-label="Next page"
           >
-            <FiChevronRight aria-hidden />
+            <ChevronRightIcon aria-hidden />
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { MouseEvent } from "react";
 import { Link } from "react-router-dom";
-import { FiCheck, FiCopy } from "react-icons/fi";
+import { CheckIcon, CopyIcon } from "../../../shared/components/icon";
 import type { TableColumn } from "../../../shared/components/table/table.types";
 import InfoTooltip from "../../../shared/components/tooltip/InfoTooltip";
 import RowActionsMenu from "../../../shared/components/table/RowActionsMenu";
@@ -35,7 +35,7 @@ const ContractIdCell = ({ id }: { id: string }) => {
         aria-label={`Copy contract ${id}`}
         title="Copy contract number"
       >
-        {copied ? <FiCheck aria-hidden /> : <FiCopy aria-hidden />}
+        {copied ? <CheckIcon aria-hidden /> : <CopyIcon aria-hidden />}
       </button>
     </span>
   );

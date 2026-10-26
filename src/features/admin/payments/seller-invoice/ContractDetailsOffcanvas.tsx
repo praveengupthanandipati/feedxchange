@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import { FiFileText, FiX } from "react-icons/fi";
+import { FileTextIcon, XIcon } from "../../../../shared/components/icon";
 import { useGetInvoiceContractDetailsQuery } from "../../../../core/store/sellerInvoiceApi";
 import "./ContractDetailsOffcanvas.scss";
 
@@ -48,7 +48,7 @@ const ContractDetailsOffcanvas = ({ open, contractNumber, onClose }: ContractDet
         <div className="contract-details-offcanvas__header">
           <h2 id="contract-details-offcanvas-title">Contract Details</h2>
           <button type="button" className="contract-details-offcanvas__close" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -117,7 +117,7 @@ const ContractDetailsOffcanvas = ({ open, contractNumber, onClose }: ContractDet
               </table>
 
               <Link to="/admin/reports/seller-invoice-reports" className="contract-details-offcanvas__invoices-btn">
-                <FiFileText aria-hidden /> View All Invoices
+                <FileTextIcon aria-hidden /> View All Invoices
               </Link>
             </>
           )}

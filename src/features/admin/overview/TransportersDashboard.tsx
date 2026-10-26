@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiUsers, FiTruck, FiUser, FiActivity, FiArrowUpRight, FiPackage } from "react-icons/fi";
+import { ActivityIcon, ArrowUpRightIcon, PackageIcon, TruckIcon, UserIcon, UsersIcon } from "../../../shared/components/icon";
 import {
   Bar,
   BarChart,
@@ -24,7 +24,7 @@ import "./TransportersDashboard.scss";
 interface DashboardMetric {
   label: string;
   value: string | number;
-  icon: typeof FiUsers;
+  icon: typeof UsersIcon;
   path: string;
   color: string;
 }
@@ -95,7 +95,7 @@ const TransportersDashboard = ({ entries }: TransportersDashboardProps) => {
     metrics.push({
       label: "Active Transporters",
       value: transportersLoading ? "…" : (transporters ?? []).filter((item) => item.status === "Active").length,
-      icon: FiUsers,
+      icon: UsersIcon,
       path: "/admin/transporters",
       color: "transporters-dashboard__card--navy",
     });
@@ -104,7 +104,7 @@ const TransportersDashboard = ({ entries }: TransportersDashboardProps) => {
     metrics.push({
       label: "Active Trucks",
       value: trucksLoading ? "…" : filteredTrucks.length,
-      icon: FiTruck,
+      icon: TruckIcon,
       path: "/admin/truck-management/transporters/truck-master",
       color: "transporters-dashboard__card--blue",
     });
@@ -113,7 +113,7 @@ const TransportersDashboard = ({ entries }: TransportersDashboardProps) => {
     metrics.push({
       label: "Active Drivers",
       value: driversLoading ? "…" : filteredDrivers.length,
-      icon: FiUser,
+      icon: UserIcon,
       path: "/admin/truck-management/transporters/driver-master",
       color: "transporters-dashboard__card--green",
     });
@@ -122,7 +122,7 @@ const TransportersDashboard = ({ entries }: TransportersDashboardProps) => {
     metrics.push({
       label: "Active Trips",
       value: tripsLoading ? "…" : filteredTrips.length,
-      icon: FiActivity,
+      icon: ActivityIcon,
       path: "/admin/truck-management/transporters/truck-trips",
       color: "transporters-dashboard__card--orange",
     });
@@ -192,7 +192,7 @@ const TransportersDashboard = ({ entries }: TransportersDashboardProps) => {
           {showCharts && (
             <section className="transporters-dashboard__panel">
               <div className="transporters-dashboard__panel-heading">
-                <span className="transporters-dashboard__panel-icon"><FiPackage aria-hidden /></span>
+                <span className="transporters-dashboard__panel-icon"><PackageIcon aria-hidden /></span>
                 <div>
                   <h3>Transporter analytics</h3>
                   <p>Active trucks and trip distribution</p>
@@ -240,7 +240,7 @@ const TransportersDashboard = ({ entries }: TransportersDashboardProps) => {
               <div className="transporters-dashboard__links">
                 {quickLinks.map((entry) => (
                   <Link to={entry.path} key={entry.id} className="transporters-dashboard__quick-link">
-                    <span>{entry.label}</span><FiArrowUpRight aria-hidden />
+                    <span>{entry.label}</span><ArrowUpRightIcon aria-hidden />
                   </Link>
                 ))}
               </div>
