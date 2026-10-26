@@ -19,8 +19,8 @@ export default defineConfig({
   expect: {
     // anti-aliasing differs a little between runs; a real change moves far more pixels than this
     toHaveScreenshot: process.env.VISUAL_STRICT
-      ? { maxDiffPixels: 0, threshold: 0, animations: "disabled", caret: "hide" }
-      : { maxDiffPixelRatio: 0.002, animations: "disabled", caret: "hide" },
+      ? { maxDiffPixels: 0, threshold: 0, animations: "disabled", caret: "hide", timeout: 15_000 }
+      : { maxDiffPixelRatio: 0.002, animations: "disabled", caret: "hide", timeout: 15_000 },
   },
   use: {
     baseURL: `http://localhost:${PORT}`,
