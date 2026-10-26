@@ -10,6 +10,7 @@ import {
   UserIcon,
 } from "../../../shared/components/icon";
 import NotificationBell from "../../../shared/notifications/NotificationBell";
+import ThemePicker from "../../../shared/theme/ThemePicker";
 import { useAuth } from "../../../core/auth/AuthContext";
 import "./Header.scss";
 
@@ -99,6 +100,8 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
 
       <div className="header__actions">
         <NotificationBell />
+
+        <ThemePicker triggerClassName="header__icon-btn" />
 
         <button
           type="button"

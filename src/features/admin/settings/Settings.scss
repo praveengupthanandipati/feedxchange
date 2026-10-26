@@ -53,6 +53,10 @@
     font-weight: v.$font-weight-semibold;
   }
 
+  &__section {
+    padding-top: v.$spacing-1;
+  }
+
   &__list {
     margin: 0;
     padding: 0;

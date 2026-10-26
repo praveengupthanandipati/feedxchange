@@ -31,6 +31,7 @@ import {
   Clipboard,
   Clock,
   CloudUpload,
+  Contrast,
   Copy,
   CreditCard,
   DollarSign,
@@ -66,6 +67,8 @@ import {
   MessageSquare,
   Minimize2,
   Minus,
+  Monitor,
+  Moon,
   Package,
   Pen,
   PenLine,
@@ -87,6 +90,7 @@ import {
   SquareCheckBig,
   SquarePen,
   Star,
+  Sun,
   Tag,
   Target,
   Trash2,
@@ -137,6 +141,7 @@ export const CircleXIcon = createIcon(CircleX, "CircleXIcon");
 export const ClipboardIcon = createIcon(Clipboard, "ClipboardIcon");
 export const ClockIcon = createIcon(Clock, "ClockIcon");
 export const CloudUploadIcon = createIcon(CloudUpload, "CloudUploadIcon");
+export const ContrastIcon = createIcon(Contrast, "ContrastIcon");
 export const CopyIcon = createIcon(Copy, "CopyIcon");
 export const CreditCardIcon = createIcon(CreditCard, "CreditCardIcon");
 export const DollarSignIcon = createIcon(DollarSign, "DollarSignIcon");
@@ -165,13 +170,15 @@ export const LogInIcon = createIcon(LogIn, "LogInIcon");
 export const LogOutIcon = createIcon(LogOut, "LogOutIcon");
 export const MailIcon = createIcon(Mail, "MailIcon");
 export const MapPinIcon = createIcon(MapPin, "MapPinIcon");
-export const MaximizeIcon = createIcon(Maximize, "MaximizeIcon");
 export const Maximize2Icon = createIcon(Maximize2, "Maximize2Icon");
+export const MaximizeIcon = createIcon(Maximize, "MaximizeIcon");
 export const MenuIcon = createIcon(Menu, "MenuIcon");
 export const MessageCircleIcon = createIcon(MessageCircle, "MessageCircleIcon");
 export const MessageSquareIcon = createIcon(MessageSquare, "MessageSquareIcon");
 export const Minimize2Icon = createIcon(Minimize2, "Minimize2Icon");
 export const MinusIcon = createIcon(Minus, "MinusIcon");
+export const MonitorIcon = createIcon(Monitor, "MonitorIcon");
+export const MoonIcon = createIcon(Moon, "MoonIcon");
 export const PackageIcon = createIcon(Package, "PackageIcon");
 export const PenIcon = createIcon(Pen, "PenIcon");
 export const PenLineIcon = createIcon(PenLine, "PenLineIcon");
@@ -193,6 +200,7 @@ export const SmartphoneIcon = createIcon(Smartphone, "SmartphoneIcon");
 export const SquareCheckBigIcon = createIcon(SquareCheckBig, "SquareCheckBigIcon");
 export const SquarePenIcon = createIcon(SquarePen, "SquarePenIcon");
 export const StarIcon = createIcon(Star, "StarIcon");
+export const SunIcon = createIcon(Sun, "SunIcon");
 export const TagIcon = createIcon(Tag, "TagIcon");
 export const TargetIcon = createIcon(Target, "TargetIcon");
 export const Trash2Icon = createIcon(Trash2, "Trash2Icon");
@@ -201,8 +209,8 @@ export const TrendingUpIcon = createIcon(TrendingUp, "TrendingUpIcon");
 export const TriangleAlertIcon = createIcon(TriangleAlert, "TriangleAlertIcon");
 export const TruckIcon = createIcon(Truck, "TruckIcon");
 export const UploadIcon = createIcon(Upload, "UploadIcon");
-export const UserIcon = createIcon(User, "UserIcon");
 export const UserCheckIcon = createIcon(UserCheck, "UserCheckIcon");
+export const UserIcon = createIcon(User, "UserIcon");
 export const UserPlusIcon = createIcon(UserPlus, "UserPlusIcon");
 export const UsersIcon = createIcon(Users, "UsersIcon");
 export const WrenchIcon = createIcon(Wrench, "WrenchIcon");

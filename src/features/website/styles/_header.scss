@@ -166,6 +166,38 @@ $drawer-width: 22rem;
   }
 }
 
+// Theme button: a quiet round button beside WhatsApp; on small phones it lives in the off-canvas menu.
+.site-theme {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid v.line(v.$line);
+  border-radius: 50%;
+  background-color: v.$surface;
+  color: v.fg(v.$navy-900);
+  font-size: 1.15rem;
+  transition: border-color 0.2s v.$ease;
+
+  &:hover {
+    border-color: v.line(v.$navy-600);
+  }
+
+  .site-header__actions & {
+    @include m.down(sm) {
+      display: none;
+    }
+  }
+}
+
+.mobile-menu__theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+  margin-bottom: v.$space-2;
+  color: v.fg(v.$ink-soft);
+  font-weight: 600;
+}
+
 .site-whatsapp {
   @include m.focus-ring;
   position: relative;

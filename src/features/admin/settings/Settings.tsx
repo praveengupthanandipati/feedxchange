@@ -1,6 +1,7 @@
 import { BellIcon, ChevronRightIcon, LogOutIcon } from "../../../shared/components/icon";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../core/auth/AuthContext";
+import ThemePicker from "../../../shared/theme/ThemePicker";
 import "./Settings.scss";
 
 /** Account screen behind the phone tab bar's Settings tab. */
@@ -25,6 +26,10 @@ const Settings = () => {
           <strong>{displayName || "Signed in"}</strong>
           {roleName && <small>{roleName}</small>}
         </div>
+      </section>
+
+      <section className="settings__section" aria-label="Appearance">
+        <ThemePicker variant="list" />
       </section>
 
       <ul className="settings__list">

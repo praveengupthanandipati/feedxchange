@@ -65,6 +65,13 @@
     }
   }
 
+  // Phones: the header keeps room for the title; the theme picker is on the Settings tab instead.
+  .theme-picker {
+    @include m.respond-below(sm) {
+      display: none;
+    }
+  }
+
   &__icon-btn {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);

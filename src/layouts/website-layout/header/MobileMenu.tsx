@@ -5,6 +5,7 @@ import { company, navItems } from "../../../features/website/data/content";
 import { sitePaths } from "../../../features/website/routes/paths";
 import Logo from "../../../features/website/components/common/Logo";
 import { JoinButton, LoginLink, WhatsAppButton } from "./HeaderActions";
+import ThemePicker from "../../../shared/theme/ThemePicker";
 
 interface MobileMenuProps {
   open: boolean;
@@ -87,6 +88,10 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
             <WhatsAppButton />
           </div>
           <LoginLink className="site-login--block" />
+          <div className="mobile-menu__theme">
+            <span>Theme</span>
+            <ThemePicker triggerClassName="site-theme" align="start" />
+          </div>
           <a href={`tel:${company.phone.replace(/\s/g, "")}`}>
             <PhoneIcon aria-hidden /> {company.phone}
           </a>
