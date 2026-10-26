@@ -304,7 +304,8 @@
     width: 2.5rem;
     height: 2.5rem;
     border-radius: v.$radius-pill;
-    color: v.fg(v.$color-white);
+    // initials sit on bright avatar colours (amber, green, red), where white is below 3:1; near-black is 4.7:1 or more on all
+    color: v.on(v.$color-black);
     font-size: v.$font-size-sm;
   }
 

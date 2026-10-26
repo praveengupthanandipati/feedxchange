@@ -44,12 +44,13 @@
   transition: background-color v.$transition-fast;
   white-space: nowrap;
 
+  // a deeper blue than $color-info, so white text has 4.5:1 (WCAG AA)
   &--info {
-    background-color: v.$color-info;
+    background-color: var(--fx-sky-40);
     color: v.on(v.$color-white);
 
     &:hover {
-      background-color: var(--fx-sky-40);
+      background-color: var(--fx-blue-32);
     }
   }
 

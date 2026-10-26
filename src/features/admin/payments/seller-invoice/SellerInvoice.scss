@@ -403,7 +403,7 @@
 
   &--primary {
     background: v.$color-orange;
-    color: v.on(v.$color-white);
+    color: v.on(v.$color-navy-dark); // navy on orange, as on the app's other orange buttons: white is only 2:1
 
     &:hover:not(:disabled) {
       background: v.$color-orange-dark;
