@@ -25,8 +25,8 @@
       "csp": {
         "default-src": "'self'",
         "script-src": "'self'",
-        "style-src": "'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src": "'self' data: https://fonts.gstatic.com",
+        "style-src": "'self' 'unsafe-inline'",
+        "font-src": "'self' data:",
         "img-src": "'self' data: blob: https://qa.feedxchange.in",
         "connect-src": "'self' ipc: http://ipc.localhost https://qa.feedxchange.in wss://qa.feedxchange.in https://api.postalpincode.in"
       },
