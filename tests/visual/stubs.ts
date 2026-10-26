@@ -8,50 +8,74 @@ import { join } from "node:path";
 
 export const FIXED_NOW = new Date("2026-10-26T10:30:00+05:30");
 
-const contracts = [
-  ["FX/2026/101", "Sri Balaji Feeds", "Godavari Poultry", "Maize DDGS", 24500, 300, "Open"],
-  ["FX/2026/102", "Annapurna Oils", "Krishna Hatcheries", "Soya DOC", 41200, 150, "Pending"],
-  ["FX/2026/103", "Deccan Agro", "Vijaya Layers", "DORB", 15800, 500, "Completed"],
-  ["FX/2026/104", "Sri Balaji Feeds", "Coastal Aqua", "Crude Oil", 98500, 60, "Open"],
-  ["FX/2026/105", "Nandi Proteins", "Godavari Poultry", "DOC", 22300, 220, "Cancelled"],
-].map(([contractNumber, sellerName, buyerName, productName, contractRate, quantity, calculatedStatus], index) => ({
+// 18 contracts over the last year, with the real status names (the API sends the status's display name) and delivery
+// windows around FIXED_NOW, so every "needs attention" group of the contracts overview has members.
+// [number, seller, buyer, product, rate per MT, quantity MT, status, contract date, delivery to, arranged, dispatched]
+const contractRows: [string, string, string, string, number, number, string, string, string, number, number][] = [
+  ["2025-11", "Sri Balaji Feeds", "Godavari Poultry", "Maize DDGS", 24500, 300, "Closed", "2025-11-08", "2025-12-20", 300, 300],
+  ["2025-12", "Annapurna Oils", "Krishna Hatcheries", "Soya DOC", 41200, 150, "Dispatched", "2025-12-14", "2026-01-31", 150, 150],
+  ["2026-01", "Deccan Agro", "Vijaya Layers", "DORB", 15800, 500, "Closed", "2026-01-09", "2026-03-15", 500, 500],
+  ["2026-02", "Nandi Proteins", "Godavari Poultry", "Soya DOC", 40600, 220, "Dispatched", "2026-02-18", "2026-04-10", 220, 220],
+  ["2026-03", "Sri Balaji Feeds", "Coastal Aqua", "Crude Oil", 98500, 60, "Partially Dispatched", "2026-03-05", "2026-09-30", 45, 40],
+  ["2026-4", "Deccan Agro", "Krishna Hatcheries", "Maize DDGS", 23900, 400, "Dispatched", "2026-04-22", "2026-06-30", 400, 400],
+  ["2026-5", "Annapurna Oils", "Vijaya Layers", "DOC", 22300, 180, "Partially Dispatched", "2026-05-11", "2026-10-15", 120, 90],
+  ["2026-6", "Nandi Proteins", "Coastal Aqua", "Soya DOC", 41800, 250, "Open", "2026-06-03", "2026-10-20", 0, 0],
+  ["2026-7", "Sri Balaji Feeds", "Godavari Poultry", "Maize DDGS", 24800, 350, "Partially Dispatched", "2026-07-16", "2026-10-30", 200, 150],
+  ["2026-8", "Deccan Agro", "Krishna Hatcheries", "DORB", 16200, 600, "Open", "2026-08-02", "2026-11-01", 0, 0],
+  ["2026-9", "Annapurna Oils", "Godavari Poultry", "Crude Oil", 99200, 80, "Open", "2026-08-27", "2026-11-18", 30, 0],
+  ["2026-10", "Nandi Proteins", "Vijaya Layers", "Soya DOC", 42100, 200, "Partially Dispatched", "2026-09-09", "2026-11-22", 120, 80],
+  ["2026-11", "Sri Balaji Feeds", "Coastal Aqua", "DOC", 22900, 140, "Open", "2026-09-21", "2026-12-15", 60, 0],
+  ["2026-12", "Deccan Agro", "Godavari Poultry", "Maize DDGS", 25100, 450, "Pending for Approval", "2026-10-06", "2026-12-31", 0, 0],
+  ["2026-13", "Annapurna Oils", "Krishna Hatcheries", "Soya DOC", 42400, 120, "Pending for Approval", "2026-10-14", "2027-01-15", 0, 0],
+  ["2026-14", "Nandi Proteins", "Godavari Poultry", "DORB", 16400, 300, "Open", "2026-10-19", "2027-01-31", 100, 0],
+  ["2026-15", "Sri Balaji Feeds", "Vijaya Layers", "Maize DDGS", 25300, 280, "Pending for Approval", "2026-10-23", "2027-02-15", 0, 0],
+  ["2026-16", "Deccan Agro", "Coastal Aqua", "Crude Oil", 99800, 50, "Open", "2026-10-24", "2027-02-28", 0, 0],
+];
+
+const contracts = contractRows.map(([number, sellerName, buyerName, productName, contractRate, quantity, calculatedStatus, date, deliveryTo, arranged, dispatchedQty], index) => ({
   contractId: 101 + index,
-  contractNumber,
-  contractDate: `2026-10-${String(10 + index).padStart(2, "0")}T00:00:00`,
-  sellerId: 10 + index,
+  contractNumber: `FX/${number}`,
+  contractDate: `${date}T00:00:00`,
+  sellerId: 10 + (index % 4),
   sellerName,
-  buyerId: 20 + index,
+  buyerId: 20 + (index % 4),
   buyerName,
-  productId: 30 + index,
+  productId: 30 + (index % 5),
   productName,
   createdBy: "Test Admin",
-  createdAt: `2026-10-${String(10 + index).padStart(2, "0")}T09:00:00`,
+  createdAt: `${date}T09:00:00`,
   updatedBy: null,
   updatedAt: null,
   basicDetails: {
     contractRate,
     quantity,
     quantityMeasure: "MT",
-    minQuantity: Number(quantity) * 0.95,
-    maxQuantity: Number(quantity) * 1.05,
+    minQuantity: quantity * 0.95,
+    maxQuantity: quantity * 1.05,
     deliverySchedule: "Weekly",
-    deliveryType: "Ex-works",
-    deliveryFromDate: "2026-11-01T00:00:00",
-    deliveryToDate: "2026-12-31T00:00:00",
+    deliveryType: index % 2 ? "Delivered" : "Ex-works",
+    deliveryFromDate: `${date}T00:00:00`,
+    deliveryToDate: `${deliveryTo}T00:00:00`,
     calculatedStatus,
     gstPercentage: 5,
-    netRate: Number(contractRate) * 1.05,
-    arrangedQuantity: Number(quantity) / 2,
-    dispatchedQuantity: Number(quantity) / 4,
-    pendingQuantity: (Number(quantity) * 3) / 4,
+    netRate: contractRate * 1.05,
+    arrangedQuantity: arranged,
+    dispatchedQuantity: dispatchedQty,
+    pendingQuantity: quantity - dispatchedQty,
   },
 }));
 
-const contractStatuses = ["Open", "Pending", "Completed", "Cancelled"].map((statusName, index) => ({
+const contractStatuses = [
+  ["Pending", "Pending for Approval"],
+  ["Open", "Open"],
+  ["PartiallyDispatched", "Partially Dispatched"],
+  ["Dispatched", "Dispatched"],
+  ["Closed", "Closed"],
+].map(([statusName, displayName], index) => ({
   contractStatusId: index + 1,
   statusName,
-  displayName: statusName,
-  description: statusName,
+  displayName,
+  description: displayName,
   isActive: true,
   sortOrder: index + 1,
 }));
