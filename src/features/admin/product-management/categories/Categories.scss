@@ -87,7 +87,7 @@
     @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-navy);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     font-size: v.$font-size-sm;
     cursor: pointer;
@@ -98,7 +98,7 @@
   @include m.flex-center;
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -156,7 +156,7 @@
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
 
     &--active {

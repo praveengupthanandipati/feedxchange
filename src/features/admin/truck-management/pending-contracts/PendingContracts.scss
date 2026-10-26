@@ -58,7 +58,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -128,7 +128,7 @@
 
   &__date-range {
     @include m.flex(row, flex-start, center, v.$spacing-1);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     min-width: 0;
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
@@ -144,7 +144,7 @@
     .date-range-input__trigger {
       min-width: 0;
       padding-inline: v.$spacing-2;
-      font-size: 0.8125rem;
+      font-size: max(11px, 0.8125rem);
     }
 
     input {
@@ -178,7 +178,7 @@
   &__search {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     flex: 1 1 18rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -204,8 +204,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border: none;
     border-radius: v.$radius-pill;
     background-color: v.alpha(v.$color-danger, 0.1);
@@ -232,8 +232,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border: none;
     border-radius: v.$radius-sm;
     background-color: v.$color-success;
@@ -285,7 +285,7 @@
     border-radius: v.$radius-pill;
     background-color: v.$color-orange;
     color: v.on(v.$color-navy-dark);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
   }
@@ -593,8 +593,8 @@
   &__share-btn {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border-radius: v.$radius-sm;
     background-color: v.$color-navy;
     color: v.on(v.$color-white);
@@ -612,7 +612,7 @@
     border-radius: v.$radius-pill;
     background-color: v.$color-orange;
     color: v.on(v.$color-navy-dark);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
   }
@@ -663,7 +663,7 @@
     border-radius: v.$radius-pill;
     background-color: v.alpha(v.$color-orange, 0.15);
     color: v.fg(v.$color-orange-dark);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
   }
 }

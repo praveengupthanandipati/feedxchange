@@ -33,7 +33,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -80,7 +80,7 @@
   &__search {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     flex: 1 1 18rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -105,8 +105,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border: none;
     border-radius: v.$radius-pill;
     background-color: v.alpha(v.$color-danger, 0.1);
@@ -165,8 +165,8 @@
     display: grid;
     place-items: center;
     flex: 0 0 2.5rem;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border-radius: v.$radius-md;
     background: v.alpha(v.$color-orange, 0.14);
     color: v.fg(v.$color-orange-dark);
@@ -288,7 +288,7 @@
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
 
     &--active {

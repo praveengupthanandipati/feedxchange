@@ -45,8 +45,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-navy);
     flex-shrink: 0;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: var(--fx-control-height-lg);
+    height: var(--fx-control-height-lg);
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-orange;
@@ -139,7 +139,7 @@
   &__cancel {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-5;
     border: 1px solid v.line(v.$color-orange);
     border-radius: v.$radius-md;
@@ -160,7 +160,7 @@
     @include m.flex-center;
     @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-6;
     font-size: v.$font-size-sm;
   }
@@ -270,7 +270,7 @@
     @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
     @include m.font-base(v.$font-weight-semibold);
     align-self: flex-start;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     font-size: v.$font-size-sm;
   }

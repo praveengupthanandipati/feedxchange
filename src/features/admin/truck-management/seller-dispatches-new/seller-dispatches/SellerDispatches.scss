@@ -38,7 +38,7 @@
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
@@ -72,7 +72,7 @@
   &__search {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -103,7 +103,7 @@
     border-radius: v.$radius-sm;
     background-color: var(--fx-amber-62);
     color: v.on(v.$color-white);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
@@ -116,7 +116,7 @@
     padding: 0.1rem 0.35rem;
     border-radius: v.$radius-sm;
     color: v.fg(v.$color-white);
-    font-size: 0.68rem;
+    font-size: max(11px, 0.68rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
 
@@ -167,7 +167,7 @@
 
     dt {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.7rem;
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 

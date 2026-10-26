@@ -45,7 +45,7 @@
   &__back {
     @include m.flex(row, center, center, v.$spacing-1);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border-radius: v.$radius-md;
     color: v.fg(v.$color-text);
@@ -60,7 +60,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     text-decoration: none;
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
@@ -93,7 +93,7 @@
     @include m.font-base;
     width: 100%;
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -198,7 +198,7 @@
 
     dt {
       color: v.fg(v.$color-text);
-      font-size: 0.8rem;
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
 
@@ -252,7 +252,7 @@
     padding: 0.1rem 0.4rem;
     border-radius: v.$radius-sm;
     color: v.fg(v.$color-white);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
     line-height: 1.4;
 
@@ -300,7 +300,7 @@
 
     dt {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.7rem;
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
@@ -465,7 +465,7 @@
 
     label {
       color: v.fg(v.$color-text);
-      font-size: 0.8rem;
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
   }

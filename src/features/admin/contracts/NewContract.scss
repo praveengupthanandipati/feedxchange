@@ -238,7 +238,7 @@
   &__cancel {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-5;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -256,7 +256,7 @@
     @include m.flex-center;
     @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-6;
     font-size: v.$font-size-sm;
   }
@@ -289,7 +289,7 @@
 
   &__control {
     @include m.font-base;
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;

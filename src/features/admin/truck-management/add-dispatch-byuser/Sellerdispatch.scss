@@ -43,7 +43,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -96,7 +96,7 @@
   &__search {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -125,7 +125,7 @@
   &__reset {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
@@ -186,7 +186,7 @@
     border-radius: v.$radius-sm;
     background-color: v.$color-navy;
     color: v.on(v.$color-white);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-medium;
     cursor: pointer;
 

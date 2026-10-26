@@ -12,6 +12,93 @@
   @include t.bootstrap-tokens;
 }
 
+// ---------- Density ----------
+// Sizes are in rem, so the root size sets the density for everything at once: 13px in the admin app, 14px on the website
+// (percentages, so a larger browser font setting still counts). Touch screens get 15px / 16px, which keeps controls about
+// 36px high, and inputs at 16px so phones do not zoom into them. No text goes below 11px (see the font-size floors).
+html {
+  font-size: 87.5%;
+}
+
+html[data-app="admin"] {
+  font-size: 81.25%;
+}
+
+@media (pointer: coarse) {
+  html {
+    font-size: 100%;
+  }
+
+  html[data-app="admin"] {
+    font-size: 93.75%;
+  }
+
+  :root {
+    --fx-control-height: 2.5rem;
+    --fx-control-height-sm: 2.25rem;
+  }
+
+  input:not([type="checkbox"], [type="radio"], [type="range"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+// WCAG 2.2 target size: anything you can press is at least 24px high (buttons also 24px wide). :where() has no
+// specificity, so this only lifts controls that would otherwise be smaller; a link inside a sentence (inline) is exempt.
+:where(button, [role="button"]) {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+:where(a[href], [tabindex="0"]) {
+  min-height: 24px;
+}
+
+// Bootstrap's controls at the app's density
+.form-control,
+.form-select {
+  min-height: var(--fx-control-height);
+  padding: 0.25rem var(--fx-control-px);
+  font-size: var(--fx-text-sm);
+  border-radius: var(--fx-radius-1);
+}
+
+.form-select {
+  padding-right: 2rem;
+  background-position: right 0.6rem center;
+}
+
+.btn {
+  --bs-btn-padding-y: 0.25rem;
+  --bs-btn-padding-x: var(--fx-control-px);
+  --bs-btn-font-size: var(--fx-text-sm);
+  --bs-btn-border-radius: var(--fx-radius-1);
+  min-height: var(--fx-control-height);
+}
+
+.btn-sm {
+  --bs-btn-padding-y: 0.125rem;
+  --bs-btn-padding-x: 0.5rem;
+  min-height: var(--fx-control-height-sm);
+}
+
+.modal {
+  --bs-modal-padding: var(--fx-dialog-padding);
+  --bs-modal-header-padding: 0.75rem var(--fx-dialog-padding);
+}
+
+.offcanvas {
+  --bs-offcanvas-padding-x: var(--fx-dialog-padding);
+  --bs-offcanvas-padding-y: 0.75rem;
+}
+
+.dropdown-menu {
+  --bs-dropdown-item-padding-y: 0.3rem;
+  --bs-dropdown-font-size: var(--fx-text-sm);
+}
+
 // Themes: data-theme on <html> is set before first paint by the script in index.html (src/shared/theme/theme.ts keeps it
 // in step afterwards). "Match my device" resolves to light or dark there, so CSS only knows these three.
 [data-theme="dark"] {

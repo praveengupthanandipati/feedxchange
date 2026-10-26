@@ -131,8 +131,8 @@ table.seller-buyer-accounts-invoices__table th {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border: none;
     border-radius: v.$radius-sm;
     background-color: v.$color-orange;
@@ -149,8 +149,8 @@ table.seller-buyer-accounts-invoices__table th {
   &__expand-btn {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border: none;
     border-radius: v.$radius-pill;
     background: transparent;

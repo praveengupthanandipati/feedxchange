@@ -120,7 +120,7 @@
     @include m.focus-ring(v.$color-orange);
     @include m.font-base(v.$font-weight-semibold);
     align-self: flex-start;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;

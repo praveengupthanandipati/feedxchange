@@ -79,7 +79,7 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex: 1;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     border: none;
     border-radius: v.$radius-md;
     font-size: v.$font-size-sm;

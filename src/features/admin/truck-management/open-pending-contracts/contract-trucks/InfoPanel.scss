@@ -34,7 +34,7 @@
     @include m.flex-center;
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     margin-top: v.$spacing-2;
     border: none;

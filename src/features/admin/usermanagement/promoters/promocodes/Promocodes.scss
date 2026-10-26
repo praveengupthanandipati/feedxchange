@@ -26,7 +26,7 @@
   &__search {
     width: 100%;
     max-width: 22rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -55,7 +55,7 @@
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
   flex-shrink: 0;
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -104,7 +104,7 @@
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
 
     &--active {
@@ -221,7 +221,7 @@
 
   &__input {
     @include m.font-base;
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -283,7 +283,7 @@
   &__cancel {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: 1px solid v.line(v.$color-orange);
     border-radius: v.$radius-md;
@@ -303,7 +303,7 @@
     @include m.flex-center;
     @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     font-size: v.$font-size-sm;
   }

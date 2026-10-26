@@ -70,7 +70,7 @@
     display: flex;
     align-items: center;
     // Same height as an input, so the buttons sit level with them.
-    min-height: 2.5rem;
+    min-height: var(--fx-control-height);
     gap: v.$spacing-2;
   }
 

@@ -74,7 +74,7 @@
 
   &__item-body {
     display: block;
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
     color: var(--fx-slate-40-fg);
     overflow: hidden;
     display: -webkit-box;
@@ -84,7 +84,7 @@
 
   &__item-time {
     display: block;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     color: var(--fx-slate-58-fg);
   }
 
@@ -102,7 +102,7 @@
     justify-content: space-between;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
   }
 
   &__link {
@@ -111,7 +111,7 @@
     color: var(--fx-orange-40-fg);
     padding: 0;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
 
     &:hover {
       text-decoration: underline;
@@ -244,7 +244,7 @@
 
   &__problem {
     color: var(--fx-orange-37-fg);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
   }
 }
 
@@ -254,7 +254,7 @@
   display: inline-block;
   padding: 0.1rem 0.55rem;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: max(11px, 0.75rem);
   font-weight: 600;
   background: var(--fx-gray-90);
   color: var(--fx-slate-27-fg);
@@ -281,7 +281,7 @@
   margin-left: 0.5rem;
   padding: 0 0.5rem;
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: max(11px, 0.7rem);
   font-weight: 600;
   line-height: 1.4;
 
@@ -312,7 +312,7 @@
 
   &__count {
     color: var(--fx-slate-46-fg);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
   }
 
   &__tools {
@@ -384,7 +384,7 @@
     z-index: 1;
     background: var(--fx-blue-32);
     color: var(--fx-white-on);
-    font-size: 0.78rem;
+    font-size: max(11px, 0.78rem);
     font-weight: 600;
 
     span:not(:first-child) {
@@ -400,7 +400,7 @@
     padding: 0.4rem 0.75rem;
     background: var(--fx-gray-96);
     border-top: 1px solid var(--fx-gray-90-line);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
     color: var(--fx-slate-27-fg);
 
     em {
@@ -409,7 +409,7 @@
       border-radius: 999px;
       background: var(--fx-gray-90);
       font-style: normal;
-      font-size: 0.7rem;
+      font-size: max(11px, 0.7rem);
     }
   }
 
@@ -425,7 +425,7 @@
     border: 0;
     background: transparent;
     color: var(--fx-blue-32-fg);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: 600;
     cursor: pointer;
 
@@ -467,7 +467,7 @@
       flex-basis: 100%;
       overflow: hidden;
       color: var(--fx-slate-46-fg);
-      font-size: 0.75rem;
+      font-size: max(11px, 0.75rem);
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -489,7 +489,7 @@
   border-radius: 999px;
   background: var(--fx-white);
   color: var(--fx-slate-46-fg);
-  font-size: 0.75rem;
+  font-size: max(11px, 0.75rem);
   cursor: pointer;
   user-select: none;
   transition: background-color 120ms, border-color 120ms, color 120ms;
@@ -628,7 +628,7 @@
     dt {
       margin-bottom: 0.15rem;
       color: var(--fx-slate-46-fg);
-      font-size: 0.72rem;
+      font-size: max(11px, 0.72rem);
       font-weight: 600;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -644,7 +644,7 @@
     small {
       display: block;
       color: var(--fx-slate-46-fg);
-      font-size: 0.78rem;
+      font-size: max(11px, 0.78rem);
       font-weight: 400;
     }
   }
@@ -694,7 +694,7 @@
     small {
       display: block;
       color: var(--fx-slate-46-fg);
-      font-size: 0.78rem;
+      font-size: max(11px, 0.78rem);
       overflow-wrap: anywhere;
     }
   }
@@ -708,7 +708,7 @@
     height: 1.6rem;
     border-radius: 50%;
     background: var(--fx-gray-90);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: 600;
   }
 }

@@ -71,7 +71,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -205,7 +205,7 @@
 
   &__input-group {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -232,7 +232,7 @@
   &__reset {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -305,7 +305,7 @@
     @include m.font-base;
     width: 100%;
     min-width: 6rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -358,7 +358,7 @@
     flex-shrink: 0;
     padding: 0.25rem 0.65rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
 
@@ -684,7 +684,7 @@
   &__cancel {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -704,7 +704,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     font-size: v.$font-size-sm;
 
@@ -718,7 +718,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.button-variant(v.$color-success, v.$color-white, var(--fx-green-31));
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     font-size: v.$font-size-sm;
   }

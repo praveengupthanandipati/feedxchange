@@ -67,7 +67,7 @@ $status-colors: (
     background-color: v.$color-bg;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
     color: v.fg(v.$color-text);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-medium;
     white-space: nowrap;
     cursor: pointer;
@@ -89,7 +89,7 @@ $status-colors: (
     padding: 0 0.25rem;
     border-radius: v.$radius-sm;
     color: v.fg(v.$color-white);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
 
     @each $name, $color in $status-colors {
@@ -100,7 +100,7 @@ $status-colors: (
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: 1px solid transparent;
     border-radius: v.$radius-md;
@@ -157,7 +157,7 @@ $status-colors: (
     label,
     span {
       color: v.fg(v.$color-text);
-      font-size: 0.8rem;
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
   }
@@ -167,7 +167,7 @@ $status-colors: (
 
     small {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.7rem;
+      font-size: max(11px, 0.7rem);
     }
   }
 
@@ -195,7 +195,7 @@ $status-colors: (
     input {
       @include m.font-base;
       width: 100%;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3 0 2.25rem;
       border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
@@ -269,7 +269,7 @@ $status-colors: (
     padding: 0.1rem 0.4rem;
     border-radius: v.$radius-sm;
     color: v.fg(v.$color-white);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
     line-height: 1.4;
     white-space: nowrap;
@@ -323,7 +323,7 @@ $status-colors: (
 
     dt {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.7rem;
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
@@ -463,7 +463,7 @@ $status-colors: (
     p {
       margin: v.$spacing-1 0 0;
       color: v.fg(v.$color-text-muted);
-      font-size: 0.8rem;
+      font-size: max(11px, 0.8rem);
       overflow-wrap: anywhere;
     }
 
@@ -505,7 +505,7 @@ $status-colors: (
 
   &__label {
     color: v.fg(v.$color-text);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-medium;
   }
 
@@ -542,7 +542,7 @@ $status-colors: (
 
   &__error {
     color: v.fg(v.$color-danger);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
   }
 
   &__actions {

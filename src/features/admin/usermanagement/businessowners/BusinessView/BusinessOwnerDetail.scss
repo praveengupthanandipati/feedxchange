@@ -191,7 +191,7 @@
     border-radius: v.$radius-pill;
     background-color: v.alpha(v.$color-success, 0.15);
     color: v.fg(v.$color-success);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
   }

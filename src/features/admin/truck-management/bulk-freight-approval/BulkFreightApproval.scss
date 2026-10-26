@@ -35,7 +35,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -88,7 +88,7 @@
 
   &__date-range {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     min-width: 0;
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
@@ -150,7 +150,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-5;
   border: none;
   border-radius: v.$radius-md;
@@ -195,8 +195,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border-radius: v.$radius-sm;
     background-color: v.$color-info;
     color: v.on(v.$color-white);
@@ -218,7 +218,7 @@
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
 
@@ -448,7 +448,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;

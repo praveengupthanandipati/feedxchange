@@ -1302,7 +1302,7 @@ $badge: 120px;
   overflow: hidden;
   color: v.fg(v.$navy-800);
   font-family: v.$font-heading;
-  font-size: 0.8rem;
+  font-size: max(11px, 0.8rem);
   font-weight: v.$fw-semibold;
   line-height: 1.3;
   -webkit-line-clamp: 2;

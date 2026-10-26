@@ -16,6 +16,8 @@
         var root = document.documentElement;
         root.setAttribute("data-theme", theme);
         root.setAttribute("data-theme-choice", choice);
+        // the admin app is more compact than the website (tokens.scss)
+        root.setAttribute("data-app", location.pathname.indexOf("/admin") === 0 ? "admin" : "site");
         document.querySelector('meta[name="color-scheme"]').setAttribute("content", theme === "dark" ? "dark" : "light");
       })();
     </script>

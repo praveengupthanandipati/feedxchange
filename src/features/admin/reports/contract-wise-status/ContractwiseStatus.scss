@@ -35,7 +35,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -102,7 +102,7 @@
 
   &__date-range {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     min-width: 0;
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
@@ -132,7 +132,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -237,8 +237,8 @@ table.contract-wise-status-supplies__table th {
 .contract-wise-status-table__expand-btn {
   @include m.flex-center;
   @include m.focus-ring(v.$color-orange);
-  width: 1.75rem;
-  height: 1.75rem;
+  width: max(24px, 1.75rem);
+  height: max(24px, 1.75rem);
   border: none;
   border-radius: v.$radius-pill;
   background: transparent;

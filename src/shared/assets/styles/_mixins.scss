@@ -92,15 +92,12 @@
   background: linear-gradient($angle, v.$color-navy 0%, v.$color-orange 100%);
 }
 
-@mixin card($padding: v.$spacing-5) {
+// Compact: one padding (--fx-card-padding, about 12px) at every width. $padding is kept for existing callers.
+@mixin card($padding: null) {
   background-color: v.$color-bg;
   border-radius: v.$radius-lg;
   box-shadow: v.$shadow-md;
-  padding: v.$spacing-4;
-
-  @include respond-to(md) {
-    padding: $padding;
-  }
+  padding: var(--fx-card-padding);
 }
 
 // $color is text on the $bg fill, so it keeps its Light colour in every theme (on()); $bg-hover defaults to 8% darker.

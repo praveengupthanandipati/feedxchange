@@ -84,7 +84,7 @@
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
@@ -123,7 +123,7 @@
 
     input {
       min-width: 0;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3;
       border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
@@ -162,7 +162,7 @@
     border-radius: v.$radius-sm;
     background-color: v.$color-navy;
     color: v.on(v.$color-white);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     white-space: nowrap;
     cursor: pointer;
 
@@ -178,7 +178,7 @@
     padding: 0.2rem 0.5rem;
     border-radius: v.$radius-sm;
     color: v.fg(v.$color-white);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
 
     &--pending { background-color: var(--fx-amber-62); }
@@ -236,7 +236,7 @@
 
     dt {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.7rem;
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 

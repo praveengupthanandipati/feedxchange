@@ -21,7 +21,12 @@ const useNoIndex = () => {
     meta.name = "robots";
     meta.content = "noindex, nofollow";
     document.head.appendChild(meta);
-    return () => meta.remove();
+    // the admin app's compact type and control sizes (tokens.scss); index.html sets it before the first paint as well
+    document.documentElement.setAttribute("data-app", "admin");
+    return () => {
+      meta.remove();
+      document.documentElement.setAttribute("data-app", "site");
+    };
   }, []);
 };
 

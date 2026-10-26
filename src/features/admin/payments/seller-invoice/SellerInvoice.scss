@@ -195,7 +195,7 @@
   }
 
   &__label {
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-semibold;
     color: v.fg(v.$color-text-muted);
   }
@@ -306,14 +306,14 @@
   border-radius: 50%;
   background: v.$color-primary;
   color: v.on(v.$color-white);
-  font-size: 0.75rem;
+  font-size: max(11px, 0.75rem);
   font-weight: v.$font-weight-semibold;
 }
 
 .si-contract-note {
   display: block;
   color: v.fg(v.$color-text-muted);
-  font-size: 0.75rem;
+  font-size: max(11px, 0.75rem);
   line-height: 1.45;
 
   strong {
@@ -324,7 +324,7 @@
 .si-error-text {
   display: block;
   color: v.fg(v.$color-danger);
-  font-size: 0.75rem;
+  font-size: max(11px, 0.75rem);
 }
 
 // ---- deductions: one row each
@@ -387,7 +387,7 @@
 .si-btn {
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border-radius: v.$radius-md;
   border: 1px solid transparent;
@@ -499,7 +499,7 @@
   &__control {
     @include m.font-base;
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -518,6 +518,6 @@
 
 .si-calc-note {
   color: v.fg(v.$color-text-muted);
-  font-size: 0.75rem;
+  font-size: max(11px, 0.75rem);
   white-space: nowrap;
 }

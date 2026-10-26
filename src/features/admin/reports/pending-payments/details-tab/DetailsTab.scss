@@ -10,7 +10,7 @@
     @include m.flex(row, flex-start, center, v.$spacing-2);
     width: 100%;
     max-width: 20rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -104,7 +104,7 @@
     border-radius: v.$radius-sm;
     background-color: v.$color-info;
     color: v.on(v.$color-white);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     cursor: pointer;
     transition: background-color v.$transition-fast;
 

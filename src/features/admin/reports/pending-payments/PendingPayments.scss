@@ -38,7 +38,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -94,7 +94,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -156,7 +156,7 @@
   button {
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
     border: none;
     background-color: transparent;

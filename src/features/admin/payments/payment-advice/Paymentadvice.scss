@@ -122,7 +122,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     min-width: 7.5rem;
-    min-height: 2.75rem;
+    min-height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-4;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -190,7 +190,7 @@
     @include m.font-base;
     @include m.focus-ring(v.$color-orange);
     width: 100%;
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -224,7 +224,7 @@
 
   &__error {
     color: v.fg(v.$color-danger);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
   }
 }
 
@@ -246,7 +246,7 @@
     @include m.focus-ring(v.$color-orange);
     @include m.font-base(v.$font-weight-semibold);
     flex: 1;
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -411,7 +411,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  min-height: 2.75rem;
+  min-height: var(--fx-control-height-lg);
   justify-content: center;
   padding: v.$spacing-2 v.$spacing-4;
   border: 1px solid v.alpha(v.line(v.$color-info), 0.4);
@@ -419,7 +419,7 @@
   border-radius: v.$radius-md;
   background: v.alpha(v.$color-info, 0.07);
   color: v.fg(v.$color-text-muted);
-  font-size: 0.8rem;
+  font-size: max(11px, 0.8rem);
 
   strong {
     color: v.fg(v.$color-primary);
@@ -491,7 +491,7 @@
   thead th {
     background: v.$color-bg-muted;
     color: v.fg(v.$color-text-muted);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-semibold;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -517,7 +517,7 @@
   }
 
   .pa-col-check {
-    width: 2.5rem;
+    width: var(--fx-control-height);
     text-align: center;
   }
 
@@ -544,7 +544,7 @@
 .pa-sub {
   display: block;
   color: v.fg(v.$color-text-muted);
-  font-size: 0.72rem;
+  font-size: max(11px, 0.72rem);
 
   &--warn {
     color: v.fg(v.$color-danger);
@@ -560,7 +560,7 @@
   padding: 0.12rem 0.6rem;
   border-radius: v.$radius-pill;
   background: v.$color-bg-muted;
-  font-size: 0.72rem;
+  font-size: max(11px, 0.72rem);
   font-weight: v.$font-weight-semibold;
 
   &--advance {
@@ -589,7 +589,7 @@
 
     span {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.75rem;
+      font-size: max(11px, 0.75rem);
     }
 
     strong {
@@ -655,7 +655,7 @@
 .pa-error {
   display: block;
   color: v.fg(v.$color-danger);
-  font-size: 0.72rem;
+  font-size: max(11px, 0.72rem);
 }
 
 .payment-advice-table__icon-btn:disabled {

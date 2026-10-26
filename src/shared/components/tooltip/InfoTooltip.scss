@@ -4,8 +4,11 @@
 .info-tooltip {
   position: relative;
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
-  margin-left: 0.3rem;
+  justify-content: center;
+  min-width: 24px; // WCAG 2.2 target size; the icon stays small inside it
+  margin-left: 0.1rem;
   color: v.fg(v.$color-gray-400);
   cursor: help;
 

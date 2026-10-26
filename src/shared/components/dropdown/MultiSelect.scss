@@ -11,7 +11,7 @@
     @include m.font-base(v.$font-weight-medium);
     @include m.focus-ring(v.$color-orange);
     width: 100%;
-    min-height: 2.5rem;
+    min-height: var(--fx-control-height);
     padding: v.$spacing-2 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;

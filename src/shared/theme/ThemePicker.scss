@@ -42,7 +42,7 @@
     @include m.flex(row, flex-start, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
     width: 100%;
-    min-height: 2.5rem;
+    min-height: var(--fx-control-height);
     padding: v.$spacing-2 v.$spacing-3;
     border: none;
     border-radius: v.$radius-sm;

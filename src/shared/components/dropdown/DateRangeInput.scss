@@ -10,7 +10,7 @@
     @include m.font-base(v.$font-weight-medium);
     @include m.focus-ring(v.$color-orange);
     width: 100%;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -105,7 +105,7 @@
 
       @include m.respond-below(sm) {
         padding: 0.25rem;
-        font-size: 0.8125rem;
+        font-size: max(11px, 0.8125rem);
       }
     }
 
@@ -147,7 +147,7 @@
       button {
         @include m.focus-ring(v.$color-orange);
         width: 100%;
-        height: 1.75rem;
+        height: max(24px, 1.75rem);
         border: none;
         border-radius: v.$radius-sm;
         background: transparent;
@@ -186,8 +186,8 @@
       }
 
       @include m.respond-below(sm) {
-        width: 1.75rem;
-        height: 1.75rem;
+        width: max(24px, 1.75rem);
+        height: max(24px, 1.75rem);
       }
     }
   }
@@ -209,7 +209,7 @@
   &__weekday {
     padding: 0.125rem 0;
     color: v.fg(v.$color-text-muted);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     text-transform: uppercase;
   }
@@ -259,7 +259,7 @@
   &__hint {
     margin: 0;
     color: v.fg(v.$color-text-muted);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     text-align: center;
   }
 }

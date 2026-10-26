@@ -39,7 +39,7 @@
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
@@ -66,7 +66,7 @@
     @include m.font-base;
     width: 100%;
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -209,8 +209,8 @@
   &__expand {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border: 1.5px solid v.line(v.$color-navy);
     border-radius: 50%;
     background: v.$color-bg;
@@ -266,7 +266,7 @@
 
     dt {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.7rem;
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
@@ -305,7 +305,7 @@
     padding: 0 v.$spacing-3 v.$spacing-3;
 
     .interest-calc__icon-btn {
-      width: 2.5rem;
+      width: var(--fx-control-height);
       height: 2.25rem;
     }
   }
@@ -335,7 +335,7 @@
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 0.1rem v.$spacing-2;
       padding: v.$spacing-2 v.$spacing-3;
-      font-size: 0.8rem;
+      font-size: max(11px, 0.8rem);
 
       & + li { border-top: 1px solid v.line(v.$color-border); }
 
@@ -431,7 +431,7 @@
 
     dt {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.75rem;
+      font-size: max(11px, 0.75rem);
     }
 
     dd {

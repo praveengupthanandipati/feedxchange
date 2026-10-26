@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, MapPinIcon } from "../../../shared/components/icon";
 import { topUsers } from "./dashboard.data";
 
@@ -16,7 +17,7 @@ const TopUsers = () => {
           const TrendIcon = user.trend === "up" ? ArrowUpIcon : ArrowDownIcon;
           return (
             <li key={user.id} className="dashboard-users__item">
-              <span className="dashboard-users__avatar" style={{ backgroundColor: user.color }}>
+              <span className="dashboard-users__avatar" style={{ "--avatar": user.color } as CSSProperties}>
                 {user.initials}
               </span>
               <div className="dashboard-users__info">

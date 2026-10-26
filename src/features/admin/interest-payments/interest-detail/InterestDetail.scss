@@ -15,7 +15,7 @@ $tones: (
   &__back {
     @include m.flex(row, center, center, v.$spacing-1);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border-radius: v.$radius-md;
     color: v.fg(v.$color-text);
@@ -110,7 +110,7 @@ $tones: (
 
   &__label {
     color: v.fg(v.$color-text-muted);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
   }
 
   &__value {

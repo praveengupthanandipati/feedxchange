@@ -192,7 +192,7 @@
     "Apple Color Emoji", "Segoe UI Emoji";
   --fx-font-heading: "Poppins", var(--fx-font-body);
   --fx-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  --fx-text-xs: 0.75rem;
+  --fx-text-xs: max(11px, 0.75rem);
   --fx-text-sm: 0.875rem;
   --fx-text-base: 1rem;
   --fx-text-lg: 1.125rem;
@@ -229,11 +229,18 @@
   --fx-site-shadow-md: 0 12px 32px -12px #{f.alpha(f.token("blue-11"), 0.18)};
   --fx-site-shadow-lg: 0 30px 60px -20px #{f.alpha(f.token("blue-11"), 0.3)};
 
-  // density: control and table sizes for the shared components (a compact density overrides these)
-  --fx-control-height: 2.5rem;
-  --fx-table-row-height: 3rem;
-  --fx-table-cell-py: 0.75rem;
-  --fx-table-cell-px: 1rem;
+  // density: control, table and panel sizes. Everything is in rem, and the root size is small (tokens.scss: 13px in the
+  // admin app, 14px on the website, larger on touch screens), so these come out compact: a control is about 29px high in
+  // the admin app, a table row about 31px, a card has 12px of padding.
+  --fx-control-height: 2.25rem;
+  --fx-control-height-sm: 1.875rem;
+  --fx-control-height-lg: 2.5rem;
+  --fx-control-px: 0.75rem;
+  --fx-table-row-height: 2.375rem;
+  --fx-table-cell-py: 0.45rem;
+  --fx-table-cell-px: 0.75rem;
+  --fx-card-padding: 0.9375rem;
+  --fx-dialog-padding: 1.25rem;
 
   // focus ring, used by every focusable control: navy on the light page (orange is only 2:1 on white); each theme and the
   // dark brand panels set their own

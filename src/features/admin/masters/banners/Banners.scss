@@ -31,7 +31,7 @@
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
@@ -69,7 +69,7 @@
     input {
       @include m.font-base;
       width: 100%;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3 0 2.25rem;
       border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
@@ -111,7 +111,7 @@
   &__thumb {
     display: block;
     width: 3.75rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     border-radius: v.$radius-sm;
     object-fit: cover;
     background-color: v.$color-gray-100;
@@ -136,7 +136,7 @@
     padding: 0.1rem 0.4rem;
     border-radius: v.$radius-sm;
     color: v.fg(v.$color-white);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
     line-height: 1.4;
 
@@ -207,7 +207,7 @@
     margin-top: auto;
     padding-right: v.$spacing-1;
     color: v.fg(v.$color-text-muted);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
   }
 
   // ---------- Pagination ----------
@@ -361,7 +361,7 @@
   &__label {
     padding: 0;
     color: v.fg(v.$color-text);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-medium;
   }
 
@@ -370,7 +370,7 @@
   &__input {
     @include m.font-base;
     width: 100%;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-sm;
@@ -397,12 +397,12 @@
 
   &__error {
     color: v.fg(v.$color-danger);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
   }
 
   &__hint {
     color: v.fg(v.$color-text-muted);
-    font-size: 0.72rem;
+    font-size: max(11px, 0.72rem);
   }
 
   &__preview {
@@ -432,7 +432,7 @@
   &__file {
     display: flex;
     align-items: stretch;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-sm;
     overflow: hidden;

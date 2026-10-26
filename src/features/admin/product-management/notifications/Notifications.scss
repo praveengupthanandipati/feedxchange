@@ -44,7 +44,7 @@ $category-colors: (
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
@@ -118,7 +118,7 @@ $category-colors: (
     border-radius: v.$radius-pill;
     background-color: v.$color-danger;
     color: v.on(v.$color-white);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     line-height: 1.25rem;
     text-align: center;
   }
@@ -127,7 +127,7 @@ $category-colors: (
     @include m.flex(row, flex-start, center, v.$spacing-2);
     flex: 1 1 16rem;
     max-width: 22rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -158,7 +158,7 @@ $category-colors: (
   &__group-title {
     margin: 0;
     color: v.fg(v.$color-text-muted);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-semibold;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -242,8 +242,8 @@ $category-colors: (
   &__icon {
     @include m.flex-center;
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border-radius: 50%;
     font-size: 1.1rem;
 
@@ -296,7 +296,7 @@ $category-colors: (
 
   &__message {
     color: v.fg(v.$color-text-muted);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
     overflow-wrap: anywhere;
   }
 
@@ -305,13 +305,13 @@ $category-colors: (
     flex-wrap: wrap;
     margin-top: 0.15rem;
     color: v.fg(v.$color-text-muted);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
   }
 
   &__tag {
     padding: 0.05rem 0.45rem;
     border-radius: v.$radius-pill;
-    font-size: 0.68rem;
+    font-size: max(11px, 0.68rem);
     font-weight: v.$font-weight-semibold;
   }
 

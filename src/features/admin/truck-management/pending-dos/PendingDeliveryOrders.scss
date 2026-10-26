@@ -43,7 +43,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -104,7 +104,7 @@
     @include m.flex(row, flex-start, center, v.$spacing-2);
     flex: 1;
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -130,8 +130,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 2.75rem;
-    height: 2.5rem;
+    width: var(--fx-control-height-lg);
+    height: var(--fx-control-height);
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-danger;
@@ -198,7 +198,7 @@
     border-radius: v.$radius-sm;
     background-color: v.$color-navy;
     color: v.on(v.$color-white);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-medium;
     white-space: nowrap;
     cursor: pointer;
@@ -295,7 +295,7 @@
     border-radius: v.$radius-pill;
     background-color: v.alpha(v.$color-success, 0.12);
     color: v.fg(v.$color-success);
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
   }
@@ -309,7 +309,7 @@
 
     dt {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.7rem;
+      font-size: max(11px, 0.7rem);
       font-weight: v.$font-weight-medium;
       text-transform: uppercase;
       letter-spacing: 0.02em;

@@ -6,7 +6,7 @@
   position: sticky;
   top: v.$spacing-3;
   z-index: v.$z-index-sticky;
-  height: 4.5rem;
+  height: 3.75rem;
   flex-shrink: 0;
   padding: 0 v.$spacing-4;
   background-color: v.$color-bg;
@@ -22,8 +22,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border: none;
     border-radius: v.$radius-pill;
     background: transparent;
@@ -76,8 +76,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     position: relative;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border: none;
     border-radius: v.$radius-pill;
     background: transparent;
@@ -104,7 +104,7 @@
     border-radius: v.$radius-pill;
     background-color: v.$color-danger;
     color: v.on(v.$color-white);
-    font-size: 0.65rem;
+    font-size: max(11px, 0.65rem);
     line-height: 1;
     border: 2px solid v.line(v.$color-bg);
   }
@@ -187,7 +187,7 @@
   }
 
   &__notification-time {
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     color: v.fg(v.$color-text-muted);
   }
 

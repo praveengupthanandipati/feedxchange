@@ -76,7 +76,7 @@ $tones: (
     border-radius: v.$radius-sm;
     background: transparent;
     color: v.fg(v.$color-navy);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-semibold;
     cursor: pointer;
 
@@ -125,7 +125,7 @@ $tones: (
   dt {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     color: v.fg(v.$color-text-muted);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
   }
 
   dd {
@@ -175,7 +175,7 @@ $tones: (
 
     dt {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.8rem;
+      font-size: max(11px, 0.8rem);
     }
 
     dd {
@@ -200,13 +200,13 @@ $tones: (
 
     label {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.8rem;
+      font-size: max(11px, 0.8rem);
     }
 
     input {
       @include m.font-base;
       width: 100%;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3;
       border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
@@ -242,7 +242,7 @@ $tones: (
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border-radius: v.$radius-md;
     font-size: v.$font-size-sm;
@@ -287,7 +287,7 @@ $tones: (
   gap: v.$spacing-1 v.$spacing-3;
   margin-top: v.$spacing-2;
   color: v.fg(v.$color-text-muted);
-  font-size: 0.8rem;
+  font-size: max(11px, 0.8rem);
 
   strong {
     color: v.fg(v.$color-text);
@@ -384,7 +384,7 @@ $tones: (
 
     dt {
       color: v.fg(v.$color-text-muted);
-      font-size: 0.7rem;
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
@@ -396,7 +396,7 @@ $tones: (
 
     .reassign__qty-input {
       max-width: none;
-      height: 2.5rem;
+      height: var(--fx-control-height);
     }
   }
 
@@ -459,7 +459,7 @@ $tones: (
   &__input-group {
     display: flex;
     align-items: stretch;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
@@ -495,7 +495,7 @@ $tones: (
   &__file {
     @include m.font-base;
     width: 100%;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     color: v.fg(v.$color-text);
@@ -515,7 +515,7 @@ $tones: (
 
   &__file-note {
     color: v.fg(v.$color-text-muted);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     overflow-wrap: anywhere;
   }
 

@@ -144,7 +144,7 @@
   &__pill {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
-    min-height: 2.75rem;
+    min-height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -242,7 +242,7 @@
     @include m.focus-ring(v.$color-orange);
     width: 100%;
     min-width: 11rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -288,8 +288,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
@@ -311,7 +311,7 @@
 
   &__error {
     color: v.fg(v.$color-danger);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
   }
 }
 
@@ -393,7 +393,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-6;
     border: none;
     border-radius: v.$radius-md;

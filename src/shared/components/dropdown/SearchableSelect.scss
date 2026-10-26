@@ -10,7 +10,7 @@
     @include m.font-base(v.$font-weight-medium);
     @include m.focus-ring(v.$color-orange);
     width: 100%;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
@@ -102,8 +102,8 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border: none;
     border-radius: v.$radius-pill;
     background-color: v.alpha(v.$color-orange, 0.12);

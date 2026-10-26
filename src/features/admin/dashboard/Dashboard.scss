@@ -205,8 +205,8 @@
 
   &__icon {
     @include m.flex-center;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: var(--fx-control-height-lg);
+    height: var(--fx-control-height-lg);
     border-radius: v.$radius-md;
     background: v.alpha(v.$color-white, 0.12);
     color: v.fg(v.$color-orange-light);
@@ -301,11 +301,13 @@
     @include m.flex-center;
     @include m.font-heading(v.$font-weight-semibold);
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border-radius: v.$radius-pill;
-    // initials sit on bright avatar colours (amber, green, red), where white is below 3:1; near-black is 4.7:1 or more on all
-    color: v.on(v.$color-black);
+    // a tint of the user's colour (--avatar, set per user) with the normal text colour: readable in every theme, where white
+    // or black initials on the full colour fall below 4.5:1 on some of them
+    background-color: color-mix(in srgb, var(--avatar) 22%, transparent);
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
   }
 
@@ -323,7 +325,7 @@
   &__location {
     @include m.flex(row, flex-start, center, 0.25rem);
     color: v.fg(v.$color-text-muted);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     margin: 0.15rem 0 0;
   }
 
@@ -331,7 +333,7 @@
     flex-shrink: 0;
     padding: 0.2rem 0.65rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
 
     &--success {
@@ -388,7 +390,7 @@
   }
 
   &__time {
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     color: v.fg(v.$color-text-muted);
     margin: 0 0 0.25rem;
   }
