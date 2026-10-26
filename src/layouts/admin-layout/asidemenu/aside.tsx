@@ -129,7 +129,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           onClick={() => {
             onCloseMobile?.();
             logout();
-            navigate("/admin/login");
+            navigate("/", { replace: true });
           }}
         >
           {!collapsed && <span>Logout</span>}

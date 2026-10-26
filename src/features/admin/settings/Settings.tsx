@@ -41,7 +41,7 @@ const Settings = () => {
             className="settings__row settings__row--danger"
             onClick={() => {
               logout();
-              navigate("/admin/login");
+              navigate("/", { replace: true });
             }}
           >
             <FiLogOut aria-hidden />

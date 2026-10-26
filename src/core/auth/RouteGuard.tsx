@@ -7,10 +7,10 @@ import { useAuth } from "./AuthContext";
 import NoAccess from "./NoAccess";
 import { requiredPermissionsFor } from "./routePermissions";
 
-/** Sends visitors without a login session to the login page. */
+/** Sends visitors without a login session to the login page (or, right after they logged out, to the website). */
 export const RequireSession = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/admin/login" replace />;
+  const { isAuthenticated, postLogoutPath } = useAuth();
+  return isAuthenticated ? <>{children}</> : <Navigate to={postLogoutPath ?? "/admin/login"} replace />;
 };
 
 /** Shows the screen only when the user's role allows it; otherwise a "no access" page (inside the normal layout). */

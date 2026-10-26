@@ -81,7 +81,7 @@ const Header = ({ title = "Dashboard", onToggleMobileNav }: HeaderProps) => {
   const handleLogout = () => {
     setOpenMenu(null);
     logout();
-    navigate("/admin/login");
+    navigate("/", { replace: true });
   };
 
   return (

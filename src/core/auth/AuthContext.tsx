@@ -40,6 +40,8 @@ interface AuthContextValue extends AuthState {
   reload: () => void;
   /** Ends the session: revokes the refresh token on the server and forgets everything locally. */
   logout: () => void;
+  /** Where to go once the session is gone: the website home after a deliberate logout, null otherwise (then the login page). */
+  postLogoutPath: string | null;
 }
 
 const readState = (): AuthState => {
@@ -62,7 +64,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [menu, setMenu] = useState<AccessMenu | null>(null);
   const lastUserId = useRef(state.userId);
 
-  const reload = useCallback(() => setState(readState()), []);
+  const [postLogoutPath, setPostLogoutPath] = useState<string | null>(null);
+
+  const reload = useCallback(() => {
+    setPostLogoutPath(null);
+    setState(readState());
+  }, []);
 
   const logout = useCallback(() => {
     // This browser must stop receiving the signed-out user's desktop notifications. Start it first: it needs the token to tell the server.
@@ -70,6 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     revokeSessionOnServer(); // reads the refresh token, so it must run before the session is cleared
     clearSession();
     setMenu(null);
+    setPostLogoutPath("/"); // signing out on purpose leads back to the public website
     setState(readState());
   }, []);
 
@@ -118,8 +126,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       can: (...keys: string[]) => hasAnyPermission(state.permissionKeys, keys),
       reload,
       logout,
+      postLogoutPath,
     }),
-    [state, menu, reload, logout],
+    [state, menu, reload, logout, postLogoutPath],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
