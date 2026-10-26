@@ -15,7 +15,7 @@ const initials = (name: string) => {
 };
 
 const About = () => {
-  usePageTitle("About Us");
+  usePageTitle("About Us", "Who we are: a trusted marketplace connecting feed ingredient sellers, buyers and transporters across India.");
   const reducedMotion = useReducedMotion();
   const [founder, ...members] = team;
 

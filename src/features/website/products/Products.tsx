@@ -5,7 +5,7 @@ import { products } from "../data/content";
 import { usePageTitle } from "../hooks/usePageTitle";
 
 const Products = () => {
-  usePageTitle("Products");
+  usePageTitle("Products", "Distilled products, crude oil, DOC, maize DDGS, DORB and soya DOC: quality-tested feed ingredients on FeedXchange.");
 
   return (
     <>

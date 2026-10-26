@@ -7,7 +7,7 @@ import { usePageTitle } from "../hooks/usePageTitle";
 
 /** Target of every "Join with us" button. */
 const JoinUs = () => {
-  usePageTitle("Join with us");
+  usePageTitle("Join with us", "Register as a seller, buyer or transporter and start trading feed ingredients on FeedXchange.");
 
   return (
     <>

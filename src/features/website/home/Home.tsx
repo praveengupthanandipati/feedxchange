@@ -12,7 +12,7 @@ import { usePageTitle } from "../hooks/usePageTitle";
 
 /** Website index page. */
 const Home = () => {
-  usePageTitle("Feed Ingredient Trading Platform");
+  usePageTitle("Feed Ingredient Trading Platform", "Trade feed ingredients with confidence: live prices, verified sellers and tracked deliveries on one platform.");
 
   return (
     <>

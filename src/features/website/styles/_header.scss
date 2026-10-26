@@ -133,6 +133,39 @@ $drawer-width: 22rem;
   }
 }
 
+// "Login" to the signed-in application: a quiet text link next to the buttons.
+.site-login {
+  @include m.focus-ring;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0 v.$space-2;
+  border-radius: v.$radius-md;
+  color: v.$navy-900;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &:hover {
+    color: v.$navy-600;
+    text-decoration: underline;
+  }
+
+  // Small phones: the link moves into the off-canvas menu.
+  .site-header__actions & {
+    @include m.down(sm) {
+      display: none;
+    }
+  }
+
+  &--block {
+    justify-content: center;
+    width: 100%;
+    margin-bottom: v.$space-2;
+    border: 1px solid rgba(v.$navy-900, 0.18);
+  }
+}
+
 .site-whatsapp {
   @include m.focus-ring;
   position: relative;

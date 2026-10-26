@@ -7,7 +7,7 @@ import { usePageTitle } from "../hooks/usePageTitle";
 
 /** Accordion: one answer open at a time, with the same smooth height animation as the mobile menu. */
 const Faqs = () => {
-  usePageTitle("FAQ's");
+  usePageTitle("FAQ's", "Answers to common questions about trading, payments, quality checks and deliveries on FeedXchange.");
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (

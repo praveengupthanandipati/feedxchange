@@ -12,7 +12,7 @@ import NotFound from "../not-found/NotFound";
 const ProductDetail = () => {
   const { slug } = useParams();
   const product = products.find((item) => item.slug === slug);
-  usePageTitle(product?.name ?? "Product not found");
+  usePageTitle(product?.name ?? "Product not found", product?.description);
 
   if (!product) return <NotFound />;
   const others = products.filter((item) => item.slug !== product.slug).slice(0, 3);

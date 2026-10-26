@@ -7,9 +7,16 @@ import { NotificationProvider } from "../shared/notifications/NotificationProvid
 import { AutoNotifyProvider } from "../shared/notifications/AutoNotifyProvider";
 import PageLoader from "../shared/components/loader/PageLoader";
 
-/** Tells search engines to keep every /admin page out of their index (robots.txt asks them not to crawl it either). */
+/**
+ * Head of every /admin page: keeps search engines from indexing it (robots.txt asks them not to crawl it either) and clears the
+ * description, canonical and social tags a prerendered website page may have left behind.
+ */
 const useNoIndex = () => {
   useEffect(() => {
+    document.title = "feedXchange";
+    document.head
+      .querySelectorAll('meta[name="description"], meta[name="twitter:card"], meta[property^="og:"], link[rel="canonical"]')
+      .forEach((element) => element.remove());
     const meta = document.createElement("meta");
     meta.name = "robots";
     meta.content = "noindex, nofollow";

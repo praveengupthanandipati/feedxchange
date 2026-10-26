@@ -5,7 +5,7 @@ import { company } from "../data/content";
 import { usePageTitle } from "../hooks/usePageTitle";
 
 const Contact = () => {
-  usePageTitle("Contact Us");
+  usePageTitle("Contact Us", "Talk to the FeedXchange team about buying, selling or moving feed ingredients.");
 
   const details = [
     { icon: FiMapPin, title: "Visit us", body: company.address },

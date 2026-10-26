@@ -4,7 +4,7 @@ import { blogPosts } from "../data/content";
 import { usePageTitle } from "../hooks/usePageTitle";
 
 const Blogs = () => {
-  usePageTitle("Blogs");
+  usePageTitle("Blogs", "Market notes, price trends and practical guides for feed ingredient buyers and sellers.");
 
   return (
     <>

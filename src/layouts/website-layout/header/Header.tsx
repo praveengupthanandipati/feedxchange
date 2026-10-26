@@ -3,7 +3,7 @@ import { FiMenu } from "react-icons/fi";
 import { useLocation } from "react-router-dom";
 import Logo from "../../../features/website/components/common/Logo";
 import DesktopNav from "./DesktopNav";
-import { JoinButton, WhatsAppButton } from "./HeaderActions";
+import { JoinButton, LoginLink, WhatsAppButton } from "./HeaderActions";
 import MobileMenu from "./MobileMenu";
 
 /**
@@ -44,6 +44,7 @@ const Header = () => {
         <Logo />
         <DesktopNav />
         <div className="site-header__actions">
+          <LoginLink />
           <JoinButton />
           <WhatsAppButton />
           <button type="button" className="site-header__toggle" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} aria-controls="mobile-menu" aria-label="Open menu">

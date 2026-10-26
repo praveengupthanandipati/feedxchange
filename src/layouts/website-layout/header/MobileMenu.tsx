@@ -4,7 +4,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { company, navItems } from "../../../features/website/data/content";
 import { sitePaths } from "../../../features/website/routes/paths";
 import Logo from "../../../features/website/components/common/Logo";
-import { JoinButton, WhatsAppButton } from "./HeaderActions";
+import { JoinButton, LoginLink, WhatsAppButton } from "./HeaderActions";
 
 interface MobileMenuProps {
   open: boolean;
@@ -86,6 +86,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
             <JoinButton className="btn-site--block" />
             <WhatsAppButton />
           </div>
+          <LoginLink className="site-login--block" />
           <a href={`tel:${company.phone.replace(/\s/g, "")}`}>
             <FiPhone aria-hidden /> {company.phone}
           </a>
