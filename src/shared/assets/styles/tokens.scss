@@ -56,10 +56,17 @@ html[data-app="admin"] {
   min-height: 24px;
 }
 
+// A visible focus ring for anything a component did not style itself (zero specificity, so component styles win)
+:where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--fx-focus-ring);
+  outline-offset: 2px;
+}
+
 // Bootstrap's controls at the app's density
 .form-control,
 .form-select {
   min-height: var(--fx-control-height);
+  border-color: var(--fx-field-border);
   padding: 0.25rem var(--fx-control-px);
   font-size: var(--fx-text-sm);
   border-radius: var(--fx-radius-1);

@@ -242,6 +242,10 @@
   --fx-card-padding: 0.9375rem;
   --fx-dialog-padding: 1.25rem;
 
+  // the edge of a text field, select or date picker: at least 3:1 against the page in every theme (WCAG 1.4.11), where the
+  // general border colour is a soft divider
+  --fx-field-border: var(--fx-slate-58-line);
+
   // focus ring, used by every focusable control: navy on the light page (orange is only 2:1 on white); each theme and the
   // dark brand panels set their own
   --fx-focus-ring: var(--fx-brand-navy-on);

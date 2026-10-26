@@ -154,7 +154,7 @@
   width: 100%;
   min-height: var(--fx-control-height);
   padding: 0 var(--fx-control-px);
-  border: 1px solid v.line(v.$color-gray-300);
+  border: 1px solid var(--fx-field-border);
   border-radius: v.$radius-sm;
   background-color: v.$color-bg;
   color: v.fg(v.$color-text);

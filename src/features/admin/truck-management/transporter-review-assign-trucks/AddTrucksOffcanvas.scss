@@ -131,7 +131,7 @@
     width: 100%;
     height: 2.25rem;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.line(v.$color-border);
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
     color: v.fg(v.$color-text);

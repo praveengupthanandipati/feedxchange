@@ -201,7 +201,7 @@
     input {
       height: var(--fx-control-height);
       padding: 0 v.$spacing-2;
-      border: 1px solid v.line(v.$color-border);
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       font-size: v.$font-size-sm;
       color: v.fg(v.$color-text);

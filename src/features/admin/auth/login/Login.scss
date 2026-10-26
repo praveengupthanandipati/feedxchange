@@ -175,7 +175,7 @@
     height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
     margin: 0 0 v.$spacing-4;
-    border: 1px solid v.line(v.$color-border);
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
 

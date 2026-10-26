@@ -220,7 +220,7 @@
       width: 100%;
       height: var(--fx-control-height);
       padding: 0 v.$spacing-3;
-      border: 1px solid v.line(v.$color-border);
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
