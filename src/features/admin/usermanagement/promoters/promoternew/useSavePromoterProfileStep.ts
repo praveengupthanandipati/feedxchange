@@ -96,7 +96,8 @@ export const useSavePromoterProfileStep = (nextPath: string) => {
       const newRegions: CreatePromoterRegionEntry[] = [];
       const updatedRegions: PromoterRegionDetail[] = [];
 
-      draft.regions.forEach((region) => {
+      // The "Add" button appends an empty row for the next region; State is required, so a row without one is not a region yet.
+      draft.regions.filter((region) => region.stateName).forEach((region) => {
         if (region.meta) {
           updatedRegions.push({
             regionId: region.meta.regionId,
