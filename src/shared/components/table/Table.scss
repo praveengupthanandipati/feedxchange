@@ -181,3 +181,111 @@
     }
   }
 }
+
+// ---------- Optional features (Table props): Columns menu, pager, sticky first column, loading rows ----------
+.table-frame {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  min-width: 0;
+}
+
+.table-toolbar {
+  @include m.flex(row, flex-end, center, v.$spacing-2);
+}
+
+.table-columns {
+  position: relative;
+
+  &__toggle {
+    @include m.flex(row, center, center, v.$spacing-1);
+    @include m.focus-ring;
+    min-height: var(--fx-control-height-sm);
+    padding: 0 0.6rem;
+    border: 1px solid v.line(v.$color-gray-300);
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    z-index: v.$z-index-dropdown;
+    display: flex;
+    flex-direction: column;
+    min-width: 12rem;
+    max-height: 18rem;
+    margin: 0;
+    padding: v.$spacing-1;
+    overflow-y: auto;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-lg;
+  }
+
+  &__item {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    min-height: 24px;
+    padding: 0.2rem v.$spacing-2;
+    border-radius: v.$radius-sm;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+  }
+}
+
+.table-pager {
+  @include m.flex(row, flex-end, center, v.$spacing-2);
+  color: v.fg(v.$color-text-muted);
+  font-size: v.$font-size-sm;
+
+  &__range {
+    margin-right: auto;
+  }
+
+  &__btn {
+    @include m.flex-center;
+    @include m.focus-ring;
+    width: var(--fx-control-height-sm);
+    height: var(--fx-control-height-sm);
+    border: 1px solid v.line(v.$color-gray-300);
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.table-wrapper--sticky-first {
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: v.$color-bg;
+    box-shadow: 1px 0 0 v.line(v.$color-border);
+  }
+
+  th:first-child {
+    z-index: 2;
+    background-color: v.$color-navy;
+  }
+}
+
+.table__loading-row td {
+  padding: var(--fx-table-cell-py) var(--fx-table-cell-px);
+}

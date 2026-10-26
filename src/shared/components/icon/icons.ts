@@ -30,6 +30,7 @@ import {
   CircleX,
   Clipboard,
   Clock,
+  Columns3,
   CloudUpload,
   Contrast,
   Copy,
@@ -140,6 +141,7 @@ export const CirclePlusIcon = createIcon(CirclePlus, "CirclePlusIcon");
 export const CircleXIcon = createIcon(CircleX, "CircleXIcon");
 export const ClipboardIcon = createIcon(Clipboard, "ClipboardIcon");
 export const ClockIcon = createIcon(Clock, "ClockIcon");
+export const Columns3Icon = createIcon(Columns3, "Columns3Icon");
 export const CloudUploadIcon = createIcon(CloudUpload, "CloudUploadIcon");
 export const ContrastIcon = createIcon(Contrast, "ContrastIcon");
 export const CopyIcon = createIcon(Copy, "CopyIcon");
