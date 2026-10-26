@@ -289,3 +289,78 @@
 .table__loading-row td {
   padding: var(--fx-table-cell-py) var(--fx-table-cell-px);
 }
+
+// ---------- Phones and small tablets ----------
+// Columns marked priority "low" step aside below 768px.
+@include m.respond-below(md) {
+  .table .is-low-priority {
+    display: none;
+  }
+}
+
+// mobileCards: below 768px every row is a card of "label: value" lines (the label comes from data-label).
+@include m.respond-below(md) {
+  .table-wrapper--cards {
+    overflow: visible;
+    border: none;
+
+    .table {
+      min-width: 0;
+    }
+
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    tbody,
+    tr,
+    td {
+      display: block;
+    }
+
+    tbody tr {
+      margin-bottom: v.$spacing-2;
+      padding: v.$spacing-2 v.$spacing-3;
+      border: 1px solid v.line(v.$color-border);
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+    }
+
+    td {
+      @include m.flex(row, space-between, center, v.$spacing-3);
+      padding: 0.3rem 0;
+      border: none;
+      text-align: right !important;
+      white-space: normal;
+
+      &::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        color: v.fg(v.$color-text-muted);
+        font-size: var(--fx-text-xs);
+        font-weight: v.$font-weight-semibold;
+        text-align: left;
+      }
+
+      &:not([data-label])::before,
+      &[data-label=""]::before {
+        content: none;
+      }
+    }
+
+    .table__select-col {
+      justify-content: flex-start;
+    }
+
+    .table__empty,
+    .table__expanded-row td {
+      display: block;
+      text-align: left !important;
+    }
+  }
+}

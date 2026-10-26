@@ -530,6 +530,7 @@ const filteredRows = useMemo(() => {
           onSelectAll={handleSelectAll}
           emptyMessage="No contracts match the current filters."
           minHeight
+          mobileCards
         />
 )}
 

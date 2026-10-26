@@ -37,6 +37,8 @@ interface TableProps<T> {
   pageSize?: number;
   /** Adds a Columns menu above the table to show or hide columns (see TableColumn.hidden / hideable). */
   columnToggle?: boolean;
+  /** Below 768px each row becomes a card of "label: value" lines instead of a table that scrolls sideways. */
+  mobileCards?: boolean;
 }
 
 /** Columns menu: a checkbox per column the user may hide. */
@@ -132,6 +134,7 @@ function Table<T>({
   stickyFirstColumn = false,
   pageSize,
   columnToggle = false,
+  mobileCards = false,
 }: TableProps<T>) {
   const [hiddenKeys, setHiddenKeys] = useState<ReadonlySet<string>>(
     () => new Set(columnToggle ? columns.filter((column) => column.hidden).map((column) => column.key) : []),
@@ -212,7 +215,7 @@ function Table<T>({
     <div
       className={`table-wrapper ${minHeight ? "table-wrapper--min-height" : ""} ${
         variant === "light" ? "table-wrapper--light" : ""
-      } ${stickyFirstColumn ? "table-wrapper--sticky-first" : ""} ${className}`}
+      } ${stickyFirstColumn ? "table-wrapper--sticky-first" : ""} ${mobileCards ? "table-wrapper--cards" : ""} ${className}`}
     >
       <table className={`table ${variant === "light" ? "table--light" : ""}`}>
         <thead>
@@ -230,7 +233,7 @@ function Table<T>({
               <th
                 key={column.key}
                 style={{ width: column.width, textAlign: column.align }}
-                className={column.sortable ? "is-sortable" : ""}
+                className={`${column.sortable ? "is-sortable" : ""} ${column.priority === "low" ? "is-low-priority" : ""}`}
                 onClick={() => handleSort(column)}
               >
                 <span className="table__header-label">
@@ -295,7 +298,12 @@ function Table<T>({
                       </td>
                     )}
                     {shownColumns.map((column) => (
-                      <td key={column.key} style={{ textAlign: column.align }}>
+                      <td
+                        key={column.key}
+                        style={{ textAlign: column.align }}
+                        className={column.priority === "low" ? "is-low-priority" : undefined}
+                        data-label={column.header}
+                      >
                         {column.render
                           ? column.render(row)
                           : String((row as Record<string, unknown>)[column.key] ?? "")}
