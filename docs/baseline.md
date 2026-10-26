@@ -54,3 +54,42 @@ Largest files:
 | fi.js (react-icons Feather) | 38.6 | 5.7 |
 | businessOwnerWizard.utils.js | 35.9 | 6.9 |
 | redux-toolkit.modern.js | 35.4 | 13.0 |
+
+## After the performance phase (Phase 7)
+
+Changes: Bootstrap's JavaScript only on the two screens that use it (it loaded everywhere); Bootstrap CSS built from its
+Sass with only the parts in use; the home page photo as WebP / recompressed JPEG with a phone size (663 KB to 47 KB, 19 KB
+on phones); Inter and Poppins self-hosted with the two first-needed files preloaded (no Google Fonts requests); libraries
+in their own long-lived files (vendor-react, -redux, -charts, -signalr, -swiper, -icons); `npm run size` budget check.
+
+### Lighthouse (`npm run lighthouse`, median of three runs)
+
+Measured on this PC against `scripts/serve-dist.mjs`, which does not compress files, so transfer sizes and mobile
+times are higher than a production server with gzip or brotli would give. Compare the rows with each other, not with
+field data. The admin login's SEO score is low on purpose (`noindex`).
+
+| Build | Page | Device | Performance | Accessibility | Best practices | SEO | FCP | LCP | TBT | CLS | Transfer |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| before | website home | mobile | 46 | 100 | 100 | 100 | 8.22 s | 11.60 s | 452 ms | 0.000 | 1957 KB |
+| after | website home | mobile | 56 | 100 | 100 | 100 | 8.89 s | 9.64 s | 0 ms | 0.000 | 1428 KB |
+| before | website home | desktop | 82 | 100 | 100 | 100 | 1.52 s | 2.04 s | 80 ms | 0.000 | 1957 KB |
+| after | website home | desktop | 84 | 100 | 100 | 100 | 1.68 s | 1.84 s | 0 ms | 0.000 | 1408 KB |
+| before | admin login | mobile | 60 | 98 | 100 | 54 | 6.58 s | 7.26 s | 58 ms | 0.000 | 1023 KB |
+| after | admin login | mobile | 62 | 98 | 100 | 54 | 5.86 s | 6.69 s | 0 ms | 0.000 | 985 KB |
+| before | admin login | desktop | 92 | 98 | 100 | 58 | 1.29 s | 1.42 s | 0 ms | 0.000 | 1031 KB |
+| after | admin login | desktop | 94 | 98 | 100 | 58 | 1.11 s | 1.29 s | 0 ms | 0.000 | 999 KB |
+
+### Bundle (`node scripts/bundle-report.mjs`, gzip)
+
+| | Phase 0 | After Phase 7 |
+| --- | ---: | ---: |
+| All JavaScript | 722 KB | 720 KB |
+| All CSS | 184 KB | 200 KB (themes, density, components) |
+| Website home, loaded up front | not measured | 188 KB JS, 54 KB CSS |
+| Admin app, loaded up front | not measured | 117 KB JS, 40 KB CSS |
+
+`npm run size` fails the build check when the up-front download passes 200 KB JS / 60 KB CSS (website) or
+130 KB JS / 50 KB CSS (admin app), or any single JS / CSS file passes 110 KB.
+
+The font files make the "all assets" total larger (a file per weight and character range), but a browser downloads only
+the ones a page uses.
