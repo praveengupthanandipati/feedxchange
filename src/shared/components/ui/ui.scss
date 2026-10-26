@@ -171,6 +171,7 @@
   }
 
   &:disabled {
+    border-color: var(--fx-field-border-disabled);
     background-color: v.$color-gray-100;
     cursor: not-allowed;
   }

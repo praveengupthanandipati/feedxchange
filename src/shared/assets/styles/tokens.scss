@@ -112,10 +112,12 @@ html[data-app="admin"] {
   color-scheme: dark;
   @include t.palette-tokens(dark);
   --fx-focus-ring: var(--fx-brand-orange-on);
-  // neutral greys a few steps above the dark field: #636363 is 3.02:1, hover 3.8:1, focus 5.3:1
-  --fx-field-border: var(--fx-gray-39-on);
-  --fx-field-border-hover: var(--fx-gray-45-on);
-  --fx-field-border-focus: var(--fx-gray-54-on);
+  // soft neutral greys a few steps above the dark field (deliberate exception, see _themes.scss): #4a4a4a 2.05:1,
+  // hover #5c5c5c 2.71:1; focus #7a7a7a 4.22:1 keeps real contrast
+  --fx-field-border: var(--fx-gray-29-on);
+  --fx-field-border-hover: var(--fx-gray-36-on);
+  --fx-field-border-focus: var(--fx-gray-48-on);
+  --fx-field-border-disabled: var(--fx-gray-24-on);
 
   // Bootstrap's select arrow and close button are drawn dark; draw them light.
   --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23dee2e6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
@@ -132,6 +134,7 @@ html[data-app="admin"] {
   --fx-field-border: var(--fx-slate-58-line);
   --fx-field-border-hover: var(--fx-slate-58-line);
   --fx-field-border-focus: var(--fx-gray-7);
+  --fx-field-border-disabled: var(--fx-slate-58-line);
 }
 
 // The dark brand panels: the admin sidebar, the login brand panel and dashboard banner, and the website's hero, dark
@@ -193,6 +196,10 @@ $dark-panels: ".aside", ".login__panel", ".dashboard-banner", ".hero", ".page-he
 
 .form-control,
 .form-select {
+  &:disabled {
+    border-color: var(--fx-field-border-disabled);
+  }
+
   &:hover:not(:focus):not(:disabled):not(.is-invalid) {
     border-color: var(--fx-field-border-hover);
   }

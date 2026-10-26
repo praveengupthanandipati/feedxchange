@@ -274,12 +274,14 @@ $tints: (
   --fx-card-padding: 0.9375rem;
   --fx-dialog-padding: 1.25rem;
 
-  // the edge of a text field, select or date picker: plain neutral grey (no blue tint), the lightest that keeps 3:1 against
-  // the field (WCAG 1.4.11): #949494 is 3.03:1 on white; hover one step darker (3.7:1); focus darker again (5.3:1), with the
-  // focus ring. Fixed greys (-on), so the Dark theme sets its own below rather than deriving a tinted one.
-  --fx-field-border: var(--fx-gray-58-on);
-  --fx-field-border-hover: var(--fx-gray-52-on);
-  --fx-field-border-focus: var(--fx-gray-42-on);
+  // The edge of a text field, select or date picker: a soft neutral grey, by the owner's choice lighter than WCAG 1.4.11
+  // asks for (3:1). DELIBERATE EXCEPTION: resting #d4d4d4 is 1.48:1 on white and hover #b8b8b8 1.98:1; the focused field
+  // keeps real contrast (#949494, 3.03:1, plus the focus ring). Fixed greys (-on), so Dark sets its own (tokens.scss).
+  // See docs/design-tokens.md, "Field borders".
+  --fx-field-border: var(--fx-gray-83-on);
+  --fx-field-border-hover: var(--fx-gray-72-on);
+  --fx-field-border-focus: var(--fx-gray-58-on);
+  --fx-field-border-disabled: var(--fx-gray-90-2-on);
 
   // focus ring, used by every focusable control: navy on the light page (orange is only 2:1 on white); each theme and the
   // dark brand panels set their own
