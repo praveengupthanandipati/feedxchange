@@ -3,6 +3,18 @@
 
 // Contracts overview above the list: tokens and the compact density only, so it follows every theme.
 
+// ---------------- tints ----------------
+// .cd-tint--<hue> picks a set of theme tokens (--fx-tint-<hue>-bg / -border / -accent / -fg, see _themes.scss): a soft fill in
+// Light, a deep muted one in Dark, none in High contrast (a strong border instead). Numbers keep the text colour.
+@each $hue in (blue, teal, green, orange, amber, red, purple) {
+  .cd-tint--#{$hue} {
+    --tint-bg: var(--fx-tint-#{$hue}-bg);
+    --tint-border: var(--fx-tint-#{$hue}-border);
+    --tint-accent: var(--fx-tint-#{$hue}-accent);
+    --tint-fg: var(--fx-tint-#{$hue}-fg);
+  }
+}
+
 .contracts-dashboard {
   display: flex;
   flex-direction: column;
@@ -61,6 +73,28 @@
   min-width: 0;
   text-align: left;
 
+  &[class*="cd-tint--"] {
+    border: 1px solid var(--tint-border);
+    border-left: 4px solid var(--tint-accent);
+    background-color: var(--tint-bg);
+    box-shadow: none;
+  }
+
+  &__head {
+    @include m.flex(row, space-between, flex-start, v.$spacing-2);
+  }
+
+  &__icon {
+    @include m.flex-center;
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1px solid var(--tint-border);
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: var(--tint-fg);
+  }
+
   &--button {
     @include m.focus-ring;
     border: none;
@@ -102,7 +136,12 @@
     display: block;
     height: 100%;
     border-radius: inherit;
-    background-color: var(--fx-chart-2);
+    background-color: var(--tint-accent, var(--fx-chart-2));
+  }
+
+  .cd-tint--green & {
+    border: 1px solid var(--tint-border);
+    background-color: v.$color-bg;
   }
 }
 
@@ -203,17 +242,32 @@
       color: v.fg(v.$color-text-muted);
     }
 
-    &--overdue:not(.is-zero) svg {
-      color: v.fg(v.$color-danger);
-    }
-
-    &--due7:not(.is-zero) svg,
-    &--approval:not(.is-zero) svg {
-      color: v.fg(v.$color-orange-dark);
-    }
 
     &.is-zero {
       color: v.fg(v.$color-text-muted);
+    }
+
+    // a group with contracts in it: its status tint, a coloured bar and icon; empty groups stay neutral
+    &[class*="cd-tint--"] {
+      border-color: var(--tint-border);
+      border-left-width: 3px;
+      border-left-color: var(--tint-accent);
+      background-color: var(--tint-bg);
+
+      svg {
+        color: var(--tint-fg);
+      }
+
+      .cd-attention__count {
+        border: 1px solid var(--tint-border);
+        background-color: v.$color-bg;
+        color: var(--tint-fg);
+      }
+
+      &:hover:not(:disabled) {
+        background-color: var(--tint-bg);
+        box-shadow: inset 0 0 0 1px var(--tint-accent);
+      }
     }
   }
 
@@ -230,11 +284,6 @@
     color: v.fg(v.$color-text);
     font-weight: v.$font-weight-semibold;
     text-align: center;
-
-    .cd-attention__row--overdue:not(.is-zero) & {
-      background-color: v.alpha(v.$color-danger, 0.14);
-      color: v.fg(v.$color-danger);
-    }
   }
 }
 

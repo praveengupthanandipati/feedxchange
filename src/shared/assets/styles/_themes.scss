@@ -185,8 +185,40 @@
   --fx-#{$name}-rgb: #{math.round(color.channel($colour, "red", $space: rgb))}, #{math.round(color.channel($colour, "green", $space: rgb))}, #{math.round(color.channel($colour, "blue", $space: rgb))};
 }
 
+/// Tinted surfaces (dashboard cards, attention rows): hue -> (tint fill, border colour, text / icon colour), palette names.
+/// Each hue becomes --fx-tint-<hue>-bg, -border, -accent and -fg. They are built from the palette's variants, so Dark
+/// turns the fill into a deep muted tint and lightens border and text on its own; High contrast drops the fill
+/// (tint-tokens-high-contrast). Text on a tint stays the normal text colour; the hue is for the bar, icon and border.
+$tints: (
+  "blue": ("slate-95", "sky-51", "sky-40"),
+  "teal": ("green-96", "teal-38", "teal-33"),
+  "green": ("green-94", "green-40", "green-31"),
+  "orange": ("orange-96", "orange-37", "orange-37"),
+  "amber": ("amber-89", "amber-33", "amber-33"),
+  "red": ("red-96", "red-56", "red-45"),
+  "purple": ("indigo-95", "violet-50", "violet-50"),
+);
+
+@mixin tint-tokens {
+  @each $hue, $set in $tints {
+    --fx-tint-#{$hue}-bg: var(--fx-#{list.nth($set, 1)});
+    --fx-tint-#{$hue}-border: var(--fx-#{list.nth($set, 2)}-line);
+    --fx-tint-#{$hue}-accent: var(--fx-#{list.nth($set, 3)}-line);
+    --fx-tint-#{$hue}-fg: var(--fx-#{list.nth($set, 3)}-fg);
+  }
+}
+
+/// High contrast: no tint fill (white), the border in the strong text colour of the hue.
+@mixin tint-tokens-high-contrast {
+  @each $hue, $set in $tints {
+    --fx-tint-#{$hue}-bg: var(--fx-white);
+    --fx-tint-#{$hue}-border: var(--fx-#{list.nth($set, 3)}-fg);
+  }
+}
+
 /// Everything that is not a colour: type, spacing, radius, shadow and density. Shared by the admin app and the website.
 @mixin scale-tokens {
+  @include tint-tokens;
   // type
   --fx-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji";

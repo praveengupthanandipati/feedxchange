@@ -122,6 +122,7 @@ html[data-app="admin"] {
 [data-theme="high-contrast"] {
   color-scheme: light;
   @include t.palette-tokens(high-contrast);
+  @include t.tint-tokens-high-contrast;
   --fx-focus-ring: var(--fx-gray-7);
 }
 

@@ -19,6 +19,8 @@ const STATUS_COLOURS: Record<string, string> = {
 const statusColour = (status: string) => STATUS_COLOURS[statusKey(status)] ?? "var(--fx-slate-65)";
 
 const ATTENTION_ICONS = { overdue: TriangleAlertIcon, due7: ClockIcon, due30: ClockIcon, noTrucks: TruckIcon, approval: FileTextIcon } as const;
+/** Tint per attention group (theme tokens --fx-tint-<hue>-*): red overdue, orange within a week, amber within a month. */
+const ATTENTION_TINTS = { overdue: "red", due7: "orange", due30: "amber", noTrucks: "purple", approval: "blue" } as const;
 
 export interface DashboardFilters {
   status: string;
@@ -170,26 +172,46 @@ const ContractsDashboard = ({ contracts, loading, error, active, onStatus, onFoc
 
       {/* ---------------- headline numbers ---------------- */}
       <div className="cd-cards">
-        <button type="button" className="cd-card cd-card--button" onClick={onClear} title="Show all contracts">
-          <span className="cd-card__label">Contracts</span>
+        <button type="button" className="cd-card cd-card--button cd-tint--blue" onClick={onClear} title="Show all contracts">
+          <span className="cd-card__head">
+            <span className="cd-card__label">Contracts</span>
+            <span className="cd-card__icon" aria-hidden>
+              <FileTextIcon size={16} />
+            </span>
+          </span>
           <strong className="cd-card__value">{metrics.total.toLocaleString("en-IN")}</strong>
           <span className="cd-card__note">{metrics.active.toLocaleString("en-IN")} active</span>
         </button>
-        <div className="cd-card">
-          <span className="cd-card__label">Contracted quantity</span>
+        <div className="cd-card cd-tint--teal">
+          <span className="cd-card__head">
+            <span className="cd-card__label">Contracted quantity</span>
+            <span className="cd-card__icon" aria-hidden>
+              <PackageIcon size={16} />
+            </span>
+          </span>
           <strong className="cd-card__value">{formatMT(metrics.quantity)}</strong>
           <span className="cd-card__note">Value {formatRupees(metrics.value)} (excl. GST)</span>
         </div>
-        <div className="cd-card">
-          <span className="cd-card__label">Dispatched</span>
+        <div className="cd-card cd-tint--green">
+          <span className="cd-card__head">
+            <span className="cd-card__label">Dispatched</span>
+            <span className="cd-card__icon" aria-hidden>
+              <TruckIcon size={16} />
+            </span>
+          </span>
           <strong className="cd-card__value">{formatMT(metrics.dispatched)}</strong>
           <span className="cd-progress" role="progressbar" aria-label="Share of contracted quantity dispatched" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
             <span style={{ width: `${percent}%` }} />
           </span>
           <span className="cd-card__note">{percent}% of contracted</span>
         </div>
-        <div className="cd-card">
-          <span className="cd-card__label">Still to dispatch</span>
+        <div className="cd-card cd-tint--orange">
+          <span className="cd-card__head">
+            <span className="cd-card__label">Still to dispatch</span>
+            <span className="cd-card__icon" aria-hidden>
+              <ClockIcon size={16} />
+            </span>
+          </span>
           <strong className="cd-card__value">{formatMT(metrics.pending)}</strong>
           <span className="cd-card__note">{formatMT(metrics.arranged)} arranged with trucks</span>
         </div>
@@ -208,7 +230,7 @@ const ContractsDashboard = ({ contracts, loading, error, active, onStatus, onFoc
                 <li key={kind}>
                   <button
                     type="button"
-                    className={`cd-attention__row cd-attention__row--${kind} ${count === 0 ? "is-zero" : ""} ${selected ? "is-active" : ""}`}
+                    className={`cd-attention__row cd-attention__row--${kind} ${count === 0 ? "is-zero" : `cd-tint--${ATTENTION_TINTS[kind]}`} ${selected ? "is-active" : ""}`}
                     aria-pressed={selected}
                     disabled={count === 0 && !selected}
                     onClick={() => onFocus(selected ? null : kind)}
