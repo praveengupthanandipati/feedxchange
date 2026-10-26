@@ -43,18 +43,17 @@ const Login = () => {
     saveTokens({ token, refreshToken: data?.refreshToken, accessTokenExpiresAt: data?.accessTokenExpiresAt });
 
     try {
+      // Only what the app reads back (core/auth/session.ts); the rest of the profile stays out of storage, where any script
+      // on the page could read it. Copies an older version saved are removed.
       localStorage.setItem("userId", String(user?.id ?? ""));
-      localStorage.setItem("businessProfileId", String(user?.businessProfileId ?? ""));
       localStorage.setItem("firstName", String(user?.firstName ?? ""));
       localStorage.setItem("lastName", String(user?.lastName ?? ""));
       localStorage.setItem("email", String(user?.email ?? ""));
-      localStorage.setItem("phoneNumber", String(user?.phoneNumber ?? ""));
-      localStorage.setItem("roleId", String(user?.roleId ?? ""));
       localStorage.setItem("roleName", String(user?.roleName ?? ""));
-      localStorage.setItem("businessName", String(user?.businessName ?? ""));
-      localStorage.setItem("lastLoginDate", String(user?.lastLoginDate ?? ""));
       localStorage.setItem("businessUnitType", String(user?.businessUnitType ?? ""));
-      localStorage.setItem("user", JSON.stringify(user));
+      ["businessProfileId", "phoneNumber", "roleId", "businessName", "lastLoginDate", "permissions", "user"].forEach((key) =>
+        localStorage.removeItem(key),
+      );
       // Undefined (older API without permission keys) leaves the UI ungated, exactly as before.
       savePermissionKeys(data?.permissionKeys, data?.roleKey);
     } catch (err) {
