@@ -235,9 +235,25 @@ function Table<T>({
                 style={{ width: column.width, textAlign: column.align }}
                 className={`${column.sortable ? "is-sortable" : ""} ${column.priority === "low" ? "is-low-priority" : ""}`}
                 onClick={() => handleSort(column)}
+                aria-sort={
+                  column.sortable
+                    ? sortKey === column.key && sortDirection
+                      ? sortDirection === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                    : undefined
+                }
               >
                 <span className="table__header-label">
-                  {column.header}
+                  {/* a real button, so sorting works from the keyboard; its click bubbles to the header's onClick */}
+                  {column.sortable ? (
+                    <button type="button" className="table__sort-btn">
+                      {column.header}
+                    </button>
+                  ) : (
+                    column.header
+                  )}
                   {column.headerTooltip && <InfoTooltip text={column.headerTooltip} />}
                   {column.sortable && (
                     <span className="table__sort-icons">
