@@ -26,7 +26,7 @@
     opacity: 0;
   }
 
-  &.reveal-ready [data-reveal].is-revealed {
+  &.reveal-ready [data-reveal][data-revealed] {
     opacity: 1;
     // "backwards" holds the start frame during the stagger delay; afterwards the element's own styles
     // (including hover transforms) take over untouched.
@@ -39,7 +39,7 @@
     stroke-dashoffset: 220;
   }
 
-  &.reveal-ready .dealing-card.is-revealed .draw {
+  &.reveal-ready .dealing-card[data-revealed] .draw {
     animation: dealing-draw 1.6s v.$ease 0.3s forwards;
   }
 

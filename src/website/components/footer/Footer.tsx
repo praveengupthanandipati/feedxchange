@@ -2,6 +2,7 @@ import { useState, type SubmitEvent } from "react";
 import { FiClock, FiMail, FiMapPin, FiPhone, FiSend } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { company, footerColumns, socialLinks } from "../../data/content";
+import { sitePaths } from "../../routes/paths";
 import Logo from "../common/Logo";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -105,10 +106,10 @@ const Footer = () => {
           </p>
           <ul>
             <li>
-              <a href="#privacy">Privacy Policy</a>
+              <Link to={sitePaths.privacy}>Privacy Policy</Link>
             </li>
             <li>
-              <a href="#terms">Terms of Service</a>
+              <Link to={sitePaths.terms}>Terms &amp; Conditions</Link>
             </li>
           </ul>
         </div>

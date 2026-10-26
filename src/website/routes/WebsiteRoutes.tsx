@@ -8,7 +8,9 @@ import Home from "../pages/Home";
 import JoinUs from "../pages/JoinUs";
 import NotFound from "../pages/NotFound";
 import ProductDetail from "../pages/ProductDetail";
+import Privacy from "../pages/Privacy";
 import Products from "../pages/Products";
+import Terms from "../pages/Terms";
 
 /**
  * Every website route. Mounted by App.tsx at "/website/*", so the paths here are relative:
@@ -20,6 +22,8 @@ import Products from "../pages/Products";
  *   /website/blogs            → Blogs
  *   /website/contact          → Contact
  *   /website/join             → Join with us
+ *   /website/privacy          → Privacy Policy
+ *   /website/terms            → Terms and Conditions
  *   /website/anything-else    → 404
  */
 const WebsiteRoutes = () => (
@@ -33,6 +37,8 @@ const WebsiteRoutes = () => (
       <Route path="blogs" element={<Blogs />} />
       <Route path="contact" element={<Contact />} />
       <Route path="join" element={<JoinUs />} />
+      <Route path="privacy" element={<Privacy />} />
+      <Route path="terms" element={<Terms />} />
       <Route path="*" element={<NotFound />} />
     </Route>
   </Routes>
