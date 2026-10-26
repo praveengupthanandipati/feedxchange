@@ -28,7 +28,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
 
   return (
     <div className={`mobile-menu ${open ? "is-open" : ""}`} inert={!open}>
-      <button type="button" className="mobile-menu__backdrop" onClick={onClose} aria-label="Close menu" tabIndex={-1} />
+      <div className="mobile-menu__backdrop" onClick={onClose} aria-hidden />
 
       <aside id="mobile-menu" className="mobile-menu__panel" role="dialog" aria-modal="true" aria-label="Menu">
         <div className="mobile-menu__head">

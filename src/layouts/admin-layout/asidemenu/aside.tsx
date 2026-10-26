@@ -33,6 +33,16 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
   const { selectedContract } = useSelectedContract();
   const { can, logout, menu } = useAuth();
 
+  // the phone drawer closes with Escape, like every other dialog
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onCloseMobile?.();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [mobileOpen, onCloseMobile]);
+
   useEffect(() => () => window.clearTimeout(scrollTimer.current), []);
 
   const navSections = useMemo(
@@ -70,6 +80,8 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
   return (
     <aside
       className={`aside ${collapsed ? "aside--collapsed" : ""} ${mobileOpen ? "aside--mobile-open" : ""}`}
+      // open on a phone it is a modal drawer (focus stays inside: shared/a11y/modalFocus.ts)
+      {...(mobileOpen ? { role: "dialog", "aria-modal": true, "aria-label": "Menu" } : {})}
     >
       <div className="aside__brand">
         <img
