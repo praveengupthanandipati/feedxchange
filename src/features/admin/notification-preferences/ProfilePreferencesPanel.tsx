@@ -157,11 +157,11 @@ const ProfilePreferencesPanel = ({ profileId, compact = false, readOnly = false 
       </section>
 
       {readOnly && (
-        <p className="pref-hint"><FiInfo aria-hidden /> View only. To change these preferences, edit the profile and open its Notification Preferences step.</p>
+        <p className="pref-hint"><InfoIcon aria-hidden /> View only. To change these preferences, edit the profile and open its Notification Preferences step.</p>
       )}
 
       {!readOnly && !canSwitchMode && !auto && (
-        <p className="pref-hint"><FiInfo aria-hidden /> Contacts' preferences can be prepared now. Ask a FeedXchange administrator to switch automatic notifications on when you are ready.</p>
+        <p className="pref-hint"><InfoIcon aria-hidden /> Contacts' preferences can be prepared now. Ask a FeedXchange administrator to switch automatic notifications on when you are ready.</p>
       )}
 
       {/* ------------------------------------------------ settings */}

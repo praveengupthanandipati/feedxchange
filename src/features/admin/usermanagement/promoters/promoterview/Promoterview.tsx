@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftIcon, DownloadIcon, MailIcon, PenLineIcon, Share2Icon } from "../../../../../shared/components/icon";
+import { ArrowLeftIcon, BellIcon, DownloadIcon, MailIcon, PenLineIcon, Share2Icon, UserIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
@@ -14,6 +14,15 @@ import "../../businessowners/BusinessList/Businessowners.scss";
 import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
 
 import Can from "../../../../../core/auth/Can";
+import { usePermission } from "../../../../../core/auth/AuthContext";
+import ProfilePreferencesPanel from "../../../notification-preferences/ProfilePreferencesPanel";
+
+const TABS = [
+  { id: "overview", label: "Overview", icon: UserIcon },
+  { id: "notifications", label: "Notifications", icon: BellIcon },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
 
 interface DetailFieldProps {
   label: string;
@@ -30,6 +39,8 @@ const DetailField = ({ label, value }: DetailFieldProps) => (
 const Promoterview = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const canSeeNotifications = usePermission("notification-preferences.view");
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [shareProfileOpen, setShareProfileOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
 
@@ -131,7 +142,37 @@ const Promoterview = () => {
           </div>
         </div>
 
-        <div className="business-owner-detail__main">
+        <nav className="business-owner-detail__tabs" role="tablist" aria-label="Promoter detail sections">
+          {TABS.filter((tab) => tab.id !== "notifications" || canSeeNotifications).map((tab) => {
+            const Icon = tab.icon;
+            const selected = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                id={`promoter-tab-${tab.id}`}
+                aria-selected={selected}
+                aria-controls={`promoter-tabpanel-${tab.id}`}
+                className={`business-owner-detail__tab ${selected ? "is-active" : ""}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <Icon aria-hidden />
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div
+          className="business-owner-detail__main"
+          role="tabpanel"
+          id={`promoter-tabpanel-${activeTab}`}
+          aria-labelledby={`promoter-tab-${activeTab}`}
+        >
+          {/* View only: preferences are changed in the edit wizard's Notification Preferences step. */}
+          {activeTab === "notifications" && canSeeNotifications && <ProfilePreferencesPanel profileId={Number(id)} compact readOnly />}
+          {activeTab === "overview" && (
           <div className="business-owner-detail__tab-panel">
             <section className="business-owner-detail__section">
               <div className="business-owner-detail__section-header">
@@ -199,6 +240,7 @@ const Promoterview = () => {
               />
             </section>
           </div>
+          )}
         </div>
       </div>
 

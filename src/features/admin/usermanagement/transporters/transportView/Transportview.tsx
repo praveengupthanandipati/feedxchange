@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftIcon, CreditCardIcon, PenLineIcon, PhoneIcon, Share2Icon, UserIcon } from "../../../../../shared/components/icon";
+import { ArrowLeftIcon, BellIcon, CreditCardIcon, PenLineIcon, PhoneIcon, Share2Icon, UserIcon } from "../../../../../shared/components/icon";
 import { useGetTransporterProfileByIdQuery } from "../../../../../core/store/transportersApi";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
@@ -13,11 +13,14 @@ import "../../businessowners/BusinessList/Businessowners.scss";
 import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
 
 import Can from "../../../../../core/auth/Can";
+import { usePermission } from "../../../../../core/auth/AuthContext";
+import ProfilePreferencesPanel from "../../../notification-preferences/ProfilePreferencesPanel";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: UserIcon },
   { id: "contacts", label: "Contacts", icon: PhoneIcon },
   { id: "bank", label: "Bank Details & Documents", icon: CreditCardIcon },
+  { id: "notifications", label: "Notifications", icon: BellIcon },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -25,6 +28,7 @@ type TabId = (typeof TABS)[number]["id"];
 const Transportview = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const canSeeNotifications = usePermission("notification-preferences.view");
   const [shareProfileOpen, setShareProfileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
@@ -102,7 +106,7 @@ const Transportview = () => {
         </div>
 
         <nav className="business-owner-detail__tabs" role="tablist" aria-label="Transporter detail sections">
-          {TABS.map((tab) => {
+          {TABS.filter((tab) => tab.id !== "notifications" || canSeeNotifications).map((tab) => {
             const Icon = tab.icon;
             const selected = activeTab === tab.id;
             return (
@@ -132,6 +136,8 @@ const Transportview = () => {
           {activeTab === "overview" && <OverviewTab profile={profile} />}
           {activeTab === "contacts" && <ContactsTab profile={profile} />}
           {activeTab === "bank" && <BankDetailsTab profile={profile} />}
+          {/* View only: preferences are changed in the edit wizard's Notification Preferences step. */}
+          {activeTab === "notifications" && canSeeNotifications && <ProfilePreferencesPanel profileId={Number(id)} compact readOnly />}
         </div>
       </div>
 
