@@ -1,13 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
-import Table from "../../../../components/table/Table";
+import {
+  FiBriefcase,
+  FiClock,
+  FiDownload,
+  FiEye,
+  FiEyeOff,
+  FiMail,
+  FiPhone,
+  FiPlus,
+  FiUsers,
+} from "react-icons/fi";
+import RowActionsMenu from "../../../../components/table/RowActionsMenu";
 import type { TableColumn } from "../../../../components/table/table.types";
 import ConfirmDialog from "../../../../components/dialog/ConfirmDialog";
 import PromotersFilters from "./PromotersFilters";
 import Pagination from "./Pagination";
 import { buildPromoterColumns } from "./promoters.columns";
 import { buildFilterOptions } from "../../businessowners/BusinessList/Businessowners";
+import SuccessToast from "../../../../components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../components/toast/useSuccessToast";
 import {
   useGetPromoterProfileSummaryQuery,
   useDeletePromoterProfileMutation,
@@ -45,6 +57,7 @@ const Promoterlist = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Promoter | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleEdit = (promoter: Promoter) => {
     navigate(`/promoters/profile?id=${promoter.profileId}`);
@@ -71,15 +84,13 @@ const Promoterlist = () => {
         modifiedBy,
       }).unwrap();
       setPendingDeleteRow(null);
+      showSuccessMessage("Promoter deleted successfully");
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : "Failed to delete promoter.");
     }
   };
 
-  const columns = useMemo(
-    () => buildPromoterColumns({ onEdit: handleEdit, onView: handleView, onDelete: handleDelete }),
-    [],
-  );
+  const columns = buildPromoterColumns({ onEdit: handleEdit, onView: handleView, onDelete: handleDelete });
 
   const commissionStructureOptions = useMemo(
     () => buildFilterOptions(rows.map((row) => row.commissionStructure)),
@@ -146,6 +157,7 @@ const Promoterlist = () => {
 
   return (
     <div className="promoters-page">
+      <SuccessToast message={successMessage} />
       <div className="promoters-card">
         <div className="promoters-card__header">
           <h1>Promoters</h1>
@@ -156,7 +168,7 @@ const Promoterlist = () => {
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
               {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
-              {filtersVisible ? "Hide" : "Show"}
+              {filtersVisible ? "Hide Filters" : "Show Filters"}
             </button>
             <button
               type="button"
@@ -192,19 +204,57 @@ const Promoterlist = () => {
           />
         )}
 
-        <Table
-          columns={columns}
-          data={pagedRows}
-          rowKey={(row) => String(row.profileId)}
-          emptyMessage={
-            isLoading
-              ? "Loading promoters…"
-              : error
-                ? "Failed to load promoters."
-                : "No promoters match the current filters."
-          }
-          minHeight
-        />
+        {isLoading ? (
+          <div className="promoter-cards__message" role="status">Loading promoters…</div>
+        ) : error ? (
+          <div className="promoter-cards__message promoter-cards__message--error" role="alert">
+            Failed to load promoters.
+          </div>
+        ) : pagedRows.length === 0 ? (
+          <div className="promoter-cards__message">No promoters match the current filters.</div>
+        ) : (
+          <div className="promoter-cards">
+            {pagedRows.map((promoter) => (
+              <article className="promoter-profile-card" key={promoter.profileId}>
+                <div className="promoter-profile-card__topline">
+                  <span className="promoter-profile-card__icon"><FiBriefcase aria-hidden /></span>
+                  <span className={`promoters__status promoters__status--${promoter.status.toLowerCase()}`}>
+                    {promoter.status}
+                  </span>
+                  <div className="promoter-profile-card__actions">
+                    <RowActionsMenu
+                      manageKeys={["profiles.promoter.manage"]}
+                      onView={() => handleView(promoter)}
+                      onEdit={() => handleEdit(promoter)}
+                      onDelete={() => handleDelete(promoter)}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="promoter-profile-card__name"
+                  onClick={() => handleView(promoter)}
+                >
+                  {promoter.legalName || promoter.tradingName || "Unnamed Promoter"}
+                </button>
+                {promoter.tradingName && promoter.tradingName !== promoter.legalName && (
+                  <p className="promoter-profile-card__trading-name">{promoter.tradingName}</p>
+                )}
+
+                <div className="promoter-profile-card__details">
+                  <span><FiPhone aria-hidden /> {promoter.mobileNumber || "Phone not provided"}</span>
+                  <span><FiMail aria-hidden /> {promoter.emailId || "Email not provided"}</span>
+                  <span>
+                    <FiUsers aria-hidden /> {promoter.totalActiveReferrals.toLocaleString("en-IN")} active /{" "}
+                    {promoter.totalReferrals.toLocaleString("en-IN")} total referrals
+                  </span>
+                  <span><FiClock aria-hidden /> {promoter.paymentFrequency || "Payment frequency not specified"}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         <Pagination
           currentPage={currentPageClamped}
