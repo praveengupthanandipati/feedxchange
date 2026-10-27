@@ -28,29 +28,19 @@
       text-align: left;
     }
 
+    // the clear "x" (FieldClear, with its own 24px click area) and the chevron, close together
     .searchable-select__trigger-icons {
-      @include m.flex(row, flex-end, center, v.$spacing-2);
+      @include m.flex(row, flex-end, center, 0);
       flex-shrink: 0;
     }
 
     svg {
       flex-shrink: 0;
-      color: v.fg(v.$color-text-muted);
+      color: var(--fx-field-icon);
       transition: transform v.$transition-fast;
 
       &.is-open {
         transform: rotate(180deg);
-      }
-    }
-
-    .searchable-select__clear {
-      @include m.focus-ring(v.$color-orange);
-      border-radius: v.$radius-pill;
-      transition: color v.$transition-fast, background-color v.$transition-fast;
-
-      &:hover {
-        color: v.fg(v.$color-danger);
-        background-color: v.$color-gray-100;
       }
     }
 

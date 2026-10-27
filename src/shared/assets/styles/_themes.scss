@@ -284,6 +284,9 @@ $tints: (
   --fx-field-border-focus: var(--fx-gray-74-on);
   --fx-field-border-disabled: var(--fx-gray-91-on);
   --fx-field-focus-glow: 0 0 0 3px rgba(128, 128, 128, 0.25);
+  // the small icons inside a field (chevron, calendar, clear "x"): muted, the clear "x" darker on hover
+  --fx-field-icon: var(--fx-slate-58-on);
+  --fx-field-icon-hover: var(--fx-slate-34-on);
   // transparent rather than none, so Windows high-contrast (forced colours) still draws an outline
   --fx-field-focus-outline: 2px solid transparent;
 

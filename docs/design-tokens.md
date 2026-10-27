@@ -113,6 +113,11 @@ to `#636363`, and point `--fx-field-focus-outline` at `2px solid var(--fx-focus-
 Icons come from Lucide through one wrapper: `import { TruckIcon } from ".../shared/components/icon"`.
 
 - Sizes: `size={16}` dense UI, `20` controls and menus, `24` headers and empty states; the default `1em` follows the text.
+- Inside a field: the chevron, the calendar and the clear "x" are all `size={14}` with `strokeWidth={ICON_STROKE_FINE}` (1.5),
+  coloured `--fx-field-icon` (`#8a93a0` in Light, 3.1:1; darker `--fx-field-icon-hover` on hover). The clear "x" is the
+  shared `FieldClear` (`shared/components/dropdown`), a 24px click area that stops the click from opening the dropdown.
+  A chip's remove "x" is `size={12}` in an 18px area. Never put `role="button"` on an `<svg>`: the 24px minimum target
+  rule then stretches the icon itself.
 - Stroke 2px everywhere. Decorative (`aria-hidden`) unless the icon has an `aria-label` or `title`.
 - A new icon: add the Lucide glyph and one line to `src/shared/components/icon/icons.ts`.
 - Menu icons stored in the database keep their Feather names (`FiTruck`); `layouts/admin-layout/asidemenu/iconMap.ts`

@@ -125,6 +125,8 @@ html[data-app="admin"] {
   --fx-field-border-focus: var(--fx-gray-36-on);
   --fx-field-border-disabled: var(--fx-gray-20-on);
   --fx-field-focus-glow: 0 0 0 3px rgba(160, 160, 160, 0.25);
+  --fx-field-icon: var(--fx-slate-65-on);
+  --fx-field-icon-hover: var(--fx-slate-84-on);
 
   // Bootstrap's select arrow and close button are drawn dark; draw them light.
   --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23dee2e6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
@@ -144,6 +146,8 @@ html[data-app="admin"] {
   --fx-field-border-disabled: var(--fx-slate-58-line);
   --fx-field-focus-glow: 0 0 0 0.25rem var(--bs-focus-ring-color);
   --fx-field-focus-outline: 2px solid var(--fx-focus-ring);
+  --fx-field-icon: var(--fx-gray-7);
+  --fx-field-icon-hover: var(--fx-gray-7);
 }
 
 // The dark brand panels: the admin sidebar, the login brand panel and dashboard banner, and the website's hero, dark

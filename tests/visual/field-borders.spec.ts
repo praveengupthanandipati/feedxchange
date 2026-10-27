@@ -88,3 +88,32 @@ for (const [theme, expected] of Object.entries(THEMES)) {
     });
   });
 }
+
+// The clear "x" inside a field matches the chevron (14px, the same fine stroke), keeps a 24px click area, and clears.
+test("clear x: same size as the chevron, 24px target, clears the value", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openScreen(page, { name: "generate-invoice", path: "/admin/company-invoices/generate", signedIn: true });
+  const trigger = page.locator(".searchable-select__trigger:visible").first();
+  const placeholder = await trigger.innerText();
+  await trigger.click();
+  await page.locator('[role="option"]').nth(1).click();
+  const clear = trigger.getByRole("button", { name: "Clear selection" });
+  const sizes = await trigger.evaluate((element) => {
+    const box = (node: Element | null) => {
+      const rect = node!.getBoundingClientRect();
+      return { width: Math.round(rect.width), height: Math.round(rect.height), stroke: node!.getAttribute("stroke-width") };
+    };
+    return {
+      x: box(element.querySelector(".field-clear svg")),
+      target: box(element.querySelector(".field-clear")),
+      chevron: box(element.querySelector(".lucide-chevron-down")),
+    };
+  });
+  expect(sizes.x).toEqual({ width: 14, height: 14, stroke: "1.5" });
+  expect(sizes.chevron).toEqual(sizes.x);
+  expect(sizes.target.width).toBeGreaterThanOrEqual(24);
+  expect(sizes.target.height).toBeGreaterThanOrEqual(24);
+  await clear.click();
+  await expect(trigger).toHaveText(placeholder);
+  await expect(page.locator('[role="listbox"]')).toHaveCount(0);
+});

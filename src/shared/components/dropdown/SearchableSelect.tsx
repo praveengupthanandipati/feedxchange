@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDownIcon, PlusIcon, SearchIcon, XIcon } from "../icon";
+import { ChevronDownIcon, ICON_STROKE_FINE, PlusIcon, SearchIcon } from "../icon";
+import FieldClear from "./FieldClear";
 import { useAnchoredPanel } from "./useAnchoredPanel";
 import "./SearchableSelect.scss";
 
@@ -135,24 +136,9 @@ const SearchableSelect = ({
         <span>{selectedLabel ?? placeholder}</span>
         <span className="searchable-select__trigger-icons">
           {clearable && value && (
-            <XIcon
-              className="searchable-select__clear"
-              aria-label="Clear selection"
-              role="button"
-              tabIndex={0}
-              onClick={(event) => {
-                event.stopPropagation();
-                onChange("");
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.stopPropagation();
-                  onChange("");
-                }
-              }}
-            />
+            <FieldClear label="Clear selection" onClear={() => onChange("")} />
           )}
-          <ChevronDownIcon className={open ? "is-open" : ""} aria-hidden />
+          <ChevronDownIcon className={open ? "is-open" : ""} size={14} strokeWidth={ICON_STROKE_FINE} aria-hidden />
         </span>
       </button>
 

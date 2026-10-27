@@ -38,21 +38,11 @@
     }
   }
 
+  // the clear "x" (FieldClear, with its own 24px click area) and the calendar, close together
   &__trigger-icons {
-    @include m.flex(row, flex-end, center, v.$spacing-2);
+    @include m.flex(row, flex-end, center, 0);
     flex-shrink: 0;
-    color: v.fg(v.$color-text-muted);
-  }
-
-  &__clear {
-    @include m.focus-ring(v.$color-orange);
-    border-radius: v.$radius-pill;
-    transition: color v.$transition-fast, background-color v.$transition-fast;
-
-    &:hover {
-      color: v.fg(v.$color-danger);
-      background-color: v.$color-gray-100;
-    }
+    color: var(--fx-field-icon);
   }
 
   &__panel {
