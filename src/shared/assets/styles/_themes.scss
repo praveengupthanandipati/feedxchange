@@ -275,13 +275,17 @@ $tints: (
   --fx-dialog-padding: 1.25rem;
 
   // The edge of a text field, select or date picker: a soft neutral grey, by the owner's choice lighter than WCAG 1.4.11
-  // asks for (3:1). DELIBERATE EXCEPTION: resting #d4d4d4 is 1.48:1 on white and hover #b8b8b8 1.98:1; the focused field
-  // keeps real contrast (#949494, 3.03:1, plus the focus ring). Fixed greys (-on), so Dark sets its own (tokens.scss).
-  // See docs/design-tokens.md, "Field borders".
-  --fx-field-border: var(--fx-gray-83-on);
-  --fx-field-border-hover: var(--fx-gray-72-on);
-  --fx-field-border-focus: var(--fx-gray-58-on);
-  --fx-field-border-disabled: var(--fx-gray-90-2-on);
+  // asks for (3:1). DELIBERATE EXCEPTION: rest #dcdcdc 1.37:1 on white, hover #cfcfcf 1.56:1, focus #bdbdbd 1.88:1. A
+  // focused field shows a soft grey glow instead of the dark focus ring (--fx-field-focus-*); buttons, links, checkboxes
+  // and menus keep the strong ring. Fixed greys (-on), so Dark sets its own (tokens.scss); High contrast keeps strong
+  // edges and the ring. See docs/design-tokens.md, "Field borders".
+  --fx-field-border: var(--fx-gray-86-on);
+  --fx-field-border-hover: var(--fx-gray-81-on);
+  --fx-field-border-focus: var(--fx-gray-74-on);
+  --fx-field-border-disabled: var(--fx-gray-91-on);
+  --fx-field-focus-glow: 0 0 0 3px rgba(128, 128, 128, 0.25);
+  // transparent rather than none, so Windows high-contrast (forced colours) still draws an outline
+  --fx-field-focus-outline: 2px solid transparent;
 
   // focus ring, used by every focusable control: navy on the light page (orange is only 2:1 on white); each theme and the
   // dark brand panels set their own

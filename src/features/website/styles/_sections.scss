@@ -162,7 +162,7 @@ $search-height: 3.75rem;
 
     &:focus-within {
       box-shadow:
-        0 0 0 4px v.alpha(v.$orange-500, 0.45),
+        var(--fx-field-focus-glow),
         0 20px 40px -18px rgba(0, 0, 0, 0.55);
     }
 

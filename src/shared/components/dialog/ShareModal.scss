@@ -92,7 +92,7 @@
 
   &__textarea {
     @include m.font-base(v.$font-weight-regular);
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
     min-height: 6rem;
     padding: v.$spacing-3;

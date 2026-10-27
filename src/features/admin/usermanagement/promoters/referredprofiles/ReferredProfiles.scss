@@ -28,7 +28,7 @@
     max-width: 22rem;
     height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.line(v.$color-border);
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
     color: v.fg(v.$color-text);
@@ -41,7 +41,7 @@
     &:focus {
       outline: none;
       border-color: var(--fx-field-border-focus);
-      box-shadow: 0 0 0 3px v.alpha(v.$color-primary, 0.12);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     @include m.respond-below(sm) {

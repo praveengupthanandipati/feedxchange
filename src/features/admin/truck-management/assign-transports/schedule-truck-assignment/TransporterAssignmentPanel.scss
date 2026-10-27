@@ -267,7 +267,7 @@
 
   &__control {
     @include m.font-base;
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
     min-width: 8rem;
     height: 2.25rem;
@@ -285,7 +285,7 @@
     &:focus {
       outline: none;
       border-color: var(--fx-field-border-focus);
-      box-shadow: 0 0 0 3px v.alpha(v.$color-primary, 0.12);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     &--narrow {

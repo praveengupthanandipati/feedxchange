@@ -108,6 +108,7 @@
       &:focus {
         outline: none;
         border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
@@ -422,6 +423,7 @@
     &:focus {
       outline: none;
       border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 

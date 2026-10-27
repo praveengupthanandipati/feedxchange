@@ -216,6 +216,7 @@ $tones: (
       &:focus {
         outline: none;
         border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
@@ -343,7 +344,7 @@ $tones: (
     max-width: 6rem;
     height: 2rem;
     padding: 0 v.$spacing-2;
-    border: 1px solid v.line(v.$color-border);
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
     color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
@@ -351,6 +352,7 @@ $tones: (
     &:focus {
       outline: none;
       border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
@@ -460,12 +462,13 @@ $tones: (
     display: flex;
     align-items: stretch;
     height: var(--fx-control-height);
-    border: 1px solid v.line(v.$color-border);
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     overflow: hidden;
 
     &:focus-within {
       border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     span {

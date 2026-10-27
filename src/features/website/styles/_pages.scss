@@ -208,9 +208,9 @@
       background-color 0.2s ease;
 
     &:focus {
-      border-color: v.line(v.$navy-600);
+      border-color: var(--fx-field-border-focus);
       background-color: v.$white;
-      box-shadow: 0 0 0 4px v.alpha(v.$navy-600, 0.12);
+      box-shadow: var(--fx-field-focus-glow);
       outline: none;
     }
 

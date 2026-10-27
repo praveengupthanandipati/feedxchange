@@ -188,7 +188,7 @@
 
   input {
     @include m.font-base;
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
     height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
@@ -204,13 +204,13 @@
     }
 
     &:hover {
-      border-color: v.line(v.$color-gray-400);
+      border-color: var(--fx-field-border-hover);
     }
 
     &:focus {
       outline: none;
       border-color: var(--fx-field-border-focus);
-      box-shadow: 0 0 0 3px v.alpha(v.$color-primary, 0.12);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     &.has-error {
@@ -634,7 +634,7 @@
   width: 100%;
   height: 2.1rem;
   padding: 0 v.$spacing-2;
-  border: 1px solid v.line(v.$color-border);
+  border: 1px solid var(--fx-field-border);
   border-radius: v.$radius-md;
   background: v.$color-bg;
   color: v.fg(v.$color-text);
@@ -644,7 +644,7 @@
   &:focus {
     outline: none;
     border-color: var(--fx-field-border-focus);
-    box-shadow: 0 0 0 3px v.alpha(v.$color-primary, 0.12);
+    box-shadow: var(--fx-field-focus-glow);
   }
 
   &.has-error {

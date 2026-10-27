@@ -78,6 +78,7 @@
     &:focus {
       outline: none;
       border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     &--readonly {
@@ -171,14 +172,15 @@
     width: 5rem;
     height: 2.2rem;
     padding: 0 v.$spacing-2;
-    border: 1px solid v.line(v.$color-border);
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
     color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &:focus {
       outline: none;
-      border-color: v.line(v.$color-navy);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 

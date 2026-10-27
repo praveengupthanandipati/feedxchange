@@ -327,7 +327,7 @@
     gap: 0.4rem;
     height: 2rem;
     padding: 0 0.6rem;
-    border: 1px solid var(--fx-gray-84-line);
+    border: 1px solid var(--fx-field-border);
     border-radius: 999px;
     color: var(--fx-slate-46-fg);
 
@@ -341,8 +341,8 @@
     }
 
     &:focus-within {
-      border-color: var(--fx-blue-32-line);
-      box-shadow: 0 0 0 3px rgba(var(--fx-blue-32-rgb), 0.12);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 

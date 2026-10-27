@@ -8,7 +8,7 @@
   &__trigger {
     @include m.flex(row, space-between, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-medium);
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
     height: var(--fx-control-height);
     padding: 0 v.$spacing-3;

@@ -165,9 +165,15 @@
     color: v.fg(v.$color-gray-500);
   }
 
+  &:focus {
+    border-color: var(--fx-field-border-focus);
+    box-shadow: var(--fx-field-focus-glow);
+  }
+
   &:focus-visible {
-    outline: 2px solid var(--fx-focus-ring);
+    outline: var(--fx-field-focus-outline);
     outline-offset: 1px;
+    box-shadow: var(--fx-field-focus-glow);
   }
 
   &:disabled {

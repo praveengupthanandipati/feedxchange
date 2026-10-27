@@ -113,7 +113,7 @@
     input[type="date"],
     textarea {
       @include m.font-base;
-      @include m.focus-ring(v.$color-orange);
+      @include m.field-focus-ring;
       width: 100%;
       padding: v.$spacing-2 v.$spacing-3;
       border: 1px solid var(--fx-field-border);

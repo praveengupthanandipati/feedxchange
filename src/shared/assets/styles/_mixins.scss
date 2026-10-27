@@ -148,6 +148,16 @@
   }
 }
 
+// Focus on a text field, select or date trigger: the soft grey glow (owner's choice), not the dark ring. High contrast
+// sets the tokens back to the strong ring.
+@mixin field-focus-ring {
+  &:focus-visible {
+    outline: var(--fx-field-focus-outline);
+    outline-offset: 2px;
+    box-shadow: var(--fx-field-focus-glow);
+  }
+}
+
 @mixin visually-hidden {
   position: absolute;
   width: 1px;

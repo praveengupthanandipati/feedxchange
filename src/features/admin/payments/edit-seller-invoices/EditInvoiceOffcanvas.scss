@@ -82,7 +82,7 @@
 
     input {
       padding: 0.45rem 0.6rem;
-      border: 1px solid rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--fx-field-border);
       border-radius: 0.4rem;
     }
   }
@@ -148,7 +148,7 @@
     input:not([type]),
     input[inputmode] {
       padding: 0.4rem 0.55rem;
-      border: 1px solid rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--fx-field-border);
       border-radius: 0.4rem;
       width: 8rem;
     }

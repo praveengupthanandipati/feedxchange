@@ -242,7 +242,7 @@
 
     input {
       @include m.font-base;
-      @include m.focus-ring(v.$color-orange);
+      @include m.field-focus-ring;
       width: 100%;
       max-width: 8rem;
       height: 2.25rem;
@@ -256,6 +256,7 @@
       &:focus {
         outline: none;
         border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
 

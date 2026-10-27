@@ -209,6 +209,7 @@ $status-colors: (
       &:focus {
         outline: none;
         border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
@@ -537,6 +538,7 @@ $status-colors: (
     &:focus {
       outline: none;
       border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
