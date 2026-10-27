@@ -1,5 +1,5 @@
 import type { AsideNavChild, AsideNavItem, AsideNavSection } from "./aside.types";
-import { localNavSections } from "./aside.data";
+import { asideNavSections, localNavSections } from "./aside.data";
 
 type CanFn = (...keys: string[]) => boolean;
 
@@ -23,6 +23,36 @@ export const filterNavSections = (sections: AsideNavSection[], can: CanFn): Asid
       }),
     }))
     .filter((section) => section.items.length > 0);
+
+/** Menu entries the frontend has but the backend menu doesn't yet, added under the group they belong to. */
+const LOCAL_CHILD_IDS = [
+  "business-owners-notification-preferences",
+  "transporters-notification-preferences",
+  "promoters-notification-preferences",
+];
+
+/** Adds LOCAL_CHILD_IDS entries (from the local menu) to the matching groups of a backend menu, when allowed and missing. */
+export const withLocalChildren = (sections: AsideNavSection[], can: CanFn): AsideNavSection[] => {
+  const localItems = asideNavSections.flatMap((section) => section.items);
+  return sections.map((section) => ({
+    ...section,
+    items: section.items.map((item) => {
+      // Same group: same route, or (a group without its own route) one of its pages is one of ours.
+      const local = localItems.find(
+        (candidate) =>
+          (candidate.path && candidate.path === item.path) ||
+          (item.children ?? []).some((child) => candidate.children?.some((own) => own.path === child.path)),
+      );
+      const extras = (local?.children ?? []).filter(
+        (child) =>
+          LOCAL_CHILD_IDS.includes(child.id) &&
+          (!child.permissions || can(...child.permissions)) &&
+          !(item.children ?? []).some((existing) => existing.path === child.path),
+      );
+      return extras.length > 0 ? { ...item, children: [...(item.children ?? []), ...extras] } : item;
+    }),
+  }));
+};
 
 /** First screen the user can open from the menu (used to land users whose role has no Dashboard). */
 export const firstNavPath = (sections: AsideNavSection[]): string | null => {

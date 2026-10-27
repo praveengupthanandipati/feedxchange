@@ -64,6 +64,10 @@ export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/admin/payments/payment-allocation", any: ["payment-allocation"] },
   { path: "/admin/payments/refunds", any: ["refunds.view"] },
 
+  ...["business-owners", "transporters", "promoters"].map((base) => ({
+    path: `/admin/${base}/notification-preferences`,
+    any: ["notification-preferences.view"],
+  })),
   // User management. The wizard steps create/edit a profile; the list and detail pages only view it.
   ...[
     ["business-owners", "profiles.business"],

@@ -1,10 +1,15 @@
+import { usePermission } from "../../../../../core/auth/AuthContext";
 import ProfileSettingsSection from "./ProfileSettingsSection";
 import { useRequireTransporterProfile } from "./useRequireTransporterProfile";
 import { useSaveTransporterProfileStep } from "./useSaveTransporterProfileStep";
 
 const ProfileSettingsStep = () => {
   const unlocked = useRequireTransporterProfile();
-  const { submitting, submitError, handleSaveAndContinue } = useSaveTransporterProfileStep("/admin/transporters");
+  // Notification Preferences follows only for users allowed to see it; otherwise this is the last step.
+  const hasPreferencesStep = usePermission("notification-preferences.view");
+  const { submitting, submitError, handleSaveAndContinue } = useSaveTransporterProfileStep(
+    hasPreferencesStep ? "/admin/transporters/notification-preferences" : "/admin/transporters",
+  );
 
   if (!unlocked) return null;
 
@@ -28,7 +33,7 @@ const ProfileSettingsStep = () => {
           onClick={handleSaveAndContinue}
           disabled={submitting}
         >
-          {submitting ? "Saving…" : "Finish"}
+          {submitting ? "Saving…" : hasPreferencesStep ? "Save & Continue" : "Finish"}
         </button>
       </div>
     </>

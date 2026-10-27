@@ -10,6 +10,22 @@ html {
   text-size-adjust: 100%;
 }
 
+// Chrome / Edge / Safari paint autofilled fields light blue and ignore background-color there, so
+// cover it with an inset shadow in the normal field colour. The long transition stops the colour
+// flashing in on browsers that animate it.
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px v.$color-bg inset !important;
+  box-shadow: 0 0 0 1000px v.$color-bg inset !important;
+  -webkit-text-fill-color: v.$color-text;
+  caret-color: v.$color-text;
+  transition: background-color 9999s ease-out 0s;
+}
+
 body {
   @include m.font-base;
   font-size: v.$font-size-base;

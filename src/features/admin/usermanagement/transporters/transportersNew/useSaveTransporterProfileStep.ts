@@ -4,6 +4,7 @@ import {
   useAddTransporterProfileMutation,
   useUpdateTransporterProfileMutation,
 } from "../../../../../core/store/transportersApi";
+import { useEnableAutoNotifications } from "../../../notification-preferences/useEnableAutoNotifications";
 import { useTransporterWizard } from "./TransporterWizardContext";
 import { buildTransporterProfilePayload } from "./transporterWizard.utils";
 
@@ -18,6 +19,7 @@ function getErrorMessage(err: unknown): string {
 export const useSaveTransporterProfileStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId, setProfileId } = useTransporterWizard();
+  const enableAutoNotifications = useEnableAutoNotifications();
   const [addTransporterProfile] = useAddTransporterProfileMutation();
   const [updateTransporterProfile] = useUpdateTransporterProfileMutation();
   const [submitting, setSubmitting] = useState(false);
@@ -39,6 +41,7 @@ export const useSaveTransporterProfileStep = (nextPath: string) => {
           throw new Error("Transporter profile was saved but the server didn't return its profile id.");
         }
         setProfileId(createdId);
+        enableAutoNotifications(createdId);
       }
 
       localStorage.setItem(

@@ -22,7 +22,8 @@
   }
 }
 
-// Light-ash selected and placeholder text for dropdown fields on these two dispatch forms only.
+// Light-ash placeholder text for dropdown fields on these dispatch forms. Only the placeholder:
+// a chosen value keeps the normal text colour, so filled fields don't look empty.
 .instant-truck-form,
 .schedule-dispatch-form {
   .searchable-select__trigger,

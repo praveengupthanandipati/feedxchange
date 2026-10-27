@@ -1,10 +1,15 @@
+import { usePermission } from "../../../../../core/auth/AuthContext";
 import ProfileSettingsSection from "./ProfileSettingsSection";
 import { useRequirePromoterProfile } from "./useRequirePromoterProfile";
 import { useSavePromoterProfileStep } from "./useSavePromoterProfileStep";
 
 const ProfileSettingsStep = () => {
   const unlocked = useRequirePromoterProfile();
-  const { submitting, submitError, handleSaveAndContinue } = useSavePromoterProfileStep("/admin/promoters");
+  // Notification Preferences follows only for users allowed to see it; otherwise this is the last step.
+  const hasPreferencesStep = usePermission("notification-preferences.view");
+  const { submitting, submitError, handleSaveAndContinue } = useSavePromoterProfileStep(
+    hasPreferencesStep ? "/admin/promoters/notification-preferences" : "/admin/promoters",
+  );
 
   if (!unlocked) return null;
 
@@ -28,7 +33,7 @@ const ProfileSettingsStep = () => {
           onClick={handleSaveAndContinue}
           disabled={submitting}
         >
-          {submitting ? "Saving…" : "Finish"}
+          {submitting ? "Saving…" : hasPreferencesStep ? "Save & Continue" : "Finish"}
         </button>
       </div>
     </>

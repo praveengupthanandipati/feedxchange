@@ -14,6 +14,7 @@ import {
   type CreateProfileAddressEntry,
   type ProfileAddressDetail,
 } from "../../../../../core/store/userProfilesCommonApi";
+import { useEnableAutoNotifications } from "../../../notification-preferences/useEnableAutoNotifications";
 import { usePromoterWizard } from "./PromoterWizardContext";
 import { buildPromoterProfilePayload } from "./promoterWizard.utils";
 
@@ -26,6 +27,7 @@ function getErrorMessage(err: unknown): string {
 export const useSavePromoterProfileStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId, setProfileId } = usePromoterWizard();
+  const enableAutoNotifications = useEnableAutoNotifications();
   const [addPromoterProfile] = useAddPromoterProfileMutation();
   const [updatePromoterProfile] = useUpdatePromoterProfileMutation();
   const [createPromoterRegion] = useCreatePromoterRegionMutation();
@@ -53,6 +55,7 @@ export const useSavePromoterProfileStep = (nextPath: string) => {
         }
         currentProfileId = createdId;
         setProfileId(createdId);
+        enableAutoNotifications(createdId);
       }
 
       const primaryAddressFields = {

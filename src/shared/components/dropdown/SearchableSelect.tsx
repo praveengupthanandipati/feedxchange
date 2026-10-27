@@ -133,7 +133,7 @@ const SearchableSelect = ({
         aria-label={ariaLabel}
         disabled={disabled}
       >
-        <span>{selectedLabel ?? placeholder}</span>
+        <span className={selectedLabel ? undefined : "is-placeholder"}>{selectedLabel ?? placeholder}</span>
         <span className="searchable-select__trigger-icons">
           {clearable && value && (
             <FieldClear label="Clear selection" onClear={() => onChange("")} />
