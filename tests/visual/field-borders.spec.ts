@@ -2,13 +2,17 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { SCREENS, openScreen } from "./screens";
 
-// Field borders. DELIBERATE EXCEPTION to WCAG 1.4.11 (non-text contrast 3:1): the owner chose soft grey borders for
-// text fields, selects and date pickers at rest (Light #d4d4d4, 1.48:1 on white; Dark #4a4a4a, 2.05:1 on the dark field).
-// So the resting border is checked for being that soft neutral grey, not for 3:1. What keeps real contrast is the
-// FOCUSED field: its border or focus outline must reach 3:1 against the page, so keyboard users always see where they are.
-// See docs/design-tokens.md, "Field borders".
+// Field borders. DELIBERATE EXCEPTION to WCAG 1.4.11 (non-text contrast 3:1) and to the app's dark focus ring, by the
+// owner's choice: text fields, selects and date pickers keep soft grey edges in every state (Light rest #dcdcdc, focus
+// #bdbdbd; Dark rest #3f3f3f, focus #5c5c5c) and a focused field shows a soft grey glow instead of the navy / orange ring.
+// So fields are checked for exactly that soft look (grey border, grey glow, no dark outline), while everything that is
+// not a text field (buttons, links, checkboxes, menus) must still show the strong ring at 3:1 or more.
+// High contrast keeps strong field edges and the ring. See docs/design-tokens.md, "Field borders".
 
-const THEMES = { light: "rgb(212, 212, 212)", dark: "rgb(74, 74, 74)" } as const;
+const THEMES = {
+  light: { rest: "rgb(220, 220, 220)", focus: "rgb(189, 189, 189)", glow: "rgba(128, 128, 128, 0.25)" },
+  dark: { rest: "rgb(63, 63, 63)", focus: "rgb(92, 92, 92)", glow: "rgba(160, 160, 160, 0.25)" },
+} as const;
 
 const withTheme = (theme: string) => async (page: Page) => {
   await page.addInitScript((value) => {
@@ -33,11 +37,11 @@ const contrast = (a: string, b: string) => {
   return (high + 0.05) / (low + 0.05);
 };
 
-for (const [theme, restingBorder] of Object.entries(THEMES)) {
+for (const [theme, expected] of Object.entries(THEMES)) {
   test.describe(`field borders ${theme}`, () => {
     test.use({ viewport: { width: 1440, height: 900 } });
 
-    test("resting borders are the soft neutral grey (deliberate exception), focus reaches 3:1", async ({ page }) => {
+    test("fields stay soft grey at rest and on focus (deliberate exception); buttons keep the strong ring", async ({ page }) => {
       await page.addInitScript(() => {
         document.addEventListener("DOMContentLoaded", () => {
           const style = document.createElement("style");
@@ -49,11 +53,25 @@ for (const [theme, restingBorder] of Object.entries(THEMES)) {
       const field = page.locator(".form-field__control").first();
 
       // resting: the soft grey
-      expect(await field.evaluate((element) => getComputedStyle(element).borderTopColor)).toBe(restingBorder);
+      expect(await field.evaluate((element) => getComputedStyle(element).borderTopColor)).toBe(expected.rest);
 
-      // focused: border or outline at least 3:1 against what is behind the field
+      // focused from the keyboard: light grey border and the grey glow, no dark outline
       await field.focus();
       const focused = await field.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return { border: style.borderTopColor, shadow: style.boxShadow, outline: style.outlineStyle === "none" ? "none" : style.outlineColor };
+      });
+      expect(focused.border).toBe(expected.focus);
+      expect(focused.shadow).toContain(expected.glow);
+      expect(["none", "rgba(0, 0, 0, 0)"]).toContain(focused.outline);
+
+      // not a field: a button focused from the keyboard keeps a ring at 3:1 or more against the page
+      const button = page.getByRole("button").first();
+      await button.focus();
+      await page.keyboard.press("Shift+Tab");
+      await page.keyboard.press("Tab");
+      const ring = await page.evaluate(() => {
+        const element = document.activeElement as HTMLElement;
         const style = getComputedStyle(element);
         let background = "rgb(255, 255, 255)";
         for (let node = element.parentElement; node; node = node.parentElement) {
@@ -63,14 +81,10 @@ for (const [theme, restingBorder] of Object.entries(THEMES)) {
             break;
           }
         }
-        return {
-          border: style.borderTopColor,
-          outline: style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0 ? style.outlineColor : null,
-          background,
-        };
+        return { tag: element.tagName, outline: style.outlineStyle !== "none" ? style.outlineColor : null, background };
       });
-      const best = Math.max(contrast(focused.border, focused.background), focused.outline ? contrast(focused.outline, focused.background) : 0);
-      expect(best, `focused field: border ${focused.border}, outline ${focused.outline} on ${focused.background}`).toBeGreaterThanOrEqual(3);
+      expect(ring.outline, `no focus ring on ${ring.tag}`).not.toBeNull();
+      expect(contrast(ring.outline!, ring.background)).toBeGreaterThanOrEqual(3);
     });
   });
 }

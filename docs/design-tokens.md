@@ -61,21 +61,34 @@ Every size is in `rem`, and the root size sets the density for everything at onc
 
 ## Field borders (an accessibility trade-off)
 
-Text fields, selects, searchable and multi selects, date pickers and Bootstrap form controls take their edge from
-`--fx-field-border` (and `-hover`, `-focus`, `-disabled`). They are plain neutral greys, set per theme:
+Text fields, selects, searchable and multi selects, date pickers, search boxes and Bootstrap form controls take their edge
+from `--fx-field-border` (and `-hover`, `-focus`, `-disabled`), and their focus look from `--fx-field-focus-glow` and
+`--fx-field-focus-outline`. All are plain neutral greys, set per theme:
 
-| Theme | Rest | Hover | Focus | Disabled |
-| --- | --- | --- | --- | --- |
-| Light | `#d4d4d4` (1.48:1 on white) | `#b8b8b8` (1.98:1) | `#949494` (3.03:1) + focus ring | `#e6e6e6` |
-| Dark | `#4a4a4a` (2.05:1 on the dark field) | `#5c5c5c` (2.71:1) | `#7a7a7a` (4.22:1) + focus ring | `#3d3d3d` |
-| High contrast | strong border, unchanged | | | |
+| Theme | Rest | Hover | Focus | Disabled | Focus glow |
+| --- | --- | --- | --- | --- | --- |
+| Light | `#dcdcdc` (1.37:1 on white) | `#cfcfcf` (1.56:1) | `#bdbdbd` (1.88:1) | `#e8e8e8` | `0 0 0 3px rgba(128,128,128,.25)` |
+| Dark | `#3f3f3f` (1.72:1 on the dark field) | `#4a4a4a` (2.05:1) | `#5c5c5c` (2.71:1) | `#333333` | `0 0 0 3px rgba(160,160,160,.25)` |
+| High contrast | strong border, unchanged | | | | the strong focus ring, unchanged |
 
-**Deliberate exception:** WCAG 1.4.11 asks for 3:1 between a field's boundary and its background. The owner chose a
-softer look, so resting and hover borders are below that in Light and Dark. What stays at 3:1 or more is the focused field
-(border, plus the focus ring) and the High contrast theme, which anyone who needs stronger edges can pick in the theme
-menu. `tests/visual/field-borders.spec.ts` checks exactly this: the soft grey at rest, 3:1 on focus. Error borders stay
-red. To go back to compliant borders, set Light rest to `#949494` and Dark rest to `#636363` in `_themes.scss` /
-`tokens.scss`.
+**Deliberate exception:** WCAG 1.4.11 asks for 3:1 between a field's boundary and its background, and the app gives
+every focusable control a 2px navy (orange on dark) ring. The owner chose a softer look for fields, so in Light and Dark:
+
+- field borders stay light grey in every state, below 3:1;
+- a focused field shows the grey glow and a slightly darker grey border instead of the dark ring (the outline is
+  transparent, not removed, so Windows high-contrast mode still draws one);
+- everything that is not a text field (buttons, links, checkboxes, radios, menus, tabs) keeps the strong ring at 3:1 or
+  more;
+- error borders stay red;
+- the High contrast theme keeps strong field edges and the ring, for anyone who needs them.
+
+How it is wired: a zero-specificity rule in `tokens.scss` gives native inputs, selects and textareas the glow;
+components use `@include m.field-focus-ring` (not `m.focus-ring`) on their field triggers, and field `:focus` /
+`:focus-within` rules use `var(--fx-field-border-focus)` and `var(--fx-field-focus-glow)`. A new field should do the same.
+
+`tests/visual/field-borders.spec.ts` checks exactly this: soft grey at rest and on focus, the grey glow, no dark outline on
+a field, and a ring of 3:1 or more on a button. To go back to compliant fields, set Light rest to `#949494` and Dark rest
+to `#636363`, and point `--fx-field-focus-outline` at `2px solid var(--fx-focus-ring)` in `_themes.scss` / `tokens.scss`.
 
 ## Themes
 
