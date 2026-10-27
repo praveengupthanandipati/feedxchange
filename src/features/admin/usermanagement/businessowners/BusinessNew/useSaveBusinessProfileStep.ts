@@ -4,6 +4,7 @@ import {
   useAddBusinessProfileMutation,
   useUpdateBusinessProfileMutation,
 } from "../../../../../core/store/businessProfilesApi";
+import { useEnableAutoNotifications } from "../../../notification-preferences/useEnableAutoNotifications";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
 import { buildBusinessProfilePayload } from "./businessOwnerWizard.utils";
 
@@ -15,6 +16,7 @@ function getErrorMessage(err: unknown): string {
 export const useSaveBusinessProfileStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId, setProfileId } = useBusinessOwnerWizard();
+  const enableAutoNotifications = useEnableAutoNotifications();
   const [addBusinessProfile] = useAddBusinessProfileMutation();
   const [updateBusinessProfile] = useUpdateBusinessProfileMutation();
   const [submitting, setSubmitting] = useState(false);
@@ -35,6 +37,7 @@ export const useSaveBusinessProfileStep = (nextPath: string) => {
           throw new Error("Business profile was saved but the server didn't return its profile id.");
         }
         setProfileId(createdId);
+        enableAutoNotifications(createdId);
       }
 
       navigate(nextPath);

@@ -179,7 +179,7 @@ const BusinessOwnerDetail = () => {
           {activeTab === "contacts" && <ContactsTab profile={profile} />}
           {activeTab === "bank" && <BankDetailsTab profile={profile} />}
           {activeTab === "linked" && <LinkedBusinessTab ownerId={String(profile.profileId)} />}
-          {activeTab === "notifications" && canSeeNotifications && <ProfilePreferencesPanel profileId={profile.profileId} compact />}
+          {activeTab === "notifications" && canSeeNotifications && <ProfilePreferencesPanel profileId={profile.profileId} compact readOnly />}
         </div>
       </div>
 

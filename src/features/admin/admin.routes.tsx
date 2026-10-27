@@ -20,6 +20,9 @@ const ContactsAddressesStep = lazy(() => import("./usermanagement/businessowners
 const DocumentsStep = lazy(() => import("./usermanagement/businessowners/BusinessNew/DocumentsStep"));
 const BankDetailsStep = lazy(() => import("./usermanagement/businessowners/BusinessNew/BankDetailsStep"));
 const ProfileSettingsStep = lazy(() => import("./usermanagement/businessowners/BusinessNew/ProfileSettingsStep"));
+const BusinessNotificationPreferencesStep = lazy(
+  () => import("./usermanagement/businessowners/BusinessNew/NotificationPreferencesStep"),
+);
 const Transprters = lazy(() => import("./usermanagement/transporters/transportersList/Transprters"));
 const TransporterWizardLayout = lazy(() => import("./usermanagement/transporters/transportersNew/TransporterWizardLayout"));
 const TransporterProfileStep = lazy(() => import("./usermanagement/transporters/transportersNew/TransporterProfileStep"));
@@ -33,6 +36,12 @@ const PromoterWizardLayout = lazy(() => import("./usermanagement/promoters/promo
 const PromoterProfileStep = lazy(() => import("./usermanagement/promoters/promoternew/PromoterProfileStep"));
 const PromoterDocumentsStep = lazy(() => import("./usermanagement/promoters/promoternew/DocumentsStep"));
 const PromoterProfileSettingsStep = lazy(() => import("./usermanagement/promoters/promoternew/ProfileSettingsStep"));
+const TransporterNotificationPreferencesStep = lazy(
+  () => import("./usermanagement/transporters/transportersNew/NotificationPreferencesStep"),
+);
+const PromoterNotificationPreferencesStep = lazy(
+  () => import("./usermanagement/promoters/promoternew/NotificationPreferencesStep"),
+);
 const Promoterview = lazy(() => import("./usermanagement/promoters/promoterview/Promoterview"));
 const Categories = lazy(() => import("./product-management/categories/Categories"));
 const Products = lazy(() => import("./product-management/products/products-list/Products"));
@@ -131,6 +140,7 @@ export const adminRoutes = (
       <Route path="business-owners/documents" element={<DocumentsStep />} />
       <Route path="business-owners/bank-details" element={<BankDetailsStep />} />
       <Route path="business-owners/profile-settings" element={<ProfileSettingsStep />} />
+      <Route path="business-owners/notification-preferences" element={<BusinessNotificationPreferencesStep />} />
     </Route>
     <Route path="transporters" element={<Transprters />} />
     <Route path="transporters/:id" element={<Transportview />} />
@@ -140,6 +150,7 @@ export const adminRoutes = (
       <Route path="transporters/documents" element={<TransporterDocumentsStep />} />
       <Route path="transporters/bank-details" element={<TransporterBankDetailsStep />} />
       <Route path="transporters/profile-settings" element={<TransporterProfileSettingsStep />} />
+      <Route path="transporters/notification-preferences" element={<TransporterNotificationPreferencesStep />} />
     </Route>
     <Route path="promoters" element={<Promoterlist />} />
     <Route path="promoters/:id" element={<Promoterview />} />
@@ -147,6 +158,7 @@ export const adminRoutes = (
       <Route path="promoters/profile" element={<PromoterProfileStep />} />
       <Route path="promoters/documents" element={<PromoterDocumentsStep />} />
       <Route path="promoters/profile-settings" element={<PromoterProfileSettingsStep />} />
+      <Route path="promoters/notification-preferences" element={<PromoterNotificationPreferencesStep />} />
     </Route>
     <Route path="categories" element={<Categories />} />
     <Route path="payments/overview" element={<SubModuleOverview />} />

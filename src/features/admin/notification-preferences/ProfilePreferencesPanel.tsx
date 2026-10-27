@@ -32,12 +32,14 @@ interface ProfilePreferencesPanelProps {
   profileId: number;
   /** Hide the profile name heading when the page around it already shows it. */
   compact?: boolean;
+  /** Show the preferences without any way to change them, e.g. on a profile's view screen when editing lives in its wizard. */
+  readOnly?: boolean;
 }
 
 /** A business profile's notification preferences: the automation switch, its settings, and every contact's coverage. */
-const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferencesPanelProps) => {
-  const canManage = usePermission("notification-preferences.manage");
-  const canSwitchMode = usePermission("notification-automation.manage");
+const ProfilePreferencesPanel = ({ profileId, compact = false, readOnly = false }: ProfilePreferencesPanelProps) => {
+  const canManage = usePermission("notification-preferences.manage") && !readOnly;
+  const canSwitchMode = usePermission("notification-automation.manage") && !readOnly;
   const { data: profile, isLoading, isError, error } = useGetProfilePreferencesQuery(profileId, { refetchOnMountOrArgChange: true });
   const { data: audit = [] } = useGetPreferenceAuditQuery(profileId, { refetchOnMountOrArgChange: true });
   const [setMode, { isLoading: modeBusy }] = useUpdateProfileModeMutation();
@@ -129,14 +131,24 @@ const ProfilePreferencesPanel = ({ profileId, compact = false }: ProfilePreferen
           aria-label="Automatic notifications"
           className="pref-switch pref-switch--large"
           disabled={!canSwitchMode || modeBusy}
-          title={canSwitchMode ? undefined : "Only FeedXchange administrators can switch automatic notifications on or off."}
+          title={
+            canSwitchMode
+              ? undefined
+              : readOnly
+                ? "Change this from the profile's edit screen."
+                : "Only FeedXchange administrators can switch automatic notifications on or off."
+          }
           onClick={() => void changeMode()}
         >
           <span />
         </button>
       </section>
 
-      {!canSwitchMode && !auto && (
+      {readOnly && (
+        <p className="pref-hint"><FiInfo aria-hidden /> View only. To change these preferences, edit the profile and open its Notification Preferences step.</p>
+      )}
+
+      {!readOnly && !canSwitchMode && !auto && (
         <p className="pref-hint"><FiInfo aria-hidden /> Contacts' preferences can be prepared now. Ask a FeedXchange administrator to switch automatic notifications on when you are ready.</p>
       )}
 

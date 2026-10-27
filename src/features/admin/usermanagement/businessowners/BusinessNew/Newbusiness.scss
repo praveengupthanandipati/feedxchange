@@ -406,6 +406,10 @@
 // Repeatable product rows (Brokerage Charges / Capacity)
 // ============================================================
 .repeatable-rows {
+  // Product takes whatever is left; the two numeric fields (buy/sell charges, TPD/TPM) only hold
+  // short numbers, so they get a narrow, capped width. Header and rows share this so they line up.
+  --repeatable-rows-columns: minmax(0, 1fr) repeat(2, minmax(5rem, 8rem)) 2.5rem;
+
   margin-top: v.$spacing-4;
   display: flex;
   flex-direction: column;
@@ -416,7 +420,7 @@
 
     @include m.respond-to(sm) {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto;
+      grid-template-columns: var(--repeatable-rows-columns);
       gap: v.$spacing-3;
       padding: 0 v.$spacing-1;
 
@@ -430,7 +434,8 @@
 
   &__row {
     display: grid;
-    grid-template-columns: 1fr;
+    // Phones: product on its own full-width line, the two numbers side by side under it.
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: v.$spacing-3;
     align-items: center;
     padding: v.$spacing-3;
@@ -438,7 +443,7 @@
     border-radius: v.$radius-md;
 
     @include m.respond-to(sm) {
-      grid-template-columns: repeat(3, 1fr) auto;
+      grid-template-columns: var(--repeatable-rows-columns);
       border: none;
       padding: 0 v.$spacing-1;
     }
@@ -446,6 +451,16 @@
     // Keep the Product dropdown's width fixed to its grid column, whether a
     // long product name is selected or the short placeholder is showing.
     .searchable-select {
+      grid-column: 1 / -1;
+      min-width: 0;
+
+      @include m.respond-to(sm) {
+        grid-column: auto;
+      }
+    }
+
+    // Let the numeric fields shrink to their narrow column.
+    input[type="number"] {
       min-width: 0;
     }
   }

@@ -12,6 +12,7 @@ import {
   type CreateBusinessBuySellChargeEntry,
   type UpdateBusinessBuySellChargePayload,
 } from "../../../../../core/store/businessProfilesApi";
+import { useEnableAutoNotifications } from "../../../notification-preferences/useEnableAutoNotifications";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
 import { buildBusinessProfilePayload } from "./businessOwnerWizard.utils";
 
@@ -23,6 +24,7 @@ function getErrorMessage(err: unknown): string {
 export const useSaveBusinessProfileMainStep = (nextPath: string) => {
   const navigate = useNavigate();
   const { draft, profileId, setProfileId } = useBusinessOwnerWizard();
+  const enableAutoNotifications = useEnableAutoNotifications();
   const [addBusinessProfile] = useAddBusinessProfileMutation();
   const [updateBusinessProfile] = useUpdateBusinessProfileMutation();
   const [createBusinessCapacityRequirement] = useCreateBusinessCapacityRequirementMutation();
@@ -51,6 +53,7 @@ export const useSaveBusinessProfileMainStep = (nextPath: string) => {
         }
         currentProfileId = createdId;
         setProfileId(createdId);
+        enableAutoNotifications(createdId);
       }
 
       const newCapacityRows: CreateBusinessCapacityRequirementEntry[] = [];

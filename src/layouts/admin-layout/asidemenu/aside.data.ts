@@ -270,6 +270,7 @@ export const asideNavSections: AsideNavSection[] = [
           { id: "business-owners-documents", permissions: ["profiles.business.manage"], label: "Documents", path: "/admin/business-owners/documents" },
           { id: "business-owners-bank-details", permissions: ["profiles.business.manage"], label: "Bank Details", path: "/admin/business-owners/bank-details" },
           { id: "business-owners-profile-settings", permissions: ["profiles.business.manage"], label: "Profile Settings", path: "/admin/business-owners/profile-settings" },
+          { id: "business-owners-notification-preferences", permissions: ["notification-preferences.view"], label: "Notification Preferences", path: "/admin/business-owners/notification-preferences" },
         ],
       },
       {
@@ -283,6 +284,7 @@ export const asideNavSections: AsideNavSection[] = [
           { id: "transporters-documents", permissions: ["profiles.transporter.manage"], label: "Documents", path: "/admin/transporters/documents" },
           { id: "transporters-bank-details", permissions: ["profiles.transporter.manage"], label: "Bank Details", path: "/admin/transporters/bank-details" },
           { id: "transporters-profile-settings", permissions: ["profiles.transporter.manage"], label: "Profile Settings", path: "/admin/transporters/profile-settings" },
+          { id: "transporters-notification-preferences", permissions: ["notification-preferences.view"], label: "Notification Preferences", path: "/admin/transporters/notification-preferences" },
         ],
       },
       {
@@ -300,6 +302,7 @@ export const asideNavSections: AsideNavSection[] = [
           { id: "promoters-profile", permissions: ["profiles.promoter.manage"], label: "Promoter Profile", path: "/admin/promoters/profile" },
           { id: "promoters-documents", permissions: ["profiles.promoter.manage"], label: "Documents", path: "/admin/promoters/documents" },
           { id: "promoters-profile-settings", permissions: ["profiles.promoter.manage"], label: "Profile Settings", path: "/admin/promoters/profile-settings" },
+          { id: "promoters-notification-preferences", permissions: ["notification-preferences.view"], label: "Notification Preferences", path: "/admin/promoters/notification-preferences" },
         ],
       },
       { id: "promocodes", permissions: ["promocodes.view"], label: "Promocodes", icon: FiTag, path: "/admin/promocodes" },

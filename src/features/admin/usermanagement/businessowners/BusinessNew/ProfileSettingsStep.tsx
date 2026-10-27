@@ -1,10 +1,15 @@
+import { usePermission } from "../../../../../core/auth/AuthContext";
 import ProfileSettingsSection from "./ProfileSettingsSection";
 import { useRequireBusinessProfile } from "./useRequireBusinessProfile";
 import { useSaveBusinessProfileStep } from "./useSaveBusinessProfileStep";
 
 const ProfileSettingsStep = () => {
   const unlocked = useRequireBusinessProfile();
-  const { submitting, submitError, handleSaveAndContinue } = useSaveBusinessProfileStep("/admin/business-owners");
+  // Notification Preferences follows only for users allowed to see it; otherwise this is the last step.
+  const hasPreferencesStep = usePermission("notification-preferences.view");
+  const { submitting, submitError, handleSaveAndContinue } = useSaveBusinessProfileStep(
+    hasPreferencesStep ? "/admin/business-owners/notification-preferences" : "/admin/business-owners",
+  );
 
   if (!unlocked) return null;
 
@@ -28,7 +33,7 @@ const ProfileSettingsStep = () => {
           onClick={handleSaveAndContinue}
           disabled={submitting}
         >
-          {submitting ? "Saving…" : "Finish"}
+          {submitting ? "Saving…" : hasPreferencesStep ? "Save & Continue" : "Finish"}
         </button>
       </div>
     </>
