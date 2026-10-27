@@ -16,6 +16,11 @@
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
 
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
+
     input {
       @include m.font-base;
       flex: 1;

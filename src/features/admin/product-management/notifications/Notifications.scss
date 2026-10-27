@@ -133,6 +133,11 @@ $category-colors: (
     border-radius: v.$radius-md;
     color: v.fg(v.$color-text-muted);
 
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
+
     @include m.respond-below(md) {
       max-width: none;
     }

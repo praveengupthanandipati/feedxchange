@@ -17,6 +17,11 @@
     background-color: v.$color-bg;
     color: v.fg(v.$color-text-muted);
 
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
+
     input {
       @include m.font-base;
       flex: 1;

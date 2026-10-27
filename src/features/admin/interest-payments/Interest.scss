@@ -229,6 +229,11 @@
     border-radius: v.$radius-md;
     color: v.fg(v.$color-text-muted);
 
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
+
     input {
       flex: 1;
       min-width: 0;

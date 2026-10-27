@@ -62,10 +62,10 @@ html[data-app="admin"] {
   outline-offset: 2px;
 }
 
-// Text fields get the soft grey glow instead (the owner's choice; see --fx-field-focus-glow in _themes.scss)
+// Text fields do not get the dark ring (the owner's choice): their own styles show focus with the soft grey border and
+// glow (--fx-field-border-focus, --fx-field-focus-glow), on the field or on the box around it (:focus-within)
 :where(input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="range"], [type="color"], [type="file"], [type="image"]), select, textarea):focus-visible {
   outline: var(--fx-field-focus-outline);
-  box-shadow: var(--fx-field-focus-glow);
 }
 
 // Bootstrap's controls at the app's density
