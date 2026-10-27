@@ -1,4 +1,4 @@
-import { FiCheckCircle, FiXCircle, FiTruck, FiChevronUp } from "react-icons/fi";
+import { ChevronUpIcon, CircleCheckBigIcon, CircleXIcon, TruckIcon } from "../../../../../shared/components/icon";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
@@ -41,9 +41,9 @@ export function buildScheduleTruckColumns({
       align: "center",
       render: (row) =>
         row.autoApprove ? (
-          <FiCheckCircle className="schedule-truck-table__auto-approve schedule-truck-table__auto-approve--on" aria-label="Auto approve enabled" />
+          <CircleCheckBigIcon className="schedule-truck-table__auto-approve schedule-truck-table__auto-approve--on" aria-label="Auto approve enabled" />
         ) : (
-          <FiXCircle className="schedule-truck-table__auto-approve schedule-truck-table__auto-approve--off" aria-label="Auto approve disabled" />
+          <CircleXIcon className="schedule-truck-table__auto-approve schedule-truck-table__auto-approve--off" aria-label="Auto approve disabled" />
         ),
       exportValue: (row) => (row.autoApprove ? "Yes" : "No"),
     },
@@ -59,7 +59,7 @@ export function buildScheduleTruckColumns({
             title={isExpanded ? "Hide Trucks" : "Add / View Trucks"}
             onClick={() => onToggleTrucks(row)}
           >
-            {isExpanded ? <FiChevronUp aria-hidden /> : <FiTruck aria-hidden />}
+            {isExpanded ? <ChevronUpIcon aria-hidden /> : <TruckIcon aria-hidden />}
             {isExpanded ? "Hide" : "Add/View"}
           </button>
         );

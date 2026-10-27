@@ -1,4 +1,4 @@
-import type { IconType } from "react-icons";
+import { type IconComponent } from "../../../shared/components/icon";
 
 export interface AsideNavChild {
   id: string;
@@ -13,7 +13,7 @@ export interface AsideNavChild {
 export interface AsideNavItem {
   id: string;
   label: string;
-  icon: IconType;
+  icon: IconComponent;
   path?: string;
   /** Shown when the user holds ANY of these keys. A group without keys shows when any child does. */
   permissions?: string[];

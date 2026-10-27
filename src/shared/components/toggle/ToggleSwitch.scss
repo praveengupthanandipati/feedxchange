@@ -12,7 +12,7 @@
   &__track {
     position: relative;
     flex-shrink: 0;
-    width: 2.75rem;
+    width: var(--fx-control-height-lg);
     height: 1.5rem;
     border-radius: v.$radius-pill;
     background-color: v.$color-gray-300;
@@ -34,7 +34,7 @@
   &__label {
     @include m.font-base(v.$font-weight-medium);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   &.is-on {

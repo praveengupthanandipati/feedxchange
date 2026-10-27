@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import { STATUS_OPTIONS, type ContactEnquiry, type ContactEnquiryStatus, type ContactEnquiryUpdate } from "../contactEnquiry.data";
 // Shared .enquiry-panel styles.
@@ -54,7 +54,7 @@ const ContactStatusOffcanvas = ({ enquiry, onSave, onClose }: ContactStatusOffca
             </p>
           </div>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
 

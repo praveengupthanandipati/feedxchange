@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiArrowUpRight, FiBox, FiGrid, FiAlertTriangle, FiDollarSign } from "react-icons/fi";
+import { ArrowUpRightIcon, BoxIcon, DollarSignIcon, LayoutGridIcon, TriangleAlertIcon } from "../../../shared/components/icon";
 import {
   Bar,
   BarChart,
@@ -30,7 +30,7 @@ interface ProductsDashboardProps {
   entries: DashboardEntry[];
 }
 
-const STOCK_COLORS = ["#2e9e5b", "#faa41a", "#9ea4ad"];
+const STOCK_COLORS = ["var(--fx-chart-2)", "var(--fx-chart-3)", "var(--fx-slate-65)"];
 
 function money(value: number): string {
   return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -105,10 +105,10 @@ const ProductsDashboard = ({ entries }: ProductsDashboardProps) => {
   const quickLinks = entries;
   const categoriesWithProducts = new Set(activeProducts.map((product) => product.categoryName?.trim()).filter(Boolean)).size;
   const metrics = [
-    ...(canViewProducts ? [{ label: "Active products", value: productsLoading ? "…" : activeProducts.length, icon: FiBox, color: "products-dashboard__card--navy", path: "/admin/products" }] : []),
-    ...(canViewCategories ? [{ label: canViewProducts ? "Categories with products" : "Active categories", value: productsLoading || categoriesLoading ? "…" : canViewProducts ? categoriesWithProducts : categories.length, icon: FiGrid, color: "products-dashboard__card--blue", path: "/admin/categories" }] : []),
-    ...(canViewProducts ? [{ label: "Low-stock products", value: productsLoading ? "…" : lowStockCount, icon: FiAlertTriangle, color: "products-dashboard__card--orange", path: "/admin/products" }] : []),
-    ...(canViewProducts && canViewPrices ? [{ label: "Average product price", value: productsLoading ? "…" : money(averagePrice), icon: FiDollarSign, color: "products-dashboard__card--green", path: "/admin/products/price-tracking" }] : []),
+    ...(canViewProducts ? [{ label: "Active products", value: productsLoading ? "…" : activeProducts.length, icon: BoxIcon, color: "products-dashboard__card--navy", path: "/admin/products" }] : []),
+    ...(canViewCategories ? [{ label: canViewProducts ? "Categories with products" : "Active categories", value: productsLoading || categoriesLoading ? "…" : canViewProducts ? categoriesWithProducts : categories.length, icon: LayoutGridIcon, color: "products-dashboard__card--blue", path: "/admin/categories" }] : []),
+    ...(canViewProducts ? [{ label: "Low-stock products", value: productsLoading ? "…" : lowStockCount, icon: TriangleAlertIcon, color: "products-dashboard__card--orange", path: "/admin/products" }] : []),
+    ...(canViewProducts && canViewPrices ? [{ label: "Average product price", value: productsLoading ? "…" : money(averagePrice), icon: DollarSignIcon, color: "products-dashboard__card--green", path: "/admin/products/price-tracking" }] : []),
   ];
 
   if (metrics.length === 0 && quickLinks.length === 0) return null;
@@ -163,7 +163,7 @@ const ProductsDashboard = ({ entries }: ProductsDashboardProps) => {
         <div className="products-dashboard__charts">
           <section className="products-dashboard__panel">
             <div className="products-dashboard__panel-heading">
-              <span className="products-dashboard__panel-icon"><FiGrid aria-hidden /></span>
+              <span className="products-dashboard__panel-icon"><LayoutGridIcon aria-hidden /></span>
               <div>
                 <h3>Products by category</h3>
                 <p>Active products in each category</p>
@@ -176,7 +176,7 @@ const ProductsDashboard = ({ entries }: ProductsDashboardProps) => {
                   <XAxis dataKey="category" tick={{ fontSize: 11 }} />
                   <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                   <Tooltip />
-                  <Bar dataKey="count" name="Products" fill="#2f8fd6" radius={[5, 5, 0, 0]} />
+                  <Bar dataKey="count" name="Products" fill="var(--fx-chart-1)" radius={[5, 5, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -184,7 +184,7 @@ const ProductsDashboard = ({ entries }: ProductsDashboardProps) => {
 
           <section className="products-dashboard__panel">
             <div className="products-dashboard__panel-heading">
-              <span className="products-dashboard__panel-icon"><FiBox aria-hidden /></span>
+              <span className="products-dashboard__panel-icon"><BoxIcon aria-hidden /></span>
               <div>
                 <h3>Stock overview</h3>
                 <p>Products grouped by stock level</p>
@@ -215,7 +215,7 @@ const ProductsDashboard = ({ entries }: ProductsDashboardProps) => {
           <div className="products-dashboard__links">
             {quickLinks.map((entry) => (
               <Link to={entry.path} key={entry.id} className="products-dashboard__quick-link">
-                <span>{entry.label}</span><FiArrowUpRight aria-hidden />
+                <span>{entry.label}</span><ArrowUpRightIcon aria-hidden />
               </Link>
             ))}
           </div>

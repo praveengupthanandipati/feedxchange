@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../shared/components/icon";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import {
@@ -91,7 +91,7 @@ const ReceiptDetailsOffcanvas = ({ open, receiptId, onClose }: ReceiptDetailsOff
             {receipt && <span>{receipt.label}</span>}
           </div>
           <button type="button" className="receipt-details-offcanvas__close" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 

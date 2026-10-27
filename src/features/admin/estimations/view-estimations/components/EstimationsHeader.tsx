@@ -1,4 +1,4 @@
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { EyeIcon, EyeOffIcon } from "../../../../../shared/components/icon";
 
 interface EstimationsHeaderProps {
   dataShowing: string;
@@ -19,7 +19,7 @@ const EstimationsHeader = ({ dataShowing, filtersVisible, onToggleFilters }: Est
       aria-expanded={filtersVisible}
       aria-controls="view-estimations-filters"
     >
-      {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+      {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
       {filtersVisible ? "Hide" : "Show"}
     </button>
   </div>

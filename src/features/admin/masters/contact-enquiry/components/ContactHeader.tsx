@@ -1,4 +1,4 @@
-import { FiEye, FiEyeOff, FiUploadCloud } from "react-icons/fi";
+import { CloudUploadIcon, EyeIcon, EyeOffIcon } from "../../../../../shared/components/icon";
 
 interface ContactHeaderProps {
   filtersVisible: boolean;
@@ -18,11 +18,11 @@ const ContactHeader = ({ filtersVisible, onToggleFilters, onExport, canExport }:
         aria-expanded={filtersVisible}
         aria-controls="contact-enquiry-filters"
       >
-        {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+        {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
         {filtersVisible ? "Hide" : "Show"}
       </button>
       <button type="button" className="contact-enquiry__btn contact-enquiry__btn--warning" onClick={onExport} disabled={!canExport}>
-        <FiUploadCloud aria-hidden /> Export
+        <CloudUploadIcon aria-hidden /> Export
       </button>
     </div>
   </div>

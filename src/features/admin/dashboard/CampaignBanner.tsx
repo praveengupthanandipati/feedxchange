@@ -1,14 +1,14 @@
-import { FiArrowRight, FiTarget } from "react-icons/fi";
+import { ArrowRightIcon, TargetIcon } from "../../../shared/components/icon";
 
 const CampaignBanner = () => {
   return (
     <div className="dashboard-card dashboard-banner">
       <div className="dashboard-banner__icon">
-        <FiTarget aria-hidden />
+        <TargetIcon aria-hidden />
       </div>
       <p className="dashboard-banner__text">
         Enhance your <strong>Campaign</strong> for better outreach{" "}
-        <FiArrowRight aria-hidden />
+        <ArrowRightIcon aria-hidden />
       </p>
       <button type="button" className="dashboard-banner__cta">
         Upgrade Account!

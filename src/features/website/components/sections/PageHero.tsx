@@ -1,4 +1,4 @@
-import { FiChevronRight } from "react-icons/fi";
+import { ChevronRightIcon } from "../../../../shared/components/icon";
 import { Link } from "react-router-dom";
 import type { NavLinkItem } from "../../data/content";
 import { sitePaths } from "../../routes/paths";
@@ -21,11 +21,11 @@ const PageHero = ({ title, text, parent }: PageHeroProps) => (
           </li>
           {parent && (
             <li>
-              <FiChevronRight aria-hidden /> <Link to={parent.to}>{parent.label}</Link>
+              <ChevronRightIcon aria-hidden /> <Link to={parent.to}>{parent.label}</Link>
             </li>
           )}
           <li aria-current="page">
-            <FiChevronRight aria-hidden /> {title}
+            <ChevronRightIcon aria-hidden /> {title}
           </li>
         </ol>
       </nav>

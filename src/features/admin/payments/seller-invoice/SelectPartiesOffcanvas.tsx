@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiFileText, FiPlus, FiX } from "react-icons/fi";
+import { FileTextIcon, PlusIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../shared/components/tooltip/InfoTooltip";
 import {
@@ -83,10 +83,10 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
       >
         <div className="select-parties-offcanvas__header">
           <h2 id="select-parties-offcanvas-title">
-            <FiFileText aria-hidden /> Select Parties
+            <FileTextIcon aria-hidden /> Select Parties
           </h2>
           <button type="button" className="select-parties-offcanvas__close" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -169,7 +169,7 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
                           className="select-parties-offcanvas__add-btn"
                           onClick={() => handleAdd(row)}
                         >
-                          <FiPlus aria-hidden /> Add
+                          <PlusIcon aria-hidden /> Add
                         </button>
                       </td>
                       <td>

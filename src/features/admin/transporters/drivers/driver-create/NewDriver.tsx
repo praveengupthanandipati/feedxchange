@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
+import { ArrowLeftIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import {
   useGetDriverByIdQuery,
@@ -120,7 +120,7 @@ const NewDriver = () => {
       <div className="new-contract__topbar">
         <h1>{isEditMode ? "Edit Driver" : "New Driver"}</h1>
         <Link to="/admin/truck-management/transporters/driver-master" className="new-contract__back">
-          <FiArrowLeft aria-hidden /> Drivers List
+          <ArrowLeftIcon aria-hidden /> Drivers List
         </Link>
       </div>
 

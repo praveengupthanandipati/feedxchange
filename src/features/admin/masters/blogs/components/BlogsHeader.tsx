@@ -1,4 +1,4 @@
-import { FiEye, FiEyeOff, FiPlus } from "react-icons/fi";
+import { EyeIcon, EyeOffIcon, PlusIcon } from "../../../../../shared/components/icon";
 
 interface BlogsHeaderProps {
   filtersVisible: boolean;
@@ -11,11 +11,11 @@ const BlogsHeader = ({ filtersVisible, onToggleFilters, onNew }: BlogsHeaderProp
     <h1>Blogs</h1>
     <div className="blogs__header-actions">
       <button type="button" className="blogs__btn blogs__btn--info" onClick={onToggleFilters} aria-expanded={filtersVisible} aria-controls="blogs-filters">
-        {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+        {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
         {filtersVisible ? "Hide" : "Show"}
       </button>
       <button type="button" className="blogs__btn blogs__btn--navy" onClick={onNew}>
-        <FiPlus aria-hidden /> New
+        <PlusIcon aria-hidden /> New
       </button>
     </div>
   </div>

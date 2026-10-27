@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiEdit3, FiShare2, FiUser, FiPhone, FiCreditCard } from "react-icons/fi";
+import { ArrowLeftIcon, CreditCardIcon, PenLineIcon, PhoneIcon, Share2Icon, UserIcon } from "../../../../../shared/components/icon";
 import { useGetTransporterProfileByIdQuery } from "../../../../../core/store/transportersApi";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
@@ -10,13 +10,14 @@ import ContactsTab from "./ContactsTab";
 import BankDetailsTab from "./BankDetailsTab";
 import "../transportersList/Transporters.scss";
 import "../../businessowners/BusinessList/Businessowners.scss";
-import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
+import "../../businessowners/BusinessView/BusinessOwnerDetail.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 const TABS = [
-  { id: "overview", label: "Overview", icon: FiUser },
-  { id: "contacts", label: "Contacts", icon: FiPhone },
-  { id: "bank", label: "Bank Details & Documents", icon: FiCreditCard },
+  { id: "overview", label: "Overview", icon: UserIcon },
+  { id: "contacts", label: "Contacts", icon: PhoneIcon },
+  { id: "bank", label: "Bank Details & Documents", icon: CreditCardIcon },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -42,7 +43,7 @@ const Transportview = () => {
     return (
       <div className="business-owner-detail">
         <Link to="/admin/transporters" className="business-owner-detail__back">
-          <FiArrowLeft aria-hidden /> Back to Transporters
+          <ArrowLeftIcon aria-hidden /> Back to Transporters
         </Link>
         <div className="business-owner-detail__card">
           <p>Loading transporter profile…</p>
@@ -55,7 +56,7 @@ const Transportview = () => {
     return (
       <div className="business-owner-detail">
         <Link to="/admin/transporters" className="business-owner-detail__back">
-          <FiArrowLeft aria-hidden /> Back to Transporters
+          <ArrowLeftIcon aria-hidden /> Back to Transporters
         </Link>
         <div className="business-owner-detail__card">
           <p>No transporter found for id "{id}".</p>
@@ -67,7 +68,7 @@ const Transportview = () => {
   return (
     <div className="business-owner-detail">
       <Link to="/admin/transporters" className="business-owner-detail__back">
-        <FiArrowLeft aria-hidden /> Back to Transporters
+        <ArrowLeftIcon aria-hidden /> Back to Transporters
       </Link>
 
       <div className="business-owner-detail__card">
@@ -87,7 +88,7 @@ const Transportview = () => {
                 className="transporters-btn transporters-btn--outline"
                 onClick={() => navigate(`/admin/transporters/profile?id=${id}`)}
               >
-                <FiEdit3 aria-hidden /> Edit
+                <PenLineIcon aria-hidden /> Edit
               </button>
             </Can>
             <button
@@ -95,7 +96,7 @@ const Transportview = () => {
               className="transporters-btn transporters-btn--primary"
               onClick={() => setShareProfileOpen(true)}
             >
-              <FiShare2 aria-hidden /> Share Profile
+              <Share2Icon aria-hidden /> Share Profile
             </button>
           </div>
         </div>

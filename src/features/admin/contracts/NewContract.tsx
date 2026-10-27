@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import type { ChangeEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FiArrowLeft, FiEye, FiEyeOff } from "react-icons/fi";
+import { ArrowLeftIcon, EyeIcon, EyeOffIcon } from "../../../shared/components/icon";
 import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
 import ToggleSwitch from "../../../shared/components/toggle/ToggleSwitch";
 import type { Contract } from "./contracts.data";
@@ -1244,12 +1244,12 @@ const { data: products } = useGetProductsQuery();
             className="new-contract__summary-toggle"
             onClick={() => setSummaryVisible((prev) => !prev)}
           >
-            {summaryVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+            {summaryVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {summaryVisible ? "Hide Summary" : "Show Summary"}
           </button>
         </div>
         <Link to="/admin/contracts" className="new-contract__back">
-          <FiArrowLeft aria-hidden /> Contract List
+          <ArrowLeftIcon aria-hidden /> Contract List
         </Link>
       </div>
 

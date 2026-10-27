@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { FiUser, FiArrowLeft, FiPlus, FiTrash2 } from "react-icons/fi";
+import { ArrowLeftIcon, PlusIcon, Trash2Icon, UserIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import { API_URL } from "../../../../../core/api/api";
@@ -269,7 +269,7 @@ const ProductNew = () => {
         <div className="product-new__topbar">
           <h1>Edit Product</h1>
           <Link to="/admin/products" className="product-new__back">
-            <FiArrowLeft aria-hidden /> Products List
+            <ArrowLeftIcon aria-hidden /> Products List
           </Link>
         </div>
         <div className="product-new-form-card">
@@ -285,7 +285,7 @@ const ProductNew = () => {
         <div className="product-new__topbar">
           <h1>Edit Product</h1>
           <Link to="/admin/products" className="product-new__back">
-            <FiArrowLeft aria-hidden /> Products List
+            <ArrowLeftIcon aria-hidden /> Products List
           </Link>
         </div>
         <div className="product-new-form-card">
@@ -300,7 +300,7 @@ const ProductNew = () => {
       <div className="product-new__topbar">
         <h1>{isEditing ? "Edit Product" : "New Product"}</h1>
         <Link to="/admin/products" className="product-new__back">
-          <FiArrowLeft aria-hidden /> Products List
+          <ArrowLeftIcon aria-hidden /> Products List
         </Link>
       </div>
 
@@ -308,7 +308,7 @@ const ProductNew = () => {
         <div className="product-new-form-card">
           <div className="product-new-upload">
             <div className="product-new-upload__preview">
-              {imagePreview ? <img src={imagePreview} alt="Product" /> : <FiUser aria-hidden />}
+              {imagePreview ? <img src={imagePreview} alt="Product" /> : <UserIcon aria-hidden />}
             </div>
             <button
               type="button"
@@ -540,7 +540,7 @@ const ProductNew = () => {
                         onClick={() => setPendingDeleteRow({ table: "spec", id: row.id })}
                         aria-label="Remove row"
                       >
-                        <FiTrash2 aria-hidden />
+                        <Trash2Icon aria-hidden />
                       </button>
                     )}
                     {index === specRows.length - 1 && (
@@ -550,7 +550,7 @@ const ProductNew = () => {
                         onClick={addSpecRow}
                         aria-label="Add row"
                       >
-                        <FiPlus aria-hidden />
+                        <PlusIcon aria-hidden />
                       </button>
                     )}
                   </div>
@@ -590,7 +590,7 @@ const ProductNew = () => {
                         onClick={() => setPendingDeleteRow({ table: "value", id: row.id })}
                         aria-label="Remove row"
                       >
-                        <FiTrash2 aria-hidden />
+                        <Trash2Icon aria-hidden />
                       </button>
                     )}
                     {index === valueRows.length - 1 && (
@@ -600,7 +600,7 @@ const ProductNew = () => {
                         onClick={addValueRow}
                         aria-label="Add row"
                       >
-                        <FiPlus aria-hidden />
+                        <PlusIcon aria-hidden />
                       </button>
                     )}
                   </div>
@@ -612,7 +612,7 @@ const ProductNew = () => {
       </div>
 
       {submitError && (
-        <p className="new-contract__error" style={{ color: "#d92d20" }}>
+        <p className="new-contract__error" role="alert" style={{ color: "var(--fx-red-49-fg)" }}>
           {submitError}
         </p>
       )}

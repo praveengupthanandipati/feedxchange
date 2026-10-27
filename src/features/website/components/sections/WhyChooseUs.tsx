@@ -1,4 +1,4 @@
-import { FiArrowRight, FiCheck } from "react-icons/fi";
+import { ArrowRightIcon, CheckIcon } from "../../../../shared/components/icon";
 import { Link } from "react-router-dom";
 import aboutImage from "../../assets/images/about-network.svg";
 import { reasons } from "../../data/content";
@@ -23,14 +23,14 @@ const WhyChooseUs = () => (
           {reasons.map((reason) => (
             <li key={reason}>
               <span aria-hidden>
-                <FiCheck />
+                <CheckIcon />
               </span>
               {reason}
             </li>
           ))}
         </ul>
         <Link to={sitePaths.about} className="btn-site btn-site--dark">
-          Learn more about us <FiArrowRight aria-hidden />
+          Learn more about us <ArrowRightIcon aria-hidden />
         </Link>
       </div>
     </div>

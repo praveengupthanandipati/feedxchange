@@ -1,4 +1,4 @@
-import { FiChevronDown, FiChevronUp, FiDownload, FiEye, FiEyeOff } from "react-icons/fi";
+import { ChevronDownIcon, ChevronUpIcon, DownloadIcon, EyeIcon, EyeOffIcon } from "../../../../../shared/components/icon";
 
 interface EstimationHeaderProps {
   filtersVisible: boolean;
@@ -21,14 +21,14 @@ const EstimationHeader = ({ filtersVisible, onToggleFilters, onExport, canExport
         aria-expanded={filtersVisible}
         aria-controls="commission-estimations-filters"
       >
-        {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+        {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
         {filtersVisible ? "Hide" : "Show"}
       </button>
       <button type="button" className="commission-estimations__btn commission-estimations__btn--warning" onClick={onExport} disabled={!canExport}>
-        <FiDownload aria-hidden /> Export
+        <DownloadIcon aria-hidden /> Export
       </button>
       <button type="button" className="commission-estimations__btn commission-estimations__btn--warning" onClick={onToggleAll} disabled={!canToggle}>
-        {allExpanded ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
+        {allExpanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
         {allExpanded ? "Collapse All" : "Toggle All"}
       </button>
     </div>

@@ -1,15 +1,14 @@
-import type { IconType } from "react-icons";
-import { FiBell, FiMail, FiMessageCircle, FiSmartphone } from "react-icons/fi";
+import { type IconComponent, BellIcon, MailIcon, MessageCircleIcon, SmartphoneIcon } from "../../../shared/components/icon";
 import type { ChannelCode } from "../../../core/store/notificationsApi";
 import type { PreferenceChannel, PreferenceEvent, Subscription } from "../../../core/store/notificationPreferencesApi";
 
 export const CHANNEL_ORDER: ChannelCode[] = ["EMAIL", "WHATSAPP", "SMS", "APP"];
 
-export const CHANNEL_META: Record<ChannelCode, { label: string; icon: IconType }> = {
-  EMAIL: { label: "Email", icon: FiMail },
-  WHATSAPP: { label: "WhatsApp", icon: FiMessageCircle },
-  SMS: { label: "SMS", icon: FiSmartphone },
-  APP: { label: "In-app", icon: FiBell },
+export const CHANNEL_META: Record<ChannelCode, { label: string; icon: IconComponent }> = {
+  EMAIL: { label: "Email", icon: MailIcon },
+  WHATSAPP: { label: "WhatsApp", icon: MessageCircleIcon },
+  SMS: { label: "SMS", icon: SmartphoneIcon },
+  APP: { label: "In-app", icon: BellIcon },
 };
 
 export interface EventGroup {

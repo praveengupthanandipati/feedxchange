@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiChevronDown, FiSearch, FiX } from "react-icons/fi";
+import { ChevronDownIcon, ICON_STROKE_FINE, SearchIcon, XIcon } from "../icon";
 import type { SearchableSelectOption } from "./SearchableSelect";
 import { useAnchoredPanel } from "./useAnchoredPanel";
 import "./MultiSelect.scss";
@@ -109,20 +109,20 @@ const MultiSelect = ({
                   aria-label={`Remove ${option.label}`}
                   onClick={(event) => removeValue(option.value, event)}
                 >
-                  <FiX aria-hidden />
+                  <XIcon size={12} strokeWidth={ICON_STROKE_FINE} aria-hidden />
                 </span>
               </span>
             ))}
           </span>
         )}
-        <FiChevronDown className={open ? "is-open" : ""} aria-hidden />
+        <ChevronDownIcon className={open ? "is-open" : ""} size={14} strokeWidth={ICON_STROKE_FINE} aria-hidden />
       </button>
 
       {open &&
         createPortal(
         <div className="multi-select__panel" ref={panelRef} style={panelStyle}>
           <div className="multi-select__search">
-            <FiSearch aria-hidden />
+            <SearchIcon aria-hidden />
             <input
               ref={inputRef}
               type="text"

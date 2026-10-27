@@ -1,4 +1,5 @@
-import { FiChevronDown, FiMapPin, FiArrowUp, FiArrowDown } from "react-icons/fi";
+import type { CSSProperties } from "react";
+import { ArrowDownIcon, ArrowUpIcon, ChevronDownIcon, MapPinIcon } from "../../../shared/components/icon";
 import { topUsers } from "./dashboard.data";
 
 const TopUsers = () => {
@@ -7,22 +8,22 @@ const TopUsers = () => {
       <div className="dashboard-card__header">
         <h2 className="dashboard-card__title">Top Users</h2>
         <button type="button" className="dashboard-card__sort">
-          <strong>All Members</strong> <FiChevronDown aria-hidden />
+          <strong>All Members</strong> <ChevronDownIcon aria-hidden />
         </button>
       </div>
 
       <ul className="dashboard-users">
         {topUsers.map((user) => {
-          const TrendIcon = user.trend === "up" ? FiArrowUp : FiArrowDown;
+          const TrendIcon = user.trend === "up" ? ArrowUpIcon : ArrowDownIcon;
           return (
             <li key={user.id} className="dashboard-users__item">
-              <span className="dashboard-users__avatar" style={{ backgroundColor: user.color }}>
+              <span className="dashboard-users__avatar" style={{ "--avatar": user.color } as CSSProperties}>
                 {user.initials}
               </span>
               <div className="dashboard-users__info">
                 <p className="dashboard-users__name">{user.name}</p>
                 <p className="dashboard-users__location">
-                  <FiMapPin aria-hidden /> {user.location}
+                  <MapPinIcon aria-hidden /> {user.location}
                 </p>
               </div>
               <span

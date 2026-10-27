@@ -6,7 +6,7 @@
   padding: v.$space-7 0;
   background-color: v.$navy-900;
   background-image: radial-gradient(120% 140% at 100% 0%, v.$navy-600 0%, v.$navy-900 60%);
-  color: rgba(v.$white, 0.8);
+  color: v.alpha(v.on(v.$white), 0.8);
 
   @include m.up(lg) {
     padding: v.$space-8 0;
@@ -15,7 +15,7 @@
   h1 {
     @include m.fluid-type(2rem, 3rem);
     margin-top: v.$space-3;
-    color: v.$white;
+    color: v.fg(v.$white);
   }
 
   p {
@@ -40,15 +40,15 @@
 
     a {
       @include m.focus-ring;
-      color: v.$orange-500;
+      color: v.fg(v.$orange-500);
 
       &:hover {
-        color: v.$white;
+        color: v.fg(v.$white);
       }
     }
 
     [aria-current="page"] {
-      color: rgba(v.$white, 0.75);
+      color: v.alpha(v.fg(v.$white), 0.75);
     }
   }
 }
@@ -56,7 +56,7 @@
 .prose-site {
   display: grid;
   gap: v.$space-4;
-  color: v.$ink-soft;
+  color: v.fg(v.$ink-soft);
   font-size: v.$fs-lg;
   line-height: 1.8;
 }
@@ -93,7 +93,7 @@
     align-items: flex-start;
     gap: v.$space-4;
     padding: v.$space-4;
-    border: 1px solid v.$line;
+    border: 1px solid v.line(v.$line);
     border-radius: v.$radius-lg;
 
     @include m.up(md) {
@@ -107,13 +107,13 @@
 
     p,
     a {
-      color: v.$ink-soft;
+      color: v.fg(v.$ink-soft);
       font-size: v.$fs-sm;
       overflow-wrap: anywhere;
     }
 
     a:hover {
-      color: v.$orange-600;
+      color: v.fg(v.$orange-600);
     }
   }
 }
@@ -154,7 +154,7 @@
     > svg {
       width: 3.5rem;
       height: 3.5rem;
-      color: v.$green-500;
+      color: v.fg(v.$green-500);
     }
 
     h2 {
@@ -164,7 +164,7 @@
     p {
       max-width: 26rem;
       margin-bottom: v.$space-3;
-      color: v.$ink-soft;
+      color: v.fg(v.$ink-soft);
     }
   }
 }
@@ -180,12 +180,12 @@
   }
 
   label {
-    color: v.$ink;
+    color: v.fg(v.$ink);
     font-size: v.$fs-sm;
     font-weight: v.$fw-medium;
 
     span {
-      color: #d64545;
+      color: var(--fx-red-55-fg);
     }
   }
 
@@ -194,10 +194,10 @@
     width: 100%;
     min-width: 0;
     padding: 0.75rem v.$space-4;
-    border: 1px solid v.$line;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
     background-color: v.$surface-alt;
-    color: v.$ink;
+    color: v.fg(v.$ink);
     // 16px stops iOS Safari zooming in when a field is focused.
     font-size: 1rem;
     -webkit-appearance: none;
@@ -208,14 +208,14 @@
       background-color 0.2s ease;
 
     &:focus {
-      border-color: v.$navy-600;
+      border-color: var(--fx-field-border-focus);
       background-color: v.$white;
-      box-shadow: 0 0 0 4px rgba(v.$navy-600, 0.12);
+      box-shadow: var(--fx-field-focus-glow);
       outline: none;
     }
 
     &[aria-invalid="true"] {
-      border-color: #d64545;
+      border-color: var(--fx-red-55-line);
     }
   }
 
@@ -225,7 +225,7 @@
   }
 
   &__error {
-    color: #d64545;
+    color: var(--fx-red-55-fg);
     font-size: v.$fs-xs;
   }
 }
@@ -252,7 +252,7 @@
 
   p {
     margin: v.$space-3 0 v.$space-6;
-    color: v.$ink-soft;
+    color: v.fg(v.$ink-soft);
   }
 }
 
@@ -304,7 +304,7 @@
     align-items: center;
     gap: v.$space-2;
     margin-top: v.$space-4;
-    color: v.$orange-600;
+    color: v.fg(v.$orange-600);
     font-size: v.$fs-sm;
     font-weight: v.$fw-semibold;
 
@@ -341,7 +341,7 @@
   flex-direction: column;
   gap: v.$space-3;
   padding: v.$space-6 v.$space-5;
-  border: 1px solid v.$line;
+  border: 1px solid v.line(v.$line);
   border-radius: v.$radius-lg;
   background-color: v.$surface;
   box-shadow: v.$shadow-md;
@@ -364,26 +364,26 @@
       justify-content: space-between;
       gap: v.$space-4;
       padding: v.$space-3 0;
-      border-bottom: 1px dashed v.$line;
+      border-bottom: 1px dashed v.line(v.$line);
     }
   }
 
   dt {
-    color: v.$ink-muted;
+    color: v.fg(v.$ink-muted);
     font-size: v.$fs-sm;
     font-weight: v.$fw-regular;
   }
 
   dd {
     margin: 0;
-    color: v.$ink;
+    color: v.fg(v.$ink);
     font-size: v.$fs-sm;
     font-weight: v.$fw-semibold;
     text-align: right;
   }
 
   .btn-site--outline svg {
-    color: #25d366;
+    color: var(--fx-green-49-fg);
     font-size: 1.15rem;
   }
 }
@@ -398,7 +398,7 @@
 }
 
 .faq-item {
-  border: 1px solid v.$line;
+  border: 1px solid v.line(v.$line);
   border-radius: v.$radius-lg;
   background-color: v.$surface;
   transition:
@@ -425,7 +425,7 @@
     border: none;
     border-radius: v.$radius-lg;
     background: none;
-    color: v.$ink;
+    color: v.fg(v.$ink);
     font-family: v.$font-heading;
     font-size: v.$fs-base;
     font-weight: v.$fw-semibold;
@@ -439,7 +439,7 @@
       padding: 0.3rem;
       border-radius: 50%;
       background-color: v.$sky-100;
-      color: v.$navy-600;
+      color: v.fg(v.$navy-600);
       transition:
         transform 0.35s v.$ease,
         background-color 0.25s ease;
@@ -448,7 +448,7 @@
 
   &.is-open button svg {
     background-color: v.$orange-500;
-    color: v.$navy-900;
+    color: v.on(v.$navy-900);
     transform: rotate(45deg);
   }
 
@@ -465,7 +465,7 @@
 
     p {
       padding: 0 v.$space-5 v.$space-5;
-      color: v.$ink-soft;
+      color: v.fg(v.$ink-soft);
       line-height: 1.75;
     }
   }
@@ -487,7 +487,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid v.$line;
+  border: 1px solid v.line(v.$line);
   border-radius: v.$radius-lg;
   background-color: v.$surface;
   transition:
@@ -523,18 +523,18 @@
     }
 
     &--1 {
-      background: linear-gradient(135deg, v.$orange-500, #c96b00);
+      background: linear-gradient(135deg, v.$orange-500, var(--fx-orange-39));
     }
 
     &--2 {
-      background: linear-gradient(135deg, v.$green-500, #0f6b45);
+      background: linear-gradient(135deg, v.$green-500, var(--fx-teal-24));
     }
 
     span {
       padding: 0.3rem 0.75rem;
       border-radius: v.$radius-pill;
-      background-color: rgba(v.$white, 0.92);
-      color: v.$navy-900;
+      background-color: v.alpha(v.$white, 0.92);
+      color: v.fg(v.$navy-900);
       font-size: v.$fs-xs;
       font-weight: v.$fw-semibold;
     }
@@ -554,7 +554,7 @@
 
     > p:not(.blog-card__meta) {
       flex: 1;
-      color: v.$ink-soft;
+      color: v.fg(v.$ink-soft);
       font-size: v.$fs-sm;
       line-height: 1.7;
     }
@@ -565,7 +565,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: v.$space-2;
-    color: v.$ink-muted;
+    color: v.fg(v.$ink-muted);
     font-size: v.$fs-xs;
 
     span {
@@ -610,8 +610,8 @@
   border: none;
   border-radius: 50%;
   background: linear-gradient(135deg, v.$navy-700, v.$navy-900);
-  box-shadow: 0 12px 28px -10px rgba(v.$navy-900, 0.6);
-  color: v.$white;
+  box-shadow: 0 12px 28px -10px v.alpha(v.$navy-900, 0.6);
+  color: v.on(v.$white);
   cursor: pointer;
   // Hidden: shrunk and faded; visibility waits for the fade-out.
   visibility: hidden;
@@ -643,7 +643,7 @@
   &:hover {
     animation-play-state: paused;
     background: linear-gradient(135deg, v.$orange-500, v.$orange-600);
-    color: v.$navy-900;
+    color: v.on(v.$navy-900);
 
     .back-to-top__icon {
       transform: translateY(-3px);
@@ -667,19 +667,19 @@
 
     circle {
       fill: none;
-      stroke: rgba(v.$white, 0.18);
+      stroke: v.alpha(v.fg(v.$white), 0.18);
       stroke-width: 2.5;
     }
   }
 
   &__progress {
-    stroke: v.$orange-500 !important;
+    stroke: v.fg(v.$orange-500) !important;
     stroke-linecap: round;
     transition: stroke-dashoffset 0.15s linear;
   }
 
   &:hover &__progress {
-    stroke: v.$navy-900 !important;
+    stroke: v.on(v.$navy-900) !important;
   }
 
   @include m.reduced-motion {
@@ -710,13 +710,13 @@
 // ---------- Who we are ----------
 .about-intro {
   strong {
-    color: v.$ink;
+    color: v.fg(v.$ink);
     font-weight: v.$fw-semibold;
   }
 
   &__label {
     margin: v.$space-6 0 v.$space-3;
-    color: v.$ink-muted;
+    color: v.fg(v.$ink-muted);
     font-size: v.$fs-xs;
     font-weight: v.$fw-semibold;
     letter-spacing: 0.12em;
@@ -742,10 +742,10 @@
 
   li {
     padding: 0.45rem v.$space-4;
-    border: 1px solid rgba(v.$navy-600, 0.15);
+    border: 1px solid v.alpha(v.line(v.$navy-600), 0.15);
     border-radius: v.$radius-pill;
     background-color: v.$sky-50;
-    color: v.$navy-700;
+    color: v.fg(v.$navy-700);
     font-size: v.$fs-sm;
     font-weight: v.$fw-medium;
     transition:
@@ -754,9 +754,9 @@
       color 0.25s ease;
 
     &:hover {
-      border-color: v.$orange-500;
-      background-color: rgba(v.$orange-500, 0.12);
-      color: v.$navy-900;
+      border-color: v.line(v.$orange-500);
+      background-color: v.alpha(v.$orange-500, 0.12);
+      color: v.fg(v.$navy-900);
     }
   }
 }
@@ -776,7 +776,7 @@
     gap: 0;
     padding: v.$space-3 v.$space-5;
     background: linear-gradient(135deg, v.$orange-500, v.$orange-600);
-    color: v.$navy-900;
+    color: v.on(v.$navy-900);
     text-align: center;
 
     span {
@@ -798,13 +798,13 @@
     bottom: 0;
     padding: v.$space-3 v.$space-4;
     background-color: v.$white;
-    color: v.$ink;
+    color: v.fg(v.$ink);
     font-size: v.$fs-sm;
     font-weight: v.$fw-medium;
 
     svg {
       flex-shrink: 0;
-      color: v.$orange-600;
+      color: v.fg(v.$orange-600);
     }
   }
 }
@@ -814,7 +814,7 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: v.$space-7 0 0;
   overflow: hidden;
-  border: 1px solid v.$line;
+  border: 1px solid v.line(v.$line);
   border-radius: v.$radius-lg;
   background-color: v.$white;
   box-shadow: v.$shadow-sm;
@@ -831,7 +831,7 @@
     text-align: center;
 
     &:not(:first-child) {
-      border-left: 1px solid v.$line;
+      border-left: 1px solid v.line(v.$line);
     }
   }
 
@@ -848,7 +848,7 @@
   }
 
   dt {
-    color: v.$ink-muted;
+    color: v.fg(v.$ink-muted);
     font-size: v.$fs-xs;
     font-weight: v.$fw-medium;
 
@@ -876,7 +876,7 @@
   }
 
   .eyebrow {
-    color: v.$orange-500;
+    color: v.fg(v.$orange-500);
   }
 
   &__text {
@@ -888,10 +888,10 @@
   &__quote {
     margin: v.$space-6 0 0;
     padding: v.$space-2 0 v.$space-2 v.$space-5;
-    border-left: 3px solid v.$orange-500;
+    border-left: 3px solid v.line(v.$orange-500);
 
     p {
-      color: v.$white;
+      color: v.fg(v.$white);
       font-family: v.$font-heading;
       @include m.fluid-type(1.2rem, 1.5rem);
       font-style: italic;
@@ -911,17 +911,17 @@
     align-items: flex-start;
     gap: v.$space-4;
     padding: v.$space-5;
-    border: 1px solid rgba(v.$white, 0.1);
+    border: 1px solid v.alpha(v.line(v.$white), 0.1);
     border-radius: v.$radius-lg;
-    background-color: rgba(v.$white, 0.05);
+    background-color: v.alpha(v.$white, 0.05);
     transition:
       background-color 0.3s ease,
       border-color 0.3s ease,
       transform 0.3s v.$ease;
 
     &:hover {
-      border-color: rgba(v.$orange-500, 0.5);
-      background-color: rgba(v.$white, 0.08);
+      border-color: v.alpha(v.line(v.$orange-500), 0.5);
+      background-color: v.alpha(v.$white, 0.08);
       transform: translateX(6px);
     }
 
@@ -942,8 +942,8 @@
     width: 3rem;
     height: 3rem;
     border-radius: v.$radius-md;
-    background-color: rgba(v.$orange-500, 0.15);
-    color: v.$orange-500;
+    background-color: v.alpha(v.$orange-500, 0.15);
+    color: v.fg(v.$orange-500);
     font-size: 1.3rem;
   }
 
@@ -953,7 +953,7 @@
   }
 
   p {
-    color: rgba(v.$white, 0.72);
+    color: v.alpha(v.fg(v.$white), 0.72);
     font-size: v.$fs-sm;
     line-height: 1.7;
   }
@@ -976,7 +976,7 @@
   flex-direction: column;
   gap: v.$space-3;
   padding: v.$space-6 v.$space-5;
-  border: 1px solid v.$line;
+  border: 1px solid v.line(v.$line);
   border-radius: v.$radius-lg;
   background-color: v.$surface;
   transition:
@@ -1007,7 +1007,7 @@
   }
 
   p {
-    color: v.$ink-soft;
+    color: v.fg(v.$ink-soft);
     font-size: v.$fs-sm;
     line-height: 1.8;
   }
@@ -1031,8 +1031,8 @@
     background: linear-gradient(135deg, v.$navy-600, v.$navy-900);
     box-shadow:
       0 0 0 4px v.$white,
-      0 0 0 6px rgba(v.$orange-500, 0.55);
-    color: v.$white;
+      0 0 0 6px v.alpha(v.$orange-500, 0.55);
+    color: v.on(v.$white);
     font-family: v.$font-heading;
     font-size: v.$fs-xl;
     font-weight: v.$fw-semibold;
@@ -1048,15 +1048,15 @@
     justify-content: center;
     width: 2rem;
     height: 2rem;
-    border: 3px solid v.$white;
+    border: 3px solid v.line(v.$white);
     border-radius: 50%;
     background-color: v.$orange-500;
-    color: v.$navy-900;
+    color: v.on(v.$navy-900);
     font-size: 0.9rem;
   }
 
   p.team-card__role {
-    color: v.$orange-600;
+    color: v.fg(v.$orange-600);
     font-size: v.$fs-sm;
     font-weight: v.$fw-semibold;
     line-height: 1.4;
@@ -1069,14 +1069,14 @@
     padding: 0.3rem v.$space-3;
     border-radius: v.$radius-pill;
     background-color: v.$sky-100;
-    color: v.$navy-600;
+    color: v.fg(v.$navy-600);
     font-size: v.$fs-xs;
     font-weight: v.$fw-semibold;
   }
 
   // Founder: wider card with a big avatar beside the story on tablets and up.
   &--featured {
-    background-image: linear-gradient(120deg, #ffffff 0%, #ffffff 55%, #fff6e6 100%);
+    background-image: linear-gradient(120deg, var(--fx-white) 0%, var(--fx-white) 55%, var(--fx-amber-95) 100%);
 
     @include m.up(md) {
       flex-direction: row;
@@ -1161,26 +1161,26 @@
       left: calc(-1 * #{v.$space-6} + 0.05rem);
       width: 0.9rem;
       height: 0.9rem;
-      border: 3px solid v.$white;
+      border: 3px solid v.line(v.$white);
       border-radius: 50%;
       background-color: v.$navy-600;
-      box-shadow: 0 0 0 1px rgba(v.$navy-600, 0.3);
+      box-shadow: 0 0 0 1px v.alpha(v.$navy-600, 0.3);
     }
 
     &:last-child::before {
       background-color: v.$orange-500;
-      box-shadow: 0 0 0 4px rgba(v.$orange-500, 0.25);
+      box-shadow: 0 0 0 4px v.alpha(v.$orange-500, 0.25);
     }
   }
 
   strong {
-    color: v.$navy-700;
+    color: v.fg(v.$navy-700);
     font-family: v.$font-heading;
     font-size: v.$fs-lg;
   }
 
   p {
-    color: v.$ink-soft;
+    color: v.fg(v.$ink-soft);
     font-size: v.$fs-sm;
     line-height: 1.7;
   }
@@ -1208,7 +1208,7 @@
     transition: background-color 0.25s ease;
 
     &:not(:last-child) {
-      border-bottom: 1px dashed v.$line;
+      border-bottom: 1px dashed v.line(v.$line);
     }
 
     &:hover {
@@ -1216,7 +1216,7 @@
 
       .feature-card__icon {
         background-color: v.$orange-500;
-        color: v.$navy-900;
+        color: v.on(v.$navy-900);
       }
     }
   }
@@ -1227,7 +1227,7 @@
   }
 
   p {
-    color: v.$ink-soft;
+    color: v.fg(v.$ink-soft);
     font-size: v.$fs-sm;
     line-height: 1.65;
   }
@@ -1246,7 +1246,7 @@
     position: absolute;
     top: -2rem;
     left: 50%;
-    color: rgba(v.$orange-500, 0.14);
+    color: v.alpha(v.fg(v.$orange-500), 0.14);
     font-family: Georgia, serif;
     font-size: 16rem;
     line-height: 1;
@@ -1284,7 +1284,7 @@
   p {
     max-width: 42rem;
     margin: v.$space-5 auto 0;
-    color: v.$ink-soft;
+    color: v.fg(v.$ink-soft);
     font-size: v.$fs-lg;
     line-height: 1.8;
   }

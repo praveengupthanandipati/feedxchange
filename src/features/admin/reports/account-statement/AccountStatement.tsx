@@ -1,5 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { FiEye, FiEyeOff, FiDownload, FiPrinter, FiCheck, FiRefreshCw, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import {
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  PrinterIcon,
+  RefreshCwIcon,
+} from "../../../../shared/components/icon";
 import DateRangeInput from "../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
@@ -131,14 +140,14 @@ const AccountStatement = () => {
               className="account-statement-btn account-statement-btn--info"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button type="button" className="account-statement-btn account-statement-btn--warning" onClick={handleExport}>
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <button type="button" className="account-statement-btn account-statement-btn--warning" onClick={handlePrint}>
-              <FiPrinter aria-hidden /> Print
+              <PrinterIcon aria-hidden /> Print
             </button>
           </div>
         </div>
@@ -180,10 +189,10 @@ const AccountStatement = () => {
             </div>
 
             <button type="button" className="account-statement-filters__apply" onClick={handleApply}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="account-statement-filters__reset" onClick={handleReset}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         )}
@@ -225,7 +234,7 @@ const AccountStatement = () => {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <button
@@ -243,7 +252,7 @@ const AccountStatement = () => {
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

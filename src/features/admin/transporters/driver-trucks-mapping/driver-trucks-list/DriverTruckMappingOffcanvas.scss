@@ -49,7 +49,7 @@
     @include m.flex(row, space-between, center);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
       @include m.flex(row, flex-start, center, v.$spacing-2);
@@ -57,7 +57,7 @@
       margin: 0;
 
       svg {
-        color: v.$color-primary;
+        color: v.fg(v.$color-primary);
       }
     }
   }
@@ -71,14 +71,14 @@
     border: none;
     border-radius: v.$radius-pill;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 1.25rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -107,19 +107,19 @@
     label {
       @include m.font-base(v.$font-weight-semibold);
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
 
     input[type="date"],
     textarea {
       @include m.font-base;
-      @include m.focus-ring(v.$color-orange);
+      @include m.field-focus-ring;
       width: 100%;
       padding: v.$spacing-2 v.$spacing-3;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       resize: vertical;
     }
@@ -129,7 +129,7 @@
     @include m.flex(row, flex-start, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-medium);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     cursor: pointer;
 
     input[type="checkbox"] {
@@ -145,15 +145,15 @@
     flex-shrink: 0;
     flex-wrap: wrap;
     padding: v.$spacing-4 v.$spacing-5;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
   }
 
   &__cancel {
     @include m.button-variant(v.$color-white, v.$color-primary, v.$color-gray-50);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     font-size: v.$font-size-sm;
     cursor: pointer;
   }
@@ -161,7 +161,7 @@
   &__submit {
     @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     font-size: v.$font-size-sm;
     cursor: pointer;

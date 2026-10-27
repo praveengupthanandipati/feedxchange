@@ -1,19 +1,19 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { IconType } from "react-icons";
 import {
-  FiBell,
-  FiCheck,
-  FiCheckCircle,
-  FiDollarSign,
-  FiFileText,
-  FiMail,
-  FiSearch,
-  FiSettings,
-  FiTrash2,
-  FiTrendingUp,
-  FiTruck,
-} from "react-icons/fi";
+  type IconComponent,
+  BellIcon,
+  CheckIcon,
+  CircleCheckBigIcon,
+  DollarSignIcon,
+  FileTextIcon,
+  MailIcon,
+  SearchIcon,
+  SettingsIcon,
+  Trash2Icon,
+  TrendingUpIcon,
+  TruckIcon,
+} from "../../../../shared/components/icon";
 import {
   CATEGORY_LABELS,
   initialNotifications,
@@ -26,12 +26,12 @@ const PAGE_SIZE = 8;
 
 type Filter = "all" | "unread" | NotificationCategory;
 
-const CATEGORY_ICONS: Record<NotificationCategory, IconType> = {
-  contracts: FiFileText,
-  dispatch: FiTruck,
-  payments: FiDollarSign,
-  prices: FiTrendingUp,
-  system: FiSettings,
+const CATEGORY_ICONS: Record<NotificationCategory, IconComponent> = {
+  contracts: FileTextIcon,
+  dispatch: TruckIcon,
+  payments: DollarSignIcon,
+  prices: TrendingUpIcon,
+  system: SettingsIcon,
 };
 
 const FILTERS: { value: Filter; label: string }[] = [
@@ -124,7 +124,7 @@ const Notifications = () => {
           onClick={markAllRead}
           disabled={unreadCount === 0}
         >
-          <FiCheckCircle aria-hidden /> Mark all as read
+          <CircleCheckBigIcon aria-hidden /> Mark all as read
         </button>
       </div>
 
@@ -145,7 +145,7 @@ const Notifications = () => {
           ))}
         </div>
         <div className="notifications__search">
-          <FiSearch aria-hidden />
+          <SearchIcon aria-hidden />
           <input
             type="text"
             value={search}
@@ -161,7 +161,7 @@ const Notifications = () => {
 
       {groups.length === 0 ? (
         <div className="notifications__empty" role="status">
-          <FiBell aria-hidden />
+          <BellIcon aria-hidden />
           <h2>No notifications</h2>
           <p>{search || filter !== "all" ? "Nothing matches the current filter." : "New activity will show up here."}</p>
         </div>
@@ -199,7 +199,7 @@ const Notifications = () => {
                         aria-label={item.read ? "Mark as unread" : "Mark as read"}
                         title={item.read ? "Mark as unread" : "Mark as read"}
                       >
-                        {item.read ? <FiMail aria-hidden /> : <FiCheck aria-hidden />}
+                        {item.read ? <MailIcon aria-hidden /> : <CheckIcon aria-hidden />}
                       </button>
                       <button
                         type="button"
@@ -208,7 +208,7 @@ const Notifications = () => {
                         aria-label="Delete notification"
                         title="Delete"
                       >
-                        <FiTrash2 aria-hidden />
+                        <Trash2Icon aria-hidden />
                       </button>
                     </div>
                   </li>

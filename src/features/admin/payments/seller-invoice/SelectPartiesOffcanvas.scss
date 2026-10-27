@@ -52,11 +52,11 @@
     @include m.flex(row, space-between, center);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
       @include m.flex(row, flex-start, center, v.$spacing-2);
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-lg;
       margin: 0;
     }
@@ -71,14 +71,14 @@
     border: none;
     border-radius: v.$radius-pill;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 1.25rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -112,7 +112,7 @@
   &__label {
     @include m.font-base(v.$font-weight-semibold);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   &__get-btn {
@@ -120,12 +120,12 @@
     @include m.focus-ring(v.$color-orange);
     @include m.font-base(v.$font-weight-semibold);
     align-self: flex-start;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
     cursor: pointer;
     transition: background-color v.$transition-fast;
@@ -139,7 +139,7 @@
   &__table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     scrollbar-width: thin;
     min-height: 200px;
   }
@@ -155,7 +155,7 @@
       @include m.font-heading(v.$font-weight-semibold);
       padding: v.$spacing-3 v.$spacing-4;
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
       font-size: v.$font-size-sm;
       text-align: left;
       white-space: nowrap;
@@ -163,9 +163,9 @@
 
     td {
       padding: v.$spacing-3 v.$spacing-4;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       white-space: nowrap;
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
     }
 
     tbody tr {
@@ -180,12 +180,12 @@
   &__empty {
     text-align: center;
     white-space: normal;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     padding: v.$spacing-6 !important;
   }
 
   &__contract-no {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-weight: v.$font-weight-semibold;
   }
 
@@ -197,14 +197,14 @@
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-success;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: #227a46;
+      background-color: var(--fx-green-31);
     }
   }
 

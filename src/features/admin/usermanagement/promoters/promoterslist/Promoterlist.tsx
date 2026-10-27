@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
+import { DownloadIcon, EyeIcon, EyeOffIcon, PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
@@ -14,7 +14,8 @@ import {
   type Promoter,
   type PromoterProfileStatus,
 } from "../../../../../core/store/promotersApi";
-import "./Promoters.scss";
+import "./Promoters.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 const PAGE_SIZE = 10;
@@ -155,7 +156,7 @@ const Promoterlist = () => {
               className="promoters-btn promoters-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
@@ -163,7 +164,7 @@ const Promoterlist = () => {
               className="promoters-btn promoters-btn--warning"
               onClick={handleExport}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["profiles.promoter.manage"]}>
               <button
@@ -171,7 +172,7 @@ const Promoterlist = () => {
                 className="promoters-btn promoters-btn--primary"
                 onClick={() => navigate("/admin/promoters/profile")}
               >
-                <FiPlus aria-hidden /> New
+                <PlusIcon aria-hidden /> New
               </button>
             </Can>
           </div>

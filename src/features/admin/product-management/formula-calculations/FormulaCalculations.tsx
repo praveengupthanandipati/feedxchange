@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FiTool } from "react-icons/fi";
+import { WrenchIcon } from "../../../../shared/components/icon";
 import "./FormulaCalculations.scss";
 
 const FormulaCalculations = () => {
@@ -7,7 +7,7 @@ const FormulaCalculations = () => {
     <div className="formula-calculations-page">
       <div className="formula-calculations-card">
         <span className="formula-calculations-card__icon">
-          <FiTool aria-hidden />
+          <WrenchIcon aria-hidden />
         </span>
         <h1>Page Under Construction</h1>
         <p>Formula Calculations is being built and will be available soon.</p>

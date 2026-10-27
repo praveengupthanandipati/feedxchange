@@ -1,4 +1,4 @@
-import { FiDownload, FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { DownloadIcon, EyeIcon, SquarePenIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import type { Estimation } from "../viewEstimation.data";
 
 export interface EstimationActionHandlers {
@@ -14,10 +14,10 @@ interface EstimationActionsProps extends EstimationActionHandlers {
 
 const EstimationActions = ({ estimation, onDownload, onView, onEdit, onDelete }: EstimationActionsProps) => {
   const actions = [
-    { key: "download", label: "Download PDF", icon: FiDownload, onClick: onDownload },
-    { key: "view", label: "View Detail", icon: FiEye, onClick: onView },
-    { key: "edit", label: "Edit", icon: FiEdit, onClick: onEdit },
-    { key: "delete", label: "Delete", icon: FiTrash2, onClick: onDelete },
+    { key: "download", label: "Download PDF", icon: DownloadIcon, onClick: onDownload },
+    { key: "view", label: "View Detail", icon: EyeIcon, onClick: onView },
+    { key: "edit", label: "Edit", icon: SquarePenIcon, onClick: onEdit },
+    { key: "delete", label: "Delete", icon: Trash2Icon, onClick: onDelete },
   ];
 
   return (

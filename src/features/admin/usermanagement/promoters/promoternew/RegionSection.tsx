@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiTrash2 } from "react-icons/fi";
+import { Trash2Icon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
@@ -95,7 +95,7 @@ const RegionSection = ({ entries, onEntriesChange }: RegionSectionProps) => {
                     onClick={() => setPendingDeleteId(entry.id)}
                     aria-label="Remove region"
                   >
-                    <FiTrash2 aria-hidden />
+                    <Trash2Icon aria-hidden />
                   </button>
                 </div>
               </div>

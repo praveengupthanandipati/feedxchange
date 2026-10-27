@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  FiArrowLeft,
-  FiEye,
-  FiEyeOff,
-  FiFileText,
-  FiTruck,
-  FiCheckCircle,
-  FiClock,
-} from "react-icons/fi";
+  ArrowLeftIcon,
+  CircleCheckBigIcon,
+  ClockIcon,
+  EyeIcon,
+  EyeOffIcon,
+  FileTextIcon,
+  TruckIcon,
+} from "../../../../shared/components/icon";
 import { defaultContractSummary, type ContractSummary } from "./assignTransports.data";
 import InstantTruckAssignment from "./instant-truck-assignment/InstantTruckAssignment";
 import ScheduleTruckAssignment from "./schedule-truck-assignment/ScheduleTruckAssignment";
@@ -92,14 +92,14 @@ const Assigntransports = () => {
             Contract No: <span className="assign-transports-card__contract-no">{summary.contractNumber}</span>
           </h1>
           <Link to="/admin/truck-management/open-pending-contracts" className="assign-transports-card__back">
-            <FiArrowLeft aria-hidden /> Back to Contract Trucks
+            <ArrowLeftIcon aria-hidden /> Back to Contract Trucks
           </Link>
         </div>
 
         <div className="assign-transports-stats">
           <div className="assign-transports-stats__card assign-transports-stats__card--navy">
             <span className="assign-transports-stats__icon">
-              <FiFileText aria-hidden />
+              <FileTextIcon aria-hidden />
             </span>
             <span className="assign-transports-stats__body">
               <span className="assign-transports-stats__label">Contract Qty</span>
@@ -108,7 +108,7 @@ const Assigntransports = () => {
           </div>
           <div className="assign-transports-stats__card assign-transports-stats__card--success">
             <span className="assign-transports-stats__icon">
-              <FiTruck aria-hidden />
+              <TruckIcon aria-hidden />
             </span>
             <span className="assign-transports-stats__body">
               <span className="assign-transports-stats__label">Dispatched</span>
@@ -117,7 +117,7 @@ const Assigntransports = () => {
           </div>
           <div className="assign-transports-stats__card assign-transports-stats__card--info">
             <span className="assign-transports-stats__icon">
-              <FiCheckCircle aria-hidden />
+              <CircleCheckBigIcon aria-hidden />
             </span>
             <span className="assign-transports-stats__body">
               <span className="assign-transports-stats__label">Vehicle Arranged</span>
@@ -126,7 +126,7 @@ const Assigntransports = () => {
           </div>
           <div className="assign-transports-stats__card assign-transports-stats__card--warning">
             <span className="assign-transports-stats__icon">
-              <FiClock aria-hidden />
+              <ClockIcon aria-hidden />
             </span>
             <span className="assign-transports-stats__body">
               <span className="assign-transports-stats__label">Pending Qty</span>
@@ -135,7 +135,7 @@ const Assigntransports = () => {
           </div>
           <div className="assign-transports-stats__card assign-transports-stats__card--danger">
             <span className="assign-transports-stats__icon">
-              <FiTruck aria-hidden />
+              <TruckIcon aria-hidden />
             </span>
             <span className="assign-transports-stats__body">
               <span className="assign-transports-stats__label">Total Trucks Assigned</span>
@@ -152,7 +152,7 @@ const Assigntransports = () => {
               className="assign-transports-details__toggle"
               onClick={() => setDetailsVisible((prev) => !prev)}
             >
-              {detailsVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {detailsVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {detailsVisible ? "Hide" : "Show"}
             </button>
           </div>

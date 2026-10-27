@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { FiAlertCircle, FiArrowLeft } from "react-icons/fi";
+import { ArrowLeftIcon, CircleAlertIcon } from "../../../../../shared/components/icon";
 import DeliveryOrderInformation from "./DeliveryOrderInformation";
 import DispatchInvoiceDetails from "./DispatchInvoiceDetails";
 import ReassignTruck from "./ReassignTruck";
@@ -12,7 +12,7 @@ const SELLER_DISPATCHES_PATH = "/admin/truck-management/seller-dispatches-new";
 
 const BackLink = () => (
   <Link to={SELLER_DISPATCHES_PATH} className="update-dispatch__back">
-    <FiArrowLeft aria-hidden /> Back to Seller Dispatches
+    <ArrowLeftIcon aria-hidden /> Back to Seller Dispatches
   </Link>
 );
 
@@ -24,7 +24,7 @@ const UpdateSellerDispatch = () => {
     return (
       <div className="update-dispatch">
         <div className="update-dispatch__not-found" role="alert">
-          <FiAlertCircle aria-hidden />
+          <CircleAlertIcon aria-hidden />
           <p>Dispatch {contractNo} could not be found.</p>
           <BackLink />
         </div>

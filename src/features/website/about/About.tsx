@@ -1,4 +1,4 @@
-import { FiAward, FiMapPin } from "react-icons/fi";
+import { AwardIcon, MapPinIcon } from "../../../shared/components/icon";
 import aboutImage from "../assets/images/about-network.svg";
 import SectionHead from "../components/common/SectionHead";
 import CtaBanner from "../components/sections/CtaBanner";
@@ -54,7 +54,7 @@ const About = () => {
               <strong>{about.founded}</strong>
             </div>
             <div className="about-badge about-badge--place">
-              <FiMapPin aria-hidden />
+              <MapPinIcon aria-hidden />
               <span>{about.city}</span>
             </div>
           </div>
@@ -147,7 +147,7 @@ const About = () => {
             <div className="team-card__avatar" aria-hidden>
               {initials(founder.name)}
               <span className="team-card__award">
-                <FiAward />
+                <AwardIcon />
               </span>
             </div>
             <div className="team-card__body">

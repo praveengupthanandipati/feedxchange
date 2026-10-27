@@ -20,7 +20,7 @@
 
     h1 {
       margin: 0;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -45,10 +45,10 @@
   &__back {
     @include m.flex(row, center, center, v.$spacing-1);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border-radius: v.$radius-md;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
     text-decoration: none;
@@ -60,11 +60,11 @@
     @include m.flex(row, center, center, v.$spacing-2);
     text-decoration: none;
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
@@ -79,8 +79,8 @@
       cursor: not-allowed;
     }
 
-    &--info { background-color: #50a5f1; }
-    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--info { background-color: var(--fx-sky-63); }
+    &--warning { background-color: v.$color-orange; color: v.on(v.$color-navy-dark); }
     &--navy { background-color: v.$color-navy; }
     &--fit { align-self: flex-start; }
 
@@ -93,23 +93,24 @@
     @include m.font-base;
     width: 100%;
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     -webkit-appearance: none;
     appearance: none;
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     &--readonly {
-      background-color: #f7f6ef;
+      background-color: var(--fx-gray-95-2);
     }
   }
 
@@ -156,7 +157,7 @@
   &__notice {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     margin: 0;
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
 
     svg { flex-shrink: 0; }
@@ -197,14 +198,14 @@
     text-align: center;
 
     dt {
-      color: v.$color-text;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text);
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
 
     dd {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-xl;
       font-weight: v.$font-weight-semibold;
       font-variant-numeric: tabular-nums;
@@ -213,7 +214,7 @@
     }
 
     &--text dd { font-size: v.$font-size-lg; }
-    &--highlight dd { color: v.$color-success; }
+    &--highlight dd { color: v.fg(v.$color-success); }
   }
 
   // ---------- Contracts table (lg+; phones and tablets get cards) ----------
@@ -251,13 +252,13 @@
     display: inline-block;
     padding: 0.1rem 0.4rem;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
-    font-size: 0.7rem;
+    color: v.fg(v.$color-white);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
     line-height: 1.4;
 
     &--sell { background-color: v.$color-navy; }
-    &--buy { background-color: #34c38f; }
+    &--buy { background-color: var(--fx-teal-48); }
   }
 
   // ---------- Cards: 1 per row on phones, 2 on tablets ----------
@@ -278,15 +279,15 @@
   &__cards-empty {
     grid-column: 1 / -1;
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
   }
 
   &__card {
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
 
@@ -299,14 +300,14 @@
     }
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
     dd {
       margin: 0.15rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -315,9 +316,9 @@
   &__card-top {
     @include m.flex(row, space-between, center, v.$spacing-2);
     padding: v.$spacing-2 v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
-    background-color: rgba(v.$color-navy, 0.06);
-    color: v.$color-navy;
+    border-bottom: 1px solid v.line(v.$color-border);
+    background-color: v.alpha(v.$color-navy, 0.06);
+    color: v.fg(v.$color-navy);
     font-size: v.$font-size-sm;
   }
 
@@ -327,10 +328,10 @@
 
   &__card-total {
     padding-top: v.$spacing-2;
-    border-top: 1px dashed v.$color-border;
+    border-top: 1px dashed v.line(v.$color-border);
 
     dd {
-      color: v.$color-navy;
+      color: v.fg(v.$color-navy);
       font-weight: v.$font-weight-bold;
     }
   }
@@ -347,7 +348,7 @@
 
     p {
       margin: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -361,10 +362,10 @@
       @include m.flex-center;
       min-width: 2.25rem;
       height: 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
@@ -375,8 +376,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -389,7 +390,7 @@
 
     h2 {
       margin: 0;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-lg;
     }
   }
@@ -408,7 +409,7 @@
   &__summary-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
   }
 
   &__summary-table {
@@ -426,22 +427,22 @@
 
     th {
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
       font-weight: v.$font-weight-semibold;
     }
 
     td + td,
     th + th {
-      border-left: 1px solid v.$color-border;
+      border-left: 1px solid v.line(v.$color-border);
     }
 
     tbody tr + tr td {
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
     }
   }
 
   &__summary-empty {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     text-align: center !important;
   }
 
@@ -464,8 +465,8 @@
     min-width: 0;
 
     label {
-      color: v.$color-text;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text);
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
   }

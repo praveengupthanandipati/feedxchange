@@ -1,5 +1,12 @@
 import { useMemo, useState } from "react";
-import { FiFileText, FiTruck, FiCheckCircle, FiClock, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CircleCheckBigIcon,
+  ClockIcon,
+  FileTextIcon,
+  TruckIcon,
+} from "../../../../shared/components/icon";
 import {
   useGetContractByContractNumberQuery,
   useGetAllOpenAndPendingContractsQuery,
@@ -118,7 +125,7 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
       <div className="assign-transports-stats">
         <div className="assign-transports-stats__card assign-transports-stats__card--navy">
           <span className="assign-transports-stats__icon">
-            <FiFileText aria-hidden />
+            <FileTextIcon aria-hidden />
           </span>
           <span className="assign-transports-stats__body">
             <span className="assign-transports-stats__label">Contract Qty</span>
@@ -127,7 +134,7 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
         </div>
         <div className="assign-transports-stats__card assign-transports-stats__card--success">
           <span className="assign-transports-stats__icon">
-            <FiTruck aria-hidden />
+            <TruckIcon aria-hidden />
           </span>
           <span className="assign-transports-stats__body">
             <span className="assign-transports-stats__label">Dispatched</span>
@@ -136,7 +143,7 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
         </div>
         <div className="assign-transports-stats__card assign-transports-stats__card--info">
           <span className="assign-transports-stats__icon">
-            <FiCheckCircle aria-hidden />
+            <CircleCheckBigIcon aria-hidden />
           </span>
           <span className="assign-transports-stats__body">
             <span className="assign-transports-stats__label">Vehicle Arranged</span>
@@ -145,7 +152,7 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
         </div>
         <div className="assign-transports-stats__card assign-transports-stats__card--warning">
           <span className="assign-transports-stats__icon">
-            <FiClock aria-hidden />
+            <ClockIcon aria-hidden />
           </span>
           <span className="assign-transports-stats__body">
             <span className="assign-transports-stats__label">Pending Qty</span>
@@ -154,7 +161,7 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
         </div>
         <div className="assign-transports-stats__card assign-transports-stats__card--danger">
           <span className="assign-transports-stats__icon">
-            <FiTruck aria-hidden />
+            <TruckIcon aria-hidden />
           </span>
           <span className="assign-transports-stats__body">
             <span className="assign-transports-stats__label">Total Trucks Assigned</span>
@@ -172,7 +179,7 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
             aria-expanded={detailsOpen}
           >
             <h2>Contract Details</h2>
-            {detailsOpen ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />}
+            {detailsOpen ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
           </button>
         </div>
         {detailsOpen && (

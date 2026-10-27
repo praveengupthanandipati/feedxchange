@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiX, FiSave } from "react-icons/fi";
+import { SaveIcon, XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import MultiSelect from "../../../../../shared/components/dropdown/MultiSelect";
@@ -258,7 +258,7 @@ const ScheduleRequestDrawer = ({
             onClick={onClose}
             aria-label="Close"
           >
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -450,10 +450,10 @@ const ScheduleRequestDrawer = ({
 
         <div className="schedule-request-drawer__footer">
           <button type="button" className="schedule-request-drawer__save" onClick={handleSave} disabled={saving}>
-            <FiSave aria-hidden /> {saving ? "Saving…" : "Save & Send"}
+            <SaveIcon aria-hidden /> {saving ? "Saving…" : "Save & Send"}
           </button>
           <button type="button" className="schedule-request-drawer__cancel" onClick={onClose} disabled={saving}>
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
         </div>
       </div>

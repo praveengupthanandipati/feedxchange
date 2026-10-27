@@ -44,44 +44,44 @@
 
   &--primary {
     background-color: v.$orange-500;
-    box-shadow: 0 8px 20px -8px rgba(v.$orange-600, 0.7);
-    color: v.$navy-900;
+    box-shadow: 0 8px 20px -8px v.alpha(v.$orange-600, 0.7);
+    color: v.on(v.$navy-900);
 
     &:hover {
       background-color: v.$orange-600;
-      color: v.$navy-900;
+      color: v.on(v.$navy-900);
     }
   }
 
   &--dark {
     background-color: v.$navy-800;
-    color: v.$white;
+    color: v.on(v.$white);
 
     &:hover {
       background-color: v.$navy-700;
-      color: v.$white;
+      color: v.on(v.$white);
     }
   }
 
   &--ghost {
-    border-color: rgba(v.$white, 0.35);
-    color: v.$white;
+    border-color: v.alpha(v.line(v.$white), 0.35);
+    color: v.fg(v.$white);
 
     &:hover {
-      border-color: v.$white;
-      background-color: rgba(v.$white, 0.08);
-      color: v.$white;
+      border-color: v.line(v.$white);
+      background-color: v.alpha(v.$white, 0.08);
+      color: v.fg(v.$white);
     }
   }
 
   &--outline {
-    border-color: v.$line;
+    border-color: v.line(v.$line);
     background-color: v.$white;
-    color: v.$navy-800;
+    color: v.fg(v.$navy-800);
 
     &:hover {
-      border-color: v.$navy-800;
-      color: v.$navy-800;
+      border-color: v.line(v.$navy-800);
+      color: v.fg(v.$navy-800);
     }
   }
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiX, FiSave } from "react-icons/fi";
+import { SaveIcon, XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import { timeOptions } from "../assignTransportsOptions.data";
@@ -353,7 +353,7 @@ const AssignNewTruckDrawer = ({
             {editingRow ? "Edit Truck Assignment" : "Assign New Truck"}
           </h2>
           <button type="button" className="assign-truck-drawer__close" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -580,10 +580,10 @@ const AssignNewTruckDrawer = ({
 
         <div className="assign-truck-drawer__footer">
           <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving}>
-            <FiSave aria-hidden /> {saving ? "Saving…" : "Save & Send"}
+            <SaveIcon aria-hidden /> {saving ? "Saving…" : "Save & Send"}
           </button>
           <button type="button" className="assign-truck-drawer__cancel" onClick={onClose} disabled={saving}>
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
         </div>
       </div>

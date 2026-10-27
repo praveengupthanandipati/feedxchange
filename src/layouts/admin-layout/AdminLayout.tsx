@@ -16,12 +16,8 @@ const AdminLayout = () => {
       <Aside mobileOpen={mobileNavOpen} onCloseMobile={() => setMobileNavOpen(false)} />
 
       {mobileNavOpen && (
-        <button
-          type="button"
-          className="app-layout__backdrop"
-          aria-label="Close menu"
-          onClick={() => setMobileNavOpen(false)}
-        />
+        // a click outside closes the drawer; keyboard and screen reader users have its Close button and Escape
+        <div className="app-layout__backdrop" aria-hidden onClick={() => setMobileNavOpen(false)} />
       )}
 
       <div className="app-layout__content">

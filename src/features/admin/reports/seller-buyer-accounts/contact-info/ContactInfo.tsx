@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import { FiMapPin, FiUser, FiCreditCard } from "react-icons/fi";
-import type { IconType } from "react-icons";
+import { type IconComponent, CreditCardIcon, MapPinIcon, UserIcon } from "../../../../../shared/components/icon";
 import { addressDetails, contactDetails, bankDetails } from "./contactInfo.data";
 import "./ContactInfo.scss";
 
@@ -10,7 +9,7 @@ const orDash = (value: string) => (value.trim() ? value : EMPTY);
 
 interface InfoCardProps {
   accent: "navy" | "success" | "info";
-  icon: IconType;
+  icon: IconComponent;
   title: string;
   children: ReactNode;
 }
@@ -52,7 +51,7 @@ const ContactInfo = () => {
 
   return (
     <div className="contact-info-grid">
-      <InfoCard accent="navy" icon={FiMapPin} title="Address Details / Referred By">
+      <InfoCard accent="navy" icon={MapPinIcon} title="Address Details / Referred By">
         <p className="contact-info-address__city">{addressDetails.cityHeading}</p>
         <p className="contact-info-address__company">{addressDetails.companyName}</p>
         <p className="contact-info-address__line">{addressLine}</p>
@@ -64,7 +63,7 @@ const ContactInfo = () => {
         </div>
       </InfoCard>
 
-      <InfoCard accent="success" icon={FiUser} title="Contact Details">
+      <InfoCard accent="success" icon={UserIcon} title="Contact Details">
         <InfoRow label="Contact Name" value={contactDetails.contactName} />
         <InfoRow label="Designation" value={contactDetails.designation} />
         <InfoRow label="Mobile" value={contactDetails.mobile} />
@@ -72,7 +71,7 @@ const ContactInfo = () => {
         <InfoRow label="Email" value={contactDetails.email} />
       </InfoCard>
 
-      <InfoCard accent="info" icon={FiCreditCard} title="Bank Details">
+      <InfoCard accent="info" icon={CreditCardIcon} title="Bank Details">
         <InfoRow label="Bank Name" value={bankDetails.bankName} />
         <InfoRow label="Account Number" value={bankDetails.accountNumber} />
         <InfoRow label="IFSC Code" value={bankDetails.ifscCode} />

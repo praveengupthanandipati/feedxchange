@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiX, FiCheckCircle } from "react-icons/fi";
+import { CircleCheckBigIcon, XIcon } from "../../../../../shared/components/icon";
 import "../../../../../shared/components/dialog/ConfirmDialog.scss";
 import "./CompleteTripModal.scss";
 
@@ -72,7 +72,7 @@ const CompleteTripModal = ({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="confirm-dialog__icon complete-trip-modal__icon">
-          <FiCheckCircle aria-hidden />
+          <CircleCheckBigIcon aria-hidden />
         </div>
         <h2 id="complete-trip-modal-title" className="confirm-dialog__title">
           Complete Trip #{tripNumber}
@@ -151,7 +151,7 @@ const CompleteTripModal = ({
           onClick={onClose}
           aria-label="Close"
         >
-          <FiX aria-hidden />
+          <XIcon aria-hidden />
         </button>
       </div>
     </div>,

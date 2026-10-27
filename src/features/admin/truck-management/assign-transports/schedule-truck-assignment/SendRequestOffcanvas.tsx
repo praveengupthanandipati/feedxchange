@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { FiX, FiSend, FiTruck } from "react-icons/fi";
+import { SendIcon, TruckIcon, XIcon } from "../../../../../shared/components/icon";
 import type { ContractSummary } from "../assignTransports.data";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 import type { TransporterAssignmentRow } from "./transporterAssignment.data";
@@ -54,7 +54,7 @@ const SendRequestOffcanvas = ({
         <div className="send-request-offcanvas__header">
           <h2 id="send-request-offcanvas-title">Send Request — Details</h2>
           <button type="button" className="send-request-offcanvas__close" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -71,7 +71,7 @@ const SendRequestOffcanvas = ({
           </table>
 
           <h3 className="send-request-offcanvas__section-title">
-            <FiTruck aria-hidden /> Transporters Requesting Approval
+            <TruckIcon aria-hidden /> Transporters Requesting Approval
           </h3>
 
           <div className="send-request-offcanvas__table-wrapper">
@@ -110,14 +110,14 @@ const SendRequestOffcanvas = ({
             className="send-request-offcanvas__btn send-request-offcanvas__btn--confirm"
             onClick={onConfirm}
           >
-            <FiSend aria-hidden /> Confirm &amp; Send
+            <SendIcon aria-hidden /> Confirm &amp; Send
           </button>
           <button
             type="button"
             className="send-request-offcanvas__btn send-request-offcanvas__btn--cancel"
             onClick={onClose}
           >
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiAlertTriangle, FiCheck, FiMail, FiPauseCircle, FiPhone, FiPlayCircle, FiX } from "react-icons/fi";
+import { CheckIcon, CirclePauseIcon, CirclePlayIcon, MailIcon, PhoneIcon, TriangleAlertIcon, XIcon } from "../../../shared/components/icon";
 import {
   usePauseContactMutation,
   useResumeContactMutation,
@@ -75,16 +75,16 @@ const ContactEditorDrawer = ({ profile, contact, canManage, onClose, onSaved }: 
             <h2>{contact.contactName}</h2>
             <p>{[contact.designation, profile.profileName].filter(Boolean).join(" · ")}</p>
             <div className="pref-drawer__reach">
-              <span className={contact.email ? "" : "is-missing"}><FiMail aria-hidden /> {contact.email ?? "No email"}</span>
-              <span className={contact.mobile ? "" : "is-missing"}><FiPhone aria-hidden /> {contact.mobile ?? "No mobile"}</span>
+              <span className={contact.email ? "" : "is-missing"}><MailIcon aria-hidden /> {contact.email ?? "No email"}</span>
+              <span className={contact.mobile ? "" : "is-missing"}><PhoneIcon aria-hidden /> {contact.mobile ?? "No mobile"}</span>
             </div>
           </div>
-          <button type="button" className="pref-modal__close" onClick={onClose} aria-label="Close"><FiX aria-hidden /></button>
+          <button type="button" className="pref-modal__close" onClick={onClose} aria-label="Close"><XIcon aria-hidden /></button>
         </header>
 
         {contact.isPaused && (
           <div className="pref-banner pref-banner--paused" role="status">
-            <FiPauseCircle aria-hidden />
+            <CirclePauseIcon aria-hidden />
             <div>
               <strong>{pauseLabel(contact.resumeOn)}</strong>
               <span>{contact.pauseReason ?? "Nothing is sent to this contact except events that are always sent."}</span>
@@ -94,7 +94,7 @@ const ContactEditorDrawer = ({ profile, contact, canManage, onClose, onSaved }: 
                 try { await resume({ contactId: contact.contactId, profileId: profile.profileId }).unwrap(); onSaved(`${contact.contactName} will be notified again.`); }
                 catch (e) { setError(apiErrorMessage(e, "Could not resume.")); }
               }}>
-                <FiPlayCircle aria-hidden /> Resume
+                <CirclePlayIcon aria-hidden /> Resume
               </button>
             )}
           </div>
@@ -105,16 +105,16 @@ const ContactEditorDrawer = ({ profile, contact, canManage, onClose, onSaved }: 
         </div>
 
         <footer className="pref-drawer__footer">
-          {error && <p className="pref-error" role="alert"><FiAlertTriangle aria-hidden /> {error}</p>}
+          {error && <p className="pref-error" role="alert"><TriangleAlertIcon aria-hidden /> {error}</p>}
           <div className="pref-drawer__summary">{total === 0 ? "Not subscribed to anything" : `Subscribed to ${total} ${total === 1 ? "event" : "events"}`}</div>
           <div className="pref-drawer__buttons">
             {canManage && !contact.isPaused && (
-              <button type="button" className="pref-btn pref-btn--quiet" onClick={() => setPausing(true)}><FiPauseCircle aria-hidden /> Pause</button>
+              <button type="button" className="pref-btn pref-btn--quiet" onClick={() => setPausing(true)}><CirclePauseIcon aria-hidden /> Pause</button>
             )}
             <button type="button" className="pref-btn" onClick={onClose}>{canManage ? "Cancel" : "Close"}</button>
             {canManage && (
               <button type="button" className="pref-btn pref-btn--primary" disabled={!dirty || saving} onClick={() => void submit()}>
-                <FiCheck aria-hidden /> {saving ? "Saving…" : "Save"}
+                <CheckIcon aria-hidden /> {saving ? "Saving…" : "Save"}
               </button>
             )}
           </div>

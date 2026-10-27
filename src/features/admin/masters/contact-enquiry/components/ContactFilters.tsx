@@ -1,4 +1,4 @@
-import { FiSearch } from "react-icons/fi";
+import { SearchIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import { STATUS_OPTIONS } from "../contactEnquiry.data";
 
@@ -13,7 +13,7 @@ interface ContactFiltersProps {
 const ContactFilters = ({ search, status, onSearchChange, onStatusChange }: ContactFiltersProps) => (
   <div id="contact-enquiry-filters" className="contact-enquiry__filters">
     <div className="contact-enquiry__search">
-      <FiSearch aria-hidden />
+      <SearchIcon aria-hidden />
       <input
         type="search"
         autoComplete="off"

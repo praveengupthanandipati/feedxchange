@@ -16,7 +16,7 @@
     z-index: v.$z-index-sticky;
     padding: v.$spacing-3 v.$spacing-4;
     background-color: v.$color-bg;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
   }
 
@@ -34,13 +34,13 @@
   &__back {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
     text-decoration: none;
 
     &:hover {
-      color: v.$color-primary-dark;
+      color: v.fg(v.$color-primary-dark);
       text-decoration: underline;
     }
   }

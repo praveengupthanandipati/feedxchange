@@ -26,8 +26,8 @@
     height: 3rem;
     margin: 0 auto v.$spacing-4;
     border-radius: v.$radius-pill;
-    background-color: rgba(v.$color-danger, 0.12);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.12);
+    color: v.fg(v.$color-danger);
     font-size: 1.5rem;
   }
 
@@ -37,7 +37,7 @@
   }
 
   &__message {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0 0 v.$spacing-5;
   }
@@ -57,15 +57,15 @@
       @include m.font-base;
       width: 100%;
       padding: v.$spacing-2 v.$spacing-3;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       font-size: v.$font-size-sm;
       resize: vertical;
 
       &:focus {
         outline: none;
-        border-color: v.$color-primary;
-        box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
@@ -79,7 +79,7 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex: 1;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     border: none;
     border-radius: v.$radius-md;
     font-size: v.$font-size-sm;
@@ -95,8 +95,8 @@
 
   &__cancel {
     background-color: v.$color-white;
-    color: v.$color-text;
-    border: 1px solid v.$color-border;
+    color: v.fg(v.$color-text);
+    border: 1px solid v.line(v.$color-border);
 
     &:hover {
       background-color: v.$color-gray-50;
@@ -105,10 +105,10 @@
 
   &__confirm {
     background-color: v.$color-danger;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: darken(v.$color-danger, 8%);
+      background-color: v.shade(v.$color-danger, 8%);
     }
   }
 }

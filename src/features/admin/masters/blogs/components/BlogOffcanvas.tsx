@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type SubmitEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import { EMPTY_FORM, MAX_DESCRIPTION_WORDS, STATUS_OPTIONS, type Blog, type BlogForm, type BlogStatus } from "../blogs.data";
 import { countWords, priorityOptions, toForm, validateBlog, type FormErrors } from "../blogs.utils";
@@ -74,7 +74,7 @@ const BlogOffcanvas = ({ blog, blogs, onSave, onClose }: BlogOffcanvasProps) => 
         <header className="blog-panel__header">
           <h2 id="blog-panel-title">{isEdit ? "Edit Blog" : "Create Blog"}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
 

@@ -14,13 +14,13 @@
 
     h2 {
       @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-lg;
       margin: 0;
     }
 
     p {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
       margin: 0;
     }
@@ -61,7 +61,7 @@ $profile-accents: (
 
   @each $name, $color in $profile-accents {
     &--#{$name} .profile-card__header {
-      background: linear-gradient(90deg, $color 0%, color.adjust($color, $lightness: -10%) 100%);
+      background: linear-gradient(90deg, $color 0%, v.shade($color, 10%) 100%);
     }
   }
 
@@ -69,7 +69,7 @@ $profile-accents: (
     @include m.flex(row, flex-start, center, v.$spacing-3);
     flex-shrink: 0;
     padding: v.$spacing-3 v.$spacing-5;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
   }
 
   &__icon {
@@ -78,8 +78,8 @@ $profile-accents: (
     width: 2rem;
     height: 2rem;
     border-radius: v.$radius-pill;
-    background-color: rgba(v.$color-white, 0.2);
-    color: v.$color-white;
+    background-color: v.alpha(v.$color-white, 0.2);
+    color: v.fg(v.$color-white);
     font-size: 1rem;
   }
 
@@ -115,11 +115,11 @@ $profile-accents: (
   gap: 0.3rem;
   min-width: 0;
   padding-bottom: v.$spacing-3;
-  border-bottom: 1px dashed v.$color-border;
+  border-bottom: 1px dashed v.line(v.$color-border);
 
   &__label {
-    color: v.$color-text-muted;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-semibold;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -127,14 +127,14 @@ $profile-accents: (
 
   &__value {
     @include m.font-heading(v.$font-weight-semibold);
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     word-break: break-word;
 
     a {
       @include m.flex(row, flex-start, center, v.$spacing-1);
       display: inline-flex;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       text-decoration: none;
 
       &:hover {
@@ -150,16 +150,16 @@ $profile-accents: (
   align-self: flex-start;
   padding: 0.2rem v.$spacing-3;
   border-radius: v.$radius-pill;
-  font-size: 0.75rem;
+  font-size: max(11px, 0.75rem);
   font-weight: v.$font-weight-semibold;
 
   &--on {
-    background-color: rgba(v.$color-success, 0.15);
-    color: v.$color-success;
+    background-color: v.alpha(v.$color-success, 0.15);
+    color: v.fg(v.$color-success);
   }
 
   &--off {
-    background-color: rgba(v.$color-danger, 0.15);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.15);
+    color: v.fg(v.$color-danger);
   }
 }

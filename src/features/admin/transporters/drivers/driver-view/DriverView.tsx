@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+// Bootstrap's modal behaviour (data-bs-toggle="modal") for the Send message dialog; only this screen needs it
+import "bootstrap/js/dist/modal";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiEdit3, FiSend } from "react-icons/fi";
+import { ArrowLeftIcon, PenLineIcon, SendIcon } from "../../../../../shared/components/icon";
 import { useGetDriverByIdQuery } from "../../../../../core/store/driversApi";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
-import "../drivers-list/Drivers.scss";
+import "../drivers-list/Drivers.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 interface DetailFieldProps {
@@ -51,7 +54,7 @@ const DriverView = () => {
     return (
       <div className="business-owner-detail">
         <Link to="/admin/truck-management/transporters/driver-master" className="business-owner-detail__back">
-          <FiArrowLeft aria-hidden /> Back to Drivers List
+          <ArrowLeftIcon aria-hidden /> Back to Drivers List
         </Link>
         <div className="business-owner-detail__card">
           <p>{isLoading ? "Loading driver…" : `No driver found for id "${id}".`}</p>
@@ -63,7 +66,7 @@ const DriverView = () => {
   return (
     <div className="business-owner-detail">
       <Link to="/admin/truck-management/transporters/driver-master" className="business-owner-detail__back">
-        <FiArrowLeft aria-hidden /> Back to Drivers List
+        <ArrowLeftIcon aria-hidden /> Back to Drivers List
       </Link>
 
       <div className="business-owner-detail__card">
@@ -81,7 +84,7 @@ const DriverView = () => {
                   navigate(`/admin/truck-management/transporters/driver-master/new?id=${driver.driverId}`)
                 }
               >
-                <FiEdit3 aria-hidden /> Edit
+                <PenLineIcon aria-hidden /> Edit
               </button>
             </Can>
             <button
@@ -90,7 +93,7 @@ const DriverView = () => {
               data-bs-toggle="modal"
               data-bs-target="#sendMessageModal"
             >
-              <FiSend aria-hidden /> Send Message
+              <SendIcon aria-hidden /> Send Message
             </button>
           </div>
         </div>
@@ -203,7 +206,7 @@ const DriverView = () => {
                 disabled={!message.trim()}
                 onClick={handleSendMessage}
               >
-                <FiSend aria-hidden /> Send
+                <SendIcon aria-hidden /> Send
               </button>
             </div>
           </div>

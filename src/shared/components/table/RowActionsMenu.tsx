@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiMoreVertical, FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
-import type { IconType } from "react-icons";
+import { type IconComponent, EllipsisVerticalIcon, EyeIcon, PenIcon, Trash2Icon } from "../icon";
 import { useAuth } from "../../../core/auth/AuthContext";
 import { useAnchoredPanel } from "../dropdown/useAnchoredPanel";
 import "./RowActionsMenu.scss";
@@ -9,7 +8,7 @@ import "./RowActionsMenu.scss";
 export interface RowAction {
   key: string;
   label: string;
-  icon: IconType;
+  icon: IconComponent;
   onClick: () => void;
   danger?: boolean;
   /** Renders a separator line above this item, for grouping (e.g. destructive actions apart from the rest). */
@@ -27,7 +26,7 @@ interface RowActionsMenuProps {
   /** Which edge the dropdown opens from. Default "right" (grows left) suits an Actions column placed last; use "left" (grows right) when Actions is the first column, so the menu doesn't overhang the table's left edge. */
   menuAlign?: "left" | "right";
   /** Overrides the trash icon for onDelete — for tables where the action isn't a literal delete (e.g. "release"). */
-  deleteIcon?: IconType;
+  deleteIcon?: IconComponent;
   /** Overrides the "Delete" label/tooltip for onDelete. */
   deleteLabel?: string;
   /** Non-interactive label rendered above the actions list (e.g. "Interest of Payments"), for grouping menu items under a heading. Only used with `actions`. */
@@ -43,7 +42,7 @@ const RowActionsMenu = ({
   actions,
   variant = "menu",
   menuAlign = "right",
-  deleteIcon: DeleteIcon = FiTrash2,
+  deleteIcon: DeleteIcon = Trash2Icon,
   deleteLabel = "Delete",
   menuHeader,
   manageKeys,
@@ -97,7 +96,7 @@ const RowActionsMenu = ({
           aria-label="View"
           title="View"
         >
-          <FiEye aria-hidden />
+          <EyeIcon aria-hidden />
         </button>
       )}
 
@@ -109,7 +108,7 @@ const RowActionsMenu = ({
           aria-label="Edit"
           title="Edit"
         >
-          <FiEdit2 aria-hidden />
+          <PenIcon aria-hidden />
         </button>
       )}
 
@@ -139,7 +138,7 @@ const RowActionsMenu = ({
         aria-haspopup="true"
         aria-expanded={open}
       >
-        <FiMoreVertical aria-hidden />
+        <EllipsisVerticalIcon aria-hidden />
       </button>
 
       {open &&
@@ -174,7 +173,7 @@ const RowActionsMenu = ({
                       onEdit();
                     }}
                   >
-                    <FiEdit2 aria-hidden />
+                    <PenIcon aria-hidden />
                     Edit
                   </button>
                 </li>
@@ -188,7 +187,7 @@ const RowActionsMenu = ({
                       onView();
                     }}
                   >
-                    <FiEye aria-hidden />
+                    <EyeIcon aria-hidden />
                     View
                   </button>
                 </li>

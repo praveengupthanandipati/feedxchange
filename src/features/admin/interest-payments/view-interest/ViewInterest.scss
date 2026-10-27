@@ -33,14 +33,14 @@
     align-items: center;
     gap: v.$spacing-1 v.$spacing-5;
     padding: v.$spacing-3 v.$spacing-4;
-    border: 1px solid rgba(v.$color-info, 0.35);
+    border: 1px solid v.alpha(v.line(v.$color-info), 0.35);
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-info, 0.12);
-    color: v.$color-text-muted;
+    background-color: v.alpha(v.$color-info, 0.12);
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
 
     strong {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       overflow-wrap: anywhere;
     }
   }
@@ -58,14 +58,15 @@
     @include m.flex(row, flex-start, center, v.$spacing-2);
     width: 100%;
     max-width: 36rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
 
     &:focus-within {
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     input {
@@ -74,7 +75,7 @@
       border: none;
       outline: none;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
   }
@@ -82,7 +83,7 @@
   &__message {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     margin: 0;
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
     font-size: v.$font-size-sm;
   }
 
@@ -99,25 +100,25 @@
     height: 1.9rem;
     border: none;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: 0.85rem;
     cursor: pointer;
 
     &:hover { filter: brightness(0.9); }
 
-    &--view { background-color: #50a5f1; }
+    &--view { background-color: var(--fx-sky-63); }
     &--print { background-color: v.$color-navy; }
-    &--edit { background-color: #f1b44c; }
-    &--delete { background-color: #f46a6a; }
+    &--edit { background-color: var(--fx-amber-62); }
+    &--delete { background-color: var(--fx-red-69); }
   }
 
   // ---------- Phone cards ----------
   &__card-title {
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
   }
 
   &__card-amount {
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-weight: v.$font-weight-bold;
   }
 
@@ -131,7 +132,7 @@
     // Larger tap targets, sharing the card's width.
     .view-interest__icon-btn {
       flex: 1;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       font-size: 1rem;
     }
   }
@@ -161,7 +162,7 @@
 
       h2 {
         margin: 0;
-        color: v.$color-navy;
+        color: v.fg(v.$color-navy);
         font-size: v.$font-size-lg;
       }
 
@@ -172,7 +173,7 @@
         border: none;
         border-radius: v.$radius-sm;
         background: transparent;
-        color: v.$color-text-muted;
+        color: v.fg(v.$color-text-muted);
         font-size: 1.1rem;
         cursor: pointer;
 
@@ -183,8 +184,8 @@
 
   &__parties {
     margin: v.$spacing-1 0 v.$spacing-4;
-    color: v.$color-text-muted;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
     overflow-wrap: anywhere;
   }
 
@@ -209,8 +210,8 @@
     }
 
     label {
-      color: v.$color-text;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text);
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
 
@@ -218,16 +219,17 @@
     textarea {
       @include m.font-base;
       width: 100%;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
 
       &:focus {
         outline: none;
-        border-color: v.$color-navy;
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
 
@@ -240,7 +242,7 @@
 
   &__error {
     margin: v.$spacing-3 0 0;
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
   }
 

@@ -19,7 +19,7 @@
 
     h1 {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -31,11 +31,11 @@
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
@@ -46,7 +46,7 @@
     &:hover:not(:disabled) { filter: brightness(0.93); }
 
     &--navy { background-color: v.$color-navy; }
-    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--warning { background-color: v.$color-orange; color: v.on(v.$color-navy-dark); }
   }
 
   &__search {
@@ -61,7 +61,7 @@
       position: absolute;
       top: 50%;
       left: v.$spacing-3;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       transform: translateY(-50%);
       pointer-events: none;
     }
@@ -69,19 +69,20 @@
     input {
       @include m.font-base;
       width: 100%;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3 0 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       -webkit-appearance: none;
       appearance: none;
 
       &:focus {
         outline: none;
-        border-color: v.$color-navy;
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
@@ -89,7 +90,7 @@
   &__message {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     margin: 0;
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
     font-size: v.$font-size-sm;
 
     svg { flex-shrink: 0; }
@@ -111,7 +112,7 @@
   &__thumb {
     display: block;
     width: 3.75rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     border-radius: v.$radius-sm;
     object-fit: cover;
     background-color: v.$color-gray-100;
@@ -126,7 +127,7 @@
   }
 
   &__url {
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     overflow-wrap: anywhere;
     word-break: break-word;
   }
@@ -135,12 +136,12 @@
     display: inline-block;
     padding: 0.1rem 0.4rem;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
-    font-size: 0.7rem;
+    color: v.fg(v.$color-white);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
     line-height: 1.4;
 
-    &--active { background-color: #34c38f; }
+    &--active { background-color: var(--fx-teal-48); }
     &--inactive { background-color: v.$color-gray-500; }
   }
 
@@ -157,16 +158,16 @@
 
   &__cards-empty {
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
   }
 
   &__card {
     display: flex;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: visible;
   }
@@ -197,7 +198,7 @@
 
     strong {
       padding-top: 0.3rem;
-      color: v.$color-navy;
+      color: v.fg(v.$color-navy);
       overflow-wrap: anywhere;
     }
   }
@@ -206,8 +207,8 @@
     @include m.flex(row, space-between, center, v.$spacing-2);
     margin-top: auto;
     padding-right: v.$spacing-1;
-    color: v.$color-text-muted;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
   }
 
   // ---------- Pagination ----------
@@ -222,7 +223,7 @@
 
     p {
       margin: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -236,10 +237,10 @@
       @include m.flex-center;
       min-width: 2.25rem;
       height: 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
@@ -250,8 +251,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -311,7 +312,7 @@
 
     h2 {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-lg;
     }
 
@@ -323,7 +324,7 @@
       border: none;
       border-radius: v.$radius-sm;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: 1.4rem;
       cursor: pointer;
 
@@ -360,22 +361,22 @@
 
   &__label {
     padding: 0;
-    color: v.$color-text;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text);
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-medium;
   }
 
-  &__required { color: v.$color-danger; }
+  &__required { color: v.fg(v.$color-danger); }
 
   &__input {
     @include m.font-base;
     width: 100%;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     -webkit-appearance: none;
     -moz-appearance: textfield;
@@ -389,20 +390,21 @@
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
-    &.is-invalid { border-color: v.$color-danger; }
+    &.is-invalid { border-color: v.line(v.$color-danger); }
   }
 
   &__error {
-    color: v.$color-danger;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-danger);
+    font-size: max(11px, 0.75rem);
   }
 
   &__hint {
-    color: v.$color-text-muted;
-    font-size: 0.72rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.72rem);
   }
 
   &__preview {
@@ -410,7 +412,7 @@
     width: 12.5rem;
     max-width: 100%;
     height: 7.5rem;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-sm;
     background-color: v.$color-gray-50;
     overflow: hidden;
@@ -425,15 +427,15 @@
   &__preview-icon {
     width: 5rem;
     height: 5rem;
-    color: v.$color-gray-500;
+    color: v.fg(v.$color-gray-500);
     stroke-width: 1.5;
   }
 
   &__file {
     display: flex;
     align-items: stretch;
-    height: 2.5rem;
-    border: 1px solid v.$color-border;
+    height: var(--fx-control-height);
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-sm;
     overflow: hidden;
 
@@ -442,16 +444,16 @@
       flex-shrink: 0;
       padding: 0 v.$spacing-3;
       border: none;
-      border-right: 1px solid v.$color-border;
+      border-right: 1px solid v.line(v.$color-border);
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
       &:hover { background-color: v.$color-gray-200; }
 
       &:focus-visible {
-        outline: 2px solid v.$color-orange;
+        outline: 2px solid v.line(v.$color-orange);
         outline-offset: -2px;
       }
     }
@@ -463,7 +465,7 @@
     align-self: center;
     min-width: 0;
     padding: 0 v.$spacing-3;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
   }
 
@@ -484,7 +486,7 @@
 
     label {
       @include m.flex(row, flex-start, center, v.$spacing-2);
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
     }
@@ -502,7 +504,7 @@
     display: flex;
     gap: v.$spacing-2;
     padding: v.$spacing-3 v.$spacing-4;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     background-color: v.$color-bg;
 
     @include m.respond-below(sm) {

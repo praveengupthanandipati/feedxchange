@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { FiArrowLeft, FiFileText, FiTruck } from "react-icons/fi";
+import { ArrowLeftIcon, FileTextIcon, TruckIcon } from "../../../../../../shared/components/icon";
 import InfoPanel from "../InfoPanel";
 import SearchableSelect from "../../../../../../shared/components/dropdown/SearchableSelect";
 import {
@@ -100,7 +100,7 @@ const ChainContent = ({ contractNumber, contractDispatchId }: ChainContentProps)
   if (!overview) {
     return (
       <InfoPanel
-        icon={FiTruck}
+        icon={TruckIcon}
         title="Chain Not Available"
         description="The chain for this truck could not be loaded. Go back to View All Trucks and try again."
         action={{
@@ -266,7 +266,7 @@ const ContractTruckChain = () => {
           }
           className="reassign-truck__cancel"
         >
-          <FiArrowLeft aria-hidden /> View All Trucks
+          <ArrowLeftIcon aria-hidden /> View All Trucks
         </Link>
       </div>
 
@@ -274,7 +274,7 @@ const ContractTruckChain = () => {
         <ChainContent contractNumber={contractNumber} contractDispatchId={contractDispatchId} />
       ) : (
         <InfoPanel
-          icon={FiFileText}
+          icon={FileTextIcon}
           title="No Truck Selected"
           description="Open a contract, go to View All Trucks and use View Chain on one of its trucks."
           action={{ label: "Go to Open & Pending Contracts", to: "/admin/truck-management/open-pending-contracts" }}

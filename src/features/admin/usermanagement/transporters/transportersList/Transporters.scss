@@ -33,7 +33,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -43,8 +43,8 @@
 
   &--outline {
     background-color: v.$color-white;
-    color: v.$color-primary;
-    border: 1px solid v.$color-border;
+    color: v.fg(v.$color-primary);
+    border: 1px solid v.line(v.$color-border);
 
     &:hover {
       background-color: v.$color-gray-50;
@@ -53,7 +53,7 @@
 
   &--warning {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -62,7 +62,7 @@
 
   &--primary {
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
       background-color: v.$color-navy-dark;
@@ -80,12 +80,17 @@
   &__search {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     flex: 1 1 18rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
+
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
 
     input {
       flex: 1;
@@ -93,10 +98,10 @@
       outline: none;
       background: transparent;
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
 
       &::placeholder {
-        color: v.$color-gray-400;
+        color: v.fg(v.$color-gray-400);
       }
     }
   }
@@ -110,10 +115,10 @@
   &__message {
     margin: 0;
     padding: v.$spacing-5;
-    border: 1px solid v.$color-gray-100;
+    border: 1px solid v.line(v.$color-gray-100);
     border-radius: v.$radius-lg;
     background: v.$color-white;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     text-align: center;
   }
 }
@@ -124,7 +129,7 @@
   min-width: 0;
   min-height: 13rem;
   padding: v.$spacing-4;
-  border: 1px solid v.$color-gray-100;
+  border: 1px solid v.line(v.$color-gray-100);
   border-radius: v.$radius-lg;
   background: v.$color-white;
   box-shadow: v.$shadow-md;
@@ -132,7 +137,7 @@
 
   &:hover {
     transform: translateY(-1px);
-    border-color: v.$color-gray-300;
+    border-color: v.line(v.$color-gray-300);
     box-shadow: v.$shadow-lg;
   }
 
@@ -147,18 +152,18 @@
     display: grid;
     place-items: center;
     flex: 0 0 2.5rem;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border-radius: v.$radius-md;
-    background: rgba(v.$color-orange, 0.14);
-    color: v.$color-orange-dark;
+    background: v.alpha(v.$color-orange, 0.14);
+    color: v.fg(v.$color-orange-dark);
   }
 
   &__actions { margin-left: auto; }
 
   &__name {
     display: block;
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-size: v.$font-size-base;
     font-weight: v.$font-weight-semibold;
     line-height: v.$line-height-tight;
@@ -166,14 +171,14 @@
     overflow-wrap: anywhere;
 
     &:hover {
-      color: v.$color-primary-dark;
+      color: v.fg(v.$color-primary-dark);
       text-decoration: underline;
     }
   }
 
   &__trading-name {
     margin: v.$spacing-1 0 0;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
@@ -188,7 +193,7 @@
       align-items: flex-start;
       gap: v.$spacing-2;
       min-width: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -196,7 +201,7 @@
     svg {
       flex: 0 0 1rem;
       margin-top: 0.1rem;
-      color: v.$color-gray-500;
+      color: v.fg(v.$color-gray-500);
     }
   }
 }
@@ -207,7 +212,7 @@
   gap: v.$spacing-3;
 
   p {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -222,10 +227,10 @@
       min-width: 2.25rem;
       height: 2.25rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
       transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -241,8 +246,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -253,13 +258,13 @@
 // ============================================================
 .transporters {
   &__link {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     text-decoration: underline;
-    text-decoration-color: rgba(v.$color-primary, 0.4);
+    text-decoration-color: v.alpha(v.fg(v.$color-primary), 0.4);
     font-weight: v.$font-weight-medium;
 
     &:hover {
-      color: v.$color-primary-dark;
+      color: v.fg(v.$color-primary-dark);
       text-decoration-color: currentColor;
     }
   }
@@ -268,22 +273,22 @@
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
 
     &--active {
-      background-color: rgba(v.$color-success, 0.15);
-      color: v.$color-success;
+      background-color: v.alpha(v.$color-success, 0.15);
+      color: v.fg(v.$color-success);
     }
 
     &--inactive {
-      background-color: rgba(v.$color-gray-400, 0.2);
-      color: v.$color-gray-600;
+      background-color: v.alpha(v.$color-gray-400, 0.2);
+      color: v.fg(v.$color-gray-600);
     }
 
     &--deleted {
-      background-color: rgba(v.$color-danger, 0.15);
-      color: v.$color-danger;
+      background-color: v.alpha(v.$color-danger, 0.15);
+      color: v.fg(v.$color-danger);
     }
   }
 }

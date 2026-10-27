@@ -18,14 +18,14 @@
   }
 
   &__stat-label {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0 0 v.$spacing-2;
   }
 
   &__stat-value {
     @include m.font-heading(v.$font-weight-bold);
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-2xl;
     margin: 0;
   }
@@ -36,11 +36,11 @@
     font-weight: v.$font-weight-semibold;
 
     &--up {
-      color: v.$color-success;
+      color: v.fg(v.$color-success);
     }
 
     &--down {
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
   }
 }

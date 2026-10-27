@@ -2,23 +2,23 @@ import { useMemo, useState, type ReactNode, type SubmitEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaRupeeSign } from "react-icons/fa";
 import {
-  FiArrowLeft,
-  FiBox,
-  FiCalendar,
-  FiChevronLeft,
-  FiChevronRight,
-  FiEye,
-  FiEyeOff,
-  FiInfo,
-  FiMapPin,
-  FiPackage,
-  FiPhone,
-  FiSmartphone,
-  FiTruck,
-  FiUser,
-  FiUserCheck,
-  FiAlertCircle,
-} from "react-icons/fi";
+  ArrowLeftIcon,
+  BoxIcon,
+  CalendarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleAlertIcon,
+  EyeIcon,
+  EyeOffIcon,
+  InfoIcon,
+  MapPinIcon,
+  PackageIcon,
+  PhoneIcon,
+  SmartphoneIcon,
+  TruckIcon,
+  UserCheckIcon,
+  UserIcon,
+} from "../../../../shared/components/icon";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
@@ -69,7 +69,7 @@ const ReviewSection = ({ id, icon, title, summary, children }: SectionProps) => 
           aria-expanded={open}
           aria-controls={bodyId}
         >
-          {open ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+          {open ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
           {open ? "Hide" : "Show"}
         </button>
       </header>
@@ -208,10 +208,10 @@ const SellerTruckReview = () => {
     return (
       <div className="seller-truck-review">
         <div className="seller-truck-review__not-found" role="alert">
-          <FiAlertCircle aria-hidden />
+          <CircleAlertIcon aria-hidden />
           <p>This pending DO could not be found.</p>
           <Link to={PENDING_DOS_PATH} className="seller-truck-review__back">
-            <FiArrowLeft aria-hidden /> Back to Pending DOs
+            <ArrowLeftIcon aria-hidden /> Back to Pending DOs
           </Link>
         </div>
       </div>
@@ -242,13 +242,13 @@ const SellerTruckReview = () => {
       <div className="seller-truck-review__page-header">
         <h1>Seller Truck Review</h1>
         <Link to={PENDING_DOS_PATH} className="seller-truck-review__back">
-          <FiArrowLeft aria-hidden /> Back to Pending DOs
+          <ArrowLeftIcon aria-hidden /> Back to Pending DOs
         </Link>
       </div>
 
       <ReviewSection
         id="request-details"
-        icon={<FiInfo aria-hidden />}
+        icon={<InfoIcon aria-hidden />}
         title="Request Details"
         summary={
           <>
@@ -275,18 +275,18 @@ const SellerTruckReview = () => {
           <Field label="Transporter">{review.transporter || undefined}</Field>
           <Field label="Schedule Date & Time">
             <span className="seller-truck-review__with-icon">
-              <FiCalendar aria-hidden /> {review.scheduleDate}
+              <CalendarIcon aria-hidden /> {review.scheduleDate}
             </span>
           </Field>
           <Field label="Loading Address">
             <span className="seller-truck-review__with-icon">
-              <FiMapPin aria-hidden className="seller-truck-review__pin--loading" />
+              <MapPinIcon aria-hidden className="seller-truck-review__pin--loading" />
               <span>{review.loadingAddress}</span>
             </span>
           </Field>
           <Field label="Delivery Address">
             <span className="seller-truck-review__with-icon">
-              <FiMapPin aria-hidden className="seller-truck-review__pin--delivery" />
+              <MapPinIcon aria-hidden className="seller-truck-review__pin--delivery" />
               <span>{review.deliveryAddress}</span>
             </span>
           </Field>
@@ -306,7 +306,7 @@ const SellerTruckReview = () => {
 
       <ReviewSection
         id="assigned-truck"
-        icon={<FiTruck aria-hidden />}
+        icon={<TruckIcon aria-hidden />}
         title="Assigned Truck Info"
         summary={
           <>
@@ -320,23 +320,23 @@ const SellerTruckReview = () => {
           <Field label="Truck Number">
             <span className="seller-truck-review__badge">{truck.truckNumber}</span>
           </Field>
-          <Field label="Truck Capacity" icon={<FiBox aria-hidden />}>
+          <Field label="Truck Capacity" icon={<BoxIcon aria-hidden />}>
             <strong>
               {truck.capacity.toFixed(2)} {row.qtyUnit}
             </strong>
           </Field>
-          <Field label="Owner Name" icon={<FiUser aria-hidden />}>
+          <Field label="Owner Name" icon={<UserIcon aria-hidden />}>
             <strong>{truck.ownerName}</strong>
           </Field>
-          <Field label="Owner Contact" icon={<FiPhone aria-hidden />}>
+          <Field label="Owner Contact" icon={<PhoneIcon aria-hidden />}>
             <a href={`tel:${truck.ownerContact}`} className="seller-truck-review__phone">
               {truck.ownerContact}
             </a>
           </Field>
-          <Field label="Driver Name" icon={<FiUserCheck aria-hidden />}>
+          <Field label="Driver Name" icon={<UserCheckIcon aria-hidden />}>
             <strong>{truck.driverName}</strong>
           </Field>
-          <Field label="Driver Contact" icon={<FiSmartphone aria-hidden />}>
+          <Field label="Driver Contact" icon={<SmartphoneIcon aria-hidden />}>
             <a href={`tel:${truck.driverContact}`} className="seller-truck-review__phone">
               {truck.driverContact}
             </a>
@@ -347,7 +347,7 @@ const SellerTruckReview = () => {
       <form className="seller-truck-review__section" onSubmit={handleSubmit} noValidate>
         <header className="seller-truck-review__section-header">
           <h2>
-            <FiPackage aria-hidden /> Dispatch Info
+            <PackageIcon aria-hidden /> Dispatch Info
           </h2>
         </header>
 
@@ -420,7 +420,7 @@ const SellerTruckReview = () => {
               <ul className="seller-truck-review__cards">
                 {pagedContracts.length === 0 && (
                   <li className="seller-truck-review__cards-empty">
-                    <FiAlertCircle aria-hidden /> No pending contracts for this seller and product.
+                    <CircleAlertIcon aria-hidden /> No pending contracts for this seller and product.
                   </li>
                 )}
                 {pagedContracts.map((contract) => (
@@ -488,7 +488,7 @@ const SellerTruckReview = () => {
                     onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                     aria-label="Previous page"
                   >
-                    <FiChevronLeft aria-hidden />
+                    <ChevronLeftIcon aria-hidden />
                   </button>
                   {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
                     <button
@@ -507,7 +507,7 @@ const SellerTruckReview = () => {
                     onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                     aria-label="Next page"
                   >
-                    <FiChevronRight aria-hidden />
+                    <ChevronRightIcon aria-hidden />
                   </button>
                 </div>
               </div>

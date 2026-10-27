@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiX, FiUpload, FiFile, FiSave } from "react-icons/fi";
+import { FileIcon, SaveIcon, UploadIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import {
   createEmptyTruckEntry,
@@ -72,7 +72,7 @@ const AddTrucksOffcanvas = ({ open, editingRow = null, onClose, onSave }: AddTru
         <div className="add-trucks-offcanvas__header">
           <h2 id="add-trucks-offcanvas-title">{editingRow ? "Edit Truck" : "Add Trucks"}</h2>
           <button type="button" className="add-trucks-offcanvas__close" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -163,20 +163,20 @@ const AddTrucksOffcanvas = ({ open, editingRow = null, onClose, onSave }: AddTru
                 ) : (
                   entry.documents.map((doc) => (
                     <span className="add-trucks-offcanvas__doc-chip" key={doc.id}>
-                      <FiFile aria-hidden /> {doc.name}
+                      <FileIcon aria-hidden /> {doc.name}
                       <button
                         type="button"
                         onClick={() => handleRemoveDocument(doc.id)}
                         aria-label={`Remove ${doc.name}`}
                       >
-                        <FiX aria-hidden />
+                        <XIcon aria-hidden />
                       </button>
                     </span>
                   ))
                 )}
               </div>
               <label className="add-trucks-offcanvas__upload">
-                <FiUpload aria-hidden /> Add File
+                <UploadIcon aria-hidden /> Add File
                 <input type="file" multiple hidden onChange={(event) => handleAddFiles(event.target.files)} />
               </label>
             </div>
@@ -189,14 +189,14 @@ const AddTrucksOffcanvas = ({ open, editingRow = null, onClose, onSave }: AddTru
             className="add-trucks-offcanvas__btn add-trucks-offcanvas__btn--save"
             onClick={handleSave}
           >
-            <FiSave aria-hidden /> {editingRow ? "Save Changes" : "Add Trucks"}
+            <SaveIcon aria-hidden /> {editingRow ? "Save Changes" : "Add Trucks"}
           </button>
           <button
             type="button"
             className="add-trucks-offcanvas__btn add-trucks-offcanvas__btn--cancel"
             onClick={onClose}
           >
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
         </div>
       </div>

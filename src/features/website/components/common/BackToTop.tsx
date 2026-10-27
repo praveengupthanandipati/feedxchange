@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiArrowUp } from "react-icons/fi";
+import { ArrowUpIcon } from "../../../../shared/components/icon";
 
 const SHOW_AFTER = 480;
 const RING = 2 * Math.PI * 22; // circumference of the progress ring (r = 22)
@@ -47,7 +47,7 @@ const BackToTop = ({ reducedMotion }: { reducedMotion: boolean }) => {
         <circle cx="24" cy="24" r="22" />
         <circle cx="24" cy="24" r="22" className="back-to-top__progress" style={{ strokeDasharray: RING, strokeDashoffset: RING * (1 - progress) }} />
       </svg>
-      <FiArrowUp aria-hidden className="back-to-top__icon" />
+      <ArrowUpIcon aria-hidden className="back-to-top__icon" />
     </button>
   );
 };

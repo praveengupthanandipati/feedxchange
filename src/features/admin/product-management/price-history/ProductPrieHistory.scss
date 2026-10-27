@@ -35,18 +35,18 @@
 
   &__date {
     @include m.font-base;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &:focus {
       outline: none;
-      border-color: v.$color-primary;
-      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
@@ -54,7 +54,7 @@
     @include m.flex-center;
     @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     font-size: v.$font-size-sm;
   }
@@ -82,6 +82,11 @@
 
   @include m.respond-to(lg) {
     grid-template-columns: 18rem 1fr;
+    align-items: stretch;
+
+    > .price-history-main {
+      align-self: start;
+    }
   }
 }
 
@@ -89,7 +94,8 @@
 // Premium Sellers sidebar
 // ============================================================
 .price-history-sellers {
-  @include m.card(0);
+  @include m.card;
+  @include m.side-panel;
   overflow: hidden;
   padding: 0;
 
@@ -98,7 +104,7 @@
     @include m.font-heading(v.$font-weight-semibold);
     padding: v.$spacing-4 v.$spacing-5;
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-base;
   }
 
@@ -111,9 +117,10 @@
     gap: v.$spacing-1;
 
     @include m.respond-to(lg) {
-      max-height: 32rem;
+      flex: 1 1 auto;
+      min-height: 0;
       overflow-x: hidden;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
   }
 
@@ -134,10 +141,10 @@
     }
 
     &.is-active {
-      background-color: rgba(v.$color-primary, 0.08);
+      background-color: v.alpha(v.$color-primary, 0.08);
 
       .price-history-sellers__info strong {
-        color: v.$color-primary;
+        color: v.fg(v.$color-primary);
       }
     }
   }
@@ -146,11 +153,11 @@
     @include m.flex-center;
     @include m.font-heading(v.$font-weight-semibold);
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border-radius: v.$radius-pill;
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
   }
 
@@ -162,7 +169,7 @@
 
     strong {
       @include m.font-base(v.$font-weight-semibold);
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -171,8 +178,8 @@
 
     span {
       @include m.flex(row, flex-start, center, 0.25rem);
-      color: v.$color-text-muted;
-      font-size: 0.75rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.75rem);
 
       svg {
         flex-shrink: 0;
@@ -208,11 +215,11 @@
 
   &__icon {
     @include m.flex-center;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: var(--fx-control-height-lg);
+    height: var(--fx-control-height-lg);
     border-radius: v.$radius-pill;
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: 1.1rem;
     margin-bottom: v.$spacing-1;
   }
@@ -220,19 +227,19 @@
   strong {
     @include m.font-heading(v.$font-weight-bold);
     font-size: v.$font-size-xl;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
 
     &.is-up {
-      color: v.$color-success;
+      color: v.fg(v.$color-success);
     }
 
     &.is-down {
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
   }
 
   span {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 }
@@ -257,21 +264,21 @@
       margin: 0;
 
       svg {
-        color: v.$color-primary;
+        color: v.fg(v.$color-primary);
         flex-shrink: 0;
       }
     }
   }
 
   &__seller {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-regular;
   }
 
   &__filter {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
 
     .searchable-select {
@@ -292,12 +299,12 @@
 
     strong {
       @include m.font-heading(v.$font-weight-bold);
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-lg;
     }
 
     span {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -309,7 +316,7 @@
 
     span {
       @include m.flex(row, flex-start, center, v.$spacing-2);
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -321,15 +328,15 @@
     border-radius: v.$radius-pill;
 
     &--original {
-      background-color: #1b3664;
+      background-color: var(--fx-brand-navy);
     }
 
     &--offer {
-      background-color: #2e9e5b;
+      background-color: var(--fx-green-40);
     }
 
     &--resale {
-      background-color: #faa41a;
+      background-color: var(--fx-brand-orange);
     }
   }
 }

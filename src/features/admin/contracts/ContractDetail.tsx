@@ -1,4 +1,6 @@
 import { useState } from "react";
+// Bootstrap's dropdown behaviour (data-bs-toggle="dropdown") for the Share information menu; only this screen needs it
+import "bootstrap/js/dist/dropdown";
 import { Link, useParams } from "react-router-dom";
 import Can from "../../../core/auth/Can";
 import NotifyModal from "../../../shared/notifications/NotifyModal";

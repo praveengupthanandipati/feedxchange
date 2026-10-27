@@ -1,4 +1,4 @@
-import { FiSearch, FiX } from "react-icons/fi";
+import { SearchIcon, XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 
 interface FilterOption {
@@ -48,7 +48,7 @@ const ProductsFilters = ({
       />
 
       <div className="products-list-filters__search">
-        <FiSearch aria-hidden />
+        <SearchIcon aria-hidden />
         <input
           type="text"
           value={keyword}
@@ -64,7 +64,7 @@ const ProductsFilters = ({
         title="Clear filters"
         aria-label="Clear filters"
       >
-        <FiX aria-hidden />
+        <XIcon aria-hidden />
       </button>
     </div>
   );

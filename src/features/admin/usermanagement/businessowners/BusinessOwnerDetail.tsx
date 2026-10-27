@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
-import { FiArrowLeft } from "react-icons/fi";
+import { ArrowLeftIcon } from "../../../../shared/components/icon";
 import { useGetBusinessProfileSummaryQuery } from "../../../../core/store/businessProfilesApi";
 import "./Businessowners.scss";
 import "./BusinessOwnerDetail.scss";
@@ -25,7 +25,7 @@ const BusinessOwnerDetail = () => {
   return (
     <div className="business-owner-detail">
       <Link to="/admin/business-owners" className="business-owner-detail__back">
-        <FiArrowLeft aria-hidden /> Back to Business Owners
+        <ArrowLeftIcon aria-hidden /> Back to Business Owners
       </Link>
 
       {isLoading ? (

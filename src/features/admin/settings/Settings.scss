@@ -15,7 +15,7 @@
 
   h1 {
     margin: 0;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-xl;
   }
 
@@ -23,7 +23,7 @@
     @include m.flex(row, flex-start, center, v.$spacing-3);
     padding: v.$spacing-3;
     border-radius: v.$radius-md;
-    background: linear-gradient(135deg, rgba(v.$color-primary, 0.08), rgba(v.$color-info, 0.08));
+    background: linear-gradient(135deg, v.alpha(v.$color-primary, 0.08), v.alpha(v.$color-info, 0.08));
 
     div {
       display: flex;
@@ -32,13 +32,13 @@
     }
 
     strong {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       overflow-wrap: anywhere;
     }
 
     small {
-      color: v.$color-text-muted;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.8rem);
     }
   }
 
@@ -49,19 +49,23 @@
     height: 3rem;
     border-radius: 50%;
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-weight: v.$font-weight-semibold;
+  }
+
+  &__section {
+    padding-top: v.$spacing-1;
   }
 
   &__list {
     margin: 0;
     padding: 0;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     list-style: none;
     overflow: hidden;
 
-    li + li { border-top: 1px solid v.$color-border; }
+    li + li { border-top: 1px solid v.line(v.$color-border); }
   }
 
   &__row {
@@ -72,7 +76,7 @@
     padding: 0 v.$spacing-4;
     border: none;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     text-align: left;
     text-decoration: none;
@@ -81,10 +85,10 @@
     -webkit-appearance: none;
     appearance: none;
 
-    &:hover { background-color: v.$color-gray-50; color: v.$color-text; }
+    &:hover { background-color: v.$color-gray-50; color: v.fg(v.$color-text); }
 
     &:focus-visible {
-      outline: 2px solid v.$color-orange;
+      outline: 2px solid v.line(v.$color-orange);
       outline-offset: -2px;
     }
 
@@ -93,8 +97,8 @@
     span { flex: 1; }
 
     &--danger,
-    &--danger:hover { color: v.$color-danger; }
+    &--danger:hover { color: v.fg(v.$color-danger); }
   }
 
-  &__chevron { color: v.$color-text-muted; }
+  &__chevron { color: v.fg(v.$color-text-muted); }
 }

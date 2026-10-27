@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { FiMail } from "react-icons/fi";
+import { MailIcon } from "../../../../../shared/components/icon";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
 import type { TransporterProfile } from "./transporterDetail.data";
@@ -59,7 +59,7 @@ const OverviewTab = ({ profile }: OverviewTabProps) => {
             className="transporters-btn transporters-btn--outline"
             onClick={() => setMessageOpen(true)}
           >
-            <FiMail aria-hidden /> Message
+            <MailIcon aria-hidden /> Message
           </button>
         </div>
         <div className="business-owner-detail__grid">

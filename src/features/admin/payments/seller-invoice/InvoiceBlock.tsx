@@ -1,4 +1,4 @@
-import { FiLink, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
+import { LinkIcon, PlusIcon, SearchIcon, Trash2Icon } from "../../../../shared/components/icon";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import { calculateRow, createEmptyDeduction, money, validateRow, type DeductionEntry, type SellerInvoiceRow } from "./sellerInvoice.data";
 
@@ -92,7 +92,7 @@ const InvoiceBlock = ({
           aria-label={`Remove invoice ${index}`}
           title={canRemove ? "Remove this invoice" : "At least one invoice is needed"}
         >
-          <FiTrash2 aria-hidden />
+          <Trash2Icon aria-hidden />
         </button>
       </header>
 
@@ -114,10 +114,10 @@ const InvoiceBlock = ({
               onKeyDown={(event) => event.key === "Enter" && onContractLeave(row)}
             />
             <button type="button" className="si-icon-btn" onClick={() => onFindContract(row)} aria-label="Find contract" title="Find contract by seller / buyer">
-              <FiLink aria-hidden />
+              <LinkIcon aria-hidden />
             </button>
             <button type="button" className="si-icon-btn" onClick={() => onContractDetails(row)} disabled={!row.contractNumber.trim()} aria-label="Contract details" title="Contract details">
-              <FiSearch aria-hidden />
+              <SearchIcon aria-hidden />
             </button>
           </div>,
         )}
@@ -241,7 +241,7 @@ const InvoiceBlock = ({
                   title="Remove this deduction"
                   onClick={() => onChange(row.id, { deductions: row.deductions.filter((x) => x.id !== d.id) })}
                 >
-                  <FiTrash2 aria-hidden />
+                  <Trash2Icon aria-hidden />
                 </button>
               </div>
               {problem && <small className="si-error-text si-ded__error">{problem}</small>}
@@ -252,7 +252,7 @@ const InvoiceBlock = ({
 
       <div className="si-ded-foot">
         <button type="button" className="si-link-btn" onClick={addDeduction}>
-          <FiPlus aria-hidden /> Add deduction
+          <PlusIcon aria-hidden /> Add deduction
         </button>
         {amounts && (
           <span className="si-ded-foot__sum">

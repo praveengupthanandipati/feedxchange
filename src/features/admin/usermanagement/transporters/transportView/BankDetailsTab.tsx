@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiMail, FiDownload } from "react-icons/fi";
+import { DownloadIcon, MailIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
@@ -53,7 +53,7 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
           aria-label={`Download ${row.fileName}`}
           title={`Download ${row.fileName}`}
         >
-          <FiDownload aria-hidden /> Download
+          <DownloadIcon aria-hidden /> Download
         </a>
       ),
     },
@@ -77,7 +77,7 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
             className="transporters-btn transporters-btn--warning"
             onClick={() => setBankModalOpen(true)}
           >
-            <FiMail aria-hidden /> Send Bank Details
+            <MailIcon aria-hidden /> Send Bank Details
           </button>
         </div>
         <p className="business-owner-detail__hint">Here you can manage the banks and documents associated with the user.</p>
@@ -101,7 +101,7 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
             className="transporters-btn transporters-btn--warning"
             onClick={() => setDocumentModalOpen(true)}
           >
-            <FiMail aria-hidden /> Send Documents
+            <MailIcon aria-hidden /> Send Documents
           </button>
         </div>
         <p className="business-owner-detail__hint">Here you can manage the documents associated with the user.</p>

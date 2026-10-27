@@ -2,15 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import { useNavigate } from "react-router-dom";
 import {
-  FiSearch,
-  FiEye,
-  FiEyeOff,
-  FiDownload,
-  FiPlus,
-  FiX,
-  FiChevronLeft,
-  FiChevronRight,
-} from "react-icons/fi";
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  PlusIcon,
+  SearchIcon,
+  XIcon,
+} from "../../../shared/components/icon";
 import Table from "../../../shared/components/table/Table";
 import type { TableColumn } from "../../../shared/components/table/table.types";
 import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
@@ -26,11 +26,29 @@ import { buildContractColumns } from "./contracts.columns";
 import { useSuccessToast } from "../../../shared/components/toast/useSuccessToast";
 import SuccessToast from "../../../shared/components/toast/SuccessToast";
 import { dateRangeOptions, type Contract } from "./contracts.data";
+import ContractsDashboard from "./dashboard/ContractsDashboard";
+import { ATTENTION, inAttention, type AttentionKind, type MonthBar } from "./dashboard/contractsDashboard.utils";
+import { ChartColumnIcon } from "../../../shared/components/icon";
 import "./Contracts.scss";
 
 import Can from "../../../core/auth/Can";
 
 const PAGE_SIZE = 10;
+const DASHBOARD_KEY = "fx-contracts-dashboard"; // "shown" | "hidden"
+
+const readDashboardShown = () => {
+  try {
+    return localStorage.getItem(DASHBOARD_KEY) !== "hidden";
+  } catch {
+    return true;
+  }
+};
+
+/** yyyy-mm-dd in local time, the format the date pickers use. */
+const isoDay = (time: number) => {
+  const date = new Date(time);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+};
 const DAY_MS = 24 * 60 * 60 * 1000;
 function getExportCellValue(row: Contract, column: TableColumn<Contract>): string {
   if (column.exportValue) return column.exportValue(row);
@@ -128,7 +146,7 @@ const Contracts = () => {
   const [rows, setRows] = useState<Contract[]>([]);
   //const [successMessage, setSuccessMessage] = useState("");
   const { message: successMessage, showSuccessMessage } = useSuccessToast();
-  const { data, isLoading, isFetching } = useGetAllContractsByFiltersQuery();
+  const { data, isLoading, isFetching, isError } = useGetAllContractsByFiltersQuery();
   
   const { data: contractStatuses = [] } = useGetAllContractStatusesQuery();
 
@@ -150,6 +168,15 @@ const Contracts = () => {
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Contract | null>(null);
+  // Overview above the list: attention group / month picked there (null = none), and whether it is shown
+  const [focus, setFocus] = useState<AttentionKind | null>(null);
+  const [monthStart, setMonthStart] = useState<number | null>(null);
+  const [dashboardShown, setDashboardShown] = useState(readDashboardShown);
+  const [now] = useState(() => Date.now());
+  const focusIds = useMemo(
+    () => (focus && data ? new Set(data.filter((contract) => inAttention(focus, contract, now)).map((contract) => contract.contractNumber)) : null),
+    [focus, data, now],
+  );
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Same toast pattern as Categories.tsx: show the message, auto-clear after 3s.
@@ -238,7 +265,7 @@ const Contracts = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, statusFilter, dateRangeFilter, customFrom, customTo]);
+  }, [keyword, statusFilter, dateRangeFilter, customFrom, customTo, focus]);
 
 
 const filteredRows = useMemo(() => {
@@ -247,6 +274,8 @@ const filteredRows = useMemo(() => {
 
   return rows.filter((row) => {
     if (row.status.toLowerCase() === "deleted") return false;
+    // a "needs attention" group picked in the overview
+    if (focusIds && !focusIds.has(row.contractNumber)) return false;
 
     if (selectedStatus) {
       const matchedStatus = contractStatuses.find(
@@ -360,6 +389,7 @@ const filteredRows = useMemo(() => {
   dateRangeFilter,
   customFrom,
   customTo,
+  focusIds,
 ]);
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -374,6 +404,7 @@ const filteredRows = useMemo(() => {
     [
       statusFilter && statusFilter !== "All" ? statusFilter : null,
       dateRangeFilter !== "All" ? dateRangeFilter : null,
+      focus ? ATTENTION[focus].label : null,
     ]
       .filter(Boolean)
       .join(" • ") || "All";
@@ -384,7 +415,47 @@ const filteredRows = useMemo(() => {
     setDateRangeFilter("All");
     setCustomFrom("");
     setCustomTo("");
+    setFocus(null);
+    setMonthStart(null);
   };
+
+  // ---------- overview -> the list's filters ----------
+  const toggleDashboard = () => {
+    setDashboardShown((shown) => {
+      try {
+        localStorage.setItem(DASHBOARD_KEY, shown ? "hidden" : "shown");
+      } catch {
+        /* storage blocked: the choice lasts for this visit */
+      }
+      return !shown;
+    });
+  };
+
+  /** The overview names a status as the API sends it (its display name); the status filter takes the status name. */
+  const pickStatus = (status: string) => {
+    const key = normalizeStatus(status);
+    const match = contractStatuses.find((item) => normalizeStatus(item.displayName) === key || normalizeStatus(item.statusName) === key);
+    const value = match?.statusName ?? status;
+    setStatusFilter((current) => (normalizeStatus(current) === normalizeStatus(value) ? "" : value));
+  };
+
+  const pickMonth = (month: MonthBar) => {
+    if (monthStart === month.start) {
+      setMonthStart(null);
+      setDateRangeFilter("All");
+      setCustomFrom("");
+      setCustomTo("");
+      return;
+    }
+    const start = new Date(month.start);
+    const end = new Date(start.getFullYear(), start.getMonth() + 1, 0).getTime();
+    setMonthStart(month.start);
+    setDateRangeFilter("Custom Date Range");
+    setCustomFrom(isoDay(month.start));
+    setCustomTo(isoDay(end));
+  };
+
+  const pickSearch = (text: string) => setKeyword((current) => (current.toLowerCase() === text.toLowerCase() ? "" : text));
 
   const handleExport = () => {
     const exportColumns = columns.filter((column) => column.key !== "actions");
@@ -415,6 +486,32 @@ const filteredRows = useMemo(() => {
 
   return (
     <div className="contracts-page">
+      <button type="button" className="contracts-dashboard-toggle" aria-expanded={dashboardShown} onClick={toggleDashboard}>
+        <ChartColumnIcon aria-hidden /> {dashboardShown ? "Hide overview" : "Show overview"}
+      </button>
+
+      {dashboardShown && (
+        <ContractsDashboard
+          contracts={data}
+          loading={isLoading}
+          error={isError}
+          now={now}
+          active={{
+            status: statusFilter,
+            focus,
+            search: keyword,
+            monthStart: dateRangeFilter === "Custom Date Range" ? monthStart : null,
+          }}
+          onStatus={pickStatus}
+          onFocus={setFocus}
+          onMonth={pickMonth}
+          onSearch={pickSearch}
+          onClear={handleClearFilters}
+        />
+      )}
+
+      {/* the overview has these figures and more; the two tiles stay for anyone who hides it */}
+      {!dashboardShown && (
       <div className="contracts-page__summary">
         <div className="contracts-summary contracts-summary--primary">
           <span>Total Contracts</span>
@@ -425,6 +522,7 @@ const filteredRows = useMemo(() => {
           <strong>{totalQuantityValue.toLocaleString("en-IN")} MT</strong>
         </div>
       </div>
+      )}
 
       <div className="contracts-card">
         <div className="contracts-card__header">
@@ -438,7 +536,7 @@ const filteredRows = useMemo(() => {
               className="contracts-btn contracts-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
@@ -446,7 +544,7 @@ const filteredRows = useMemo(() => {
               className="contracts-btn contracts-btn--warning"
               onClick={handleExport}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["contracts.manage"]}>
               <button
@@ -454,7 +552,7 @@ const filteredRows = useMemo(() => {
                 className="contracts-btn contracts-btn--primary"
                 onClick={() => navigate("new")}
               >
-                <FiPlus aria-hidden /> New
+                <PlusIcon aria-hidden /> New
               </button>
             </Can>
           </div>
@@ -470,7 +568,7 @@ const filteredRows = useMemo(() => {
             />
 
             <div className="contracts-filters__search">
-              <FiSearch aria-hidden />
+              <SearchIcon aria-hidden />
               <input
                 type="text"
                 value={keyword}
@@ -512,7 +610,7 @@ const filteredRows = useMemo(() => {
               title="Clear filters"
               aria-label="Clear filters"
             >
-              <FiX aria-hidden />
+              <XIcon aria-hidden />
             </button>
           </div>
         )}
@@ -530,6 +628,7 @@ const filteredRows = useMemo(() => {
           onSelectAll={handleSelectAll}
           emptyMessage="No contracts match the current filters."
           minHeight
+          mobileCards
         />
 )}
 
@@ -549,7 +648,7 @@ const filteredRows = useMemo(() => {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <button
@@ -567,7 +666,7 @@ const filteredRows = useMemo(() => {
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

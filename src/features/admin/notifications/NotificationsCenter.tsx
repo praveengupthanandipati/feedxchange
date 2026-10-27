@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiInbox, FiSend } from "react-icons/fi";
+import { InboxIcon, SendIcon } from "../../../shared/components/icon";
 import { usePermission } from "../../../core/auth/AuthContext";
 import { useGetUnreadCountQuery } from "../../../core/store/notificationsApi";
 import NotificationHistoryPanel from "./NotificationHistoryPanel";
@@ -24,9 +24,9 @@ const NotificationsCenter = () => {
 
       {canHistory && (
         <div className="nc-tabs" role="tablist" aria-label="Notifications">
-          <button type="button" role="tab" aria-selected={active === "sent"} className={active === "sent" ? "is-active" : ""} onClick={() => setTab("sent")}><FiSend aria-hidden /> Sent messages</button>
+          <button type="button" role="tab" aria-selected={active === "sent"} className={active === "sent" ? "is-active" : ""} onClick={() => setTab("sent")}><SendIcon aria-hidden /> Sent messages</button>
           <button type="button" role="tab" aria-selected={active === "inbox"} className={active === "inbox" ? "is-active" : ""} onClick={() => setTab("inbox")}>
-            <FiInbox aria-hidden /> My inbox{unread > 0 && <span className="nc-count">{unread}</span>}
+            <InboxIcon aria-hidden /> My inbox{unread > 0 && <span className="nc-count">{unread}</span>}
           </button>
         </div>
       )}

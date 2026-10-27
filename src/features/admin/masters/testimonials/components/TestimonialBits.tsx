@@ -1,4 +1,4 @@
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { SquarePenIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import type { Testimonial, TestimonialStatus } from "../testimonials.data";
 
 export interface TestimonialActionHandlers {
@@ -20,7 +20,7 @@ export const TestimonialActions = ({ testimonial, onEdit, onDelete }: Testimonia
       aria-label={`Edit testimonial from ${testimonial.customerName}`}
       title="Edit"
     >
-      <FiEdit aria-hidden />
+      <SquarePenIcon aria-hidden />
     </button>
     <button
       type="button"
@@ -29,7 +29,7 @@ export const TestimonialActions = ({ testimonial, onEdit, onDelete }: Testimonia
       aria-label={`Delete testimonial from ${testimonial.customerName}`}
       title="Delete"
     >
-      <FiTrash2 aria-hidden />
+      <Trash2Icon aria-hidden />
     </button>
   </div>
 );

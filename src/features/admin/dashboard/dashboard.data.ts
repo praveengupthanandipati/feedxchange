@@ -20,7 +20,7 @@ export const statCards: StatCard[] = [
     deltaPercent: 2.65,
     deltaDirection: "up",
     visual: "bars",
-    color: "#6366f1",
+    color: "var(--fx-indigo-67)",
     sparkline: [14, 22, 10, 18, 26, 16, 24, 30, 20, 28],
   },
   {
@@ -30,7 +30,7 @@ export const statCards: StatCard[] = [
     deltaPercent: 0.82,
     deltaDirection: "down",
     visual: "ring",
-    color: "#22c55e",
+    color: "var(--fx-green-45)",
     ringPercent: 68,
   },
   {
@@ -40,7 +40,7 @@ export const statCards: StatCard[] = [
     deltaPercent: 6.24,
     deltaDirection: "down",
     visual: "ring",
-    color: "#6366f1",
+    color: "var(--fx-indigo-67)",
     ringPercent: 42,
   },
   {
@@ -50,7 +50,7 @@ export const statCards: StatCard[] = [
     deltaPercent: 10.51,
     deltaDirection: "up",
     visual: "bars",
-    color: "#f59e0b",
+    color: "var(--fx-amber-50)",
     sparkline: [10, 14, 12, 20, 16, 24, 18, 28, 22, 32],
   },
 ];
@@ -89,11 +89,11 @@ export interface TopProduct {
 }
 
 export const topSellingProducts: TopProduct[] = [
-  { id: "soya-lecithin-1", name: "Soya Lecithin Cattle Feed", percent: 92, color: "#0f172a" },
-  { id: "soya-lecithin-2", name: "Soya Lecithin Cattle Feed", percent: 78, color: "#38bdf8" },
-  { id: "brown-soyabean", name: "Brown Soyabean Deoiled", percent: 66, color: "#22c55e" },
-  { id: "granules-groundnut", name: "Granules Groundnut", percent: 84, color: "#f59e0b" },
-  { id: "brown-groundnut-oil", name: "Brown Groundnut Oil", percent: 58, color: "#6366f1" },
+  { id: "soya-lecithin-1", name: "Soya Lecithin Cattle Feed", percent: 92, color: "var(--fx-slate-11)" },
+  { id: "soya-lecithin-2", name: "Soya Lecithin Cattle Feed", percent: 78, color: "var(--fx-sky-60)" },
+  { id: "brown-soyabean", name: "Brown Soyabean Deoiled", percent: 66, color: "var(--fx-green-45)" },
+  { id: "granules-groundnut", name: "Granules Groundnut", percent: 84, color: "var(--fx-amber-50)" },
+  { id: "brown-groundnut-oil", name: "Brown Groundnut Oil", percent: 58, color: "var(--fx-indigo-67)" },
 ];
 
 export interface TopUser {
@@ -116,7 +116,7 @@ export const topUsers: TopUser[] = [
     amount: "₹250.00",
     trend: "up",
     initials: "BP",
-    color: "#f59e0b",
+    color: "var(--fx-amber-50)",
   },
   {
     id: "tara-poultry",
@@ -126,7 +126,7 @@ export const topUsers: TopUser[] = [
     amount: "₹110.00",
     trend: "down",
     initials: "TP",
-    color: "#22c55e",
+    color: "var(--fx-green-45)",
   },
   {
     id: "sri-venkateswara",
@@ -136,7 +136,7 @@ export const topUsers: TopUser[] = [
     amount: "₹480.00",
     trend: "up",
     initials: "SV",
-    color: "#6366f1",
+    color: "var(--fx-indigo-67)",
   },
   {
     id: "krishna-hatcheries",
@@ -146,7 +146,7 @@ export const topUsers: TopUser[] = [
     amount: "₹320.00",
     trend: "down",
     initials: "KH",
-    color: "#ef4444",
+    color: "var(--fx-red-60)",
   },
 ];
 

@@ -5,16 +5,25 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && node scripts/prerender.mjs",
+    "build": "tsc -b && vite build && node scripts/prerender.mjs && node scripts/check-csp.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "prerender": "node scripts/prerender.mjs",
-    "serve:dist": "node scripts/serve-dist.mjs"
+    "serve:dist": "node scripts/serve-dist.mjs",
+    "tauri": "tauri",
+    "desktop:web": "tsc -b && vite build --mode desktop",
+    "desktop:build": "tauri build",
+    "test:visual": "playwright test",
+    "size": "node scripts/check-bundle-budget.mjs",
+    "lighthouse": "node scripts/lighthouse.mjs"
   },
   "dependencies": {
+    "@fontsource/inter": "5.3.0",
+    "@fontsource/poppins": "5.3.0",
     "@microsoft/signalr": "^8.0.29",
     "@reduxjs/toolkit": "^2.12.0",
     "bootstrap": "^5.3.8",
+    "lucide-react": "1.55.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-icons": "^5.7.0",
@@ -26,6 +35,9 @@
     "swiper": "^14.3.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "^1.64.1",
+    "@tauri-apps/cli": "^2.12.4",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

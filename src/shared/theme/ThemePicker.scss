@@ -1,0 +1,124 @@
+@use "../assets/styles/variables" as v;
+@use "../assets/styles/mixins" as m;
+
+// Used inside both the admin app and the website, so it reads only the shared tokens.
+.theme-picker {
+  font-family: v.$font-family-base;
+
+  &--menu {
+    position: relative;
+    display: inline-flex;
+  }
+
+  &__trigger {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    cursor: pointer;
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + #{v.$spacing-2});
+    z-index: v.$z-index-dropdown;
+    display: flex;
+    flex-direction: column;
+    min-width: 12.5rem;
+    padding: v.$spacing-1;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-lg;
+
+    &--end {
+      right: 0;
+    }
+
+    &--start {
+      left: 0;
+    }
+  }
+
+  &__item {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    min-height: var(--fx-control-height);
+    padding: v.$spacing-2 v.$spacing-3;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background-color: v.$color-gray-100;
+    }
+
+    &[aria-checked="true"] {
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__check {
+    margin-left: auto;
+    color: v.fg(v.$color-primary);
+  }
+
+  // ---------- Settings: every choice with its description ----------
+  &--list {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+  }
+
+  &__heading {
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__option {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    padding: v.$spacing-3 v.$spacing-4;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-gray-50;
+    }
+
+    &[aria-checked="true"] {
+      border-color: v.line(v.$color-primary);
+      box-shadow: inset 0 0 0 1px v.line(v.$color-primary);
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    color: v.fg(v.$color-text-muted);
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  &__label {
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__hint {
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+}

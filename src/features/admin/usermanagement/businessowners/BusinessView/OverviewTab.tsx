@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { FiMail } from "react-icons/fi";
+import { MailIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
@@ -50,7 +50,7 @@ const OverviewTab = ({ profile }: OverviewTabProps) => {
             className="business-owners-btn business-owners-btn--outline"
             onClick={() => setMessageOpen(true)}
           >
-            <FiMail aria-hidden /> Message
+            <MailIcon aria-hidden /> Message
           </button>
         </div>
         <div className="business-owner-detail__grid">

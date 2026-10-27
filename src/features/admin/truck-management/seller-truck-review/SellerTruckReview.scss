@@ -14,7 +14,7 @@
 
     h1 {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -25,7 +25,7 @@
 
   &__back {
     @include m.flex(row, flex-start, center, v.$spacing-1);
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-sm;
     text-decoration: none;
 
@@ -37,12 +37,12 @@
   &__not-found {
     @include m.card(v.$spacing-5);
     @include m.flex(column, center, center, v.$spacing-2);
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     text-align: center;
 
     > svg {
       font-size: 1.75rem;
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
 
     p {
@@ -64,7 +64,7 @@
     align-items: center;
     gap: v.$spacing-2 v.$spacing-4;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     @include m.respond-below(sm) {
       padding: v.$spacing-3;
@@ -73,7 +73,7 @@
     h2 {
       @include m.flex(row, flex-start, center, v.$spacing-2);
       margin: 0;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-lg;
     }
   }
@@ -83,11 +83,11 @@
     flex-wrap: wrap;
     gap: v.$spacing-1 v.$spacing-4;
     flex: 1 1 auto;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     strong {
-      color: v.$color-navy;
+      color: v.fg(v.$color-navy);
     }
 
     // The full details sit directly below on small screens; the summary is just noise there.
@@ -104,8 +104,8 @@
     border: none;
     border-radius: v.$radius-sm;
     background: transparent;
-    color: v.$color-navy;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-navy);
+    font-size: max(11px, 0.8rem);
     cursor: pointer;
 
     &:hover {
@@ -144,26 +144,26 @@
 
     dt {
       @include m.flex(row, flex-start, center, v.$spacing-1);
-      color: v.$color-text-muted;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-regular;
     }
 
     dd {
       margin: 0.25rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       line-height: 1.6;
       overflow-wrap: anywhere;
 
       strong {
-        color: v.$color-navy;
+        color: v.fg(v.$color-navy);
       }
     }
   }
 
   &__empty {
-    color: v.$color-gray-400;
+    color: v.fg(v.$color-gray-400);
   }
 
   &__with-icon {
@@ -178,11 +178,11 @@
   }
 
   &__pin--loading {
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
   }
 
   &__pin--delivery {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
   }
 
   &__big {
@@ -190,11 +190,11 @@
     font-weight: v.$font-weight-semibold;
 
     &--info {
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
     }
 
     &--success {
-      color: v.$color-success;
+      color: v.fg(v.$color-success);
     }
   }
 
@@ -203,14 +203,14 @@
     padding: 0.1rem 0.4rem;
     border-radius: v.$radius-sm;
     background-color: v.$color-orange;
-    color: v.$color-white;
-    font-size: 0.7rem;
+    color: v.on(v.$color-white);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
     line-height: 1.5;
   }
 
   &__phone {
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-weight: v.$font-weight-bold;
     text-decoration: none;
 
@@ -260,8 +260,8 @@
     min-width: 0;
 
     label {
-      color: v.$color-text;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text);
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
   }
@@ -269,18 +269,18 @@
   &__input {
     @include m.font-base;
     width: 100%;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
-      box-shadow: 0 0 0 3px rgba(v.$color-navy, 0.12);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
@@ -294,7 +294,7 @@
   &__checkbox {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     width: fit-content;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
     cursor: pointer;
@@ -314,13 +314,13 @@
     h3,
     p {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-base;
       font-weight: v.$font-weight-regular;
     }
 
     strong {
-      color: v.$color-navy;
+      color: v.fg(v.$color-navy);
     }
   }
 
@@ -335,7 +335,7 @@
   }
 
   &__qty {
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-weight: v.$font-weight-bold;
     white-space: nowrap;
   }
@@ -346,14 +346,15 @@
     min-width: 7rem;
     height: 2.4rem;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
@@ -379,14 +380,14 @@
   &__cards-empty {
     @include m.flex(row, center, center, v.$spacing-2);
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
   &__contract-card {
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
   }
@@ -394,8 +395,8 @@
   &__contract-card-top {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     padding: v.$spacing-2 v.$spacing-3;
-    background-color: rgba(v.$color-navy, 0.06);
-    border-bottom: 1px solid v.$color-border;
+    background-color: v.alpha(v.$color-navy, 0.06);
+    border-bottom: 1px solid v.line(v.$color-border);
     font-size: v.$font-size-sm;
     cursor: pointer;
 
@@ -406,12 +407,12 @@
     }
 
     strong {
-      color: v.$color-navy;
+      color: v.fg(v.$color-navy);
     }
 
     span {
       margin-left: auto;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
     }
   }
 
@@ -423,8 +424,8 @@
     padding: v.$spacing-3;
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
       font-weight: v.$font-weight-medium;
       text-transform: uppercase;
       letter-spacing: 0.02em;
@@ -432,7 +433,7 @@
 
     dd {
       margin: 0.1rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -453,7 +454,7 @@
 
     p {
       margin: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -469,10 +470,10 @@
       min-width: 2.25rem;
       height: 2.25rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
@@ -487,8 +488,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -496,10 +497,10 @@
   &__errors {
     margin: 0;
     padding: v.$spacing-3 v.$spacing-3 v.$spacing-3 v.$spacing-6;
-    border: 1px solid rgba(v.$color-danger, 0.3);
+    border: 1px solid v.alpha(v.line(v.$color-danger), 0.3);
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-danger, 0.06);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.06);
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
   }
 
@@ -507,7 +508,7 @@
     @include m.flex(row, flex-end, center, v.$spacing-2);
     flex-wrap: wrap;
     padding-top: v.$spacing-3;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
 
     @include m.respond-below(sm) {
       flex-direction: column-reverse;
@@ -519,7 +520,7 @@
     @include m.flex-center;
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border-radius: v.$radius-md;
     font-size: v.$font-size-sm;
@@ -530,7 +531,7 @@
     &--primary {
       border: none;
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
 
       &:hover {
         background-color: v.$color-navy-light;
@@ -538,9 +539,9 @@
     }
 
     &--ghost {
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
 
       &:hover {
         background-color: v.$color-gray-100;

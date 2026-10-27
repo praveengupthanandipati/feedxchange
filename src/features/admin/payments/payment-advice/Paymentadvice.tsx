@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiAlertCircle, FiCheck, FiCheckCircle, FiCreditCard, FiDollarSign, FiEdit, FiFileText, FiMinusCircle, FiTrash2, FiX, FiZap } from "react-icons/fi";
-import type { IconType } from "react-icons";
+import {
+  type IconComponent,
+  CheckIcon,
+  CircleAlertIcon,
+  CircleCheckBigIcon,
+  CircleMinusIcon,
+  CreditCardIcon,
+  DollarSignIcon,
+  FileTextIcon,
+  SquarePenIcon,
+  Trash2Icon,
+  XIcon,
+  ZapIcon,
+} from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import {
@@ -41,11 +53,11 @@ import {
 import "./Paymentadvice.scss";
 import { useNotifyPrompt } from "../../../../shared/notifications/useNotifyPrompt";
 
-const modeIcons: Record<PaymentMode, IconType> = {
-  online: FiCreditCard,
-  cheque: FiFileText,
-  cash: FiDollarSign,
-  none: FiMinusCircle,
+const modeIcons: Record<PaymentMode, IconComponent> = {
+  online: CreditCardIcon,
+  cheque: FileTextIcon,
+  cash: DollarSignIcon,
+  none: CircleMinusIcon,
 };
 
 const dash = (value: string | null | undefined) => value || "-";
@@ -288,7 +300,7 @@ const Paymentadvice = () => {
     <div className="payment-advice-page">
       {toast && (
         <div className={`payment-advice-page__toast${toast.error ? " payment-advice-page__toast--error" : ""}`} role={toast.error ? "alert" : "status"}>
-          {toast.error ? <FiAlertCircle aria-hidden /> : <FiCheckCircle aria-hidden />}
+          {toast.error ? <CircleAlertIcon aria-hidden /> : <CircleCheckBigIcon aria-hidden />}
           {toast.text}
         </div>
       )}
@@ -424,10 +436,10 @@ const Paymentadvice = () => {
 
         <div className="payment-advice-actions">
           <button type="button" className="payment-advice-actions__cancel" onClick={() => resetForm()}>
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
           <button type="button" className="payment-advice-actions__save" onClick={handleSave} disabled={saving || updating}>
-            <FiCheck aria-hidden /> {editingId ? "Update Payment" : "Save Payments"}
+            <CheckIcon aria-hidden /> {editingId ? "Update Payment" : "Save Payments"}
           </button>
         </div>
       </section>
@@ -474,7 +486,7 @@ const Paymentadvice = () => {
                       {r.kind === "Regular" ? (
                         <input type="checkbox" checked={!excluded.has(r.receiptId)} onChange={() => toggleReceipt(r.receiptId)} aria-label={`Use receipt ${r.receiptNumber} for allocation`} title="Use this receipt for the allocation below" />
                       ) : (
-                        <FiZap className="pa-auto" aria-label="Adjusted automatically" title="Advance: adjusted automatically by the contract's advance %" />
+                        <ZapIcon className="pa-auto" aria-label="Adjusted automatically" title="Advance: adjusted automatically by the contract's advance %" />
                       )}
                     </td>
                     <td>{r.receiptNumber}</td>
@@ -500,7 +512,7 @@ const Paymentadvice = () => {
                           aria-label="Edit payment"
                           title="Edit"
                         >
-                          <FiEdit aria-hidden />
+                          <SquarePenIcon aria-hidden />
                         </button>
                         <button
                           type="button"
@@ -510,7 +522,7 @@ const Paymentadvice = () => {
                           aria-label="Delete payment"
                           title={!r.canDelete ? "Part of this receipt is already allocated" : "Delete"}
                         >
-                          <FiTrash2 aria-hidden />
+                          <Trash2Icon aria-hidden />
                         </button>
                       </div>
                     </td>
@@ -541,7 +553,7 @@ const Paymentadvice = () => {
           <div><span>Advance adjusted</span><strong>{money(advanceTotal)}</strong></div>
           <div className="pa-pool__buttons">
             <button type="button" className="pa-btn" onClick={handleAutoAllocate} disabled={openInvoices.length === 0 || regularPool <= 0}>
-              <FiZap aria-hidden /> Auto-allocate
+              <ZapIcon aria-hidden /> Auto-allocate
             </button>
             <button type="button" className="pa-btn pa-btn--ghost" onClick={() => setAlloc({})} disabled={allocTotal <= 0}>
               Clear
@@ -649,10 +661,10 @@ const Paymentadvice = () => {
 
         <div className="payment-advice-actions">
           <button type="button" className="payment-advice-actions__cancel" onClick={() => setAlloc({})}>
-            <FiX aria-hidden /> Reset
+            <XIcon aria-hidden /> Reset
           </button>
           <button type="button" className="payment-advice-actions__save" onClick={handleApply} disabled={openInvoices.length === 0 || applying}>
-            <FiCheck aria-hidden /> {applying ? "Applying…" : "Apply Allocation"}
+            <CheckIcon aria-hidden /> {applying ? "Applying…" : "Apply Allocation"}
           </button>
         </div>
       </section>

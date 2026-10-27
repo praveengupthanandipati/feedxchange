@@ -1,6 +1,8 @@
-import { FiBell, FiChevronRight, FiLogOut } from "react-icons/fi";
+import { BellIcon, ChevronRightIcon, LogOutIcon } from "../../../shared/components/icon";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../core/auth/AuthContext";
+import ThemePicker from "../../../shared/theme/ThemePicker";
+import { PageHeader } from "../../../shared/components/ui";
 import "./Settings.scss";
 
 /** Account screen behind the phone tab bar's Settings tab. */
@@ -15,7 +17,7 @@ const Settings = () => {
 
   return (
     <div className="settings">
-      <h1>Settings</h1>
+      <PageHeader title="Settings" />
 
       <section className="settings__profile" aria-label="Account">
         <span className="settings__avatar" aria-hidden>
@@ -27,12 +29,16 @@ const Settings = () => {
         </div>
       </section>
 
+      <section className="settings__section" aria-label="Appearance">
+        <ThemePicker variant="list" />
+      </section>
+
       <ul className="settings__list">
         <li>
           <Link to="/admin/notifications" className="settings__row">
-            <FiBell aria-hidden />
+            <BellIcon aria-hidden />
             <span>Notifications</span>
-            <FiChevronRight aria-hidden className="settings__chevron" />
+            <ChevronRightIcon aria-hidden className="settings__chevron" />
           </Link>
         </li>
         <li>
@@ -44,7 +50,7 @@ const Settings = () => {
               navigate("/", { replace: true });
             }}
           >
-            <FiLogOut aria-hidden />
+            <LogOutIcon aria-hidden />
             <span>Log out</span>
           </button>
         </li>

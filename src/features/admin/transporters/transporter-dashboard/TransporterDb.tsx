@@ -2,20 +2,20 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaHourglassHalf, FaRupeeSign } from "react-icons/fa";
 import {
-  FiAlertCircle,
-  FiCheck,
-  FiCheckCircle,
-  FiChevronLeft,
-  FiChevronRight,
-  FiClock,
-  FiDownload,
-  FiEye,
-  FiEyeOff,
-  FiFileText,
-  FiHardDrive,
-  FiRefreshCw,
-  FiTruck,
-} from "react-icons/fi";
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleAlertIcon,
+  CircleCheckBigIcon,
+  ClockIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  FileTextIcon,
+  HardDriveIcon,
+  RefreshCwIcon,
+  TruckIcon,
+} from "../../../../shared/components/icon";
 import DateRangeInput from "../../../../shared/components/dropdown/DateRangeInput";
 import MultiSelect from "../../../../shared/components/dropdown/MultiSelect";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
@@ -48,10 +48,10 @@ const EMPTY_FILTERS: Filters = {
   status: "All",
 };
 
-const STATUS_ICONS: Record<TransportStatus, typeof FiClock> = {
-  Pending: FiClock,
-  Submitted: FiFileText,
-  Approved: FiCheckCircle,
+const STATUS_ICONS: Record<TransportStatus, typeof ClockIcon> = {
+  Pending: ClockIcon,
+  Submitted: FileTextIcon,
+  Approved: CircleCheckBigIcon,
 };
 
 const formatInr = (value: number) => value.toLocaleString("en-IN");
@@ -241,11 +241,11 @@ const TransporterDb = () => {
     <div className="transport-db">
       <div className="transport-db__stats">
         <div className="transport-db__stat transport-db__stat--navy">
-          <span><FiTruck aria-hidden /> Total Trucks</span>
+          <span><TruckIcon aria-hidden /> Total Trucks</span>
           <strong>{stats.trucks}</strong>
         </div>
         <div className="transport-db__stat transport-db__stat--green">
-          <span><FiHardDrive aria-hidden /> Total Qty</span>
+          <span><HardDriveIcon aria-hidden /> Total Qty</span>
           <strong>{stats.qty} MT</strong>
         </div>
         <div className="transport-db__stat transport-db__stat--blue">
@@ -269,11 +269,11 @@ const TransporterDb = () => {
               aria-expanded={filtersVisible}
               aria-controls="transport-db-filters"
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button type="button" className="transport-db__btn transport-db__btn--warning" onClick={handleExport}>
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -330,10 +330,10 @@ const TransporterDb = () => {
             />
             <div className="transport-db__filter-actions">
               <button type="button" className="transport-db__btn transport-db__btn--success" onClick={handleApply}>
-                <FiCheck aria-hidden /> Apply
+                <CheckIcon aria-hidden /> Apply
               </button>
               <button type="button" className="transport-db__btn transport-db__btn--danger" onClick={handleReset}>
-                <FiRefreshCw aria-hidden /> Reset
+                <RefreshCwIcon aria-hidden /> Reset
               </button>
             </div>
           </div>
@@ -351,7 +351,7 @@ const TransporterDb = () => {
         <ul className="transport-db__cards">
           {pagedRows.length === 0 && (
             <li className="transport-db__cards-empty">
-              <FiAlertCircle aria-hidden /> No transports match the current filters.
+              <CircleAlertIcon aria-hidden /> No transports match the current filters.
             </li>
           )}
           {pagedRows.map((row) => (
@@ -412,7 +412,7 @@ const TransporterDb = () => {
               onClick={() => setCurrentPage(page - 1)}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => (
               <button
@@ -431,7 +431,7 @@ const TransporterDb = () => {
               onClick={() => setCurrentPage(page + 1)}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiChevronLeft, FiChevronRight, FiStar } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from "../../../../shared/components/icon";
 import type { Swiper as SwiperInstance } from "swiper";
 import { A11y, Autoplay, Keyboard, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -50,7 +50,7 @@ const Testimonials = () => {
                 <figure className="quote-card">
                   <div className="quote-card__stars" role="img" aria-label="Rated 5 out of 5">
                     {Array.from({ length: 5 }, (_, index) => (
-                      <FiStar key={index} aria-hidden />
+                      <StarIcon key={index} aria-hidden />
                     ))}
                   </div>
                   <blockquote>“{item.quote}”</blockquote>
@@ -68,10 +68,10 @@ const Testimonials = () => {
 
           <div className="site-testimonials__nav">
             <button type="button" onClick={() => swiper?.slidePrev()} aria-label="Previous testimonials">
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             <button type="button" onClick={() => swiper?.slideNext()} aria-label="Next testimonials">
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

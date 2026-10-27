@@ -17,17 +17,17 @@
   }
 
   &__title {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-xl;
     margin: 0 0 v.$spacing-4;
     padding-bottom: v.$spacing-4;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
   }
 
   &__fields {
     padding-bottom: v.$spacing-5;
     margin-bottom: v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
   }
 
   &__input-group {
@@ -45,12 +45,12 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-navy);
     flex-shrink: 0;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: var(--fx-control-height-lg);
+    height: var(--fx-control-height-lg);
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
     font-size: v.$font-size-lg;
     cursor: pointer;
     transition: background-color v.$transition-fast;
@@ -63,7 +63,7 @@
   &__details {
     padding: v.$spacing-4;
     margin-bottom: v.$spacing-5;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
 
     @include m.respond-to(md) {
@@ -78,14 +78,14 @@
     margin-bottom: v.$spacing-5;
 
     h2 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-lg;
       margin: 0;
     }
   }
 
   &__placeholder {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -104,7 +104,7 @@
 
     .toggle-switch {
       &.is-on .toggle-switch__label {
-        color: v.$color-primary;
+        color: v.fg(v.$color-primary);
         font-weight: v.$font-weight-semibold;
       }
     }
@@ -126,7 +126,7 @@
       z-index: v.$z-index-sticky;
       padding: v.$spacing-3 v.$spacing-4;
       background-color: v.$color-bg;
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
       box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
 
       .contract-change-status__cancel,
@@ -139,11 +139,11 @@
   &__cancel {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-5;
-    border: 1px solid v.$color-orange;
+    border: 1px solid v.line(v.$color-orange);
     border-radius: v.$radius-md;
-    color: v.$color-orange-dark;
+    color: v.fg(v.$color-orange-dark);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     text-decoration: none;
@@ -152,7 +152,7 @@
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: rgba(v.$color-orange, 0.08);
+      background-color: v.alpha(v.$color-orange, 0.08);
     }
   }
 
@@ -160,7 +160,7 @@
     @include m.flex-center;
     @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-6;
     font-size: v.$font-size-sm;
   }
@@ -217,10 +217,10 @@
     @include m.flex(row, space-between, center);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-lg;
       margin: 0;
     }
@@ -234,14 +234,14 @@
     border: none;
     border-radius: v.$radius-pill;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 1.25rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -270,7 +270,7 @@
     @include m.button-variant(v.$color-navy, v.$color-white, v.$color-navy-dark);
     @include m.font-base(v.$font-weight-semibold);
     align-self: flex-start;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     font-size: v.$font-size-sm;
   }

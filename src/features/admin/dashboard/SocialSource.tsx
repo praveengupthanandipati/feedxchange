@@ -1,4 +1,4 @@
-import { FiChevronDown } from "react-icons/fi";
+import { ChevronDownIcon } from "../../../shared/components/icon";
 import { FaFacebookF } from "react-icons/fa";
 import { socialSource } from "./dashboard.data";
 
@@ -8,7 +8,7 @@ const SocialSource = () => {
       <div className="dashboard-card__header">
         <h2 className="dashboard-card__title">Social Source</h2>
         <button type="button" className="dashboard-card__sort">
-          <strong>Monthly</strong> <FiChevronDown aria-hidden />
+          <strong>Monthly</strong> <ChevronDownIcon aria-hidden />
         </button>
       </div>
 

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { FiCheckCircle } from "react-icons/fi";
+import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import { initialTestimonials, type Testimonial, type TestimonialForm } from "./testimonials.data";
 import { matchesSearch, today } from "./testimonials.utils";
@@ -73,7 +73,7 @@ const Testimonials = () => {
 
       {message && (
         <p className="testimonials__message" role="status">
-          <FiCheckCircle aria-hidden /> {message}
+          <CircleCheckBigIcon aria-hidden /> {message}
         </p>
       )}
 

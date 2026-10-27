@@ -18,7 +18,7 @@
     gap: v.$spacing-3;
 
     h1 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-xl;
       margin: 0;
     }
@@ -35,7 +35,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -46,16 +46,16 @@
 
   &--info {
     background-color: v.$color-info;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-sky-40);
     }
   }
 
   &--warning {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -64,7 +64,7 @@
 
   &--primary {
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover:not(:disabled) {
       background-color: v.$color-primary-dark;
@@ -102,10 +102,10 @@
 
   &__date-range {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     min-width: 0;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
 
@@ -116,13 +116,13 @@
       border: none;
       outline: none;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
 
     span {
       flex-shrink: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -132,7 +132,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -144,7 +144,7 @@
 
   &__apply {
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
       background-color: v.$color-primary-dark;
@@ -152,11 +152,11 @@
   }
 
   &__reset {
-    background-color: rgba(v.$color-danger, 0.1);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.1);
+    color: v.fg(v.$color-danger);
 
     &:hover {
-      background-color: rgba(v.$color-danger, 0.18);
+      background-color: v.alpha(v.$color-danger, 0.18);
     }
   }
 }
@@ -171,9 +171,9 @@
   &__table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-primary, 0.04);
+    background-color: v.alpha(v.$color-primary, 0.04);
   }
 
   &__table {
@@ -185,10 +185,10 @@
 
     td {
       padding: v.$spacing-5 v.$spacing-6;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       text-align: left;
       white-space: nowrap;
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
     }
   }
 }
@@ -201,10 +201,10 @@ table.contract-wise-status-supplies__table th {
   @include m.font-heading(v.$font-weight-semibold);
   padding: v.$spacing-4 v.$spacing-5;
   background-color: v.$color-bg-muted !important;
-  color: v.$color-text !important;
+  color: v.fg(v.$color-text) !important;
   text-align: left;
   white-space: nowrap;
-  border-bottom: 2px solid v.$color-primary;
+  border-bottom: 2px solid v.line(v.$color-primary);
 }
 
 .contract-wise-status-table.table-wrapper .table tbody tr.table__expanded-row td {
@@ -223,13 +223,13 @@ table.contract-wise-status-supplies__table th {
   padding: 0;
   border: none;
   background: transparent;
-  color: v.$color-primary;
+  color: v.fg(v.$color-primary);
   font-size: inherit;
   text-decoration: none;
   cursor: pointer;
 
   &:hover {
-    color: v.$color-primary-dark;
+    color: v.fg(v.$color-primary-dark);
     text-decoration: underline;
   }
 }
@@ -237,17 +237,17 @@ table.contract-wise-status-supplies__table th {
 .contract-wise-status-table__expand-btn {
   @include m.flex-center;
   @include m.focus-ring(v.$color-orange);
-  width: 1.75rem;
-  height: 1.75rem;
+  width: max(24px, 1.75rem);
+  height: max(24px, 1.75rem);
   border: none;
   border-radius: v.$radius-pill;
   background: transparent;
-  color: v.$color-text-muted;
+  color: v.fg(v.$color-text-muted);
   cursor: pointer;
   transition: background-color v.$transition-fast, color v.$transition-fast;
 
   &:hover {
     background-color: v.$color-gray-100;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
   }
 }

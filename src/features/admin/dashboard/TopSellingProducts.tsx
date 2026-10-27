@@ -1,4 +1,4 @@
-import { FiChevronDown } from "react-icons/fi";
+import { ChevronDownIcon } from "../../../shared/components/icon";
 import { topSellingProducts } from "./dashboard.data";
 
 const TopSellingProducts = () => {
@@ -7,7 +7,7 @@ const TopSellingProducts = () => {
       <div className="dashboard-card__header">
         <h2 className="dashboard-card__title">Top Selling Products</h2>
         <button type="button" className="dashboard-card__sort">
-          Sort By: <strong>Yearly</strong> <FiChevronDown aria-hidden />
+          Sort By: <strong>Yearly</strong> <ChevronDownIcon aria-hidden />
         </button>
       </div>
 

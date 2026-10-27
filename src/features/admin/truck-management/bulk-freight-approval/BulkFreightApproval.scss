@@ -18,7 +18,7 @@
     gap: v.$spacing-3;
 
     h1 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-xl;
       margin: 0;
     }
@@ -35,7 +35,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -45,16 +45,16 @@
 
   &--info {
     background-color: v.$color-info;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-sky-40);
     }
   }
 
   &--warning {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -88,10 +88,10 @@
 
   &__date-range {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     min-width: 0;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
 
@@ -102,13 +102,13 @@
       border: none;
       outline: none;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
 
     span {
       flex-shrink: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -125,14 +125,14 @@
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-danger, 0.1);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.1);
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: rgba(v.$color-danger, 0.18);
+      background-color: v.alpha(v.$color-danger, 0.18);
     }
   }
 }
@@ -150,7 +150,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-5;
   border: none;
   border-radius: v.$radius-md;
@@ -165,19 +165,19 @@
 
   &--approve {
     background-color: v.$color-success;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover:not(:disabled) {
-      background-color: #227a46;
+      background-color: var(--fx-green-31);
     }
   }
 
   &--reject {
     background-color: v.$color-danger;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover:not(:disabled) {
-      background-color: #b8352b;
+      background-color: var(--fx-red-45);
     }
   }
 }
@@ -195,46 +195,46 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border-radius: v.$radius-sm;
     background-color: v.$color-info;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: 0.85rem;
     text-decoration: none;
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-sky-40);
     }
   }
 
   &__contract-text {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
   }
 
   &__status {
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
 
     &--updated {
       background-color: v.$color-orange;
-      color: v.$color-navy-dark;
+      color: v.on(v.$color-navy-dark);
     }
 
     &--accepted {
       background-color: v.$color-success;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
 
     &--rejected {
       background-color: v.$color-danger;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
   }
 
@@ -243,12 +243,12 @@
   }
 
   &__change-original {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     text-decoration: line-through;
   }
 
   &__change-current {
-    color: v.$color-info;
+    color: v.fg(v.$color-info);
     font-weight: v.$font-weight-semibold;
   }
 
@@ -274,7 +274,7 @@
   gap: v.$spacing-3;
 
   p {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -290,10 +290,10 @@
       min-width: 2.25rem;
       height: 2.25rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
       transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -309,8 +309,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -345,7 +345,7 @@
     @include m.flex(row, space-between, center);
     padding-bottom: v.$spacing-4;
     margin-bottom: v.$spacing-4;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
       font-size: v.$font-size-lg;
@@ -361,13 +361,13 @@
     border: none;
     border-radius: v.$radius-pill;
     background: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -380,7 +380,7 @@
   }
 
   &__notice {
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -388,7 +388,7 @@
   &__list {
     margin: 0;
     padding-left: v.$spacing-5;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
 
@@ -406,24 +406,24 @@
   &__label {
     @include m.font-base(v.$font-weight-semibold);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   &__textarea {
     @include m.font-base(v.$font-weight-regular);
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
     min-height: 6rem;
     padding: v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     resize: vertical;
 
     &::placeholder {
-      color: v.$color-gray-400;
+      color: v.fg(v.$color-gray-400);
     }
   }
 
@@ -432,7 +432,7 @@
     flex-wrap: wrap;
     padding-top: v.$spacing-5;
     margin-top: v.$spacing-5;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
 
     @include m.respond-below(sm) {
       flex-direction: column-reverse;
@@ -448,7 +448,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -459,7 +459,7 @@
 
   &__cancel {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -469,19 +469,19 @@
   &__confirm {
     &--approve {
       background-color: v.$color-success;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
 
       &:hover {
-        background-color: #227a46;
+        background-color: var(--fx-green-31);
       }
     }
 
     &--reject {
       background-color: v.$color-danger;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
 
       &:hover {
-        background-color: #b8352b;
+        background-color: var(--fx-red-45);
       }
     }
   }

@@ -21,7 +21,7 @@
     gap: v.$spacing-3;
 
     h1 {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-xl;
       margin: 0;
     }
@@ -41,7 +41,7 @@
   gap: v.$spacing-2;
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -52,16 +52,16 @@
 
   &--hide {
     background-color: v.$color-danger;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: darken(v.$color-danger, 8%);
+      background-color: v.shade(v.$color-danger, 8%);
     }
   }
 
   &--export {
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
       background-color: v.$color-primary-dark;
@@ -102,7 +102,7 @@
     gap: v.$spacing-2;
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -114,16 +114,16 @@
 
   &__apply {
     background-color: v.$color-success;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: darken(v.$color-success, 8%);
+      background-color: v.shade(v.$color-success, 8%);
     }
   }
 
   &__reset {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -141,16 +141,16 @@
 .monthly-reports-tabs {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border-bottom: 1px solid v.$color-border;
+  border-bottom: 1px solid v.line(v.$color-border);
 
   button {
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
     border: none;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
     white-space: nowrap;
@@ -161,12 +161,12 @@
 
     &:hover:not(.is-active) {
       background-color: v.$color-bg-muted;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
 
     &.is-active {
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
   }
 

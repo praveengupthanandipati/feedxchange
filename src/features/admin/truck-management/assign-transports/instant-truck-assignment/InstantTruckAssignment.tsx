@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FiPlus } from "react-icons/fi";
+import { PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import { buildInstantTruckColumns } from "./instantTruckAssignment.columns";
@@ -65,7 +65,7 @@ const InstantTruckAssignment = ({
           className="instant-truck-assignment__add-btn"
           onClick={handleOpenNew}
         >
-          <FiPlus aria-hidden /> Assign New Truck
+          <PlusIcon aria-hidden /> Assign New Truck
         </button>
       </div>
 

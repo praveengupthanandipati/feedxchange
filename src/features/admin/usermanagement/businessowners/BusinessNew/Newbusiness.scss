@@ -16,7 +16,7 @@
     z-index: v.$z-index-sticky;
     padding: v.$spacing-3 v.$spacing-4;
     background-color: v.$color-bg;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
   }
 
@@ -38,10 +38,10 @@
 
   &__completion {
     font-size: v.$font-size-sm;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
 
     strong {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-weight: v.$font-weight-semibold;
     }
   }
@@ -49,13 +49,13 @@
   &__back {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
     text-decoration: none;
 
     &:hover {
-      color: v.$color-primary-dark;
+      color: v.fg(v.$color-primary-dark);
       text-decoration: underline;
     }
   }
@@ -72,19 +72,19 @@
     border-radius: v.$radius-pill;
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     text-decoration: none;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     transition: filter v.$transition-fast;
 
     &:hover {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
     }
 
     &--active {
-      color: v.$color-navy-dark;
+      color: v.on(v.$color-navy-dark);
       background-color: v.$color-orange;
-      border-color: v.$color-orange;
+      border-color: v.line(v.$color-orange);
     }
 
     &--locked {
@@ -99,11 +99,11 @@
     height: 1.25rem;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.08);
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
   }
 
   &__step-hint {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0 0 v.$spacing-4;
   }
@@ -135,18 +135,18 @@
 
   .new-contract__section-title {
     padding-bottom: v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
   }
 }
 
 // Shared sub-heading style — used by every section that groups repeatable
 // entries under a labeled sub-block (Contact & Address, Bank Details, Documents).
 .form-subheading {
-  color: v.$color-primary;
+  color: v.fg(v.$color-primary);
   font-size: v.$font-size-base;
   margin: 0 0 v.$spacing-4;
   padding-bottom: v.$spacing-3;
-  border-bottom: 1px solid v.$color-border;
+  border-bottom: 1px solid v.line(v.$color-border);
 }
 
 // ============================================================
@@ -182,7 +182,7 @@
 }
 
 .repeatable-entry {
-  border: 1px solid v.$color-border;
+  border: 1px solid v.line(v.$color-border);
   border-radius: v.$radius-md;
   padding: v.$spacing-4;
 
@@ -195,7 +195,7 @@
     border: none;
     border-radius: v.$radius-sm;
     background-color: v.$color-danger;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     cursor: pointer;
     transition: filter v.$transition-fast;
 
@@ -217,7 +217,7 @@
     @include m.font-base(v.$font-weight-medium);
     margin-top: v.$spacing-4;
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     cursor: pointer;
 
     input {
@@ -229,7 +229,7 @@
   }
 
   &__radio-label {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-weight: v.$font-weight-semibold;
   }
 }
@@ -252,13 +252,13 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 2.75rem;
-    border: 1px solid v.$color-border;
-    border-left: 1px solid v.$color-primary;
+    width: var(--fx-control-height-lg);
+    border: 1px solid v.line(v.$color-border);
+    border-left: 1px solid v.line(v.$color-primary);
     border-top-right-radius: v.$radius-md;
     border-bottom-right-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
@@ -268,13 +268,13 @@
   }
 
   &__error {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     margin: v.$spacing-1 0 0;
   }
 
   &__hint {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     margin: v.$spacing-3 0 0;
   }
@@ -282,9 +282,9 @@
   &__file {
     @include m.flex(row, flex-start, center, v.$spacing-3);
     position: relative;
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
     overflow: hidden;
@@ -294,16 +294,16 @@
     @include m.font-base(v.$font-weight-semibold);
     flex-shrink: 0;
     border: none;
-    border-right: 1px solid v.$color-border;
+    border-right: 1px solid v.line(v.$color-border);
     background: transparent;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     padding-right: v.$spacing-3;
     font-size: v.$font-size-sm;
     cursor: pointer;
   }
 
   &__file-name {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -328,12 +328,12 @@
   gap: v.$spacing-3;
   margin-top: v.$spacing-4;
   padding: v.$spacing-4;
-  border: 1px dashed v.$color-border;
+  border: 1px dashed v.line(v.$color-border);
   border-radius: v.$radius-md;
   background-color: v.$color-bg-muted;
 
   &__message {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -353,7 +353,7 @@
 // ============================================================
 .profile-settings-table {
   margin-top: v.$spacing-4;
-  border: 1px solid v.$color-border;
+  border: 1px solid v.line(v.$color-border);
   border-radius: v.$radius-md;
   overflow: hidden;
 
@@ -372,7 +372,7 @@
     span {
       @include m.font-base(v.$font-weight-semibold);
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
 
     span:last-child {
@@ -381,20 +381,20 @@
   }
 
   &__row {
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
   }
 
   &__title {
     @include m.font-base(v.$font-weight-semibold);
     margin: 0;
     font-size: v.$font-size-base;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   &__hint {
     margin: v.$spacing-1 0 0;
     font-size: v.$font-size-sm;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
   }
 
   &__value {
@@ -425,7 +425,7 @@
       padding: 0 v.$spacing-1;
 
       span {
-        color: v.$color-text-muted;
+        color: v.fg(v.$color-text-muted);
         font-size: v.$font-size-sm;
         font-weight: v.$font-weight-semibold;
       }
@@ -439,7 +439,7 @@
     gap: v.$spacing-3;
     align-items: center;
     padding: v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
 
     @include m.respond-to(sm) {
@@ -492,12 +492,12 @@
   }
 
   &__delete {
-    background-color: rgba(v.$color-danger, 0.12);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.12);
+    color: v.fg(v.$color-danger);
   }
 
   &__add {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
   }
 }

@@ -8,12 +8,17 @@
   @include m.flex(row, flex-start, center, v.$spacing-2);
   width: 100%;
   max-width: 20rem;
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-3;
-  border: 1px solid v.$color-border;
+  border: 1px solid var(--fx-field-border);
   border-radius: v.$radius-md;
   background-color: v.$color-bg;
-  color: v.$color-text-muted;
+  color: v.fg(v.$color-text-muted);
+
+  &:focus-within {
+    border-color: var(--fx-field-border-focus);
+    box-shadow: var(--fx-field-focus-glow);
+  }
 
   input {
     @include m.font-base;
@@ -22,11 +27,11 @@
     border: none;
     outline: none;
     background: transparent;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &::placeholder {
-      color: v.$color-gray-400;
+      color: v.fg(v.$color-gray-400);
     }
   }
 }
@@ -36,12 +41,12 @@
 // ============================================================
 .summary-table {
   &__buyer {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-weight: v.$font-weight-semibold;
   }
 
   &__overdue--severe {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-weight: v.$font-weight-semibold;
   }
 }
@@ -54,7 +59,7 @@
   flex-wrap: wrap;
 
   p {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -69,10 +74,10 @@
       min-width: 2rem;
       height: 2rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
       transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -88,8 +93,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -103,7 +108,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: v.$spacing-2 v.$spacing-5;
   padding-top: v.$spacing-4;
-  border-top: 1px solid v.$color-border;
+  border-top: 1px solid v.line(v.$color-border);
   font-size: v.$font-size-sm;
 
   @include m.respond-to(md) {
@@ -116,12 +121,12 @@
   }
 
   span {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     white-space: nowrap;
 
     @include m.respond-to(lg) {
       padding-left: v.$spacing-4;
-      border-left: 1px solid v.$color-border;
+      border-left: 1px solid v.line(v.$color-border);
 
       &:first-child {
         padding-left: 0;
@@ -132,7 +137,7 @@
 
   strong {
     margin-left: 0.25em;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-weight: v.$font-weight-semibold;
   }
 }

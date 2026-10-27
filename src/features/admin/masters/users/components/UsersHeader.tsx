@@ -1,4 +1,4 @@
-import { FiPlus } from "react-icons/fi";
+import { PlusIcon } from "../../../../../shared/components/icon";
 
 interface UsersHeaderProps {
   business: string;
@@ -14,7 +14,7 @@ const UsersHeader = ({ business, onNew }: UsersHeaderProps) => (
       </p>
     </div>
     <button type="button" className="users__btn users__btn--navy" onClick={onNew}>
-      <FiPlus aria-hidden /> New
+      <PlusIcon aria-hidden /> New
     </button>
   </div>
 );

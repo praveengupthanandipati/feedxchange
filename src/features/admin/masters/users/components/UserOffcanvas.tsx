@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../../shared/components/icon";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ToggleSwitch from "../../../../../shared/components/toggle/ToggleSwitch";
@@ -81,7 +81,7 @@ const UserOffcanvas = ({ user, users, onSave, onClose }: UserOffcanvasProps) => 
         <header className="user-panel__header">
           <h2 id="user-panel-title">{isEdit ? "Edit User" : "Create User"}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
 

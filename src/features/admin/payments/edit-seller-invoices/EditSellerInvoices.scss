@@ -11,18 +11,18 @@
     gap: 0.5rem;
     padding: 0.65rem 1rem;
     border-radius: 0.5rem;
-    background: #e7f6ec;
-    color: #146c2e;
+    background: var(--fx-green-94);
+    color: var(--fx-green-25-fg);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 
     &--error {
-      background: #fdecee;
-      color: #a61e2d;
+      background: var(--fx-red-96);
+      color: var(--fx-red-38-fg);
     }
   }
 
   &__card {
-    background: #fff;
+    background: var(--fx-white);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 0.75rem;
     padding: 1rem 1.25rem;
@@ -44,14 +44,14 @@
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      font-size: 0.8rem;
+      font-size: max(11px, 0.8rem);
     }
 
     select,
     input {
       min-width: 12rem;
       padding: 0.45rem 0.6rem;
-      border: 1px solid rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--fx-field-border);
       border-radius: 0.4rem;
     }
 
@@ -65,14 +65,14 @@
       padding: 0.5rem 0.9rem;
       border: 0;
       border-radius: 0.4rem;
-      background: #0f2744;
-      color: #fff;
+      background: var(--fx-blue-16);
+      color: var(--fx-white-on);
       cursor: pointer;
     }
   }
 
   &__error {
-    color: #a61e2d;
+    color: var(--fx-red-38-fg);
   }
 
   &__table {
@@ -83,33 +83,33 @@
     display: inline-block;
     padding: 0.15rem 0.55rem;
     border-radius: 999px;
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: 600;
-    background: #eef1f4;
+    background: var(--fx-gray-96);
 
     &--pending {
-      background: #fff4d6;
-      color: #8a6100;
+      background: var(--fx-amber-92);
+      color: var(--fx-amber-27-2-fg);
     }
 
     &--partially-paid {
-      background: #e3f0ff;
-      color: #0b5cad;
+      background: var(--fx-slate-95);
+      color: var(--fx-blue-36-fg);
     }
 
     &--paid {
-      background: #e7f6ec;
-      color: #146c2e;
+      background: var(--fx-green-94);
+      color: var(--fx-green-25-fg);
     }
 
     &--cancelled {
-      background: #f1f1f1;
-      color: #666;
+      background: var(--fx-gray-95);
+      color: var(--fx-gray-40-fg);
     }
   }
 
   &__deductions {
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
 
     ul {
       margin: 0.2rem 0 0;
@@ -126,10 +126,10 @@
     margin-left: 0.3rem;
     padding: 0 0.35rem;
     border-radius: 999px;
-    font-size: 0.65rem;
+    font-size: max(11px, 0.65rem);
     font-weight: 600;
-    background: #e3f0ff;
-    color: #0b5cad;
+    background: var(--fx-slate-95);
+    color: var(--fx-blue-36-fg);
   }
 
   &__actions {
@@ -144,12 +144,12 @@
     padding: 0.3rem 0.6rem;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 0.4rem;
-    background: #fff;
+    background: var(--fx-white);
     cursor: pointer;
 
     &--danger {
-      color: #a61e2d;
-      border-color: rgba(166, 30, 45, 0.4);
+      color: var(--fx-red-38-fg);
+      border-color: rgba(var(--fx-red-38-line-rgb), 0.4);
     }
 
     &:disabled {
@@ -174,7 +174,7 @@
       padding: 0.3rem 0.5rem;
       border: 1px solid rgba(0, 0, 0, 0.2);
       border-radius: 0.4rem;
-      background: #fff;
+      background: var(--fx-white);
       cursor: pointer;
 
       &:disabled {

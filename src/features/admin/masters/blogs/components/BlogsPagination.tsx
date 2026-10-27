@@ -1,4 +1,4 @@
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon } from "../../../../../shared/components/icon";
 
 interface BlogsPaginationProps {
   page: number;
@@ -16,7 +16,7 @@ const BlogsPagination = ({ page, pageSize, total, onPageChange }: BlogsPaginatio
       <p>{total === 0 ? "Showing 0 Results" : `Showing ${start + 1}-${Math.min(start + pageSize, total)} of ${total} Results`}</p>
       <div className="blogs__pages">
         <button type="button" disabled={page === 1} onClick={() => onPageChange(page - 1)} aria-label="Previous page">
-          <FiChevronLeft aria-hidden />
+          <ChevronLeftIcon aria-hidden />
         </button>
         {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => (
           <button
@@ -30,7 +30,7 @@ const BlogsPagination = ({ page, pageSize, total, onPageChange }: BlogsPaginatio
           </button>
         ))}
         <button type="button" disabled={page === totalPages} onClick={() => onPageChange(page + 1)} aria-label="Next page">
-          <FiChevronRight aria-hidden />
+          <ChevronRightIcon aria-hidden />
         </button>
       </div>
     </nav>

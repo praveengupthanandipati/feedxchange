@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { FiLock } from "react-icons/fi";
+import { LockIcon } from "../../../shared/components/icon";
 import type { ChannelCode } from "../../../core/store/notificationsApi";
 import type { PreferenceChannel, PreferenceEvent, Subscription } from "../../../core/store/notificationPreferencesApi";
 import { CHANNEL_META, CHANNEL_ORDER, PRESETS, applyPreset, channelsOf, groupEvents, setChannels } from "./preferenceUtils";
@@ -93,7 +93,7 @@ const SubscriptionEditor = ({ events, channels, value, onChange, unavailable = {
                       <strong>{event.eventName}</strong>
                       {event.isMandatory && (
                         <span className="pref-lock" title="This notification is always sent. At least one channel stays on.">
-                          <FiLock aria-hidden /> Always sent
+                          <LockIcon aria-hidden /> Always sent
                         </span>
                       )}
                     </div>

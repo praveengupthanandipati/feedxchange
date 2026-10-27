@@ -5,20 +5,20 @@
 
 $tones: (
   navy: v.$color-navy,
-  green: #34c38f,
-  blue: #50a5f1,
-  red: #f46a6a,
-  orange: #f1b44c,
+  green: v.token("teal-48"),
+  blue: v.token("sky-63"),
+  red: v.token("red-69"),
+  orange: v.token("amber-62"),
 );
 
 .interest-detail-page {
   &__back {
     @include m.flex(row, center, center, v.$spacing-1);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
     border-radius: v.$radius-md;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
     text-decoration: none;
@@ -51,14 +51,14 @@ $tones: (
   }
 
   &__message {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
   }
 
   &__empty {
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
   }
 
   // ---------- Summary tiles: 1 → 2 → 4 per row on a soft grey panel ----------
@@ -87,10 +87,10 @@ $tones: (
   gap: v.$spacing-3;
   min-width: 0;
   padding: v.$spacing-3 v.$spacing-4;
-  border-left: 3px solid v.$color-navy;
+  border-left: 3px solid v.line(v.$color-navy);
   border-radius: v.$radius-md;
   background-color: v.$color-bg;
-  box-shadow: 0 1px 3px rgba(v.$color-navy, 0.06);
+  box-shadow: 0 1px 3px v.alpha(v.$color-navy, 0.06);
 
   &__icon {
     @include m.flex-center;
@@ -109,23 +109,23 @@ $tones: (
   }
 
   &__label {
-    color: v.$color-text-muted;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
   }
 
   &__value {
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     overflow-wrap: anywhere;
   }
 
   @each $name, $color in $tones {
     &--#{$name} {
-      border-left-color: $color;
+      border-left-color: v.line($color);
 
       .detail-tile__icon {
-        background-color: rgba($color, 0.12);
-        color: $color;
+        background-color: v.alpha($color, 0.12);
+        color: v.fg($color);
       }
     }
   }

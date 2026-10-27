@@ -28,7 +28,7 @@
 
   &__print-all {
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
       background-color: v.$color-primary-dark;
@@ -37,10 +37,10 @@
 
   &__download-all {
     background-color: v.$color-success;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #227a46;
+      background-color: var(--fx-green-31);
     }
   }
 }
@@ -49,7 +49,7 @@
 // Table cells
 // ============================================================
 .account-summary-tab-table__party {
-  color: v.$color-primary;
+  color: v.fg(v.$color-primary);
   font-weight: v.$font-weight-semibold;
 }
 
@@ -75,7 +75,7 @@
 
 .account-summary-tab-table__print {
   background-color: v.$color-primary;
-  color: v.$color-white;
+  color: v.on(v.$color-white);
 
   &:hover {
     background-color: v.$color-primary-dark;
@@ -84,9 +84,9 @@
 
 .account-summary-tab-table__download {
   background-color: v.$color-success;
-  color: v.$color-white;
+  color: v.on(v.$color-white);
 
   &:hover {
-    background-color: #227a46;
+    background-color: var(--fx-green-31);
   }
 }

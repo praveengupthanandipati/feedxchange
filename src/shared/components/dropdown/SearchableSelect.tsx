@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiChevronDown, FiPlus, FiSearch, FiX } from "react-icons/fi";
+import { ChevronDownIcon, ICON_STROKE_FINE, PlusIcon, SearchIcon } from "../icon";
+import FieldClear from "./FieldClear";
 import { useAnchoredPanel } from "./useAnchoredPanel";
 import "./SearchableSelect.scss";
 
@@ -135,24 +136,9 @@ const SearchableSelect = ({
         <span className={selectedLabel ? undefined : "is-placeholder"}>{selectedLabel ?? placeholder}</span>
         <span className="searchable-select__trigger-icons">
           {clearable && value && (
-            <FiX
-              className="searchable-select__clear"
-              aria-label="Clear selection"
-              role="button"
-              tabIndex={0}
-              onClick={(event) => {
-                event.stopPropagation();
-                onChange("");
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.stopPropagation();
-                  onChange("");
-                }
-              }}
-            />
+            <FieldClear label="Clear selection" onClear={() => onChange("")} />
           )}
-          <FiChevronDown className={open ? "is-open" : ""} aria-hidden />
+          <ChevronDownIcon className={open ? "is-open" : ""} size={14} strokeWidth={ICON_STROKE_FINE} aria-hidden />
         </span>
       </button>
 
@@ -160,7 +146,7 @@ const SearchableSelect = ({
         createPortal(
         <div className="searchable-select__panel" ref={panelRef} style={panelStyle}>
           <div className="searchable-select__search">
-            <FiSearch aria-hidden />
+            <SearchIcon aria-hidden />
             <input
               ref={inputRef}
               type="text"
@@ -182,7 +168,7 @@ const SearchableSelect = ({
                 aria-label="Add new item"
                 title={onAddNew ? "Add new" : "Save as new option"}
               >
-                <FiPlus aria-hidden />
+                <PlusIcon aria-hidden />
               </button>
             )}
           </div>

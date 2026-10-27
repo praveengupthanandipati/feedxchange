@@ -23,7 +23,7 @@
 
     h1 {
       margin: 0;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -43,7 +43,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -58,17 +58,17 @@
 
   &--info {
     background-color: v.$color-info;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover,
     &.is-active {
-      background-color: #1f6fae;
+      background-color: var(--fx-sky-40);
     }
   }
 
   &--warning {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover:not(:disabled) {
       background-color: v.$color-orange-dark;
@@ -96,12 +96,17 @@
   &__search {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
+
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
 
     @include m.respond-to(lg) {
       grid-column: span 2;
@@ -113,11 +118,11 @@
       border: none;
       outline: none;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
 
       &::placeholder {
-        color: v.$color-gray-400;
+        color: v.fg(v.$color-gray-400);
       }
     }
   }
@@ -125,19 +130,19 @@
   &__reset {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-danger;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: #c43a2f;
+      background-color: var(--fx-red-48);
     }
 
     // Full width when stacked; hugs its label once it sits beside the search box.
@@ -155,17 +160,17 @@
   min-height: 18rem;
   padding: v.$spacing-6 v.$spacing-4;
   border-radius: v.$radius-md;
-  box-shadow: 0 1px 6px rgba(v.$color-navy, 0.1);
+  box-shadow: 0 1px 6px v.alpha(v.$color-navy, 0.1);
   text-align: center;
 
   &__icon {
     font-size: 1.25rem;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
   }
 
   h2 {
     margin: v.$spacing-2 0 0;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-lg;
     font-weight: v.$font-weight-semibold;
   }
@@ -173,7 +178,7 @@
   p {
     max-width: 32rem;
     margin: 0;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
@@ -185,8 +190,8 @@
     border: none;
     border-radius: v.$radius-sm;
     background-color: v.$color-navy;
-    color: v.$color-white;
-    font-size: 0.8rem;
+    color: v.on(v.$color-white);
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-medium;
     cursor: pointer;
 
@@ -201,7 +206,7 @@
 // ============================================================
 .seller-dispatch-table {
   &__contract {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-weight: v.$font-weight-semibold;
     text-decoration: underline;
   }
@@ -217,7 +222,7 @@
   }
 
   &__qty {
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-weight: v.$font-weight-bold;
     white-space: nowrap;
   }
@@ -235,7 +240,7 @@
 
   p {
     margin: 0;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
@@ -250,10 +255,10 @@
       min-width: 2.25rem;
       height: 2.25rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
@@ -268,8 +273,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }

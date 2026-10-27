@@ -1,4 +1,4 @@
-import { FiInfo } from "react-icons/fi";
+import { InfoIcon } from "../icon";
 import "./InfoTooltip.scss";
 
 interface InfoTooltipProps {
@@ -8,7 +8,7 @@ interface InfoTooltipProps {
 const InfoTooltip = ({ text }: InfoTooltipProps) => {
   return (
     <span className="info-tooltip" tabIndex={0}>
-      <FiInfo aria-hidden />
+      <InfoIcon aria-hidden />
       <span className="info-tooltip__bubble" role="tooltip">
         {text}
       </span>

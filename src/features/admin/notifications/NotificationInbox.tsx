@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiBell, FiCheckCircle } from "react-icons/fi";
+import { BellIcon, CircleCheckBigIcon } from "../../../shared/components/icon";
 import { useGetInboxQuery, useMarkAllNotificationsReadMutation, useMarkNotificationReadMutation } from "../../../core/store/notificationsApi";
 import type { InboxItem } from "../../../core/store/notificationsApi";
 import { adminPath } from "../../../core/routes/adminPaths";
@@ -28,13 +28,13 @@ const NotificationInbox = ({ embedded = false }: { embedded?: boolean }) => {
     <section className="nc-inbox" aria-label="My inbox">
       <header className="nc-inbox__head">
         <strong>{unread > 0 ? `${unread} unread` : "All caught up"}</strong>
-        <button type="button" className="nc-btn" disabled={unread === 0} onClick={() => void markAll()}><FiCheckCircle aria-hidden /> Mark all read</button>
+        <button type="button" className="nc-btn" disabled={unread === 0} onClick={() => void markAll()}><CircleCheckBigIcon aria-hidden /> Mark all read</button>
       </header>
 
       {!data && isFetching && <p className="nc-muted nc-pad">Loading…</p>}
       {data && data.items.length === 0 && (
         <div className="nc-empty nc-empty--flat">
-          <span aria-hidden><FiBell /></span>
+          <span aria-hidden><BellIcon /></span>
           <h3>No notifications yet</h3>
           <p>Messages sent to you in the app will appear here.</p>
         </div>

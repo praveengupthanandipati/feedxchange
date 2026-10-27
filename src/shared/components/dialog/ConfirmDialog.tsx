@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { FiAlertTriangle } from "react-icons/fi";
+import { TriangleAlertIcon } from "../icon";
 import "./ConfirmDialog.scss";
 
 interface ConfirmDialogProps {
@@ -54,7 +54,7 @@ const ConfirmDialog = ({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="confirm-dialog__icon">
-          <FiAlertTriangle aria-hidden />
+          <TriangleAlertIcon aria-hidden />
         </div>
         <h2 id="confirm-dialog-title" className="confirm-dialog__title">
           {title}

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { FiCalendar, FiCreditCard, FiFileText, FiHome, FiTruck, FiUser } from "react-icons/fi";
+import { CalendarIcon, CreditCardIcon, FileTextIcon, HouseIcon, TruckIcon, UserIcon } from "../../../../shared/components/icon";
 import type { PendingContractRow } from "./pendingContracts.data";
 import "./ContractDashboard.scss";
 
@@ -154,14 +154,14 @@ export const ContractCards = ({ rows, onOpenTruckDetails, emptyMessage }: { rows
           <article key={row.id} className="cd-card">
             <header className="cd-card__head">
               <Link to={`/admin/contracts/${row.id}`} className="cd-card__id">
-                <FiFileText aria-hidden /> {row.id}
+                <FileTextIcon aria-hidden /> {row.id}
               </Link>
               <span className={`cd-chip cd-chip--${contractStatusModifier(row)}`}>{status}</span>
             </header>
             <p className="cd-card__product">{row.product}</p>
             <div className="cd-card__parties">
-              <span title={row.seller}><FiHome aria-hidden /> {row.seller}</span>
-              <span title={row.buyer}><FiUser aria-hidden /> {row.buyer}</span>
+              <span title={row.seller}><HouseIcon aria-hidden /> {row.seller}</span>
+              <span title={row.buyer}><UserIcon aria-hidden /> {row.buyer}</span>
             </div>
 
             <div className="cd-card__qty">
@@ -178,8 +178,8 @@ export const ContractCards = ({ rows, onOpenTruckDetails, emptyMessage }: { rows
             </div>
 
             <div className="cd-card__meta">
-              <span><FiCalendar aria-hidden /> {row.fromDate} – {row.toDate}</span>
-              <span><FiCreditCard aria-hidden /> {row.paymentType}</span>
+              <span><CalendarIcon aria-hidden /> {row.fromDate} – {row.toDate}</span>
+              <span><CreditCardIcon aria-hidden /> {row.paymentType}</span>
               <span className="cd-chip cd-chip--plain">{row.deliverySchedule}</span>
               <span className="cd-card__rate">{row.cRate}/MT</span>
             </div>
@@ -187,7 +187,7 @@ export const ContractCards = ({ rows, onOpenTruckDetails, emptyMessage }: { rows
             <footer className="cd-card__foot">
               <span className="cd-card__date">Contract date {row.date}</span>
               <button type="button" className="cd-card__btn" onClick={() => onOpenTruckDetails(row)}>
-                <FiTruck aria-hidden /> Truck details
+                <TruckIcon aria-hidden /> Truck details
               </button>
             </footer>
           </article>

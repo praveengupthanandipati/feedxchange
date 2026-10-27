@@ -1,0 +1,357 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+// Shared components: tokens and density only, so they follow every theme and the compact sizes.
+
+// ---------------------------------------------------------------- Button
+.ui-btn {
+  @include m.flex(row, center, center, v.$spacing-1);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring;
+  min-height: var(--fx-control-height);
+  padding: 0 var(--fx-control-px);
+  border: 1px solid transparent;
+  border-radius: v.$radius-sm;
+  font-size: v.$font-size-sm;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color v.$transition-fast, border-color v.$transition-fast, color v.$transition-fast;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &--sm {
+    min-height: var(--fx-control-height-sm);
+    padding: 0 0.5rem;
+  }
+
+  &--icon {
+    min-width: var(--fx-control-height);
+    padding: 0;
+
+    &.ui-btn--sm {
+      min-width: var(--fx-control-height-sm);
+    }
+  }
+
+  &--primary {
+    background-color: v.$color-navy;
+    color: v.on(v.$color-white);
+
+    &:hover:not(:disabled) {
+      background-color: v.shade(v.$color-navy, 8%);
+    }
+  }
+
+  &--accent {
+    background-color: v.$color-orange;
+    color: v.on(v.$color-navy-dark);
+
+    &:hover:not(:disabled) {
+      background-color: v.shade(v.$color-orange, 10%);
+    }
+  }
+
+  &--danger {
+    background-color: v.shade(v.$color-danger, 12%);
+    color: v.on(v.$color-white);
+
+    &:hover:not(:disabled) {
+      background-color: var(--fx-red-45);
+    }
+  }
+
+  &--secondary {
+    border-color: v.line(v.$color-gray-300);
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+
+    &:hover:not(:disabled) {
+      background-color: v.$color-gray-50;
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: v.fg(v.$color-primary);
+
+    &:hover:not(:disabled) {
+      background-color: v.$color-gray-100;
+    }
+  }
+}
+
+.ui-spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ui-spin 0.7s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 2s;
+  }
+}
+
+@keyframes ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ---------------------------------------------------------------- Field
+.ui-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+
+  &__label {
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+  }
+
+  &__required {
+    color: v.fg(v.$color-danger);
+  }
+
+  &__hint {
+    color: v.fg(v.$color-text-muted);
+    font-size: var(--fx-text-xs);
+  }
+
+  &__error {
+    color: v.fg(v.$color-danger);
+    font-size: var(--fx-text-xs);
+  }
+}
+
+.ui-control {
+  position: relative;
+  display: flex;
+
+  &__icon {
+    position: absolute;
+    top: 50%;
+    left: 0.6rem;
+    color: v.fg(v.$color-text-muted);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  &--icon .ui-input {
+    padding-left: 2rem;
+  }
+}
+
+.ui-input,
+.ui-select {
+  width: 100%;
+  min-height: var(--fx-control-height);
+  padding: 0 var(--fx-control-px);
+  border: 1px solid var(--fx-field-border);
+  border-radius: v.$radius-sm;
+  background-color: v.$color-bg;
+  color: v.fg(v.$color-text);
+  font: inherit;
+  font-size: v.$font-size-sm;
+
+  &::placeholder {
+    color: v.fg(v.$color-gray-500);
+  }
+
+  &:focus {
+    border-color: var(--fx-field-border-focus);
+    box-shadow: var(--fx-field-focus-glow);
+  }
+
+  &:focus-visible {
+    outline: var(--fx-field-focus-outline);
+    outline-offset: 1px;
+    box-shadow: var(--fx-field-focus-glow);
+  }
+
+  &:disabled {
+    border-color: var(--fx-field-border-disabled);
+    background-color: v.$color-gray-100;
+    cursor: not-allowed;
+  }
+
+  .ui-field--invalid & {
+    border-color: v.line(v.$color-danger);
+  }
+}
+
+// ---------------------------------------------------------------- Card
+.ui-card {
+  @include m.card;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  min-width: 0;
+
+  &__header {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    @include m.font-heading(v.$font-weight-semibold);
+    margin: 0;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-base;
+  }
+
+  &__actions {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    flex-wrap: wrap;
+  }
+}
+
+// ---------------------------------------------------------------- Badge
+.ui-badge {
+  @include m.flex(row, center, center, 0.25rem);
+  display: inline-flex;
+  padding: 0.125rem 0.5rem;
+  border-radius: v.$radius-pill;
+  font-size: var(--fx-text-xs);
+  font-weight: v.$font-weight-semibold;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  &--neutral {
+    background-color: v.$color-gray-100;
+    color: v.fg(v.$color-text);
+  }
+
+  &--primary {
+    background-color: v.alpha(v.$color-primary, 0.1);
+    color: v.fg(v.$color-primary);
+  }
+
+  &--info {
+    background-color: v.alpha(v.$color-info, 0.14);
+    color: v.fg(v.$color-info);
+  }
+
+  &--success {
+    background-color: v.alpha(v.$color-success, 0.14);
+    color: v.fg(v.$color-success);
+  }
+
+  &--warning {
+    background-color: v.alpha(v.$color-orange, 0.18);
+    color: v.fg(v.$color-orange-dark);
+  }
+
+  &--danger {
+    background-color: v.alpha(v.$color-danger, 0.12);
+    color: v.fg(v.$color-danger);
+  }
+}
+
+// ---------------------------------------------------------------- PageHeader
+.ui-page-header {
+  @include m.flex(row, space-between, flex-end, v.$spacing-3);
+  flex-wrap: wrap;
+
+  &__text {
+    min-width: 0;
+  }
+
+  &__back {
+    margin-bottom: 0.25rem;
+    font-size: v.$font-size-sm;
+  }
+
+  &__title {
+    @include m.font-heading(v.$font-weight-semibold);
+    margin: 0;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-xl;
+  }
+
+  &__description {
+    margin: 0.25rem 0 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+
+  &__actions {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    flex-wrap: wrap;
+  }
+}
+
+// ---------------------------------------------------------------- EmptyState
+.ui-empty {
+  @include m.flex(column, center, center, v.$spacing-2);
+  padding: v.$spacing-6 v.$spacing-4;
+  text-align: center;
+
+  &__icon {
+    @include m.flex-center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: v.$color-gray-100;
+    color: v.fg(v.$color-text-muted);
+  }
+
+  &__title {
+    margin: 0;
+    color: v.fg(v.$color-text);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__description {
+    max-width: 28rem;
+    margin: 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+
+  &__action {
+    margin-top: v.$spacing-1;
+  }
+}
+
+// ---------------------------------------------------------------- Skeleton
+.ui-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+
+  &__line,
+  &__block {
+    display: block;
+    border-radius: v.$radius-sm;
+    background: linear-gradient(90deg, v.$color-gray-100 25%, v.$color-gray-50 50%, v.$color-gray-100 75%);
+    background-size: 200% 100%;
+    animation: ui-shimmer 1.4s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  &__line {
+    height: 0.75em;
+  }
+}
+
+@keyframes ui-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}

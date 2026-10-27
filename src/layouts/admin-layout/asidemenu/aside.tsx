@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiChevronLeft, FiLogOut, FiX } from "react-icons/fi";
+import { ChevronLeftIcon, LogOutIcon, XIcon } from "../../../shared/components/icon";
 import logo from "../../../shared/assets/img/logo.png";
 import favIcon from "../../../shared/assets/img/fav.png";
 import { asideNavSections } from "./aside.data";
@@ -32,6 +32,16 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
   const scrollTimer = useRef<number | undefined>(undefined);
   const { selectedContract } = useSelectedContract();
   const { can, logout, menu } = useAuth();
+
+  // the phone drawer closes with Escape, like every other dialog
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onCloseMobile?.();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [mobileOpen, onCloseMobile]);
 
   useEffect(() => () => window.clearTimeout(scrollTimer.current), []);
 
@@ -70,6 +80,8 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
   return (
     <aside
       className={`aside ${collapsed ? "aside--collapsed" : ""} ${mobileOpen ? "aside--mobile-open" : ""}`}
+      // open on a phone it is a modal drawer (focus stays inside: shared/a11y/modalFocus.ts)
+      {...(mobileOpen ? { role: "dialog", "aria-modal": true, "aria-label": "Menu" } : {})}
     >
       <div className="aside__brand">
         <img
@@ -84,7 +96,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           aria-expanded={!collapsed}
         >
-          <FiChevronLeft className={collapsed ? "is-rotated" : ""} />
+          <ChevronLeftIcon className={collapsed ? "is-rotated" : ""} />
         </button>
         <button
           type="button"
@@ -92,7 +104,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           onClick={onCloseMobile}
           aria-label="Close menu"
         >
-          <FiX aria-hidden />
+          <XIcon aria-hidden />
         </button>
       </div>
 
@@ -133,7 +145,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           }}
         >
           {!collapsed && <span>Logout</span>}
-          <FiLogOut aria-hidden />
+          <LogOutIcon aria-hidden />
         </button>
       </div>
     </aside>

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import type { ChangeEvent } from "react";
-import { FiTrash2 } from "react-icons/fi";
+import { Trash2Icon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
@@ -190,7 +190,7 @@ const DocumentsSection = ({ entries, onEntriesChange }: DocumentsSectionProps) =
                     onClick={() => setPendingDeleteId(entry.id)}
                     aria-label="Remove document"
                   >
-                    <FiTrash2 aria-hidden />
+                    <Trash2Icon aria-hidden />
                   </button>
                 </div>
 

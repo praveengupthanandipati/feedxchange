@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
-import { FiEye, FiEyeOff, FiDownload, FiCheck, FiRefreshCw, FiMaximize2, FiMinimize2 } from "react-icons/fi";
+import {
+  CheckIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  Maximize2Icon,
+  Minimize2Icon,
+  RefreshCwIcon,
+} from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
@@ -142,7 +150,7 @@ const ContractwiseStatus = () => {
               className="contract-wise-status-btn contract-wise-status-btn--info"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
@@ -150,7 +158,7 @@ const ContractwiseStatus = () => {
               className="contract-wise-status-btn contract-wise-status-btn--warning"
               onClick={handleExport}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <button
               type="button"
@@ -158,7 +166,7 @@ const ContractwiseStatus = () => {
               onClick={handleToggleExpandAll}
               disabled={expandableRows.length === 0}
             >
-              {allExpanded ? <FiMinimize2 aria-hidden /> : <FiMaximize2 aria-hidden />}
+              {allExpanded ? <Minimize2Icon aria-hidden /> : <Maximize2Icon aria-hidden />}
               {allExpanded ? "Collapse All" : "Expand All"}
             </button>
           </div>
@@ -196,10 +204,10 @@ const ContractwiseStatus = () => {
             </div>
 
             <button type="button" className="contract-wise-status-filters__apply" onClick={handleApply}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="contract-wise-status-filters__reset" onClick={handleReset}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         )}

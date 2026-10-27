@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiCheckCircle } from "react-icons/fi";
+import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import { EMPTY_FILTERS, estimations as initialEstimations, type Estimation, type EstimationFilters } from "./viewEstimation.data";
 import { dataShowingLabel, displayAmount, downloadEstimation, matchesFilters, uniqueOptions } from "./viewEstimation.utils";
@@ -62,7 +62,7 @@ const ViewEstimations = () => {
 
       {message && (
         <p className="view-estimations__message" role="status">
-          <FiCheckCircle aria-hidden /> {message}
+          <CircleCheckBigIcon aria-hidden /> {message}
         </p>
       )}
 

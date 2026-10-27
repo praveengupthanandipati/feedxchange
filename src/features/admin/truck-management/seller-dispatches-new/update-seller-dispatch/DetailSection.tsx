@@ -1,5 +1,5 @@
 import { useId, useState, type ReactNode } from "react";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { EyeIcon, EyeOffIcon } from "../../../../../shared/components/icon";
 
 interface DetailSectionProps {
   title: string;
@@ -31,7 +31,7 @@ const DetailSection = ({ title, subtitle, actions, children }: DetailSectionProp
             aria-expanded={open}
             aria-controls={bodyId}
           >
-            {open ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+            {open ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {open ? "Hide" : "Show"}
           </button>
         </div>

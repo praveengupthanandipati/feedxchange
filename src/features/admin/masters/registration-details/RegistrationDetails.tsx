@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { FiCheckCircle } from "react-icons/fi";
+import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import { initialRegistrations, REGISTRATION_STATUSES, type Registration, type RegistrationStatus, type RegistrationUpdate } from "./registrationDetails.data";
 import { exportRegistrations, matchesSearch } from "./registrationDetails.utils";
 import RegistrationCards from "./components/RegistrationCards";
@@ -78,7 +78,7 @@ const RegistrationDetails = () => {
 
       {message && (
         <p className="registrations__message" role="status">
-          <FiCheckCircle aria-hidden /> {message}
+          <CircleCheckBigIcon aria-hidden /> {message}
         </p>
       )}
 

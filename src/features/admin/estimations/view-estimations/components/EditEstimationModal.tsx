@@ -1,5 +1,5 @@
 import { useState, type SubmitEvent } from "react";
-import { FiSave, FiX } from "react-icons/fi";
+import { SaveIcon, XIcon } from "../../../../../shared/components/icon";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import type { Estimation, EstimationEdit } from "../viewEstimation.data";
 import { EMPTY_VALUE } from "../viewEstimation.utils";
@@ -49,10 +49,10 @@ const EditEstimationModal = ({ estimation, onSave, onClose }: EditEstimationModa
         )}
         <div className="estimations-modal__actions">
           <button type="button" className="view-estimations__btn view-estimations__btn--ghost" onClick={onClose}>
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
           <button type="submit" className="view-estimations__btn view-estimations__btn--navy">
-            <FiSave aria-hidden /> Update
+            <SaveIcon aria-hidden /> Update
           </button>
         </div>
       </form>

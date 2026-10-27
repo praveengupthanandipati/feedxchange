@@ -9,21 +9,21 @@
   &__trigger {
     @include m.flex(row, space-between, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-medium);
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
-    min-height: 2.5rem;
+    min-height: var(--fx-control-height);
     padding: v.$spacing-2 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     cursor: pointer;
     text-align: left;
 
     > svg {
       flex-shrink: 0;
-      color: v.$color-text-muted;
+      color: var(--fx-field-icon);
       transition: transform v.$transition-fast;
 
       &.is-open {
@@ -32,18 +32,18 @@
     }
 
     &:hover {
-      border-color: v.$color-primary;
+      border-color: var(--fx-field-border-hover);
     }
 
     &:disabled {
       background-color: v.$color-gray-50;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       cursor: not-allowed;
     }
   }
 
   &__placeholder {
-    color: v.$color-gray-400;
+    color: v.fg(v.$color-gray-400);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -60,20 +60,28 @@
     @include m.flex(row, flex-start, center, v.$spacing-1);
     padding: 0.15rem v.$spacing-2;
     border-radius: v.$radius-pill;
-    background-color: rgba(v.$color-navy, 0.08);
-    color: v.$color-primary;
+    background-color: v.alpha(v.$color-navy, 0.08);
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
     white-space: nowrap;
   }
 
+  // 12px "x" in an 18px click area (the chip around it keeps the 24px target spacing)
   &__chip-remove {
     @include m.flex-center;
-    color: v.$color-text-muted;
+    width: 18px;
+    height: 18px;
+    min-width: 0;
+    min-height: 0;
+    margin-right: -4px;
+    border-radius: v.$radius-pill;
+    color: var(--fx-field-icon);
     cursor: pointer;
 
     &:hover {
-      color: v.$color-danger;
+      color: var(--fx-field-icon-hover);
+      background-color: v.$color-gray-100;
     }
   }
 
@@ -81,7 +89,7 @@
   &__panel {
     position: fixed;
     background-color: v.$color-bg;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     box-shadow: v.$shadow-lg;
     z-index: v.$z-index-modal-top;
@@ -91,8 +99,8 @@
   &__search {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     padding: v.$spacing-2 v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
-    color: v.$color-text-muted;
+    border-bottom: 1px solid var(--fx-field-border);
+    color: v.fg(v.$color-text-muted);
 
     input {
       flex: 1;
@@ -101,7 +109,7 @@
       outline: none;
       background: transparent;
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -121,7 +129,7 @@
       border: none;
       border-radius: v.$radius-md;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       text-align: left;
       cursor: pointer;
@@ -137,8 +145,8 @@
       }
 
       &.is-selected {
-        background-color: rgba(v.$color-orange, 0.1);
-        color: v.$color-orange-dark;
+        background-color: v.alpha(v.$color-orange, 0.1);
+        color: v.fg(v.$color-orange-dark);
         font-weight: v.$font-weight-semibold;
       }
     }
@@ -146,7 +154,7 @@
 
   &__empty {
     padding: v.$spacing-3;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
   }

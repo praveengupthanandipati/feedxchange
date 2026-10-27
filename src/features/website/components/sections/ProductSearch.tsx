@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { FiArrowRight, FiPackage, FiSearch, FiX } from "react-icons/fi";
+import { ArrowRightIcon, PackageIcon, SearchIcon, XIcon } from "../../../../shared/components/icon";
 import { useNavigate } from "react-router-dom";
 import { products } from "../../data/content";
 import { productPath } from "../../routes/paths";
@@ -64,7 +64,7 @@ const ProductSearch = () => {
   return (
     <div className="product-search" ref={wrapRef}>
       <div className={`product-search__box ${open ? "is-open" : ""}`}>
-        <FiSearch aria-hidden className="product-search__icon" />
+        <SearchIcon aria-hidden className="product-search__icon" />
         <input
           ref={inputRef}
           type="search"
@@ -98,7 +98,7 @@ const ProductSearch = () => {
               inputRef.current?.focus();
             }}
           >
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         )}
       </div>
@@ -118,13 +118,13 @@ const ProductSearch = () => {
               onClick={() => go(product.slug)}
             >
               <span className="product-search__thumb">
-                <FiPackage aria-hidden />
+                <PackageIcon aria-hidden />
               </span>
               <span className="product-search__text">
                 <strong>{product.name}</strong>
                 <small>{product.summary}</small>
               </span>
-              <FiArrowRight aria-hidden className="product-search__go" />
+              <ArrowRightIcon aria-hidden className="product-search__go" />
             </li>
           ))}
         </ul>

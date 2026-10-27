@@ -1,4 +1,4 @@
-import { FiPhone, FiUser } from "react-icons/fi";
+import { PhoneIcon, UserIcon } from "../../../../../shared/components/icon";
 import { LuClipboardList, LuTruck } from "react-icons/lu";
 import DetailSection from "./DetailSection";
 import InfoTile from "./InfoTile";
@@ -9,8 +9,8 @@ const TruckInformation = ({ truck }: { truck: DispatchTruck }) => (
     <dl className="info-grid info-grid--four">
       <InfoTile icon={LuTruck} label="Truck No" value={truck.truckNo} tone="navy" />
       <InfoTile icon={LuClipboardList} label="Truck Capacity" value={truck.capacity} tone="blue" />
-      <InfoTile icon={FiUser} label="Driver Name" value={truck.driverName} tone="green" />
-      <InfoTile icon={FiPhone} label="Driver Contact Number" value={truck.driverContact} tone="orange" phone />
+      <InfoTile icon={UserIcon} label="Driver Name" value={truck.driverName} tone="green" />
+      <InfoTile icon={PhoneIcon} label="Driver Contact Number" value={truck.driverContact} tone="orange" phone />
     </dl>
   </DetailSection>
 );

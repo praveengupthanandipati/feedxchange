@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
+import { DownloadIcon, EyeIcon, EyeOffIcon, PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
@@ -14,7 +14,8 @@ import {
   useDeleteTruckDetailsMutation,
   type Truck,
 } from "../../../../../core/store/trucksApi";
-import "./Trucks.scss";
+import "./Trucks.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 const PAGE_SIZE = 10;
@@ -203,11 +204,11 @@ const TrucksList = () => {
               className="trucks-btn trucks-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button type="button" className="trucks-btn trucks-btn--warning" onClick={handleExport}>
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["truck-master.manage"]}>
               <button
@@ -215,7 +216,7 @@ const TrucksList = () => {
                 className="trucks-btn trucks-btn--primary"
                 onClick={() => navigate("/admin/truck-management/transporters/truck-master/new")}
               >
-                <FiPlus aria-hidden /> New
+                <PlusIcon aria-hidden /> New
               </button>
             </Can>
           </div>

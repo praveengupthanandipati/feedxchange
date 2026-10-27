@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { FiChevronDown, FiMail, FiPhone, FiX } from "react-icons/fi";
+import { ChevronDownIcon, MailIcon, PhoneIcon, XIcon } from "../../../shared/components/icon";
 import { NavLink, useLocation } from "react-router-dom";
 import { company, navItems } from "../../../features/website/data/content";
 import { sitePaths } from "../../../features/website/routes/paths";
 import Logo from "../../../features/website/components/common/Logo";
 import { JoinButton, LoginLink, WhatsAppButton } from "./HeaderActions";
+import ThemePicker from "../../../shared/theme/ThemePicker";
 
 interface MobileMenuProps {
   open: boolean;
@@ -27,13 +28,13 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
 
   return (
     <div className={`mobile-menu ${open ? "is-open" : ""}`} inert={!open}>
-      <button type="button" className="mobile-menu__backdrop" onClick={onClose} aria-label="Close menu" tabIndex={-1} />
+      <div className="mobile-menu__backdrop" onClick={onClose} aria-hidden />
 
       <aside id="mobile-menu" className="mobile-menu__panel" role="dialog" aria-modal="true" aria-label="Menu">
         <div className="mobile-menu__head">
           <Logo />
           <button ref={closeRef} type="button" className="mobile-menu__close" onClick={onClose} aria-label="Close menu">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -51,7 +52,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                       onClick={() => setProductsOpen((prev) => !prev)}
                     >
                       {item.label}
-                      <FiChevronDown aria-hidden className="mobile-menu__chevron" />
+                      <ChevronDownIcon aria-hidden className="mobile-menu__chevron" />
                     </button>
                     {/* Height animates smoothly via grid-template-rows 0fr → 1fr. */}
                     <div id="mobile-products" className={`mobile-menu__sub ${productsOpen ? "is-open" : ""}`}>
@@ -87,11 +88,15 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
             <WhatsAppButton />
           </div>
           <LoginLink className="site-login--block" />
+          <div className="mobile-menu__theme">
+            <span>Theme</span>
+            <ThemePicker triggerClassName="site-theme" align="start" />
+          </div>
           <a href={`tel:${company.phone.replace(/\s/g, "")}`}>
-            <FiPhone aria-hidden /> {company.phone}
+            <PhoneIcon aria-hidden /> {company.phone}
           </a>
           <a href={`mailto:${company.email}`}>
-            <FiMail aria-hidden /> {company.email}
+            <MailIcon aria-hidden /> {company.email}
           </a>
         </div>
       </aside>

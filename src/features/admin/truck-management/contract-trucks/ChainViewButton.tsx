@@ -1,4 +1,4 @@
-import { FiLink } from "react-icons/fi";
+import { LinkIcon } from "../../../../shared/components/icon";
 import { useGetContractTruckChainOverviewQuery } from "../../../../core/store/contractTrucksApi";
 
 interface ChainViewButtonProps {
@@ -27,7 +27,7 @@ const ChainViewButton = ({ contractDispatchId, onClick }: ChainViewButtonProps) 
       onClick={onClick}
       title="See every contract this truck is on"
     >
-      <FiLink aria-hidden /> View Chain
+      <LinkIcon aria-hidden /> View Chain
     </button>
   );
 };

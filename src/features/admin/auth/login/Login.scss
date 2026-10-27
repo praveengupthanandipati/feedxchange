@@ -20,7 +20,7 @@
     gap: v.$spacing-7;
     padding: v.$spacing-7;
     background-color: v.$color-navy-dark;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &::before,
     &::after {
@@ -65,13 +65,13 @@
     h1 {
       @include m.font-heading(v.$font-weight-bold);
       font-size: v.$font-size-4xl;
-      color: v.$color-white;
+      color: v.fg(v.$color-white);
       margin: 0 0 v.$spacing-3;
     }
 
     p {
       font-size: v.$font-size-lg;
-      color: rgba(v.$color-white, 0.75);
+      color: v.alpha(v.fg(v.$color-white), 0.75);
       max-width: 30rem;
       margin: 0;
     }
@@ -91,7 +91,7 @@
       @include m.flex(row, flex-start, center, v.$spacing-3);
       @include m.font-base(v.$font-weight-semibold);
       font-size: v.$font-size-sm;
-      color: rgba(v.$color-white, 0.9);
+      color: v.alpha(v.fg(v.$color-white), 0.9);
     }
   }
 
@@ -101,7 +101,7 @@
     height: 0.5rem;
     border-radius: v.$radius-pill;
     background-color: v.$color-orange;
-    box-shadow: 0 0 0 4px rgba(v.$color-orange, 0.2);
+    box-shadow: 0 0 0 4px v.alpha(v.$color-orange, 0.2);
   }
 
   // ============================================================
@@ -140,13 +140,13 @@
   }
 
   &__subtitle {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     margin: 0 0 v.$spacing-5;
   }
 
   &__hint {
-    background-color: rgba(v.$color-orange, 0.1);
-    color: v.$color-orange-dark;
+    background-color: v.alpha(v.$color-orange, 0.1);
+    color: v.fg(v.$color-orange-dark);
     border-radius: v.$radius-md;
     padding: v.$spacing-3;
     font-size: v.$font-size-sm;
@@ -158,7 +158,7 @@
   }
 
   &__error {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     margin: 0 0 v.$spacing-4;
   }
@@ -172,16 +172,16 @@
 
   &__input {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
     margin: 0 0 v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
 
     svg:first-child {
       flex-shrink: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
     }
 
     input {
@@ -192,16 +192,16 @@
       outline: none;
       background: transparent;
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
 
       &::placeholder {
-        color: v.$color-gray-400;
+        color: v.fg(v.$color-gray-400);
       }
     }
 
     &:focus-within {
-      border-color: v.$color-primary;
-      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
@@ -210,18 +210,18 @@
     flex-shrink: 0;
     border: none;
     background: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     cursor: pointer;
 
     &:hover {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
     }
   }
 
   &__remember {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     margin: 0 0 v.$spacing-5;
     cursor: pointer;
 
@@ -237,7 +237,7 @@
     @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
     @include m.font-heading(v.$font-weight-semibold);
     width: 100%;
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     gap: v.$spacing-2;
     font-size: v.$font-size-base;
   }

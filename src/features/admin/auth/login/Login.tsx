@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { SubmitEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
+import { ArrowRightIcon, EyeIcon, EyeOffIcon, LockIcon, MailIcon } from "../../../../shared/components/icon";
 import logo from "../../../../shared/assets/img/logo.png";
 import { useLoginMutation } from "../../../../core/store/authApi";
 import { useAuth } from "../../../../core/auth/AuthContext";
@@ -43,18 +43,17 @@ const Login = () => {
     saveTokens({ token, refreshToken: data?.refreshToken, accessTokenExpiresAt: data?.accessTokenExpiresAt });
 
     try {
+      // Only what the app reads back (core/auth/session.ts); the rest of the profile stays out of storage, where any script
+      // on the page could read it. Copies an older version saved are removed.
       localStorage.setItem("userId", String(user?.id ?? ""));
-      localStorage.setItem("businessProfileId", String(user?.businessProfileId ?? ""));
       localStorage.setItem("firstName", String(user?.firstName ?? ""));
       localStorage.setItem("lastName", String(user?.lastName ?? ""));
       localStorage.setItem("email", String(user?.email ?? ""));
-      localStorage.setItem("phoneNumber", String(user?.phoneNumber ?? ""));
-      localStorage.setItem("roleId", String(user?.roleId ?? ""));
       localStorage.setItem("roleName", String(user?.roleName ?? ""));
-      localStorage.setItem("businessName", String(user?.businessName ?? ""));
-      localStorage.setItem("lastLoginDate", String(user?.lastLoginDate ?? ""));
       localStorage.setItem("businessUnitType", String(user?.businessUnitType ?? ""));
-      localStorage.setItem("user", JSON.stringify(user));
+      ["businessProfileId", "phoneNumber", "roleId", "businessName", "lastLoginDate", "permissions", "user"].forEach((key) =>
+        localStorage.removeItem(key),
+      );
       // Undefined (older API without permission keys) leaves the UI ungated, exactly as before.
       savePermissionKeys(data?.permissionKeys, data?.roleKey);
     } catch (err) {
@@ -131,7 +130,7 @@ const Login = () => {
             Email address
           </label>
           <div className="login__input">
-            <FiMail aria-hidden />
+            <MailIcon aria-hidden />
             <input
               id="email"
               type="email"
@@ -147,7 +146,7 @@ const Login = () => {
             Password
           </label>
           <div className="login__input">
-            <FiLock aria-hidden />
+            <LockIcon aria-hidden />
             <input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -163,7 +162,7 @@ const Login = () => {
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {showPassword ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             </button>
           </div>
 
@@ -179,7 +178,7 @@ const Login = () => {
           <button type="submit" className="login__submit" disabled={isLoading}>
             {isLoading ? "Signing In…" : (
               <>
-                Sign In <FiArrowRight aria-hidden />
+                Sign In <ArrowRightIcon aria-hidden />
               </>
             )}
           </button>

@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
-import { FiUserPlus, FiX } from "react-icons/fi";
+import { UserPlusIcon, XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import {
   useAddDriverMutation,
@@ -108,7 +108,7 @@ const NewDriverModal = ({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="confirm-dialog__icon new-driver-modal__icon">
-          <FiUserPlus aria-hidden />
+          <UserPlusIcon aria-hidden />
         </div>
         <h2 id="new-driver-modal-title" className="confirm-dialog__title">
           New Driver
@@ -376,7 +376,7 @@ const NewDriverModal = ({
         </form>
 
         <button type="button" className="new-driver-modal__close" onClick={onClose} aria-label="Close">
-          <FiX aria-hidden />
+          <XIcon aria-hidden />
         </button>
       </div>
     </div>,

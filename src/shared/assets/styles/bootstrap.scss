@@ -1,0 +1,42 @@
+// Bootstrap 5.3 (same version as node_modules/bootstrap), built from its own Sass with only the parts the app uses: the
+// full bootstrap.min.css carried the accordion, breadcrumb, button group, carousel, input group, list group, navbar,
+// offcanvas, pagination, placeholders, popover, progress, tooltip, range and floating labels, none of which any screen uses.
+// Same import order as bootstrap/scss/bootstrap.scss. A screen that starts using a removed part: add its line back.
+
+// Configuration
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// Layout & components
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms/labels";
+@import "bootstrap/scss/forms/form-text";
+@import "bootstrap/scss/forms/form-control";
+@import "bootstrap/scss/forms/form-select";
+@import "bootstrap/scss/forms/form-check";
+@import "bootstrap/scss/forms/validation";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/dropdown";
+@import "bootstrap/scss/nav";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/toasts";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/spinners";
+
+// Helpers and utilities (all of them: class names are often put together in code)
+@import "bootstrap/scss/helpers";
+@import "bootstrap/scss/utilities/api";

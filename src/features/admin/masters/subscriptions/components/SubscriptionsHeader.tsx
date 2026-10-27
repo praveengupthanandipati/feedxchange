@@ -1,4 +1,4 @@
-import { FiSearch } from "react-icons/fi";
+import { SearchIcon } from "../../../../../shared/components/icon";
 
 interface SubscriptionsHeaderProps {
   search: string;
@@ -9,7 +9,7 @@ const SubscriptionsHeader = ({ search, onSearchChange }: SubscriptionsHeaderProp
   <>
     <h1 className="subscriptions__title">Subscriptions</h1>
     <div className="subscriptions__search">
-      <FiSearch aria-hidden />
+      <SearchIcon aria-hidden />
       <input
         type="search"
         inputMode="email"

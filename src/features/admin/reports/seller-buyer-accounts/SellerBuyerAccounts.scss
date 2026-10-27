@@ -13,7 +13,7 @@
   gap: v.$spacing-4;
 
   h1 {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-xl;
     margin: 0;
   }
@@ -34,14 +34,14 @@
 
   &__party {
     font-size: v.$font-size-sm;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
 
     @include m.respond-to(md) {
       text-align: right;
     }
 
     strong {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-weight: v.$font-weight-semibold;
     }
   }
@@ -51,12 +51,12 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
   background-color: v.$color-orange;
-  color: v.$color-navy-dark;
+  color: v.on(v.$color-navy-dark);
   font-size: v.$font-size-sm;
   cursor: pointer;
   transition: background-color v.$transition-fast;
@@ -82,14 +82,14 @@
 
   select {
     @include m.font-base(v.$font-weight-semibold);
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
   }
 }
@@ -100,7 +100,7 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: v.$spacing-2;
-  border-bottom: 1px solid v.$color-border;
+  border-bottom: 1px solid v.line(v.$color-border);
 
   @include m.respond-to(sm) {
     display: flex;
@@ -115,7 +115,7 @@
     border: none;
     border-radius: v.$radius-md;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     white-space: nowrap;
     cursor: pointer;
@@ -123,12 +123,12 @@
 
     &:hover:not(.is-active) {
       background-color: v.$color-bg-muted;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
 
     &.is-active {
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
   }
 }
@@ -137,6 +137,6 @@
   padding: v.$spacing-6;
   border-radius: v.$radius-md;
   background-color: v.$color-bg-muted;
-  color: v.$color-text-muted;
+  color: v.fg(v.$color-text-muted);
   text-align: center;
 }

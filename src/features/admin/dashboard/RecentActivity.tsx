@@ -1,4 +1,4 @@
-import { FiChevronDown } from "react-icons/fi";
+import { ChevronDownIcon } from "../../../shared/components/icon";
 import { recentActivity } from "./dashboard.data";
 
 const RecentActivity = () => {
@@ -7,7 +7,7 @@ const RecentActivity = () => {
       <div className="dashboard-card__header">
         <h2 className="dashboard-card__title">Recent Activity</h2>
         <button type="button" className="dashboard-card__sort">
-          <strong>Recent</strong> <FiChevronDown aria-hidden />
+          <strong>Recent</strong> <ChevronDownIcon aria-hidden />
         </button>
       </div>
 

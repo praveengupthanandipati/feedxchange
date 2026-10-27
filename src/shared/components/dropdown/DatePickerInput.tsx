@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type Ref } from "react";
 import { createPortal } from "react-dom";
-import { FiCalendar, FiX } from "react-icons/fi";
+import { CalendarIcon, ICON_STROKE_FINE } from "../icon";
+import FieldClear from "./FieldClear";
 import Calendar, { formatDisplayDate } from "./Calendar";
 import { useAnchoredPanel } from "./useAnchoredPanel";
 import "./DateRangeInput.scss";
@@ -84,24 +85,9 @@ const DatePickerInput = ({
         <span className={value ? "" : "is-placeholder"}>{value ? formatDisplayDate(value) : placeholder}</span>
         <span className="date-range-input__trigger-icons">
           {clearable && value && (
-            <FiX
-              className="date-range-input__clear"
-              aria-label="Clear date"
-              role="button"
-              tabIndex={0}
-              onClick={(event) => {
-                event.stopPropagation();
-                onChange("");
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.stopPropagation();
-                  onChange("");
-                }
-              }}
-            />
+            <FieldClear label="Clear date" onClear={() => onChange("")} />
           )}
-          <FiCalendar aria-hidden />
+          <CalendarIcon size={14} strokeWidth={ICON_STROKE_FINE} aria-hidden />
         </span>
       </button>
 

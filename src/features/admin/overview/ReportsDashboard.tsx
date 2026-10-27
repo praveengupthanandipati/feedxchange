@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FiArrowUpRight, FiFileText, FiLayers, FiDollarSign, FiCalendar, FiTrendingUp } from "react-icons/fi";
+import { ArrowUpRightIcon, CalendarIcon, DollarSignIcon, FileTextIcon, LayersIcon, TrendingUpIcon } from "../../../shared/components/icon";
 import {
   Bar,
   BarChart,
@@ -25,28 +25,28 @@ const REPORT_GROUPS = [
   {
     id: "sales",
     label: "Sales & accounts",
-    icon: FiDollarSign,
+    icon: DollarSignIcon,
     color: "reports-dashboard__card--blue",
     paths: ["/admin/reports/seller-invoice-reports", "/admin/reports/seller-buyer-accounts", "/admin/reports/account-statement"],
   },
   {
     id: "contracts",
     label: "Contracts & supply",
-    icon: FiLayers,
+    icon: LayersIcon,
     color: "reports-dashboard__card--navy",
     paths: ["/admin/reports/contract-wise-status", "/admin/reports/contract-summary", "/admin/reports/pending-supplies"],
   },
   {
     id: "payments",
     label: "Payments",
-    icon: FiTrendingUp,
+    icon: TrendingUpIcon,
     color: "reports-dashboard__card--green",
     paths: ["/admin/reports/pending-payments"],
   },
   {
     id: "periodic",
     label: "Monthly reports",
-    icon: FiCalendar,
+    icon: CalendarIcon,
     color: "reports-dashboard__card--orange",
     paths: ["/admin/reports/monthly-reports"],
   },
@@ -88,7 +88,7 @@ const ReportsDashboard = ({ entries }: ReportsDashboardProps) => {
       <div className="reports-dashboard__lower">
         <section className="reports-dashboard__panel">
           <div className="reports-dashboard__panel-heading">
-            <span className="reports-dashboard__panel-icon"><FiFileText aria-hidden /></span>
+            <span className="reports-dashboard__panel-icon"><FileTextIcon aria-hidden /></span>
             <div>
               <h3>Report types available</h3>
               <p>{reportCount} reports are available in your menu. Open a report to view its data.</p>
@@ -103,7 +103,7 @@ const ReportsDashboard = ({ entries }: ReportsDashboardProps) => {
                 <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="category" width={125} tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(value) => [`${value} ${Number(value) === 1 ? "report" : "reports"}`, "Available"]} />
-                <Bar dataKey="reports" name="Reports" fill="#2f8fd6" radius={[0, 5, 5, 0]} barSize={22} />
+                <Bar dataKey="reports" name="Reports" fill="var(--fx-chart-1)" radius={[0, 5, 5, 0]} barSize={22} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -117,7 +117,7 @@ const ReportsDashboard = ({ entries }: ReportsDashboardProps) => {
           <div className="reports-dashboard__links">
             {reports.map((entry) => (
               <Link to={entry.path} key={entry.id} className="reports-dashboard__quick-link">
-                <span>{entry.label}</span><FiArrowUpRight aria-hidden />
+                <span>{entry.label}</span><ArrowUpRightIcon aria-hidden />
               </Link>
             ))}
           </div>

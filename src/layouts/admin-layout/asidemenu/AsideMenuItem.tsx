@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
-import { FiChevronDown } from "react-icons/fi";
+import { ChevronDownIcon } from "../../../shared/components/icon";
 import type { AsideNavChild, AsideNavItem } from "./aside.types";
 
 interface AsideMenuItemProps {
@@ -126,7 +126,7 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onNavigate }: AsideM
             <span className="aside-item__label" aria-hidden={collapsed}>
               {item.label}
             </span>
-            <FiChevronDown className={`aside-item__chevron ${expanded ? "is-open" : ""}`} aria-hidden />
+            <ChevronDownIcon className={`aside-item__chevron ${expanded ? "is-open" : ""}`} aria-hidden />
           </button>
         )}
 
@@ -138,7 +138,7 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onNavigate }: AsideM
             aria-expanded={expanded}
             aria-label={`Toggle ${item.label} submenu`}
           >
-            <FiChevronDown className={`aside-item__chevron ${expanded ? "is-open" : ""}`} aria-hidden />
+            <ChevronDownIcon className={`aside-item__chevron ${expanded ? "is-open" : ""}`} aria-hidden />
           </button>
         )}
       </div>

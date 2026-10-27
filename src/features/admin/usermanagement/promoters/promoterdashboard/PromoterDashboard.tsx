@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FiEye, FiEyeOff, FiDownload } from "react-icons/fi";
+import { DownloadIcon, EyeIcon, EyeOffIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import Pagination from "../promoterslist/Pagination";
@@ -120,7 +120,7 @@ const PromoterDashboard = () => {
             className="promoter-dashboard-btn promoter-dashboard-btn--info"
             onClick={() => setFiltersVisible((prev) => !prev)}
           >
-            {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+            {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {filtersVisible ? "Hide" : "Show"}
           </button>
           <button
@@ -128,7 +128,7 @@ const PromoterDashboard = () => {
             className="promoter-dashboard-btn promoter-dashboard-btn--warning"
             onClick={handleExport}
           >
-            <FiDownload aria-hidden /> Export
+            <DownloadIcon aria-hidden /> Export
           </button>
         </div>
       </div>

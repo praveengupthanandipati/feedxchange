@@ -27,7 +27,7 @@
     @include m.flex(row, space-between, center, v.$spacing-2);
     padding: v.$spacing-4;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-lg;
 
     span {
@@ -40,9 +40,9 @@
     }
 
     &--navy { background-color: v.$color-navy; }
-    &--green { background-color: #34c38f; }
-    &--blue { background-color: #50a5f1; }
-    &--orange { background-color: #f1b44c; color: v.$color-navy-dark; }
+    &--green { background-color: var(--fx-teal-48); }
+    &--blue { background-color: var(--fx-sky-63); }
+    &--orange { background-color: var(--fx-amber-62); color: v.on(v.$color-navy-dark); }
   }
 
   // ---------- Main card ----------
@@ -65,7 +65,7 @@
 
     h1 {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -84,11 +84,11 @@
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     cursor: pointer;
@@ -96,7 +96,7 @@
     &:hover { filter: brightness(0.93); }
 
     &--info { background-color: v.$color-info; }
-    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--warning { background-color: v.$color-orange; color: v.on(v.$color-navy-dark); }
     &--success { background-color: v.$color-success; }
     &--danger { background-color: v.$color-danger; }
   }
@@ -123,16 +123,17 @@
 
     input {
       min-width: 0;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
 
       &:focus {
         outline: none;
-        border-color: v.$color-navy;
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
@@ -145,13 +146,13 @@
     white-space: nowrap;
 
     small {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: 0.75em;
     }
   }
 
   &__bill--change {
-    color: #8b5e5e;
+    color: var(--fx-red-46-fg);
     font-weight: v.$font-weight-bold;
   }
 
@@ -161,8 +162,8 @@
     border: none;
     border-radius: v.$radius-sm;
     background-color: v.$color-navy;
-    color: v.$color-white;
-    font-size: 0.75rem;
+    color: v.on(v.$color-white);
+    font-size: max(11px, 0.75rem);
     white-space: nowrap;
     cursor: pointer;
 
@@ -177,13 +178,13 @@
     min-width: 6.5rem;
     padding: 0.2rem 0.5rem;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
-    font-size: 0.7rem;
+    color: v.fg(v.$color-white);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
 
-    &--pending { background-color: #f1b44c; }
-    &--submitted { background-color: #50a5f1; }
-    &--approved { background-color: #34c38f; }
+    &--pending { background-color: var(--fx-amber-62); }
+    &--submitted { background-color: var(--fx-sky-63); }
+    &--approved { background-color: var(--fx-teal-48); }
   }
 
   &__amount {
@@ -215,14 +216,14 @@
   &__cards-empty {
     @include m.flex(row, center, center, v.$spacing-2);
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
   &__row-card {
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
 
@@ -235,14 +236,14 @@
     }
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
     dd {
       margin: 0.1rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -251,9 +252,9 @@
   &__row-card-top {
     @include m.flex(row, space-between, center, v.$spacing-2);
     padding: v.$spacing-2 v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
-    background-color: rgba(v.$color-navy, 0.06);
-    color: v.$color-navy;
+    border-bottom: 1px solid v.line(v.$color-border);
+    background-color: v.alpha(v.$color-navy, 0.06);
+    color: v.fg(v.$color-navy);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
   }
@@ -284,7 +285,7 @@
 
     p {
       margin: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -298,10 +299,10 @@
       @include m.flex-center;
       min-width: 2.25rem;
       height: 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
@@ -312,8 +313,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }

@@ -17,7 +17,7 @@
     gap: v.$spacing-3;
 
     h1 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-lg;
       font-weight: v.$font-weight-semibold;
       margin: 0;
@@ -29,11 +29,11 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
-  color: v.$color-white;
+  color: v.fg(v.$color-white);
   font-size: v.$font-size-sm;
   cursor: pointer;
   text-decoration: none;
@@ -45,14 +45,14 @@
   // which then matches the navy-dark hover background below and disappears.
   &:hover,
   &:focus-visible {
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
   }
 
   &--info {
     background-color: v.$color-info;
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-sky-40);
     }
   }
 
@@ -60,7 +60,7 @@
     background-color: v.$color-success;
 
     &:hover {
-      background-color: #227a46;
+      background-color: var(--fx-green-31);
     }
   }
 
@@ -68,7 +68,7 @@
     background-color: v.$color-danger;
 
     &:hover {
-      background-color: #b8352b;
+      background-color: var(--fx-red-45);
     }
   }
 
@@ -76,7 +76,7 @@
     background-color: v.$color-success;
 
     &:hover {
-      background-color: #227a46;
+      background-color: var(--fx-green-31);
     }
   }
 
@@ -116,13 +116,13 @@
     min-width: 0;
 
     span {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
 
     strong {
       @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       word-break: break-word;
     }
   }
@@ -146,7 +146,7 @@
   flex-direction: column;
   gap: v.$spacing-4;
   padding: v.$spacing-4;
-  border: 1px solid v.$color-border;
+  border: 1px solid v.line(v.$color-border);
   border-radius: v.$radius-md;
   min-width: 0;
 
@@ -155,7 +155,7 @@
   }
 
   &__title {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-base;
     margin: 0;
   }
@@ -182,18 +182,18 @@
     font-weight: v.$font-weight-semibold;
 
     &--accepted {
-      background-color: rgba(v.$color-success, 0.15);
-      color: v.$color-success;
+      background-color: v.alpha(v.$color-success, 0.15);
+      color: v.fg(v.$color-success);
     }
 
     &--rejected {
-      background-color: rgba(v.$color-danger, 0.15);
-      color: v.$color-danger;
+      background-color: v.alpha(v.$color-danger, 0.15);
+      color: v.fg(v.$color-danger);
     }
   }
 
   &__hint {
-    color: v.$color-info;
+    color: v.fg(v.$color-info);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -207,7 +207,7 @@
   min-width: 0;
 
   &__label {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
@@ -216,19 +216,19 @@
 
     strong {
       @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-base;
     }
 
     button {
       @include m.flex-center;
       @include m.focus-ring(v.$color-orange);
-      width: 1.75rem;
-      height: 1.75rem;
+      width: max(24px, 1.75rem);
+      height: max(24px, 1.75rem);
       border: none;
       border-radius: v.$radius-sm;
       background-color: v.$color-orange;
-      color: v.$color-navy-dark;
+      color: v.on(v.$color-navy-dark);
       cursor: pointer;
 
       &:hover {
@@ -242,32 +242,33 @@
 
     input {
       @include m.font-base;
-      @include m.focus-ring(v.$color-orange);
+      @include m.field-focus-ring;
       width: 100%;
       max-width: 8rem;
       height: 2.25rem;
       padding: 0 v.$spacing-3;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
 
       &:focus {
         outline: none;
-        border-color: v.$color-primary;
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
 
     button {
       @include m.flex-center;
       @include m.focus-ring(v.$color-orange);
-      width: 1.75rem;
-      height: 1.75rem;
+      width: max(24px, 1.75rem);
+      height: max(24px, 1.75rem);
       flex-shrink: 0;
       border: none;
       border-radius: v.$radius-sm;
-      color: v.$color-white;
+      color: v.fg(v.$color-white);
       cursor: pointer;
 
       &:first-of-type {
@@ -281,8 +282,8 @@
   }
 
   &__meta {
-    color: v.$color-success;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-success);
+    font-size: max(11px, 0.75rem);
   }
 }
 
@@ -292,7 +293,7 @@
 .review-assign-trucks-history {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid v.$color-border;
+  border: 1px solid v.line(v.$color-border);
   border-radius: v.$radius-md;
 
   table {
@@ -307,37 +308,37 @@
     @include m.font-heading(v.$font-weight-semibold);
     padding: v.$spacing-2 v.$spacing-3;
     background-color: v.$color-bg-muted;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     text-align: left;
     white-space: nowrap;
   }
 
   td {
     padding: v.$spacing-2 v.$spacing-3;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     white-space: nowrap;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
   }
 
   &__status {
     padding: 0.15rem v.$spacing-2;
     border-radius: v.$radius-pill;
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-semibold;
 
     &--accepted {
-      background-color: rgba(v.$color-success, 0.15);
-      color: v.$color-success;
+      background-color: v.alpha(v.$color-success, 0.15);
+      color: v.fg(v.$color-success);
     }
 
     &--rejected {
-      background-color: rgba(v.$color-danger, 0.15);
-      color: v.$color-danger;
+      background-color: v.alpha(v.$color-danger, 0.15);
+      color: v.fg(v.$color-danger);
     }
 
     &--pending {
-      background-color: rgba(v.$color-orange, 0.18);
-      color: v.$color-orange-dark;
+      background-color: v.alpha(v.$color-orange, 0.18);
+      color: v.fg(v.$color-orange-dark);
     }
   }
 
@@ -348,13 +349,13 @@
     margin-top: v.$spacing-1;
     border: none;
     background: transparent;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
     cursor: pointer;
 
     &:hover {
-      color: v.$color-primary-dark;
+      color: v.fg(v.$color-primary-dark);
       text-decoration: underline;
     }
   }
@@ -374,7 +375,7 @@
     gap: v.$spacing-3;
 
     h2 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-base;
       margin: 0;
     }
@@ -399,17 +400,17 @@
     @include m.focus-ring(v.$color-orange);
     display: inline-flex;
     padding: 0.2rem v.$spacing-3;
-    border: 1px solid v.$color-info;
+    border: 1px solid v.line(v.$color-info);
     border-radius: v.$radius-pill;
-    color: v.$color-info;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-info);
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-semibold;
     text-decoration: none;
     white-space: nowrap;
 
     &:hover {
       background-color: v.$color-info;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
   }
 
@@ -425,7 +426,7 @@
     flex-shrink: 0;
     border: none;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: 0.9rem;
     cursor: pointer;
     transition: filter v.$transition-fast;

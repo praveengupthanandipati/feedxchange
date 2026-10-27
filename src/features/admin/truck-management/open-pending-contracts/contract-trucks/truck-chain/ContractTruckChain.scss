@@ -17,7 +17,7 @@
     gap: v.$spacing-4;
     margin-bottom: v.$spacing-4;
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-white;
 
@@ -32,8 +32,8 @@
     span {
       display: block;
       margin-bottom: v.$spacing-1;
-      color: v.$color-text-muted;
-      font-size: 0.65rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.65rem);
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
@@ -45,13 +45,13 @@
 
   &__viewer-note {
     margin: 0;
-    color: v.$color-text-muted;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
   }
 
   &__table-wrapper {
     overflow-x: auto;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
   }
 
@@ -64,22 +64,22 @@
     td {
       padding: v.$spacing-3;
       text-align: left;
-      border-bottom: 1px solid v.$color-border;
+      border-bottom: 1px solid v.line(v.$color-border);
       vertical-align: top;
     }
 
     th {
       background-color: v.$color-gray-100;
-      color: v.$color-text-muted;
-      font-size: 0.65rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.65rem);
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
 
     td span {
       display: block;
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
     }
 
     tbody tr:last-child td {
@@ -87,7 +87,7 @@
     }
 
     tbody tr.is-transporter {
-      background-color: rgba(v.$color-success, 0.08);
+      background-color: v.alpha(v.$color-success, 0.08);
     }
   }
 

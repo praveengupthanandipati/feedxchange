@@ -1,22 +1,22 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import type { IconType } from "react-icons";
 import { FaRegBuilding, FaRegMoneyBillAlt } from "react-icons/fa";
 import {
-  FiAlertCircle,
-  FiArrowLeft,
-  FiCalendar,
-  FiCheck,
-  FiEye,
-  FiEyeOff,
-  FiHash,
-  FiMinus,
-  FiPercent,
-  FiPlus,
-  FiPrinter,
-  FiRefreshCw,
-  FiUser,
-} from "react-icons/fi";
+  type IconComponent,
+  ArrowLeftIcon,
+  CalendarIcon,
+  CheckIcon,
+  CircleAlertIcon,
+  EyeIcon,
+  EyeOffIcon,
+  HashIcon,
+  MinusIcon,
+  PercentIcon,
+  PlusIcon,
+  PrinterIcon,
+  RefreshCwIcon,
+  UserIcon,
+} from "../../../../shared/components/icon";
 import DateRangeInput from "../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
@@ -39,7 +39,7 @@ const EMPTY_FILTERS: Filters = { seller: "", buyer: "", interestNo: "", from: ""
 
 type Tone = "navy" | "green" | "blue" | "red" | "orange";
 
-const SummaryTile = ({ icon: Icon, label, value, tone }: { icon: IconType; label: string; value: string; tone: Tone }) => (
+const SummaryTile = ({ icon: Icon, label, value, tone }: { icon: IconComponent; label: string; value: string; tone: Tone }) => (
   <div className={`detail-tile detail-tile--${tone}`}>
     <span className="detail-tile__icon">
       <Icon aria-hidden />
@@ -156,7 +156,7 @@ const InterestDetail = () => {
         aria-expanded={open}
         aria-label={open ? `Hide payments for ${row.invoiceNo}` : `Show payments for ${row.invoiceNo}`}
       >
-        {open ? <FiMinus aria-hidden /> : <FiPlus aria-hidden />}
+        {open ? <MinusIcon aria-hidden /> : <PlusIcon aria-hidden />}
       </button>
     );
   };
@@ -185,7 +185,7 @@ const InterestDetail = () => {
         <h1>Interest of Payments</h1>
         <div className="interest-calc__header-actions">
           <Link to="/admin/interest-payments/view" className="interest-detail-page__back">
-            <FiArrowLeft aria-hidden /> Back
+            <ArrowLeftIcon aria-hidden /> Back
           </Link>
           <button
             type="button"
@@ -194,7 +194,7 @@ const InterestDetail = () => {
             aria-expanded={filtersVisible}
             aria-controls="interest-detail-filters"
           >
-            {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+            {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {filtersVisible ? "Hide" : "Show"}
           </button>
           <button
@@ -203,7 +203,7 @@ const InterestDetail = () => {
             onClick={() => record && printDetail(record, rows, totalInterest, totalAmount)}
             disabled={!record}
           >
-            <FiPrinter aria-hidden /> Print
+            <PrinterIcon aria-hidden /> Print
           </button>
           <button
             type="button"
@@ -211,7 +211,7 @@ const InterestDetail = () => {
             onClick={() => setExpandedKeys(allExpanded ? [] : rows.map((row) => row.id))}
             disabled={rows.length === 0}
           >
-            {allExpanded ? <FiMinus aria-hidden /> : <FiPlus aria-hidden />}
+            {allExpanded ? <MinusIcon aria-hidden /> : <PlusIcon aria-hidden />}
             {allExpanded ? "Collapse All" : "Expand All"}
           </button>
         </div>
@@ -225,10 +225,10 @@ const InterestDetail = () => {
           <SearchableSelect options={interestNoOptions} value={filters.interestNo} onChange={(interestNo) => setFilters({ ...filters, interestNo })} placeholder="Select Interest No" ariaLabel="Select Interest No" clearable />
           <div className="interest-calc__filter-actions">
             <button type="button" className="interest-calc__btn interest-calc__btn--navy" onClick={handleApply}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="interest-calc__btn interest-calc__btn--danger" onClick={handleReset}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         </div>
@@ -236,29 +236,29 @@ const InterestDetail = () => {
 
       {message && (
         <p className="interest-detail-page__message" role="alert">
-          <FiAlertCircle aria-hidden /> {message}
+          <CircleAlertIcon aria-hidden /> {message}
         </p>
       )}
 
       {!record ? (
         <p className="interest-detail-page__empty" role="status">
-          <FiAlertCircle aria-hidden /> {id ? `Interest entry ${id} could not be found.` : "There are no interest entries yet."}
+          <CircleAlertIcon aria-hidden /> {id ? `Interest entry ${id} could not be found.` : "There are no interest entries yet."}
         </p>
       ) : (
         <>
           <div className="interest-detail-page__tiles">
-            <SummaryTile icon={FiHash} label="Interest No" value={record.id} tone="navy" />
-            <SummaryTile icon={FiCalendar} label="From - To Date" value={`${formatDate(record.fromDate)} - ${formatDate(record.toDate)}`} tone="green" />
-            <SummaryTile icon={FiUser} label="Buyer" value={record.buyer} tone="blue" />
+            <SummaryTile icon={HashIcon} label="Interest No" value={record.id} tone="navy" />
+            <SummaryTile icon={CalendarIcon} label="From - To Date" value={`${formatDate(record.fromDate)} - ${formatDate(record.toDate)}`} tone="green" />
+            <SummaryTile icon={UserIcon} label="Buyer" value={record.buyer} tone="blue" />
             <SummaryTile icon={FaRegBuilding} label="Seller" value={record.seller} tone="red" />
-            <SummaryTile icon={FiPercent} label="Percentage" value={`${record.ratePercent}%`} tone="orange" />
+            <SummaryTile icon={PercentIcon} label="Percentage" value={`${record.ratePercent}%`} tone="orange" />
             <SummaryTile icon={FaRegMoneyBillAlt} label="Total Interest" value={formatInr(totalInterest)} tone="green" />
             <SummaryTile icon={FaRegMoneyBillAlt} label="Total Amount" value={formatInr(totalAmount)} tone="green" />
           </div>
 
           {rows.length === 0 ? (
             <p className="interest-detail-page__empty" role="status">
-              <FiAlertCircle aria-hidden /> No invoice breakdown is linked to {record.id}.
+              <CircleAlertIcon aria-hidden /> No invoice breakdown is linked to {record.id}.
             </p>
           ) : (
             <>

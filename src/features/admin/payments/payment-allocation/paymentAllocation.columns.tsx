@@ -1,4 +1,4 @@
-import { FiExternalLink } from "react-icons/fi";
+import { ExternalLinkIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import {
@@ -75,7 +75,7 @@ function entryColumns<T extends { id: string }>({
                 aria-label="View receipt details"
                 title={receiptId ? "View receipt details" : "Select a receipt first"}
               >
-                <FiExternalLink aria-hidden />
+                <ExternalLinkIcon aria-hidden />
               </button>
             </div>
             {error && <span className="payment-allocation-cell__error">{error}</span>}

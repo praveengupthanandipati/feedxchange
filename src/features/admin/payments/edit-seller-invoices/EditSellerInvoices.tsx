@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiCheckCircle, FiChevronLeft, FiChevronRight, FiEdit2, FiXCircle } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon, CircleCheckBigIcon, CircleXIcon, PenIcon } from "../../../../shared/components/icon";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
@@ -138,7 +138,7 @@ const EditSellerInvoices = () => {
             title={row.isEditable ? "Edit invoice" : row.status === "Paid" ? "Cleared invoices cannot be edited" : "Cancelled invoices cannot be edited"}
             aria-label={`Edit invoice ${row.invoiceNumber}`}
           >
-            <FiEdit2 aria-hidden /> Edit
+            <PenIcon aria-hidden /> Edit
           </button>
           <button
             type="button"
@@ -148,7 +148,7 @@ const EditSellerInvoices = () => {
             title={row.isCancellable ? "Cancel invoice" : "Only an invoice with no payment can be cancelled"}
             aria-label={`Cancel invoice ${row.invoiceNumber}`}
           >
-            <FiXCircle aria-hidden /> Cancel
+            <CircleXIcon aria-hidden /> Cancel
           </button>
         </div>
       ),
@@ -160,7 +160,7 @@ const EditSellerInvoices = () => {
       {notify.element}
       {toast && (
         <div className={`edit-invoices__toast edit-invoices__toast--${toast.kind}`} role="status">
-          {toast.kind === "ok" && <FiCheckCircle aria-hidden />} {toast.text}
+          {toast.kind === "ok" && <CircleCheckBigIcon aria-hidden />} {toast.text}
         </div>
       )}
 
@@ -232,13 +232,13 @@ const EditSellerInvoices = () => {
           <p>{total === 0 ? "Showing 0 Results" : `Showing ${(page - 1) * PAGE_SIZE + 1}-${Math.min(page * PAGE_SIZE, total)} of ${total} Results`}</p>
           <div>
             <button type="button" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} aria-label="Previous page">
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             <span>
               {page} / {totalPages}
             </span>
             <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} aria-label="Next page">
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

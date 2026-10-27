@@ -10,12 +10,12 @@
   &__back {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     align-self: flex-start;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-decoration: none;
 
     &:hover {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
     }
   }
 
@@ -31,7 +31,7 @@
     flex-wrap: wrap;
     gap: v.$spacing-3;
     padding-bottom: v.$spacing-4;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h1 {
       font-size: v.$font-size-xl;
@@ -48,10 +48,10 @@
   &__card-title {
     @include m.font-heading(v.$font-weight-semibold);
     font-size: v.$font-size-lg;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     margin: 0 0 v.$spacing-5;
     padding-bottom: v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
   }
 
   // ============================================================
@@ -62,7 +62,7 @@
     gap: v.$spacing-1;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
     margin-bottom: v.$spacing-2;
 
     &::-webkit-scrollbar {
@@ -80,7 +80,7 @@
     border: none;
     border-bottom: 3px solid transparent;
     background: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     cursor: pointer;
     white-space: nowrap;
@@ -91,14 +91,14 @@
     }
 
     &:hover {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       background-color: v.$color-bg-muted;
     }
 
     &.is-active {
-      color: v.$color-white;
+      color: v.on(v.$color-white);
       background-color: v.$color-navy;
-      border-bottom-color: v.$color-orange;
+      border-bottom-color: v.line(v.$color-orange);
     }
   }
 
@@ -136,7 +136,7 @@
   &__section-title {
     @include m.font-heading(v.$font-weight-semibold);
     font-size: v.$font-size-base;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     margin: 0;
   }
 
@@ -147,13 +147,13 @@
   }
 
   &__description {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
 
   &__hint {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -161,7 +161,7 @@
   &__label {
     @include m.font-base(v.$font-weight-semibold);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   &__grid {
@@ -189,9 +189,9 @@
     display: inline-block;
     padding: 0.15rem 0.6rem;
     border-radius: v.$radius-pill;
-    background-color: rgba(v.$color-success, 0.15);
-    color: v.$color-success;
-    font-size: 0.7rem;
+    background-color: v.alpha(v.$color-success, 0.15);
+    color: v.fg(v.$color-success);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
   }
@@ -202,7 +202,7 @@
     width: 2rem;
     height: 2rem;
     border-radius: v.$radius-pill;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     text-decoration: none;
     cursor: pointer;
     transition: background-color v.$transition-fast;
@@ -212,7 +212,7 @@
     }
 
     &--danger {
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
   }
 
@@ -226,7 +226,7 @@
     gap: v.$spacing-2;
     background-color: v.$color-bg-muted;
     box-shadow: none;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
 
     h3 {
       @include m.flex(row, flex-start, center, v.$spacing-2);
@@ -253,8 +253,8 @@
   &__notice {
     padding: v.$spacing-4;
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-info, 0.1);
-    color: v.$color-info;
+    background-color: v.alpha(v.$color-info, 0.1);
+    color: v.fg(v.$color-info);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
   }
@@ -279,13 +279,13 @@
   gap: v.$spacing-1;
 
   &__label {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
   &__value {
     @include m.font-heading(v.$font-weight-semibold);
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     margin: 0;
   }
 }

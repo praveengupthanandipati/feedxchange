@@ -13,19 +13,19 @@
   // Dark enough everywhere that the white text stays readable.
   background-color: v.$navy-900;
   background-image:
-    linear-gradient(180deg, rgba(#050f24, 0.35) 0%, rgba(#050f24, 0) 35%, rgba(#050f24, 0.6) 100%),
+    linear-gradient(180deg, rgba(var(--fx-slate-8-rgb), 0.35) 0%, rgba(var(--fx-slate-8-rgb), 0) 35%, rgba(var(--fx-slate-8-rgb), 0.6) 100%),
     linear-gradient(
       120deg,
-      rgba(#071a33, 0.92) 0%,
-      rgba(#1e2a78, 0.78) 30%,
-      rgba(#0f6b6b, 0.62) 62%,
-      rgba(#e08c0b, 0.55) 100%
+      rgba(var(--fx-blue-11-rgb), 0.92) 0%,
+      rgba(var(--fx-blue-29-rgb), 0.78) 30%,
+      rgba(var(--fx-cyan-24-rgb), 0.62) 62%,
+      rgba(var(--fx-amber-46-2-rgb), 0.55) 100%
     ),
     var(--hero-bg);
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  color: rgba(v.$white, 0.88);
+  color: v.alpha(v.on(v.$white), 0.88);
   text-align: center;
   // Keeps the glows and pattern inside the hero without clipping the search dropdown.
   isolation: isolate;
@@ -46,9 +46,9 @@
     left: 0;
     z-index: -1;
     background-image:
-      radial-gradient(40% 55% at 92% 8%, rgba(#f5a524, 0.45), transparent 70%),
-      radial-gradient(35% 50% at 6% 12%, rgba(#d946ef, 0.28), transparent 70%),
-      radial-gradient(45% 45% at 50% 100%, rgba(#14b8a6, 0.35), transparent 70%);
+      radial-gradient(40% 55% at 92% 8%, rgba(var(--fx-amber-55-rgb), 0.45), transparent 70%),
+      radial-gradient(35% 50% at 6% 12%, rgba(var(--fx-purple-61-rgb), 0.28), transparent 70%),
+      radial-gradient(45% 45% at 50% 100%, rgba(var(--fx-teal-40-rgb), 0.35), transparent 70%);
     background-size: 100% 100%;
     animation: hero-glow 14s ease-in-out infinite alternate;
     pointer-events: none;
@@ -64,8 +64,8 @@
     left: 0;
     z-index: -1;
     background-image:
-      radial-gradient(rgba(v.$white, 0.22) 1px, transparent 1.5px),
-      repeating-linear-gradient(135deg, rgba(v.$white, 0.05) 0 1px, transparent 1px 14px);
+      radial-gradient(v.alpha(v.$white, 0.22) 1px, transparent 1.5px),
+      repeating-linear-gradient(135deg, v.alpha(v.$white, 0.05) 0 1px, transparent 1px 14px);
     background-size:
       18px 18px,
       auto;
@@ -76,7 +76,7 @@
 
   // Thin multi-colour line along the bottom edge.
   border-bottom: 3px solid v.$orange-500;
-  border-image: linear-gradient(90deg, #14b8a6, v.$orange-500 50%, #d946ef) 1;
+  border-image: linear-gradient(90deg, var(--fx-teal-40-line), v.line(v.$orange-500) 50%, var(--fx-purple-61-line)) 1;
 
   @include m.reduced-motion {
     &::before {
@@ -93,7 +93,7 @@
   }
 
   .eyebrow {
-    color: v.$orange-500;
+    color: v.fg(v.$orange-500);
 
     &::after {
       content: "";
@@ -107,9 +107,9 @@
   h1 {
     @include m.fluid-type(2rem, 3.25rem);
     max-width: 48rem;
-    color: v.$white;
+    color: v.fg(v.$white);
     letter-spacing: -0.02em;
-    text-shadow: 0 2px 24px rgba(v.$navy-900, 0.4);
+    text-shadow: 0 2px 24px v.alpha(v.$navy-900, 0.4);
   }
 
   &__text {
@@ -134,7 +134,7 @@
     }
 
     svg {
-      color: v.$green-500;
+      color: v.fg(v.$green-500);
     }
   }
 }
@@ -162,7 +162,7 @@ $search-height: 3.75rem;
 
     &:focus-within {
       box-shadow:
-        0 0 0 4px rgba(v.$orange-500, 0.45),
+        var(--fx-field-focus-glow),
         0 20px 40px -18px rgba(0, 0, 0, 0.55);
     }
 
@@ -174,7 +174,7 @@ $search-height: 3.75rem;
       border: none;
       border-radius: inherit;
       background: transparent;
-      color: v.$ink;
+      color: v.fg(v.$ink);
       // 16px stops iOS Safari zooming in when the field is focused.
       font-size: 1rem;
       outline: none;
@@ -182,7 +182,7 @@ $search-height: 3.75rem;
       appearance: none;
 
       &::placeholder {
-        color: v.$ink-muted;
+        color: v.fg(v.$ink-muted);
         opacity: 1;
       }
 
@@ -201,7 +201,7 @@ $search-height: 3.75rem;
   &__icon {
     position: absolute;
     left: v.$space-5;
-    color: v.$navy-700;
+    color: v.fg(v.$navy-700);
     font-size: 1.2rem;
     pointer-events: none;
   }
@@ -218,12 +218,12 @@ $search-height: 3.75rem;
     border: none;
     border-radius: 50%;
     background-color: v.$surface-alt;
-    color: v.$ink-soft;
+    color: v.fg(v.$ink-soft);
     cursor: pointer;
 
     &:hover {
       background-color: v.$sky-100;
-      color: v.$navy-900;
+      color: v.fg(v.$navy-900);
     }
   }
 
@@ -272,11 +272,11 @@ $search-height: 3.75rem;
       cursor: pointer;
 
       &.is-highlighted {
-        background: linear-gradient(90deg, v.$sky-50, rgba(v.$orange-500, 0.1));
+        background: linear-gradient(90deg, v.$sky-50, v.alpha(v.$orange-500, 0.1));
 
         .product-search__thumb {
           background-color: v.$orange-500;
-          color: v.$navy-900;
+          color: v.on(v.$navy-900);
         }
 
         .product-search__go {
@@ -304,7 +304,7 @@ $search-height: 3.75rem;
     height: 2.5rem;
     border-radius: v.$radius-sm;
     background-color: v.$sky-100;
-    color: v.$navy-600;
+    color: v.fg(v.$navy-600);
     transition:
       background-color 0.15s ease,
       color 0.15s ease;
@@ -316,7 +316,7 @@ $search-height: 3.75rem;
 
     strong {
       display: block;
-      color: v.$navy-900;
+      color: v.fg(v.$navy-900);
       font-size: v.$fs-sm;
       font-weight: v.$fw-semibold;
     }
@@ -324,7 +324,7 @@ $search-height: 3.75rem;
     small {
       display: block;
       overflow: hidden;
-      color: v.$ink-muted;
+      color: v.fg(v.$ink-muted);
       font-size: v.$fs-xs;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -333,7 +333,7 @@ $search-height: 3.75rem;
 
   &__go {
     flex-shrink: 0;
-    color: v.$orange-600;
+    color: v.fg(v.$orange-600);
     opacity: 0;
     transform: translateX(-4px);
     transition:
@@ -343,7 +343,7 @@ $search-height: 3.75rem;
 
   &__empty {
     padding: v.$space-4;
-    color: v.$ink-muted;
+    color: v.fg(v.$ink-muted);
     font-size: v.$fs-sm;
     text-align: center;
   }
@@ -356,7 +356,7 @@ $search-height: 3.75rem;
     margin-top: v.$space-3;
 
     > span {
-      color: rgba(v.$white, 0.85);
+      color: v.alpha(v.fg(v.$white), 0.85);
       font-size: v.$fs-sm;
       font-style: italic;
       font-weight: v.$fw-medium;
@@ -372,10 +372,10 @@ $search-height: 3.75rem;
     button {
       @include m.focus-ring;
       padding: 0.3rem 0.8rem;
-      border: 1px solid rgba(v.$white, 0.55);
+      border: 1px solid v.alpha(v.line(v.$white), 0.55);
       border-radius: v.$radius-pill;
-      background-color: rgba(v.$white, 0.08);
-      color: v.$white;
+      background-color: v.alpha(v.$white, 0.08);
+      color: v.fg(v.$white);
       font-size: v.$fs-xs;
       font-weight: v.$fw-medium;
       cursor: pointer;
@@ -385,9 +385,9 @@ $search-height: 3.75rem;
         color 0.2s ease;
 
       &:hover {
-        border-color: v.$orange-500;
+        border-color: v.line(v.$orange-500);
         background-color: v.$orange-500;
-        color: v.$navy-900;
+        color: v.on(v.$navy-900);
       }
     }
   }
@@ -396,13 +396,13 @@ $search-height: 3.75rem;
 // ---------- Partners ----------
 .partners {
   padding: v.$space-6 0;
-  border-bottom: 1px solid v.$line;
+  border-bottom: 1px solid v.line(v.$line);
   background-color: v.$white;
   background-image: v.$gradient-warm;
 
   &__title {
     margin-bottom: v.$space-4;
-    color: v.$ink-muted;
+    color: v.fg(v.$ink-muted);
     font-size: v.$fs-xs;
     font-weight: v.$fw-semibold;
     letter-spacing: 0.12em;
@@ -436,7 +436,7 @@ $search-height: 3.75rem;
 .feature-card {
   position: relative;
   padding: v.$space-6 v.$space-5;
-  border: 1px solid v.$line;
+  border: 1px solid v.line(v.$line);
   border-radius: v.$radius-lg;
   background-color: v.$surface;
   transition:
@@ -451,7 +451,7 @@ $search-height: 3.75rem;
 
     .feature-card__icon {
       background-color: v.$orange-500;
-      color: v.$navy-900;
+      color: v.on(v.$navy-900);
     }
   }
 
@@ -469,7 +469,7 @@ $search-height: 3.75rem;
   }
 
   p {
-    color: v.$ink-soft;
+    color: v.fg(v.$ink-soft);
     font-size: v.$fs-sm;
     line-height: 1.7;
   }
@@ -503,7 +503,7 @@ $search-height: 3.75rem;
     height: 3rem;
     border-radius: v.$radius-md;
     background-color: v.$sky-100;
-    color: v.$navy-600;
+    color: v.fg(v.$navy-600);
     font-size: 1.3rem;
     transition:
       background-color 0.25s ease,
@@ -554,7 +554,7 @@ $search-height: 3.75rem;
     display: flex;
     align-items: flex-start;
     gap: v.$space-3;
-    color: v.$ink;
+    color: v.fg(v.$ink);
     font-weight: v.$fw-medium;
   }
 
@@ -567,8 +567,8 @@ $search-height: 3.75rem;
     height: 1.5rem;
     margin-top: 0.05rem;
     border-radius: 50%;
-    background-color: rgba(v.$green-500, 0.12);
-    color: v.$green-500;
+    background-color: v.alpha(v.$green-500, 0.12);
+    color: v.fg(v.$green-500);
     font-size: 0.85rem;
   }
 }
@@ -597,14 +597,14 @@ $search-height: 3.75rem;
 
     @include m.up(lg) {
       &:not(:first-child) {
-        border-left: 1px solid rgba(v.$white, 0.12);
+        border-left: 1px solid v.alpha(v.line(v.$white), 0.12);
       }
     }
   }
 
   dd {
     margin: 0;
-    color: v.$white;
+    color: v.fg(v.$white);
     font-family: v.$font-heading;
     font-weight: v.$fw-bold;
     @include m.fluid-type(1.9rem, 2.75rem);
@@ -612,7 +612,7 @@ $search-height: 3.75rem;
   }
 
   dt {
-    color: rgba(v.$white, 0.7);
+    color: v.alpha(v.fg(v.$white), 0.7);
     font-size: v.$fs-sm;
     font-weight: v.$fw-regular;
   }
@@ -647,7 +647,7 @@ $search-height: 3.75rem;
     }
 
     p {
-      color: v.$ink-soft;
+      color: v.fg(v.$ink-soft);
       font-size: v.$fs-sm;
     }
 
@@ -677,7 +677,7 @@ $search-height: 3.75rem;
     height: 2.75rem;
     border-radius: 50%;
     background: linear-gradient(135deg, v.$orange-500, v.$orange-600);
-    color: v.$navy-900;
+    color: v.on(v.$navy-900);
     font-family: v.$font-heading;
     font-size: v.$fs-sm;
     font-weight: v.$fw-bold;
@@ -690,14 +690,14 @@ $search-height: 3.75rem;
   flex-direction: column;
   gap: v.$space-4;
   padding: v.$space-6 v.$space-5;
-  border: 1px solid v.$line;
+  border: 1px solid v.line(v.$line);
   border-radius: v.$radius-lg;
   background-color: v.$surface;
 
   &__stars {
     display: flex;
     gap: 0.2rem;
-    color: v.$orange-500;
+    color: v.fg(v.$orange-500);
 
     svg {
       fill: currentColor;
@@ -707,7 +707,7 @@ $search-height: 3.75rem;
   blockquote {
     flex: 1;
     margin: 0;
-    color: v.$ink;
+    color: v.fg(v.$ink);
     font-size: v.$fs-base;
     line-height: 1.7;
   }
@@ -717,7 +717,7 @@ $search-height: 3.75rem;
     align-items: center;
     gap: v.$space-3;
     padding-top: v.$space-4;
-    border-top: 1px solid v.$line;
+    border-top: 1px solid v.line(v.$line);
 
     > span {
       display: inline-flex;
@@ -728,7 +728,7 @@ $search-height: 3.75rem;
       height: 2.75rem;
       border-radius: 50%;
       background-color: v.$navy-800;
-      color: v.$white;
+      color: v.on(v.$white);
       font-size: v.$fs-sm;
       font-weight: v.$fw-semibold;
     }
@@ -740,12 +740,12 @@ $search-height: 3.75rem;
     }
 
     strong {
-      color: v.$ink;
+      color: v.fg(v.$ink);
       font-size: v.$fs-sm;
     }
 
     small {
-      color: v.$ink-muted;
+      color: v.fg(v.$ink-muted);
       font-size: v.$fs-xs;
     }
   }
@@ -756,7 +756,7 @@ $search-height: 3.75rem;
   padding: 0 0 v.$space-8;
   // Continues the light gradient of the section above it.
   background-color: v.$white;
-  background-image: linear-gradient(180deg, #f4f8fd 0%, #ffffff 100%);
+  background-image: linear-gradient(180deg, var(--fx-gray-97) 0%, var(--fx-white) 100%);
 
   &__box {
     position: relative;
@@ -767,7 +767,7 @@ $search-height: 3.75rem;
     padding: v.$space-7 v.$space-5;
     border-radius: v.$radius-lg;
     background: linear-gradient(120deg, v.$navy-800 0%, v.$navy-600 100%);
-    color: rgba(v.$white, 0.8);
+    color: v.alpha(v.on(v.$white), 0.8);
 
     @include m.up(md) {
       padding: v.$space-7;
@@ -787,13 +787,13 @@ $search-height: 3.75rem;
       width: 20rem;
       height: 20rem;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(v.$orange-500, 0.35), transparent 65%);
+      background: radial-gradient(circle, v.alpha(v.$orange-500, 0.35), transparent 65%);
       pointer-events: none;
     }
 
     h2 {
       @include m.fluid-type(1.6rem, 2.2rem);
-      color: v.$white;
+      color: v.fg(v.$white);
     }
 
     p {
@@ -832,12 +832,12 @@ $search-height: 3.75rem;
 // ---------- Popular Categories ----------
 // Tile colours: [icon background, icon colour, accent glow].
 $category-colors: (
-  0: (#e0f2fe, #0369a1, #38bdf8),
-  1: (#fff1d6, #b45309, #f5a524),
-  2: (#e3f7ec, #15803d, #22a06b),
-  3: (#fef3c7, #a16207, #eab308),
-  4: (#ffe4ec, #be185d, #f472b6),
-  5: (#ede9fe, #6d28d9, #8b5cf6),
+  0: (v.token("slate-95"), v.token("sky-32"), v.token("sky-60")),
+  1: (v.token("amber-92"), v.token("orange-37"), v.token("amber-55")),
+  2: (v.token("green-94"), v.token("green-29"), v.token("teal-38")),
+  3: (v.token("amber-89"), v.token("amber-33"), v.token("amber-47")),
+  4: (v.token("pink-95"), v.token("pink-42"), v.token("pink-70")),
+  5: (v.token("indigo-95"), v.token("violet-50"), v.token("violet-66")),
 );
 
 .site-categories {
@@ -872,7 +872,7 @@ $category-colors: (
   gap: v.$space-4;
   overflow: hidden;
   padding: v.$space-4;
-  border: 1px solid v.$line;
+  border: 1px solid v.line(v.$line);
   border-radius: v.$radius-lg;
   background-color: v.$white;
   box-shadow: v.$shadow-sm;
@@ -922,7 +922,7 @@ $category-colors: (
 
     .category-tile__go {
       background-color: v.$orange-500;
-      color: v.$navy-900;
+      color: v.on(v.$navy-900);
       transform: rotate(45deg);
     }
   }
@@ -930,7 +930,7 @@ $category-colors: (
   @each $i, $c in $category-colors {
     &--#{$i} {
       --tile-bg: #{list.nth($c, 1)};
-      --tile-fg: #{list.nth($c, 2)};
+      --tile-fg: #{v.fg(list.nth($c, 2))};
       --glow: #{list.nth($c, 3)};
     }
   }
@@ -955,7 +955,7 @@ $category-colors: (
 
     strong {
       display: block;
-      color: v.$navy-900;
+      color: v.fg(v.$navy-900);
       font-family: v.$font-heading;
       font-size: v.$fs-base;
       font-weight: v.$fw-semibold;
@@ -964,7 +964,7 @@ $category-colors: (
     small {
       display: block;
       margin-top: 0.15rem;
-      color: v.$ink-muted;
+      color: v.fg(v.$ink-muted);
       font-size: v.$fs-xs;
       line-height: 1.45;
     }
@@ -977,7 +977,7 @@ $category-colors: (
     padding: 0.55rem;
     border-radius: 50%;
     background-color: v.$surface-alt;
-    color: v.$navy-700;
+    color: v.fg(v.$navy-700);
     transition:
       background-color 0.25s ease,
       color 0.25s ease,
@@ -1009,12 +1009,12 @@ $badge: 120px;
 // Colourful gradient (sky → cream → blush) with colour glows in three corners.
 .dealing {
   position: relative;
-  background-color: #eaf4ff;
+  background-color: var(--fx-slate-95-2);
   background-image:
-    radial-gradient(60% 80% at 0% 0%, rgba(#38bdf8, 0.28), transparent 70%),
-    radial-gradient(55% 70% at 100% 100%, rgba(#f472b6, 0.22), transparent 70%),
-    radial-gradient(50% 60% at 100% 0%, rgba(v.$orange-500, 0.25), transparent 70%),
-    linear-gradient(135deg, #e0f2fe 0%, #fff7e6 50%, #fdeef6 100%);
+    radial-gradient(60% 80% at 0% 0%, rgba(var(--fx-sky-60-rgb), 0.28), transparent 70%),
+    radial-gradient(55% 70% at 100% 100%, rgba(var(--fx-pink-70-rgb), 0.22), transparent 70%),
+    radial-gradient(50% 60% at 100% 0%, v.alpha(v.$orange-500, 0.25), transparent 70%),
+    linear-gradient(135deg, var(--fx-slate-95) 0%, var(--fx-amber-95) 50%, var(--fx-pink-96) 100%);
   isolation: isolate;
 
   // Simple pattern: small "+" signs on a 28px grid, strongest at the edges and fading toward the centre.
@@ -1065,10 +1065,10 @@ $badge: 120px;
   flex-direction: column;
   align-items: center;
   padding: v.$space-6 v.$space-5;
-  border: 1px solid rgba(v.$white, 0.8);
+  border: 1px solid v.alpha(v.line(v.$white), 0.8);
   border-radius: v.$radius-lg;
-  background-color: rgba(v.$white, 0.75);
-  box-shadow: 0 10px 30px -18px rgba(v.$navy-900, 0.35);
+  background-color: v.alpha(v.$white, 0.75);
+  box-shadow: 0 10px 30px -18px v.alpha(v.$navy-900, 0.35);
   text-align: center;
   transition:
     transform 0.35s v.$ease,
@@ -1081,7 +1081,7 @@ $badge: 120px;
   }
 
   &:hover {
-    box-shadow: 0 24px 44px -20px rgba(v.$navy-900, 0.45);
+    box-shadow: 0 24px 44px -20px v.alpha(v.$navy-900, 0.45);
     transform: translateY(-6px);
   }
 
@@ -1091,30 +1091,30 @@ $badge: 120px;
   }
 
   p {
-    color: v.$ink-soft;
+    color: v.fg(v.$ink-soft);
     font-size: v.$fs-sm;
     line-height: 1.75;
   }
 
   // Badge and ring colours per farm type.
   &--poultry {
-    --badge: #fff1d6;
-    --ring: #f5a524;
+    --badge: var(--fx-amber-92);
+    --ring: var(--fx-amber-55);
   }
 
   &--fish {
-    --badge: #dff3ff;
-    --ring: #38bdf8;
+    --badge: var(--fx-slate-95);
+    --ring: var(--fx-sky-60);
   }
 
   &--prawn {
-    --badge: #ffe4ec;
-    --ring: #f472b6;
+    --badge: var(--fx-pink-95);
+    --ring: var(--fx-pink-70);
   }
 
   &--cattle {
-    --badge: #e3f7ec;
-    --ring: #22a06b;
+    --badge: var(--fx-green-94);
+    --ring: var(--fx-teal-38);
   }
 
   &__icon {
@@ -1128,7 +1128,7 @@ $badge: 120px;
     margin-top: 6px;
     border-radius: 50%;
     background: radial-gradient(circle at 30% 25%, v.$white 0%, var(--badge, v.$sky-100) 70%);
-    box-shadow: inset 0 0 0 1px rgba(v.$navy-900, 0.05);
+    box-shadow: inset 0 0 0 1px v.alpha(v.$navy-900, 0.05);
 
     // Dashed ring the orbiting dot travels along.
     &::before {
@@ -1138,7 +1138,7 @@ $badge: 120px;
       right: -6px;
       bottom: -6px;
       left: -6px;
-      border: 1.5px dashed var(--ring, v.$orange-500);
+      border: 1.5px dashed var(--ring, v.line(v.$orange-500));
       border-radius: 50%;
       opacity: 0.5;
     }
@@ -1153,7 +1153,7 @@ $badge: 120px;
     height: 10px;
     border-radius: 50%;
     background-color: var(--ring, v.$orange-500);
-    box-shadow: 0 0 0 3px rgba(v.$white, 0.9);
+    box-shadow: 0 0 0 3px v.alpha(v.$white, 0.9);
     offset-path: path("M 60 -6 A 66 66 0 1 1 59.99 -6");
     offset-rotate: 0deg;
     animation: dealing-orbit 6s linear infinite;
@@ -1200,19 +1200,19 @@ $badge: 120px;
   overflow: visible;
 
   .draw {
-    stroke: v.$navy-900;
+    stroke: v.fg(v.$navy-900);
     stroke-width: 1.8;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
 
   .fill {
-    fill: v.$navy-900;
+    fill: v.fg(v.$navy-900);
   }
 
   .accent-stroke {
     fill: none;
-    stroke: v.$orange-500;
+    stroke: v.fg(v.$orange-500);
     stroke-width: 1.8;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -1223,7 +1223,7 @@ $badge: 120px;
   }
 
   .accent-fill {
-    fill: v.$orange-500;
+    fill: v.fg(v.$orange-500);
   }
 }
 
@@ -1255,9 +1255,9 @@ $badge: 120px;
   height: auto;
   min-height: 6.5rem;
   padding: v.$space-3 v.$space-2;
-  border: 1px solid v.$line;
+  border: 1px solid v.line(v.$line);
   border-radius: v.$radius-md;
-  background-color: rgba(v.$white, 0.9);
+  background-color: v.alpha(v.$white, 0.9);
   box-shadow: v.$shadow-sm;
   text-align: center;
   transition:
@@ -1268,13 +1268,13 @@ $badge: 120px;
   user-select: none;
 
   &:hover {
-    border-color: rgba(v.$orange-500, 0.6);
+    border-color: v.alpha(v.line(v.$orange-500), 0.6);
     box-shadow: v.$shadow-md;
     transform: translateY(-2px);
 
     .partners__logo {
       background: linear-gradient(135deg, v.$orange-500, v.$orange-600);
-      color: v.$navy-900;
+      color: v.on(v.$navy-900);
     }
   }
 }
@@ -1288,7 +1288,7 @@ $badge: 120px;
   height: 2.5rem;
   border-radius: 50%;
   background: linear-gradient(135deg, v.$navy-600, v.$navy-900);
-  color: v.$white;
+  color: v.on(v.$white);
   font-family: v.$font-heading;
   font-size: v.$fs-xs;
   font-weight: v.$fw-bold;
@@ -1300,9 +1300,9 @@ $badge: 120px;
   display: -webkit-box;
   max-width: 100%;
   overflow: hidden;
-  color: v.$navy-800;
+  color: v.fg(v.$navy-800);
   font-family: v.$font-heading;
-  font-size: 0.8rem;
+  font-size: max(11px, 0.8rem);
   font-weight: v.$fw-semibold;
   line-height: 1.3;
   -webkit-line-clamp: 2;
@@ -1365,11 +1365,11 @@ $badge: 120px;
     justify-content: center;
     width: 2.75rem;
     height: 2.75rem;
-    border: 1px solid v.$line;
+    border: 1px solid v.line(v.$line);
     border-radius: 50%;
     background-color: v.$white;
     box-shadow: v.$shadow-sm;
-    color: v.$navy-800;
+    color: v.fg(v.$navy-800);
     font-size: 1.25rem;
     cursor: pointer;
     transition:
@@ -1381,7 +1381,7 @@ $badge: 120px;
 
     &:hover {
       background-color: v.$orange-500;
-      color: v.$navy-900;
+      color: v.on(v.$navy-900);
       transform: scale(1.06);
     }
   }

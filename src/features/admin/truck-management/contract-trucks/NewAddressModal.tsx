@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiMapPin, FiX } from "react-icons/fi";
+import { MapPinIcon, XIcon } from "../../../../shared/components/icon";
 import {
   useCreateBusinessProfileAddressMutation,
   useLazyGetProfileAddressQuery,
@@ -258,7 +258,7 @@ const NewAddressModal = ({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="confirm-dialog__icon new-address-modal__icon">
-          <FiMapPin aria-hidden />
+          <MapPinIcon aria-hidden />
         </div>
         <h2 id="new-address-modal-title" className="confirm-dialog__title">
           {title}
@@ -439,7 +439,7 @@ const NewAddressModal = ({
         </form>
 
         <button type="button" className="new-address-modal__close" onClick={onClose} aria-label="Close">
-          <FiX aria-hidden />
+          <XIcon aria-hidden />
         </button>
       </div>
     </div>,

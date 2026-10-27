@@ -1,4 +1,4 @@
-import { FiSave, FiEdit2, FiTrash2, FiRotateCcw, FiPlus } from "react-icons/fi";
+import { PenIcon, PlusIcon, RotateCcwIcon, SaveIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import type { SearchableSelectOption } from "../../../../../shared/components/dropdown/SearchableSelect";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
@@ -179,10 +179,10 @@ export function buildTransporterAssignmentColumns({
           <RowActionsMenu
             actions={[
               row.saved
-                ? { key: "edit", label: "Edit", icon: FiEdit2, onClick: () => onEditRow(row) }
-                : { key: "save", label: "Save", icon: FiSave, onClick: () => onSaveRow(row) },
-              { key: "history", label: "Request History", icon: FiRotateCcw, onClick: () => onViewHistory(row) },
-              { key: "delete", label: "Delete", icon: FiTrash2, onClick: () => onDeleteRow(row), danger: true },
+                ? { key: "edit", label: "Edit", icon: PenIcon, onClick: () => onEditRow(row) }
+                : { key: "save", label: "Save", icon: SaveIcon, onClick: () => onSaveRow(row) },
+              { key: "history", label: "Request History", icon: RotateCcwIcon, onClick: () => onViewHistory(row) },
+              { key: "delete", label: "Delete", icon: Trash2Icon, onClick: () => onDeleteRow(row), danger: true },
             ]}
           />
           {row.id === lastRowId && (
@@ -193,7 +193,7 @@ export function buildTransporterAssignmentColumns({
               aria-label="Add new transporter row"
               title="Add Row"
             >
-              <FiPlus aria-hidden />
+              <PlusIcon aria-hidden />
             </button>
           )}
         </div>

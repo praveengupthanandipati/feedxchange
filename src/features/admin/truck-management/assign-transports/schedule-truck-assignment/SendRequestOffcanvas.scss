@@ -52,11 +52,11 @@
     @include m.flex(row, space-between, center);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
       @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-lg;
       margin: 0;
     }
@@ -71,14 +71,14 @@
     border: none;
     border-radius: v.$radius-pill;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 1.25rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -97,12 +97,12 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
 
     tr:not(:last-child) td {
-      border-bottom: 1px solid v.$color-border;
+      border-bottom: 1px solid v.line(v.$color-border);
     }
   }
 
@@ -110,13 +110,13 @@
     width: 40%;
     padding: v.$spacing-3 v.$spacing-4;
     background-color: v.$color-bg-muted;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
   &__details-value {
     padding: v.$spacing-3 v.$spacing-4;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
   }
@@ -124,7 +124,7 @@
   &__section-title {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     @include m.font-heading(v.$font-weight-semibold);
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-base;
     margin: 0;
   }
@@ -132,7 +132,7 @@
   &__table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
   }
 
@@ -147,26 +147,26 @@
       @include m.font-heading(v.$font-weight-semibold);
       padding: v.$spacing-3 v.$spacing-4;
       background-color: v.$color-bg-muted;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       text-align: left;
       white-space: nowrap;
     }
 
     td {
       padding: v.$spacing-3 v.$spacing-4;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       white-space: nowrap;
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
     }
   }
 
   &__freight {
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
     font-weight: v.$font-weight-semibold;
   }
 
   &__note {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -175,18 +175,18 @@
     @include m.flex(row, flex-start, center, v.$spacing-3);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
   }
 
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     cursor: pointer;
     transition: background-color v.$transition-fast;
@@ -195,7 +195,7 @@
       background-color: v.$color-success;
 
       &:hover {
-        background-color: #227a46;
+        background-color: var(--fx-green-31);
       }
     }
 
@@ -203,7 +203,7 @@
       background-color: v.$color-danger;
 
       &:hover {
-        background-color: #b8352b;
+        background-color: var(--fx-red-45);
       }
     }
   }

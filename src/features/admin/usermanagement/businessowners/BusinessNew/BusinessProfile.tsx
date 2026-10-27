@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { FiPlus } from "react-icons/fi";
+import { PlusIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../../shared/components/tooltip/InfoTooltip";
 import EmptyRowsState from "./EmptyRowsState";
@@ -169,7 +169,7 @@ const BrokerageChargesCard = ({
                       onClick={addRow}
                       aria-label="Add row"
                     >
-                      <FiPlus aria-hidden />
+                      <PlusIcon aria-hidden />
                     </button>
                   )}
                 </div>
@@ -254,7 +254,7 @@ const CapacityRequirementsCard = ({ rows, onRowsChange, productOptions }: Capaci
                     onClick={addRow}
                     aria-label="Add row"
                   >
-                    <FiPlus aria-hidden />
+                    <PlusIcon aria-hidden />
                   </button>
                 )}
               </div>

@@ -51,22 +51,22 @@
 
     input {
       flex: 1 1 12rem;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
 
       &::placeholder {
-        color: v.$color-gray-400;
+        color: v.fg(v.$color-gray-400);
       }
 
       &:focus {
         outline: none;
-        border-color: v.$color-primary;
-        box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
@@ -76,7 +76,7 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border-radius: v.$radius-md;
     font-size: v.$font-size-sm;
@@ -88,7 +88,7 @@
   &__apply {
     border: none;
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
       background-color: v.$color-navy-dark;
@@ -96,12 +96,12 @@
   }
 
   &__reset {
-    border: 1px solid v.$color-orange;
+    border: 1px solid v.line(v.$color-orange);
     background-color: v.$color-bg;
-    color: v.$color-orange-dark;
+    color: v.fg(v.$color-orange-dark);
 
     &:hover {
-      background-color: rgba(v.$color-orange, 0.08);
+      background-color: v.alpha(v.$color-orange, 0.08);
     }
   }
 }
@@ -110,7 +110,7 @@
   @include m.flex(row, space-between, center);
   padding: v.$spacing-4;
   border-radius: v.$radius-lg;
-  color: v.$color-white;
+  color: v.fg(v.$color-white);
 
   @include m.respond-to(md) {
     padding: v.$spacing-5 v.$spacing-6;
@@ -139,7 +139,7 @@
   }
 
   &--info {
-    background: linear-gradient(135deg, v.$color-info 0%, #1f6fae 100%);
+    background: linear-gradient(135deg, v.$color-info 0%, var(--fx-sky-40) 100%);
   }
 
   &--warning {
@@ -151,12 +151,12 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
   font-size: v.$font-size-sm;
-  color: v.$color-white;
+  color: v.fg(v.$color-white);
   cursor: pointer;
   transition: background-color v.$transition-fast;
 
@@ -164,13 +164,13 @@
     background-color: v.$color-info;
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-sky-40);
     }
   }
 
   &--warning {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -182,16 +182,16 @@
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: v.$radius-pill;
-  font-size: 0.7rem;
+  font-size: max(11px, 0.7rem);
   font-weight: v.$font-weight-semibold;
 
   &--paid {
-    background-color: rgba(v.$color-success, 0.15);
-    color: v.$color-success;
+    background-color: v.alpha(v.$color-success, 0.15);
+    color: v.fg(v.$color-success);
   }
 
   &--pending {
-    background-color: rgba(v.$color-warning, 0.15);
-    color: v.$color-orange-dark;
+    background-color: v.alpha(v.$color-warning, 0.15);
+    color: v.fg(v.$color-orange-dark);
   }
 }

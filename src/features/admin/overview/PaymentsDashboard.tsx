@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { FiArrowUpRight, FiDollarSign, FiFileText, FiCheckCircle, FiClock } from "react-icons/fi";
+import { ArrowUpRightIcon, CircleCheckBigIcon, ClockIcon, DollarSignIcon, FileTextIcon } from "../../../shared/components/icon";
 import {
   Bar,
   BarChart,
@@ -31,12 +31,12 @@ interface PaymentsDashboardProps {
 
 const PAGE_SIZE = 100;
 const STATUS_COLORS: Record<string, string> = {
-  Paid: "#2e9e5b",
-  "Partially Paid": "#2f8fd6",
-  Pending: "#faa41a",
-  Cancelled: "#e0483c",
+  Paid: "var(--fx-chart-2)",
+  "Partially Paid": "var(--fx-chart-1)",
+  Pending: "var(--fx-chart-3)",
+  Cancelled: "var(--fx-chart-5)",
 };
-const CHART_COLORS = ["#2f8fd6", "#2e9e5b", "#faa41a", "#7657d5", "#e0483c"];
+const CHART_COLORS = ["var(--fx-chart-1)", "var(--fx-chart-2)", "var(--fx-chart-3)", "var(--fx-chart-4)", "var(--fx-chart-5)"];
 
 function money(value: number): string {
   return `₹${value.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -172,10 +172,10 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
 
   const quickLinks = entries;
   const metrics = canViewInvoices ? [
-    { label: "Invoices", value: filteredInvoices.length, icon: FiFileText, color: "payments-dashboard__card--navy" },
-    { label: "Payable amount", value: money(totals.payable), icon: FiDollarSign, color: "payments-dashboard__card--blue" },
-    { label: "Paid amount", value: money(totals.paid), icon: FiCheckCircle, color: "payments-dashboard__card--green" },
-    { label: "Amount due", value: money(totals.outstanding), icon: FiClock, color: "payments-dashboard__card--orange" },
+    { label: "Invoices", value: filteredInvoices.length, icon: FileTextIcon, color: "payments-dashboard__card--navy" },
+    { label: "Payable amount", value: money(totals.payable), icon: DollarSignIcon, color: "payments-dashboard__card--blue" },
+    { label: "Paid amount", value: money(totals.paid), icon: CircleCheckBigIcon, color: "payments-dashboard__card--green" },
+    { label: "Amount due", value: money(totals.outstanding), icon: ClockIcon, color: "payments-dashboard__card--orange" },
   ] : [];
 
   return (
@@ -230,7 +230,7 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
             <div className="payments-dashboard__charts">
               <section className="payments-dashboard__panel">
                 <div className="payments-dashboard__panel-heading">
-                  <span className="payments-dashboard__panel-icon"><FiDollarSign aria-hidden /></span>
+                  <span className="payments-dashboard__panel-icon"><DollarSignIcon aria-hidden /></span>
                   <div>
                     <h3>Payment activity</h3>
                     <p>Paid and outstanding amounts for the selected filters (up to 12 months shown)</p>
@@ -243,8 +243,8 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                       <YAxis tickFormatter={(value: number) => value >= 100000 ? `₹${Math.round(value / 100000)}L` : `₹${Math.round(value / 1000)}k`} tick={{ fontSize: 11 }} />
                       <Tooltip formatter={(value) => money(Number(value))} />
-                      <Bar dataKey="paid" name="Paid" fill="#2e9e5b" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="outstanding" name="Amount due" fill="#2f8fd6" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="paid" name="Paid" fill="var(--fx-chart-2)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="outstanding" name="Amount due" fill="var(--fx-chart-1)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -252,7 +252,7 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
 
               <section className="payments-dashboard__panel">
                 <div className="payments-dashboard__panel-heading">
-                  <span className="payments-dashboard__panel-icon"><FiFileText aria-hidden /></span>
+                  <span className="payments-dashboard__panel-icon"><FileTextIcon aria-hidden /></span>
                   <div>
                     <h3>Invoice status</h3>
                     <p>Invoices grouped by payment status</p>
@@ -283,7 +283,7 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
           <div className="payments-dashboard__links">
             {quickLinks.map((entry) => (
               <Link to={entry.path} key={entry.id} className="payments-dashboard__quick-link">
-                <span>{entry.label}</span><FiArrowUpRight aria-hidden />
+                <span>{entry.label}</span><ArrowUpRightIcon aria-hidden />
               </Link>
             ))}
           </div>

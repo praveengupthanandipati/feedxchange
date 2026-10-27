@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiMail, FiExternalLink } from "react-icons/fi";
+import { ExternalLinkIcon, MailIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
@@ -34,7 +34,7 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
       header: "Google Location",
       render: (row) => (
         <a href={row.googleMapUrl} target="_blank" rel="noopener noreferrer" className="business-owners__link">
-          View on Map <FiExternalLink aria-hidden />
+          View on Map <ExternalLinkIcon aria-hidden />
         </a>
       ),
     },
@@ -75,7 +75,7 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
             className="transporters-btn transporters-btn--warning"
             onClick={() => setAddressModalOpen(true)}
           >
-            <FiMail aria-hidden /> Send Addresses
+            <MailIcon aria-hidden /> Send Addresses
           </button>
         </div>
         <Table
@@ -98,7 +98,7 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
             className="transporters-btn transporters-btn--warning"
             onClick={() => setContactModalOpen(true)}
           >
-            <FiMail aria-hidden /> Send Message
+            <MailIcon aria-hidden /> Send Message
           </button>
         </div>
         <Table

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiX, FiSend, FiMessageCircle, FiMessageSquare, FiMail } from "react-icons/fi";
-import type { IconType } from "react-icons";
+import { type IconComponent, MailIcon, MessageCircleIcon, MessageSquareIcon, SendIcon, XIcon } from "../icon";
 import MultiSelect from "../dropdown/MultiSelect";
 import type { SearchableSelectOption } from "../dropdown/SearchableSelect";
 import "./ShareModal.scss";
@@ -27,10 +26,10 @@ interface ShareModalProps {
   confirmLabel?: string;
 }
 
-const CHANNELS: { value: ShareChannel; label: string; icon: IconType }[] = [
-  { value: "whatsapp", label: "WhatsApp", icon: FiMessageCircle },
-  { value: "sms", label: "SMS", icon: FiMessageSquare },
-  { value: "email", label: "Email", icon: FiMail },
+const CHANNELS: { value: ShareChannel; label: string; icon: IconComponent }[] = [
+  { value: "whatsapp", label: "WhatsApp", icon: MessageCircleIcon },
+  { value: "sms", label: "SMS", icon: MessageSquareIcon },
+  { value: "email", label: "Email", icon: MailIcon },
 ];
 
 const ShareModal = ({
@@ -87,7 +86,7 @@ const ShareModal = ({
         <div className="share-modal__header">
           <h2 id="share-modal-title">{title}</h2>
           <button type="button" className="share-modal__close" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -154,10 +153,10 @@ const ShareModal = ({
             onClick={handleSend}
             disabled={!canSend}
           >
-            <FiSend aria-hidden /> {confirmLabel ?? "Send"}
+            <SendIcon aria-hidden /> {confirmLabel ?? "Send"}
           </button>
           <button type="button" className="business-owners-btn business-owners-btn--warning" onClick={onClose}>
-            <FiX aria-hidden /> Cancel
+            <XIcon aria-hidden /> Cancel
           </button>
         </div>
       </div>

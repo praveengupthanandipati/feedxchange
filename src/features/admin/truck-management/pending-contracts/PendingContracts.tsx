@@ -7,18 +7,18 @@ import {
   useGetAllContractsByFiltersQuery,
 } from "../../../../core/store/contractsApi";
 import {
-  FiEye,
-  FiEyeOff,
-  FiDownload,
-  FiSearch,
-  FiX,
-  FiChevronLeft,
-  FiChevronRight,
-  FiHome,
-  FiUser,
-  FiTruck,
-  FiPlus,
-} from "react-icons/fi";
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  HouseIcon,
+  PlusIcon,
+  SearchIcon,
+  TruckIcon,
+  UserIcon,
+  XIcon,
+} from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
@@ -92,29 +92,29 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
                 onClick={onClose}
                 aria-label="Close"
               >
-                <FiX aria-hidden />
+                <XIcon aria-hidden />
               </button>
             </div>
 
             <div className="truck-tracking-drawer__body">
               <div className="truck-tracking-drawer__parties">
                 <p>
-                  <FiHome aria-hidden /> Seller: <strong>{row.seller}</strong>
+                  <HouseIcon aria-hidden /> Seller: <strong>{row.seller}</strong>
                 </p>
                 <p>
-                  <FiUser aria-hidden /> Buyer: <strong>{row.buyer}</strong>
+                  <UserIcon aria-hidden /> Buyer: <strong>{row.buyer}</strong>
                 </p>
               </div>
 
               <div className="truck-tracking-drawer__section-header">
                 <h3>
-                  <FiTruck aria-hidden /> Truck Tracking Details
+                  <TruckIcon aria-hidden /> Truck Tracking Details
                 </h3>
                 <Link
                   to={`/admin/truck-management/assign-transports?contract=${encodeURIComponent(row.id)}`}
                   className="truck-tracking-drawer__add-btn"
                 >
-                  <FiPlus aria-hidden /> Add / View Trucks
+                  <PlusIcon aria-hidden /> Add / View Trucks
                 </Link>
               </div>
 
@@ -322,7 +322,7 @@ const PendingContracts = () => {
               className="pending-contracts-btn pending-contracts-btn--info"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
@@ -330,7 +330,7 @@ const PendingContracts = () => {
               className="pending-contracts-btn pending-contracts-btn--warning"
               onClick={handleExportToExcel}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -379,7 +379,7 @@ const PendingContracts = () => {
 
             <div className="pending-contracts-filters__search-row">
               <div className="pending-contracts-filters__search">
-                <FiSearch aria-hidden />
+                <SearchIcon aria-hidden />
                 <input
                   type="text"
                   value={keyword}
@@ -394,7 +394,7 @@ const PendingContracts = () => {
                 title="Clear filters"
                 aria-label="Clear filters"
               >
-                <FiX aria-hidden />
+                <XIcon aria-hidden />
               </button>
             </div>
           </div>
@@ -428,7 +428,7 @@ const PendingContracts = () => {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <button
@@ -446,7 +446,7 @@ const PendingContracts = () => {
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

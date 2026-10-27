@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../../shared/components/icon";
 import { money, type ContractRow } from "./contracts.data";
 import "./ContractDetailOffcanvas.scss";
 
@@ -47,7 +47,7 @@ const ContractDetailOffcanvas = ({ open, row, onClose }: ContractDetailOffcanvas
             <div className="contract-detail-offcanvas__header">
               <h2 id="contract-detail-offcanvas-title">Contract Number: {row.contractNumber}</h2>
               <button type="button" className="contract-detail-offcanvas__close" onClick={onClose} aria-label="Close">
-                <FiX aria-hidden />
+                <XIcon aria-hidden />
               </button>
             </div>
 

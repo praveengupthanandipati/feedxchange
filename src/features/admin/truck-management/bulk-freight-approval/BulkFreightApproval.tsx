@@ -1,15 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
-import {
-  FiEye,
-  FiEyeOff,
-  FiDownload,
-  FiX,
-  FiCheck,
-  FiChevronLeft,
-  FiChevronRight,
-} from "react-icons/fi";
+import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, DownloadIcon, EyeIcon, EyeOffIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import MultiSelect from "../../../../shared/components/dropdown/MultiSelect";
 import Table from "../../../../shared/components/table/Table";
@@ -70,7 +62,7 @@ const FreightActionModal = ({ variant, open, rows, onClose, onConfirm }: Freight
         <div className="freight-action-modal__header">
           <h2 id="freight-action-modal-title">{isApprove ? "Approve Trucks" : "Reject Trucks"}</h2>
           <button type="button" className="freight-action-modal__close" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
@@ -107,7 +99,7 @@ const FreightActionModal = ({ variant, open, rows, onClose, onConfirm }: Freight
             className={`freight-action-modal__confirm freight-action-modal__confirm--${variant}`}
             onClick={() => onConfirm(comments)}
           >
-            <FiCheck aria-hidden /> {isApprove ? "Approve" : "Reject"}
+            <CheckIcon aria-hidden /> {isApprove ? "Approve" : "Reject"}
           </button>
         </div>
       </div>
@@ -240,7 +232,7 @@ const BulkFreightApproval = () => {
               className="bulk-freight-approval-btn bulk-freight-approval-btn--info"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
@@ -248,7 +240,7 @@ const BulkFreightApproval = () => {
               className="bulk-freight-approval-btn bulk-freight-approval-btn--warning"
               onClick={handleExport}
             >
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -307,7 +299,7 @@ const BulkFreightApproval = () => {
                 className="bulk-freight-approval-filters__clear"
                 onClick={handleClearFilters}
               >
-                <FiX aria-hidden /> Clear
+                <XIcon aria-hidden /> Clear
               </button>
             </div>
           </div>
@@ -320,7 +312,7 @@ const BulkFreightApproval = () => {
             disabled={selectedKeys.length === 0}
             onClick={() => setActionModal("approve")}
           >
-            <FiCheck aria-hidden /> Approve
+            <CheckIcon aria-hidden /> Approve
           </button>
           <button
             type="button"
@@ -328,7 +320,7 @@ const BulkFreightApproval = () => {
             disabled={selectedKeys.length === 0}
             onClick={() => setActionModal("reject")}
           >
-            <FiX aria-hidden /> Reject
+            <XIcon aria-hidden /> Reject
           </button>
         </div>
 
@@ -360,7 +352,7 @@ const BulkFreightApproval = () => {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <button
@@ -378,7 +370,7 @@ const BulkFreightApproval = () => {
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

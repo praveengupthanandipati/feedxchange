@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FiPrinter, FiDownload } from "react-icons/fi";
+import { DownloadIcon, PrinterIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import { buildAccountSummaryColumns } from "./accountSummaryTab.columns";
 import { accountSummaryRows, type AccountSummaryRow } from "./accountSummaryTab.data";
@@ -61,10 +61,10 @@ const AccountSummaryTab = ({ onRegisterExport }: AccountSummaryTabProps) => {
     <div className="account-summary-tab">
       <div className="account-summary-tab__toolbar">
         <button type="button" className="account-summary-tab__print-all" onClick={handlePrintAll}>
-          <FiPrinter aria-hidden /> Print All
+          <PrinterIcon aria-hidden /> Print All
         </button>
         <button type="button" className="account-summary-tab__download-all" onClick={handleDownloadAll}>
-          <FiDownload aria-hidden /> Download All
+          <DownloadIcon aria-hidden /> Download All
         </button>
       </div>
 

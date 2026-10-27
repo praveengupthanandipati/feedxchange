@@ -16,7 +16,7 @@
     flex-direction: column;
     gap: v.$spacing-3;
     padding: v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
 
     @include m.respond-to(md) {
@@ -70,7 +70,7 @@
     display: flex;
     align-items: center;
     // Same height as an input, so the buttons sit level with them.
-    min-height: 2.5rem;
+    min-height: var(--fx-control-height);
     gap: v.$spacing-2;
   }
 
@@ -91,12 +91,12 @@
   }
 
   &__delete {
-    background-color: rgba(v.$color-danger, 0.12);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.12);
+    color: v.fg(v.$color-danger);
   }
 
   &__add {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
   }
 }

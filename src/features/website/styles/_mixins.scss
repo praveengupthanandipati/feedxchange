@@ -45,7 +45,7 @@
 
 @mixin focus-ring {
   &:focus-visible {
-    outline: 3px solid rgba(v.$orange-500, 0.7);
+    outline: 3px solid var(--fx-focus-ring);
     outline-offset: 2px;
   }
 }

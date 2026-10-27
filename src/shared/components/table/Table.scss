@@ -8,7 +8,7 @@
   overflow-x: scroll;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid v.$color-border;
+  border: 1px solid v.line(v.$color-border);
   scrollbar-width: thin;
 
   &--min-height {
@@ -20,13 +20,14 @@
   // SearchableSelect panel — aren't cut off at the table's edge.
   &--light {
     border-radius: v.$radius-md;
-    border-color: v.$color-border;
+    border-color: v.line(v.$color-border);
   }
 }
 
 .table {
   width: 100%;
-  min-width: 1200px;
+  // as wide as its columns need, at least the panel: wide tables scroll inside their panel, narrow ones no longer stretch to 1200px
+  min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-size: v.$font-size-sm;
@@ -36,9 +37,9 @@
     position: sticky;
     top: 0;
     z-index: 1;
-    padding: v.$spacing-3 v.$spacing-4;
+    padding: var(--fx-table-cell-py) var(--fx-table-cell-px);
     background-color: v.$color-navy!important;
-    color: v.$color-white!important;
+    color: v.on(v.$color-white)!important;
     font-size: v.$font-size-sm;
     text-align: left;
     white-space: nowrap;
@@ -48,7 +49,7 @@
       cursor: pointer;
 
       &:hover {
-        background-color: rgba(v.$color-white, 0.08);
+        background-color: v.alpha(v.$color-white, 0.08);
       }
     }
   }
@@ -68,16 +69,16 @@
       width: 0.7rem;
       height: 0.7rem;
       margin: -0.15rem 0;
-      color: rgba(v.$color-white, 0.4);
+      color: v.alpha(v.fg(v.$color-white), 0.4);
 
       &.is-active {
-        color: v.$color-orange;
+        color: v.fg(v.$color-orange);
       }
     }
   }
 
   &__select-col {
-    width: 2.5rem;
+    width: var(--fx-control-height);
     text-align: center;
 
     input[type="checkbox"] {
@@ -99,10 +100,10 @@
     margin: 0 auto;
     padding: v.$spacing-3 v.$spacing-5;
     max-width: fit-content;
-    border: 1px solid rgba(v.$color-info, 0.3);
+    border: 1px solid v.alpha(v.line(v.$color-info), 0.3);
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-info, 0.08);
-    color: v.$color-info;
+    background-color: v.alpha(v.$color-info, 0.08);
+    color: v.fg(v.$color-info);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
 
@@ -112,7 +113,7 @@
   }
 
   tbody tr {
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     transition: background-color v.$transition-fast;
 
     &:hover {
@@ -120,7 +121,7 @@
     }
 
     &.is-selected {
-      background-color: rgba(v.$color-orange, 0.06);
+      background-color: v.alpha(v.$color-orange, 0.06);
     }
 
     &.is-clickable {
@@ -141,8 +142,8 @@
   }
 
   td {
-    padding: v.$spacing-3 v.$spacing-4;
-    color: v.$color-text;
+    padding: var(--fx-table-cell-py) var(--fx-table-cell-px);
+    color: v.fg(v.$color-text);
     white-space: nowrap;
   }
 
@@ -151,8 +152,8 @@
   &--light {
     th {
       background-color: v.$color-bg-muted !important;
-      color: v.$color-text !important;
-      border-bottom: 2px solid v.$color-primary;
+      color: v.fg(v.$color-text) !important;
+      border-bottom: 2px solid v.line(v.$color-primary);
 
       &:first-child {
         border-top-left-radius: v.$radius-md;
@@ -168,15 +169,217 @@
     }
 
     .table__sort-icons svg {
-      color: v.$color-gray-400;
+      color: v.fg(v.$color-gray-400);
 
       &.is-active {
-        color: v.$color-primary;
+        color: v.fg(v.$color-primary);
       }
     }
 
     tbody tr:nth-child(even) {
-      background-color: rgba(v.$color-bg-muted, 0.5);
+      background-color: v.alpha(v.$color-bg-muted, 0.5);
     }
+  }
+}
+
+// ---------- Optional features (Table props): Columns menu, pager, sticky first column, loading rows ----------
+.table-frame {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  min-width: 0;
+}
+
+.table-toolbar {
+  @include m.flex(row, flex-end, center, v.$spacing-2);
+}
+
+.table-columns {
+  position: relative;
+
+  &__toggle {
+    @include m.flex(row, center, center, v.$spacing-1);
+    @include m.focus-ring;
+    min-height: var(--fx-control-height-sm);
+    padding: 0 0.6rem;
+    border: 1px solid v.line(v.$color-gray-300);
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    z-index: v.$z-index-dropdown;
+    display: flex;
+    flex-direction: column;
+    min-width: 12rem;
+    max-height: 18rem;
+    margin: 0;
+    padding: v.$spacing-1;
+    overflow-y: auto;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-lg;
+  }
+
+  &__item {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    min-height: 24px;
+    padding: 0.2rem v.$spacing-2;
+    border-radius: v.$radius-sm;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+    }
+  }
+}
+
+.table-pager {
+  @include m.flex(row, flex-end, center, v.$spacing-2);
+  color: v.fg(v.$color-text-muted);
+  font-size: v.$font-size-sm;
+
+  &__range {
+    margin-right: auto;
+  }
+
+  &__btn {
+    @include m.flex-center;
+    @include m.focus-ring;
+    width: var(--fx-control-height-sm);
+    height: var(--fx-control-height-sm);
+    border: 1px solid v.line(v.$color-gray-300);
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.table-wrapper--sticky-first {
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: v.$color-bg;
+    box-shadow: 1px 0 0 v.line(v.$color-border);
+  }
+
+  th:first-child {
+    z-index: 2;
+    background-color: v.$color-navy;
+  }
+}
+
+.table__loading-row td {
+  padding: var(--fx-table-cell-py) var(--fx-table-cell-px);
+}
+
+// ---------- Phones and small tablets ----------
+// Columns marked priority "low" step aside below 768px.
+@include m.respond-below(md) {
+  .table .is-low-priority {
+    display: none;
+  }
+}
+
+// mobileCards: below 768px every row is a card of "label: value" lines (the label comes from data-label).
+@include m.respond-below(md) {
+  .table-wrapper--cards {
+    overflow: visible;
+    border: none;
+
+    .table {
+      min-width: 0;
+    }
+
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    tbody,
+    tr,
+    td {
+      display: block;
+    }
+
+    tbody tr {
+      margin-bottom: v.$spacing-2;
+      padding: v.$spacing-2 v.$spacing-3;
+      border: 1px solid v.line(v.$color-border);
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+    }
+
+    td {
+      @include m.flex(row, space-between, center, v.$spacing-3);
+      padding: 0.3rem 0;
+      border: none;
+      text-align: right !important;
+      white-space: normal;
+
+      &::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        color: v.fg(v.$color-text-muted);
+        font-size: var(--fx-text-xs);
+        font-weight: v.$font-weight-semibold;
+        text-align: left;
+      }
+
+      &:not([data-label])::before,
+      &[data-label=""]::before {
+        content: none;
+      }
+    }
+
+    .table__select-col {
+      justify-content: flex-start;
+    }
+
+    .table__empty,
+    .table__expanded-row td {
+      display: block;
+      text-align: left !important;
+    }
+  }
+}
+
+// Sortable header label: a button for the keyboard that looks like the header text
+.table__sort-btn {
+  min-width: 0;
+  min-height: 0; // a header cell is taller than 24px around it (WCAG 2.5.8 spacing exception); keeps header rows as they were
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+
+  &:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
   }
 }

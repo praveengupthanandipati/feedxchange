@@ -52,11 +52,11 @@
     @include m.flex(row, space-between, center);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
       @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-lg;
       margin: 0;
     }
@@ -71,14 +71,14 @@
     border: none;
     border-radius: v.$radius-pill;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 1.25rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -97,7 +97,7 @@
     flex-direction: column;
     gap: v.$spacing-4;
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg-muted;
   }
@@ -121,35 +121,35 @@
     label {
       @include m.font-base(v.$font-weight-semibold);
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
   &__control {
     @include m.font-base;
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
     height: 2.25rem;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &::placeholder {
-      color: v.$color-gray-400;
+      color: v.fg(v.$color-gray-400);
     }
 
     &:focus {
       outline: none;
-      border-color: v.$color-primary;
-      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     &[readonly] {
       background-color: v.$color-gray-100;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       cursor: not-allowed;
     }
   }
@@ -162,7 +162,7 @@
     label {
       @include m.font-base(v.$font-weight-semibold);
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -173,17 +173,17 @@
   }
 
   &__doc-empty {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
   &__doc-chip {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     padding: v.$spacing-1 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-pill;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     button {
@@ -193,11 +193,11 @@
       height: 1rem;
       border: none;
       background: transparent;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       cursor: pointer;
 
       &:hover {
-        color: v.$color-danger;
+        color: v.fg(v.$color-danger);
       }
     }
   }
@@ -208,10 +208,10 @@
     align-self: flex-start;
     height: 2rem;
     padding: 0 v.$spacing-3;
-    border: 1px dashed v.$color-border;
+    border: 1px dashed v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     cursor: pointer;
@@ -226,18 +226,18 @@
     @include m.flex(row, flex-start, center, v.$spacing-3);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
   }
 
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     cursor: pointer;
     transition: background-color v.$transition-fast;
@@ -246,7 +246,7 @@
       background-color: v.$color-success;
 
       &:hover {
-        background-color: #227a46;
+        background-color: var(--fx-green-31);
       }
     }
 
@@ -254,7 +254,7 @@
       background-color: v.$color-danger;
 
       &:hover {
-        background-color: #b8352b;
+        background-color: var(--fx-red-45);
       }
     }
   }

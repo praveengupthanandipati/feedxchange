@@ -1,4 +1,4 @@
-import { FiPrinter, FiDownload } from "react-icons/fi";
+import { DownloadIcon, PrinterIcon } from "../../../../../shared/components/icon";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import { type AccountSummaryRow } from "./accountSummaryTab.data";
 
@@ -29,10 +29,10 @@ export function buildAccountSummaryColumns({
       render: (row) => (
         <span className="account-summary-tab-table__actions">
           <button type="button" className="account-summary-tab-table__print" onClick={() => onPrint(row)}>
-            <FiPrinter aria-hidden /> Print
+            <PrinterIcon aria-hidden /> Print
           </button>
           <button type="button" className="account-summary-tab-table__download" onClick={() => onDownload(row)}>
-            <FiDownload aria-hidden /> Download
+            <DownloadIcon aria-hidden /> Download
           </button>
         </span>
       ),

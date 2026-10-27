@@ -1,45 +1,48 @@
 // ============================================================
-// Website design tokens. Kept separate from the app's tokens
-// (src/assets/styles) so the two can evolve independently.
+// Website design tokens. Since the UI modernization these point at the same CSS custom properties as the admin app
+// (src/shared/assets/styles: _palette.scss, _themes.scss), so the website follows the theme too. The names below stay as
+// the website's SCSS API; the helpers (alpha, shade, fg, line, on) come with them.
 // ============================================================
+@use "../../../shared/assets/styles/functions" as f;
+@forward "../../../shared/assets/styles/functions";
 
 // ---------- Brand ----------
-$navy-900: #071a33;
-$navy-800: #0b2547;
-$navy-700: #12345f;
-$navy-600: #1b4a85;
-$orange-500: #f5a524;
-$orange-600: #e08c0b;
-$green-500: #22a06b;
-$sky-100: #e8f1fb;
-$sky-50: #f4f8fd;
+$navy-900: f.token("blue-11");
+$navy-800: f.token("blue-16");
+$navy-700: f.token("blue-22");
+$navy-600: f.token("blue-31");
+$orange-500: f.token("amber-55");
+$orange-600: f.token("amber-46-2");
+$green-500: f.token("teal-38");
+$sky-100: f.token("slate-95-2");
+$sky-50: f.token("gray-97");
 
 // ---------- Section gradients ----------
-$gradient-light: linear-gradient(180deg, #ffffff 0%, #f4f8fd 100%);
-$gradient-alt: linear-gradient(135deg, #eef4fb 0%, #fbf7ee 100%);
-$gradient-warm: linear-gradient(90deg, #ffffff 0%, #fff6e6 50%, #ffffff 100%);
-$gradient-dark: radial-gradient(120% 120% at 100% 0%, #1b4a85 0%, #071a33 55%);
-$gradient-footer: linear-gradient(160deg, #0b2547 0%, #071a33 60%);
+$gradient-light: linear-gradient(180deg, f.token("white") 0%, f.token("gray-97") 100%);
+$gradient-alt: linear-gradient(135deg, f.token("slate-96") 0%, f.token("gray-95-2") 100%);
+$gradient-warm: linear-gradient(90deg, f.token("white") 0%, f.token("amber-95") 50%, f.token("white") 100%);
+$gradient-dark: radial-gradient(120% 120% at 100% 0%, f.token("blue-31") 0%, f.token("blue-11") 55%);
+$gradient-footer: linear-gradient(160deg, f.token("blue-16") 0%, f.token("blue-11") 60%);
 
 // ---------- Neutrals ----------
-$white: #ffffff;
-$ink: #0f1b2d;
-$ink-soft: #46546a;
-$ink-muted: #6b7a90;
-$line: #e3e9f1;
-$surface: #ffffff;
-$surface-alt: #f6f8fb;
+$white: f.token("white");
+$ink: f.token("slate-12");
+$ink-soft: f.token("slate-35");
+$ink-muted: f.token("slate-49");
+$line: f.token("slate-92");
+$surface: f.token("white");
+$surface-alt: f.token("gray-97-2");
 
 // ---------- Type ----------
 // Inter and Poppins are already loaded by index.html, so the site needs no extra font download.
-$font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-$font-heading: "Poppins", $font-body;
+$font-body: var(--fx-font-body);
+$font-heading: var(--fx-font-heading);
 
-$fs-xs: 0.75rem;
-$fs-sm: 0.875rem;
-$fs-base: 1rem;
-$fs-lg: 1.125rem;
-$fs-xl: 1.25rem;
+$fs-xs: var(--fx-text-xs);
+$fs-sm: var(--fx-text-sm);
+$fs-base: var(--fx-text-base);
+$fs-lg: var(--fx-text-lg);
+$fs-xl: var(--fx-text-xl);
 
 $fw-regular: 400;
 $fw-medium: 500;
@@ -47,24 +50,24 @@ $fw-semibold: 600;
 $fw-bold: 700;
 
 // ---------- Space / shape ----------
-$space-1: 0.25rem;
-$space-2: 0.5rem;
-$space-3: 0.75rem;
-$space-4: 1rem;
-$space-5: 1.5rem;
-$space-6: 2rem;
-$space-7: 3rem;
-$space-8: 4rem;
-$space-9: 6rem;
+$space-1: var(--fx-space-1);
+$space-2: var(--fx-space-2);
+$space-3: var(--fx-space-3);
+$space-4: var(--fx-space-4);
+$space-5: var(--fx-space-5);
+$space-6: var(--fx-space-6);
+$space-7: var(--fx-space-7);
+$space-8: var(--fx-space-8);
+$space-9: var(--fx-space-9);
 
-$radius-sm: 0.5rem;
-$radius-md: 0.875rem;
-$radius-lg: 1.25rem;
-$radius-pill: 999px;
+$radius-sm: var(--fx-radius-2);
+$radius-md: var(--fx-radius-3);
+$radius-lg: var(--fx-radius-5);
+$radius-pill: var(--fx-radius-pill);
 
-$shadow-sm: 0 1px 2px rgba($navy-900, 0.06), 0 1px 3px rgba($navy-900, 0.05);
-$shadow-md: 0 12px 32px -12px rgba($navy-900, 0.18);
-$shadow-lg: 0 30px 60px -20px rgba($navy-900, 0.3);
+$shadow-sm: var(--fx-site-shadow-sm);
+$shadow-md: var(--fx-site-shadow-md);
+$shadow-lg: var(--fx-site-shadow-lg);
 
 // Share of the viewport the content column uses from laptops up (.fx-site spans the full viewport).
 $container-width: 80%;

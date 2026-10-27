@@ -26,13 +26,13 @@
   &__back {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
     text-decoration: none;
 
     &:hover {
-      color: v.$color-primary-dark;
+      color: v.fg(v.$color-primary-dark);
       text-decoration: underline;
     }
   }
@@ -74,12 +74,12 @@
     height: 3.5rem;
     border-radius: v.$radius-pill;
     background-color: v.$color-bg-muted;
-    color: v.$color-gray-400;
+    color: v.fg(v.$color-gray-400);
     overflow: hidden;
 
     svg {
-      width: 1.75rem;
-      height: 1.75rem;
+      width: max(24px, 1.75rem);
+      height: max(24px, 1.75rem);
     }
 
     img {
@@ -93,7 +93,7 @@
     @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-navy);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     font-size: v.$font-size-sm;
     cursor: pointer;
@@ -133,7 +133,7 @@
     span {
       @include m.font-base(v.$font-weight-semibold);
       padding: v.$spacing-3;
-      color: v.$color-white;
+      color: v.fg(v.$color-white);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -144,7 +144,7 @@
     grid-template-columns: 1fr;
     gap: v.$spacing-3;
     padding: v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
   }
 
@@ -207,7 +207,7 @@
   &__checkbox-label {
     @include m.font-base(v.$font-weight-medium);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
 
     @include m.respond-to(sm) {
       display: none;
@@ -231,7 +231,7 @@
     height: 2rem;
     border: none;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     cursor: pointer;
     transition: filter v.$transition-fast;
 
@@ -241,7 +241,7 @@
 
     &--add {
       background-color: v.$color-orange;
-      color: v.$color-navy-dark;
+      color: v.on(v.$color-navy-dark);
     }
 
     &--delete {
@@ -257,7 +257,7 @@
   @include m.flex-center;
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.75rem;
+  height: var(--fx-control-height-lg);
   padding: 0 v.$spacing-5;
   border: none;
   border-radius: v.$radius-md;
@@ -266,17 +266,17 @@
   transition: background-color v.$transition-fast;
 
   &--cancel {
-    background-color: rgba(v.$color-danger, 0.12);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.12);
+    color: v.fg(v.$color-danger);
 
     &:hover {
-      background-color: rgba(v.$color-danger, 0.2);
+      background-color: v.alpha(v.$color-danger, 0.2);
     }
   }
 
   &--save {
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
       background-color: v.$color-navy-dark;

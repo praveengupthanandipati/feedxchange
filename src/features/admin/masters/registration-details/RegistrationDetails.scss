@@ -3,12 +3,12 @@
 
 // One colour per status, shared by the header chips and the row badges.
 $status-colors: (
-  "pending": #f1b44c,
-  "converted": #34c38f,
+  "pending": v.token("amber-62"),
+  "converted": v.token("teal-48"),
   "membership-taken": v.$color-navy,
-  "not-interested": #f7a440,
-  "follow-up-later": #50a5f1,
-  "rejected": #f46a6a,
+  "not-interested": v.token("orange-61"),
+  "follow-up-later": v.token("sky-63"),
+  "rejected": v.token("red-69"),
 );
 
 .registrations {
@@ -30,7 +30,7 @@ $status-colors: (
 
     h1 {
       margin: 0 v.$spacing-2 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-xl;
       white-space: nowrap;
 
@@ -62,22 +62,22 @@ $status-colors: (
     flex-shrink: 0;
     height: 2rem;
     padding: 0 0.6rem;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-sm;
     background-color: v.$color-bg;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-    color: v.$color-text;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-text);
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-medium;
     white-space: nowrap;
     cursor: pointer;
     -webkit-appearance: none;
     appearance: none;
 
-    &:hover { border-color: v.$color-navy; }
+    &:hover { border-color: v.line(v.$color-navy); }
 
     &.is-active {
-      border-color: v.$color-info;
+      border-color: v.line(v.$color-info);
       box-shadow: 0 0 0 1px v.$color-info;
     }
   }
@@ -88,8 +88,8 @@ $status-colors: (
     height: 1.15rem;
     padding: 0 0.25rem;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
-    font-size: 0.7rem;
+    color: v.fg(v.$color-white);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
 
     @each $name, $color in $status-colors {
@@ -100,11 +100,11 @@ $status-colors: (
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: 1px solid transparent;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
@@ -119,14 +119,14 @@ $status-colors: (
       cursor: not-allowed;
     }
 
-    &--success { background-color: #34c38f; }
+    &--success { background-color: var(--fx-teal-48); }
     &--navy { background-color: v.$color-navy; }
-    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--warning { background-color: v.$color-orange; color: v.on(v.$color-navy-dark); }
 
     &--outline {
-      border-color: v.$color-orange;
+      border-color: v.line(v.$color-orange);
       background-color: v.$color-bg;
-      color: v.$color-orange;
+      color: v.fg(v.$color-orange);
     }
   }
 
@@ -137,7 +137,7 @@ $status-colors: (
     gap: v.$spacing-3;
     align-items: end;
     padding-bottom: v.$spacing-4;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     @include m.respond-to(md) {
       grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
@@ -156,8 +156,8 @@ $status-colors: (
 
     label,
     span {
-      color: v.$color-text;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text);
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
   }
@@ -166,8 +166,8 @@ $status-colors: (
     @include m.flex(row, space-between, baseline, v.$spacing-2);
 
     small {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
     }
   }
 
@@ -187,7 +187,7 @@ $status-colors: (
       position: absolute;
       top: 50%;
       left: v.$spacing-3;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       transform: translateY(-50%);
       pointer-events: none;
     }
@@ -195,12 +195,12 @@ $status-colors: (
     input {
       @include m.font-base;
       width: 100%;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3 0 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       text-overflow: ellipsis;
       -webkit-appearance: none;
@@ -208,7 +208,8 @@ $status-colors: (
 
       &:focus {
         outline: none;
-        border-color: v.$color-navy;
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
@@ -216,7 +217,7 @@ $status-colors: (
   &__message {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     margin: 0;
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
     font-size: v.$font-size-sm;
 
     svg { flex-shrink: 0; }
@@ -247,14 +248,14 @@ $status-colors: (
   }
 
   &__nowrap { white-space: nowrap; }
-  &__muted { color: v.$color-text-muted; }
+  &__muted { color: v.fg(v.$color-text-muted); }
 
   &__link {
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     text-decoration: none;
 
     &:hover {
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       text-decoration: underline;
     }
   }
@@ -268,8 +269,8 @@ $status-colors: (
     display: inline-block;
     padding: 0.1rem 0.4rem;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
-    font-size: 0.7rem;
+    color: v.fg(v.$color-white);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
     line-height: 1.4;
     white-space: nowrap;
@@ -297,9 +298,9 @@ $status-colors: (
   &__cards-empty {
     grid-column: 1 / -1;
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
   }
@@ -308,7 +309,7 @@ $status-colors: (
   &__card {
     display: flex;
     flex-direction: column;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
 
     dl {
@@ -322,14 +323,14 @@ $status-colors: (
     }
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
     dd {
       margin: 0.15rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -338,10 +339,10 @@ $status-colors: (
   &__card-top {
     @include m.flex(row, space-between, center, v.$spacing-2);
     padding: v.$spacing-1 v.$spacing-2 v.$spacing-1 v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md v.$radius-md 0 0;
-    background-color: rgba(v.$color-navy, 0.06);
-    color: v.$color-navy;
+    background-color: v.alpha(v.$color-navy, 0.06);
+    color: v.fg(v.$color-navy);
     font-size: v.$font-size-sm;
 
     strong { overflow-wrap: anywhere; }
@@ -367,7 +368,7 @@ $status-colors: (
 
     p {
       margin: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -381,10 +382,10 @@ $status-colors: (
       @include m.flex-center;
       min-width: 2.25rem;
       height: 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
@@ -395,8 +396,8 @@ $status-colors: (
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -456,14 +457,14 @@ $status-colors: (
 
     h2 {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-lg;
     }
 
     p {
       margin: v.$spacing-1 0 0;
-      color: v.$color-text-muted;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.8rem);
       overflow-wrap: anywhere;
     }
 
@@ -476,7 +477,7 @@ $status-colors: (
       border: none;
       border-radius: v.$radius-sm;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: 1.4rem;
       cursor: pointer;
 
@@ -504,22 +505,22 @@ $status-colors: (
   }
 
   &__label {
-    color: v.$color-text;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text);
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-medium;
   }
 
-  &__required { color: v.$color-danger; }
+  &__required { color: v.fg(v.$color-danger); }
 
   &__textarea {
     @include m.font-base;
     width: 100%;
     min-height: 6.5rem;
     padding: v.$spacing-2 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     // 16px stops iOS Safari zooming in when the field is focused.
     font-size: 1rem;
     line-height: 1.45;
@@ -530,19 +531,20 @@ $status-colors: (
     @include m.respond-to(md) { font-size: v.$font-size-sm; }
 
     &::placeholder {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       opacity: 1;
     }
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
   &__error {
-    color: v.$color-danger;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-danger);
+    font-size: max(11px, 0.75rem);
   }
 
   &__actions {

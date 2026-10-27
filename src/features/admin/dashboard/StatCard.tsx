@@ -1,4 +1,4 @@
-import { FiArrowUp, FiArrowDown } from "react-icons/fi";
+import { ArrowDownIcon, ArrowUpIcon } from "../../../shared/components/icon";
 import type { StatCard as StatCardData } from "./dashboard.data";
 import MiniBarChart from "./MiniBarChart";
 import ProgressRing from "./ProgressRing";
@@ -8,7 +8,7 @@ interface StatCardProps {
 }
 
 const StatCard = ({ stat }: StatCardProps) => {
-  const DeltaIcon = stat.deltaDirection === "up" ? FiArrowUp : FiArrowDown;
+  const DeltaIcon = stat.deltaDirection === "up" ? ArrowUpIcon : ArrowDownIcon;
 
   return (
     <div className="dashboard-stat">

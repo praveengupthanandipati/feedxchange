@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaRupeeSign } from "react-icons/fa";
-import { FiPlus } from "react-icons/fi";
+import { PlusIcon } from "../../../../shared/components/icon";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import InfoTooltip from "../../../../shared/components/tooltip/InfoTooltip";
 import type { PendingDeliveryOrderRow } from "./pendingDeliveryOrders.data";
@@ -48,7 +48,7 @@ export const DoNumberCell = ({ row, onAddDo }: DoNumberCellProps) =>
       onClick={() => onAddDo(row)}
       aria-label={`Add DO or reassign truck ${row.truckNumber}`}
     >
-      <FiPlus aria-hidden /> Add DO / Reassign
+      <PlusIcon aria-hidden /> Add DO / Reassign
     </button>
   );
 

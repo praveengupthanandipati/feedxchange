@@ -1,4 +1,4 @@
-import { FiRefreshCw } from "react-icons/fi";
+import { RefreshCwIcon } from "../../../../../shared/components/icon";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import type { Registration, RegistrationStatus } from "../registrationDetails.data";
 import { statusSlug } from "../registrationDetails.utils";
@@ -29,5 +29,5 @@ interface RegistrationActionsProps {
 
 /** Three-dots menu with the row's actions. */
 export const RegistrationActions = ({ registration, onUpdateStatus, menuAlign = "left" }: RegistrationActionsProps) => (
-  <RowActionsMenu menuAlign={menuAlign} actions={[{ key: "update-status", label: "Update Status", icon: FiRefreshCw, onClick: () => onUpdateStatus(registration) }]} />
+  <RowActionsMenu menuAlign={menuAlign} actions={[{ key: "update-status", label: "Update Status", icon: RefreshCwIcon, onClick: () => onUpdateStatus(registration) }]} />
 );

@@ -19,7 +19,7 @@
 
     h1 {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -30,7 +30,7 @@
 
   &__business {
     margin: v.$spacing-2 0 0;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     overflow-wrap: anywhere;
   }
@@ -39,11 +39,11 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
@@ -54,13 +54,13 @@
     &:hover:not(:disabled) { filter: brightness(0.93); }
 
     &--navy { background-color: v.$color-navy; }
-    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--warning { background-color: v.$color-orange; color: v.on(v.$color-navy-dark); }
   }
 
   &__message {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     margin: 0;
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
     font-size: v.$font-size-sm;
 
     svg { flex-shrink: 0; }
@@ -93,11 +93,11 @@
   &__nowrap { white-space: nowrap; }
 
   &__link {
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     text-decoration: none;
 
     &:hover {
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       text-decoration: underline;
     }
   }
@@ -111,13 +111,13 @@
     display: inline-block;
     padding: 0.1rem 0.4rem;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
-    font-size: 0.7rem;
+    color: v.on(v.$color-black); // near-black on the bright status colours: white is below 3:1 on both
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
     line-height: 1.4;
 
-    &--active { background-color: #34c38f; }
-    &--inactive { background-color: #f46a6a; }
+    &--active { background-color: var(--fx-teal-48); }
+    &--inactive { background-color: var(--fx-red-69); }
   }
 
   // ---------- Cards: 1 per row on phones, 2 on tablets ----------
@@ -138,9 +138,9 @@
   &__cards-empty {
     grid-column: 1 / -1;
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
   }
@@ -148,7 +148,7 @@
   &__card {
     display: flex;
     flex-direction: column;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
 
     dl {
@@ -162,14 +162,14 @@
     }
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
     dd {
       margin: 0.15rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -178,11 +178,11 @@
   &__card-top {
     @include m.flex(row, space-between, center, v.$spacing-2);
     padding: v.$spacing-1 v.$spacing-2 v.$spacing-1 v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
     // Rounded here rather than clipping the card, which would hide the actions dropdown.
     border-radius: v.$radius-md v.$radius-md 0 0;
-    background-color: rgba(v.$color-navy, 0.06);
-    color: v.$color-navy;
+    background-color: v.alpha(v.$color-navy, 0.06);
+    color: v.fg(v.$color-navy);
     font-size: v.$font-size-sm;
 
     strong { overflow-wrap: anywhere; }
@@ -208,7 +208,7 @@
 
     p {
       margin: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -222,10 +222,10 @@
       @include m.flex-center;
       min-width: 2.25rem;
       height: 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
@@ -236,8 +236,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -296,7 +296,7 @@
 
     h2 {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-lg;
     }
 
@@ -309,7 +309,7 @@
       border: none;
       border-radius: v.$radius-sm;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: 1.4rem;
       cursor: pointer;
 
@@ -351,23 +351,23 @@
   }
 
   &__label {
-    color: v.$color-text;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text);
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-medium;
   }
 
-  &__required { color: v.$color-danger; }
+  &__required { color: v.fg(v.$color-danger); }
 
   &__input {
     @include m.font-base;
     width: 100%;
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     // 16px stops iOS Safari zooming in when a field is focused.
     font-size: 1rem;
     text-overflow: ellipsis;
@@ -377,22 +377,23 @@
     @include m.respond-to(md) { font-size: v.$font-size-sm; }
 
     &::placeholder {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       opacity: 1;
     }
 
     // Chrome / Safari autofill paints fields blue; keep them white like the rest.
     &:-webkit-autofill {
       -webkit-box-shadow: 0 0 0 100px v.$color-bg inset;
-      -webkit-text-fill-color: v.$color-text;
+      -webkit-text-fill-color: v.fg(v.$color-text);
     }
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
-    &.is-invalid { border-color: v.$color-danger; }
+    &.is-invalid { border-color: v.line(v.$color-danger); }
   }
 
   &__textarea {
@@ -420,30 +421,30 @@
       position: absolute;
       top: 0;
       right: 0;
-      width: 2.5rem;
-      height: 2.5rem;
+      width: var(--fx-control-height);
+      height: var(--fx-control-height);
       border: none;
       background: transparent;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       cursor: pointer;
 
-      &:hover { color: v.$color-text; }
+      &:hover { color: v.fg(v.$color-text); }
 
       &:focus-visible {
-        outline: 2px solid v.$color-orange;
+        outline: 2px solid v.line(v.$color-orange);
         outline-offset: -2px;
       }
     }
   }
 
   &__hint {
-    color: v.$color-text-muted;
-    font-size: 0.72rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.72rem);
   }
 
   &__error {
-    color: v.$color-danger;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-danger);
+    font-size: max(11px, 0.75rem);
   }
 
   &__actions {

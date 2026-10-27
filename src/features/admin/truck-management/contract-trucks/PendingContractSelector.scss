@@ -9,7 +9,7 @@
 
   &__label {
     @include m.font-base(v.$font-weight-semibold);
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 }

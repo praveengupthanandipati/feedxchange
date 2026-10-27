@@ -3,9 +3,9 @@
 
 $category-colors: (
   contracts: v.$color-navy,
-  dispatch: #50a5f1,
-  payments: #34c38f,
-  prices: #f1b44c,
+  dispatch: v.token("sky-63"),
+  payments: v.token("teal-48"),
+  prices: v.token("amber-62"),
   system: v.$color-gray-500,
 );
 
@@ -26,7 +26,7 @@ $category-colors: (
 
     h1 {
       margin: 0;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -36,7 +36,7 @@ $category-colors: (
 
     p {
       margin: v.$spacing-1 0 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -44,12 +44,12 @@ $category-colors: (
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     cursor: pointer;
@@ -93,10 +93,10 @@ $category-colors: (
     flex-shrink: 0;
     height: 2.25rem;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-pill;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     white-space: nowrap;
     cursor: pointer;
@@ -106,9 +106,9 @@ $category-colors: (
     }
 
     &.is-active {
-      border-color: v.$color-navy;
+      border-color: v.line(v.$color-navy);
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
   }
 
@@ -117,8 +117,8 @@ $category-colors: (
     padding: 0 0.35rem;
     border-radius: v.$radius-pill;
     background-color: v.$color-danger;
-    color: v.$color-white;
-    font-size: 0.7rem;
+    color: v.on(v.$color-white);
+    font-size: max(11px, 0.7rem);
     line-height: 1.25rem;
     text-align: center;
   }
@@ -127,11 +127,16 @@ $category-colors: (
     @include m.flex(row, flex-start, center, v.$spacing-2);
     flex: 1 1 16rem;
     max-width: 22rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
+
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
 
     @include m.respond-below(md) {
       max-width: none;
@@ -143,7 +148,7 @@ $category-colors: (
       border: none;
       outline: none;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
   }
@@ -157,8 +162,8 @@ $category-colors: (
 
   &__group-title {
     margin: 0;
-    color: v.$color-text-muted;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-semibold;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -169,7 +174,7 @@ $category-colors: (
     flex-direction: column;
     margin: 0;
     padding: 0;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     list-style: none;
     overflow: hidden;
@@ -178,7 +183,7 @@ $category-colors: (
   &__empty {
     @include m.flex(column, center, center, v.$spacing-2);
     min-height: 16rem;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     text-align: center;
 
     > svg {
@@ -200,10 +205,10 @@ $category-colors: (
     @include m.focus-ring(v.$color-orange);
     align-self: center;
     padding: v.$spacing-2 v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     cursor: pointer;
@@ -232,18 +237,18 @@ $category-colors: (
   }
 
   & + & {
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
   }
 
   &.is-unread {
-    background-color: rgba(v.$color-info, 0.06);
+    background-color: v.alpha(v.$color-info, 0.06);
   }
 
   &__icon {
     @include m.flex-center;
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border-radius: 50%;
     font-size: 1.1rem;
 
@@ -277,7 +282,7 @@ $category-colors: (
     display: flex;
     align-items: center;
     gap: v.$spacing-2;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     overflow-wrap: anywhere;
 
@@ -295,8 +300,8 @@ $category-colors: (
   }
 
   &__message {
-    color: v.$color-text-muted;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
     overflow-wrap: anywhere;
   }
 
@@ -304,22 +309,22 @@ $category-colors: (
     @include m.flex(row, flex-start, center, v.$spacing-2);
     flex-wrap: wrap;
     margin-top: 0.15rem;
-    color: v.$color-text-muted;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
   }
 
   &__tag {
     padding: 0.05rem 0.45rem;
     border-radius: v.$radius-pill;
-    font-size: 0.68rem;
+    font-size: max(11px, 0.68rem);
     font-weight: v.$font-weight-semibold;
   }
 
   @each $name, $color in $category-colors {
     &__icon--#{$name},
     &__tag--#{$name} {
-      background-color: rgba($color, 0.14);
-      color: $color;
+      background-color: v.alpha($color, 0.14);
+      color: v.fg($color);
     }
   }
 
@@ -341,17 +346,17 @@ $category-colors: (
       border: none;
       border-radius: v.$radius-sm;
       background: transparent;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       cursor: pointer;
 
       &:hover {
         background-color: v.$color-gray-100;
-        color: v.$color-navy;
+        color: v.fg(v.$color-navy);
       }
     }
   }
 
   &__delete:hover {
-    color: v.$color-danger !important;
+    color: v.fg(v.$color-danger) !important;
   }
 }

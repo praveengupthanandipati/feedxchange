@@ -3,9 +3,9 @@
 
 $tones: (
   navy: v.$color-navy,
-  blue: #50a5f1,
-  green: #34c38f,
-  orange: #f1b44c,
+  blue: v.token("sky-63"),
+  green: v.token("teal-48"),
+  orange: v.token("amber-62"),
   red: v.$color-danger,
 );
 
@@ -22,7 +22,7 @@ $tones: (
 
   &__back {
     @include m.flex(row, flex-start, center, v.$spacing-1);
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     text-decoration: none;
@@ -35,12 +35,12 @@ $tones: (
   &__not-found {
     @include m.card(v.$spacing-5);
     @include m.flex(column, center, center, v.$spacing-2);
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     text-align: center;
 
     > svg {
       font-size: 1.75rem;
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
 
     p {
@@ -63,7 +63,7 @@ $tones: (
 
     h2 {
       margin: 0;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-lg;
     }
   }
@@ -75,8 +75,8 @@ $tones: (
     border: none;
     border-radius: v.$radius-sm;
     background: transparent;
-    color: v.$color-navy;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-navy);
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-semibold;
     cursor: pointer;
 
@@ -118,19 +118,19 @@ $tones: (
 .info-tile {
   min-width: 0;
   padding: v.$spacing-3;
-  border-left: 3px solid v.$color-navy;
+  border-left: 3px solid v.line(v.$color-navy);
   border-radius: v.$radius-sm;
   background-color: v.$color-gray-100;
 
   dt {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    color: v.$color-text-muted;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
   }
 
   dd {
     margin: v.$spacing-2 0 0;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-weight: v.$font-weight-semibold;
     overflow-wrap: anywhere;
   }
@@ -147,11 +147,11 @@ $tones: (
 
   @each $name, $color in $tones {
     &--#{$name} {
-      border-left-color: $color;
+      border-left-color: v.line($color);
 
       .info-tile__icon,
       .info-tile__phone {
-        color: $color;
+        color: v.fg($color);
       }
     }
   }
@@ -174,13 +174,13 @@ $tones: (
     min-width: 0;
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.8rem);
     }
 
     dd {
       margin: v.$spacing-1 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-weight: v.$font-weight-semibold;
       overflow-wrap: anywhere;
     }
@@ -199,30 +199,31 @@ $tones: (
     min-width: 0;
 
     label {
-      color: v.$color-text-muted;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.8rem);
     }
 
     input {
       @include m.font-base;
       width: 100%;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
 
       &:focus {
         outline: none;
-        border-color: v.$color-navy;
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
 
   &__error {
     margin: 0;
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
   }
 
@@ -242,7 +243,7 @@ $tones: (
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border-radius: v.$radius-md;
     font-size: v.$font-size-sm;
@@ -253,7 +254,7 @@ $tones: (
     &--primary {
       border: none;
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
 
       &:hover {
         background-color: v.$color-navy-light;
@@ -263,7 +264,7 @@ $tones: (
     &--ghost {
       border: none;
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
 
       &:hover {
         background-color: v.$color-gray-200;
@@ -286,18 +287,18 @@ $tones: (
   flex-wrap: wrap;
   gap: v.$spacing-1 v.$spacing-3;
   margin-top: v.$spacing-2;
-  color: v.$color-text-muted;
-  font-size: 0.8rem;
+  color: v.fg(v.$color-text-muted);
+  font-size: max(11px, 0.8rem);
 
   strong {
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   // Divider between items on wider screens; on phones each item wraps to its own line.
   @include m.respond-to(sm) {
     > span + span {
       padding-left: v.$spacing-3;
-      border-left: 1px solid v.$color-orange;
+      border-left: 1px solid v.line(v.$color-orange);
     }
   }
 }
@@ -327,12 +328,12 @@ $tones: (
     margin: 0;
     font-size: v.$font-size-sm;
 
-    &--error { color: v.$color-danger; }
-    &--success { color: v.$color-success; }
+    &--error { color: v.fg(v.$color-danger); }
+    &--success { color: v.fg(v.$color-success); }
   }
 
   &__pending {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-weight: v.$font-weight-medium;
     white-space: nowrap;
   }
@@ -343,14 +344,15 @@ $tones: (
     max-width: 6rem;
     height: 2rem;
     padding: 0 v.$spacing-2;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
@@ -370,7 +372,7 @@ $tones: (
   }
 
   &__card {
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
 
@@ -383,28 +385,28 @@ $tones: (
     }
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
     dd {
       margin: 0.1rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
 
     .reassign__qty-input {
       max-width: none;
-      height: 2.5rem;
+      height: var(--fx-control-height);
     }
   }
 
   &__card-top {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     padding: v.$spacing-2 v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
-    background-color: rgba(v.$color-navy, 0.06);
+    border-bottom: 1px solid v.line(v.$color-border);
+    background-color: v.alpha(v.$color-navy, 0.06);
     font-size: v.$font-size-sm;
     cursor: pointer;
 
@@ -417,13 +419,13 @@ $tones: (
 
     strong {
       min-width: 0;
-      color: v.$color-navy;
+      color: v.fg(v.$color-navy);
       overflow-wrap: anywhere;
     }
 
     span {
       margin-left: auto;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       white-space: nowrap;
     }
   }
@@ -459,20 +461,21 @@ $tones: (
   &__input-group {
     display: flex;
     align-items: stretch;
-    height: 2.5rem;
-    border: 1px solid v.$color-border;
+    height: var(--fx-control-height);
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     overflow: hidden;
 
     &:focus-within {
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     span {
       @include m.flex-center;
       padding: 0 v.$spacing-3;
       background-color: v.$color-gray-100;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
 
@@ -488,17 +491,17 @@ $tones: (
 
     &--readonly input {
       background-color: v.$color-gray-100;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
     }
   }
 
   &__file {
     @include m.font-base;
     width: 100%;
-    height: 2.5rem;
-    border: 1px solid v.$color-border;
+    height: var(--fx-control-height);
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &::file-selector-button {
@@ -506,16 +509,16 @@ $tones: (
       margin-right: v.$spacing-3;
       padding: 0 v.$spacing-3;
       border: none;
-      border-right: 1px solid v.$color-border;
+      border-right: 1px solid v.line(v.$color-border);
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       cursor: pointer;
     }
   }
 
   &__file-note {
-    color: v.$color-text-muted;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
     overflow-wrap: anywhere;
   }
 
@@ -523,7 +526,7 @@ $tones: (
     display: inline-flex;
     align-items: center;
     gap: v.$spacing-1;
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-size: v.$font-size-sm;
     text-decoration: none;
     overflow-wrap: anywhere;

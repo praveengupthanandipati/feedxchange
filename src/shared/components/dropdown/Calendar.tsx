@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FiChevronDown, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "../icon";
 import "./DateRangeInput.scss";
 
 const MONTHS = [
@@ -100,7 +100,7 @@ const Calendar = ({ from, to = "", onPick, min, max }: CalendarProps) => {
     <>
       <div className="date-range-input__month">
         <button type="button" onClick={() => shiftMonth(-1)} aria-label="Previous month">
-          <FiChevronLeft aria-hidden />
+          <ChevronLeftIcon aria-hidden />
         </button>
         <span className="date-range-input__month-selects">
           <button
@@ -111,7 +111,7 @@ const Calendar = ({ from, to = "", onPick, min, max }: CalendarProps) => {
             aria-label={`Month ${MONTHS[view.month]}`}
           >
             {MONTHS[view.month].slice(0, 3)}
-            <FiChevronDown aria-hidden />
+            <ChevronDownIcon aria-hidden />
           </button>
           <div className="date-range-input__month-year" ref={yearRef}>
             <button
@@ -123,7 +123,7 @@ const Calendar = ({ from, to = "", onPick, min, max }: CalendarProps) => {
               aria-label={`Year ${view.year}`}
             >
               {view.year}
-              <FiChevronDown aria-hidden />
+              <ChevronDownIcon aria-hidden />
             </button>
             {yearOpen && (
               <ul className="date-range-input__month-year-list" role="listbox" aria-label="Year" ref={yearListRef}>
@@ -148,7 +148,7 @@ const Calendar = ({ from, to = "", onPick, min, max }: CalendarProps) => {
           </div>
         </span>
         <button type="button" onClick={() => shiftMonth(1)} aria-label="Next month">
-          <FiChevronRight aria-hidden />
+          <ChevronRightIcon aria-hidden />
         </button>
       </div>
 

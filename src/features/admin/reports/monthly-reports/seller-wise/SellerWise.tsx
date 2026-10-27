@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FiPrinter, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon, PrinterIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import { buildSellerWiseColumns } from "./sellerWise.columns";
@@ -67,7 +67,7 @@ const SellerWise = ({ onRegisterExport }: SellerWiseProps) => {
       <div className="seller-wise__header">
         <h2>Seller Wise Report</h2>
         <button type="button" className="seller-wise__print" onClick={handlePrint}>
-          <FiPrinter aria-hidden /> Print
+          <PrinterIcon aria-hidden /> Print
         </button>
       </div>
 
@@ -102,7 +102,7 @@ const SellerWise = ({ onRegisterExport }: SellerWiseProps) => {
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
             aria-label="Previous page"
           >
-            <FiChevronLeft aria-hidden />
+            <ChevronLeftIcon aria-hidden />
           </button>
           {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
             <button
@@ -120,7 +120,7 @@ const SellerWise = ({ onRegisterExport }: SellerWiseProps) => {
             onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
             aria-label="Next page"
           >
-            <FiChevronRight aria-hidden />
+            <ChevronRightIcon aria-hidden />
           </button>
         </div>
       </div>

@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import {
-  FiEye,
-  FiEyeOff,
-  FiDownload,
-  FiPrinter,
-  FiSearch,
-  FiRefreshCw,
-  FiChevronLeft,
-  FiChevronRight,
-} from "react-icons/fi";
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  PrinterIcon,
+  RefreshCwIcon,
+  SearchIcon,
+} from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
@@ -120,14 +120,14 @@ const PendingSupplies = () => {
               className="pending-supplies-btn pending-supplies-btn--info"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button type="button" className="pending-supplies-btn pending-supplies-btn--warning" onClick={handleExport}>
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <button type="button" className="pending-supplies-btn pending-supplies-btn--warning" onClick={handlePrint}>
-              <FiPrinter aria-hidden /> Print
+              <PrinterIcon aria-hidden /> Print
             </button>
           </div>
         </div>
@@ -164,10 +164,10 @@ const PendingSupplies = () => {
             </div>
 
             <button type="button" className="pending-supplies-filters__show" onClick={handleShowFilters}>
-              <FiSearch aria-hidden /> Show
+              <SearchIcon aria-hidden /> Show
             </button>
             <button type="button" className="pending-supplies-filters__reset" onClick={handleReset}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         )}
@@ -194,7 +194,7 @@ const PendingSupplies = () => {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <button
@@ -212,7 +212,7 @@ const PendingSupplies = () => {
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

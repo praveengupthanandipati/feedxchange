@@ -1,4 +1,4 @@
-import { FiSearch } from "react-icons/fi";
+import { SearchIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import { STATUS_OPTIONS } from "../blogs.data";
 
@@ -13,7 +13,7 @@ interface BlogsFiltersProps {
 const BlogsFilters = ({ search, status, onSearchChange, onStatusChange }: BlogsFiltersProps) => (
   <div id="blogs-filters" className="blogs__filters">
     <div className="blogs__search">
-      <FiSearch aria-hidden />
+      <SearchIcon aria-hidden />
       <input
         type="search"
         autoComplete="off"

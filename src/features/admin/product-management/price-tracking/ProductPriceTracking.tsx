@@ -3,29 +3,29 @@ import DatePickerInput from "../../../../shared/components/dropdown/DatePickerIn
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
-  FiEye,
-  FiEyeOff,
-  FiMessageSquare,
-  FiSave,
-  FiCheck,
-  FiRefreshCw,
-  FiCalendar,
-  FiClock,
-  FiX,
-  FiInfo,
-  FiSliders,
-  FiEdit3,
-  FiStar,
-  FiArrowRight,
-  FiArrowLeft,
-  FiTrendingUp,
-  FiTrendingDown,
-  FiAlertTriangle,
-  FiPackage,
-  FiChevronLeft,
-  FiChevronRight,
-  FiCheckCircle,
-} from "react-icons/fi";
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CalendarIcon,
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleCheckBigIcon,
+  ClockIcon,
+  EyeIcon,
+  EyeOffIcon,
+  InfoIcon,
+  MessageSquareIcon,
+  PackageIcon,
+  PenLineIcon,
+  RefreshCwIcon,
+  SaveIcon,
+  SlidersVerticalIcon,
+  StarIcon,
+  TrendingDownIcon,
+  TrendingUpIcon,
+  TriangleAlertIcon,
+  XIcon,
+} from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
 import { buildPriceTrackingColumns } from "./priceTracking.columns";
@@ -48,11 +48,11 @@ const nowTime = () => {
   return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 };
 
-const SENTIMENT_ICONS: Record<CommentSentiment, typeof FiTrendingUp> = {
-  up: FiTrendingUp,
-  down: FiTrendingDown,
-  info: FiInfo,
-  warning: FiAlertTriangle,
+const SENTIMENT_ICONS: Record<CommentSentiment, typeof TrendingUpIcon> = {
+  up: TrendingUpIcon,
+  down: TrendingDownIcon,
+  info: InfoIcon,
+  warning: TriangleAlertIcon,
 };
 
 interface CommentDrawerProps {
@@ -105,7 +105,7 @@ const CommentDrawer = ({
         .filter((option) => selectedCommentIds.includes(option.id))
         .map((option) => ({ id: option.id, label: option.label, Icon: SENTIMENT_ICONS[option.sentiment] })),
       ...(otherChecked && otherText.trim()
-        ? [{ id: "other", label: otherText.trim(), Icon: FiEdit3 }]
+        ? [{ id: "other", label: otherText.trim(), Icon: PenLineIcon }]
         : []),
     ],
     [selectedCommentIds, otherChecked, otherText],
@@ -124,7 +124,7 @@ const CommentDrawer = ({
       >
         <div className="comment-drawer__header">
           <h2 id="comment-drawer-title">
-            {step === "select" ? <FiMessageSquare aria-hidden /> : <FiEye aria-hidden />}
+            {step === "select" ? <MessageSquareIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {step === "select" ? "Add Comments for Selected Products" : "Preview Comments"}
           </h2>
           <button
@@ -133,19 +133,19 @@ const CommentDrawer = ({
             onClick={onCancel}
             aria-label="Close"
           >
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </div>
 
         <div className="comment-drawer__body">
           <p className="comment-drawer__selected-label">
-            <FiInfo aria-hidden /> Selected Products ({selectedRows.length})
+            <InfoIcon aria-hidden /> Selected Products ({selectedRows.length})
           </p>
 
           <div className="comment-drawer__selected-list">
             {selectedRows.map((row) => (
               <div className="comment-drawer__selected-chip" key={row.id}>
-                <FiPackage aria-hidden />
+                <PackageIcon aria-hidden />
                 <strong>{row.productName}</strong>
                 <span>({row.sellerName})</span>
               </div>
@@ -155,7 +155,7 @@ const CommentDrawer = ({
           {step === "select" ? (
             <>
               <p className="comment-drawer__section-title">
-                <FiSliders aria-hidden /> Select Comments
+                <SlidersVerticalIcon aria-hidden /> Select Comments
               </p>
 
               <div className="comment-drawer__comment-list">
@@ -186,7 +186,7 @@ const CommentDrawer = ({
                     checked={otherChecked}
                     onChange={(event) => onOtherToggle(event.target.checked)}
                   />
-                  <FiEdit3 aria-hidden />
+                  <PenLineIcon aria-hidden />
                   <span>Other</span>
                 </label>
                 {otherChecked && (
@@ -205,7 +205,7 @@ const CommentDrawer = ({
                   checked={majorEvent}
                   onChange={(event) => onMajorEventToggle(event.target.checked)}
                 />
-                <FiStar aria-hidden />
+                <StarIcon aria-hidden />
                 <div>
                   <strong>Mark as Major Event</strong>
                   <p>This will highlight the comment as a major market event</p>
@@ -215,7 +215,7 @@ const CommentDrawer = ({
           ) : (
             <>
               <p className="comment-drawer__selected-label comment-drawer__selected-label--success">
-                <FiCheckCircle aria-hidden /> Selected Comments ({selectedCommentEntries.length})
+                <CircleCheckBigIcon aria-hidden /> Selected Comments ({selectedCommentEntries.length})
               </p>
 
               <div className="comment-drawer__preview-list">
@@ -229,7 +229,7 @@ const CommentDrawer = ({
 
               {majorEvent && (
                 <p className="comment-drawer__preview-major-event">
-                  <FiStar aria-hidden /> Marked as Major Event
+                  <StarIcon aria-hidden /> Marked as Major Event
                 </p>
               )}
             </>
@@ -240,7 +240,7 @@ const CommentDrawer = ({
           {step === "select" ? (
             <>
               <button type="button" className="comment-drawer__cancel" onClick={onCancel}>
-                <FiX aria-hidden /> Cancel
+                <XIcon aria-hidden /> Cancel
               </button>
               <button
                 type="button"
@@ -248,16 +248,16 @@ const CommentDrawer = ({
                 disabled={nextCount === 0}
                 onClick={() => setStep("preview")}
               >
-                Next ({nextCount}) <FiArrowRight aria-hidden />
+                Next ({nextCount}) <ArrowRightIcon aria-hidden />
               </button>
             </>
           ) : (
             <>
               <button type="button" className="comment-drawer__cancel" onClick={() => setStep("select")}>
-                <FiArrowLeft aria-hidden /> Back
+                <ArrowLeftIcon aria-hidden /> Back
               </button>
               <button type="button" className="comment-drawer__submit-final" onClick={onSubmit}>
-                <FiCheck aria-hidden /> Submit Comments
+                <CheckIcon aria-hidden /> Submit Comments
               </button>
             </>
           )}
@@ -411,7 +411,7 @@ const ProductPriceTracking = () => {
     <div className="price-tracking-page">
       {saveToastVisible && (
         <div className="price-tracking__toast" role="status">
-          <FiCheckCircle aria-hidden />
+          <CircleCheckBigIcon aria-hidden />
           Prices saved successfully.
         </div>
       )}
@@ -425,7 +425,7 @@ const ProductPriceTracking = () => {
               className="price-tracking-btn price-tracking-btn--info"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button
@@ -434,7 +434,7 @@ const ProductPriceTracking = () => {
               onClick={handleOpenCommentDrawer}
               disabled={selectedIds.length === 0}
             >
-              <FiMessageSquare aria-hidden /> Add Comment
+              <MessageSquareIcon aria-hidden /> Add Comment
             </button>
             <button
               type="button"
@@ -442,7 +442,7 @@ const ProductPriceTracking = () => {
               onClick={handleSave}
               disabled={selectedIds.length === 0}
             >
-              <FiSave aria-hidden /> Save
+              <SaveIcon aria-hidden /> Save
             </button>
           </div>
         </div>
@@ -471,7 +471,7 @@ const ProductPriceTracking = () => {
             <div className="price-tracking-filters__field">
               <span className="price-tracking-filters__label">Select Date Range</span>
               <div className="price-tracking-filters__input-group">
-                <FiCalendar aria-hidden />
+                <CalendarIcon aria-hidden />
                 <DatePickerInput
                   value={dateRange}
                   onChange={(value) => setDateRange(value)}
@@ -484,7 +484,7 @@ const ProductPriceTracking = () => {
             <div className="price-tracking-filters__field">
               <span className="price-tracking-filters__label">Select Time</span>
               <div className="price-tracking-filters__input-group">
-                <FiClock aria-hidden />
+                <ClockIcon aria-hidden />
                 <input
                   type="time"
                   value={timeValue}
@@ -495,10 +495,10 @@ const ProductPriceTracking = () => {
             </div>
 
             <button type="button" className="price-tracking-filters__apply" onClick={handleApply}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="price-tracking-filters__reset" onClick={handleReset}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         )}
@@ -531,7 +531,7 @@ const ProductPriceTracking = () => {
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <button
@@ -549,7 +549,7 @@ const ProductPriceTracking = () => {
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

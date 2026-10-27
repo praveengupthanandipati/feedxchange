@@ -38,14 +38,14 @@
     border: none;
     background: transparent;
     padding: 0;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-medium;
     text-decoration: none;
     cursor: pointer;
 
     &:hover {
-      color: v.$color-primary-dark;
+      color: v.fg(v.$color-primary-dark);
       text-decoration: underline;
     }
   }
@@ -74,19 +74,19 @@
     }
 
     span {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
 
     strong {
       @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
   &__error {
-    background-color: rgba(v.$color-danger, 0.08);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.08);
+    color: v.fg(v.$color-danger);
     border-radius: v.$radius-md;
     padding: v.$spacing-3 v.$spacing-4;
     font-size: v.$font-size-sm;
@@ -101,7 +101,7 @@
   }
 
   &__section-title {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-lg;
     margin: 0 0 v.$spacing-5;
   }
@@ -144,16 +144,16 @@
   }
 
   &__condition-card {
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     padding: v.$spacing-4;
 
     h3 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-base;
       margin: 0 0 v.$spacing-4;
       padding-bottom: v.$spacing-3;
-      border-bottom: 1px solid v.$color-border;
+      border-bottom: 1px solid v.line(v.$color-border);
     }
   }
 
@@ -163,7 +163,7 @@
   &__settings-table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
     font-size: v.$font-size-sm;
@@ -172,14 +172,14 @@
       background-color: v.$color-bg-muted;
       text-align: left;
       padding: v.$spacing-3 v.$spacing-4;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-weight: v.$font-weight-semibold;
-      border-bottom: 1px solid v.$color-border;
+      border-bottom: 1px solid v.line(v.$color-border);
     }
 
     td {
       padding: v.$spacing-4;
-      border-bottom: 1px solid v.$color-border;
+      border-bottom: 1px solid v.line(v.$color-border);
       vertical-align: top;
     }
 
@@ -190,12 +190,12 @@
 
   &__setting-title {
     @include m.font-base(v.$font-weight-semibold);
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     margin: 0 0 v.$spacing-1;
   }
 
   &__setting-description {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -205,7 +205,7 @@
   }
 
   &__setting-status {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
   }
 
@@ -225,7 +225,7 @@
       z-index: v.$z-index-sticky;
       padding: v.$spacing-3 v.$spacing-4;
       background-color: v.$color-bg;
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
       box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
 
       .new-contract__cancel,
@@ -238,11 +238,11 @@
   &__cancel {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-5;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     text-decoration: none;
@@ -256,7 +256,7 @@
     @include m.flex-center;
     @include m.button-variant(v.$color-orange, v.$color-navy-dark, v.$color-orange-dark);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-6;
     font-size: v.$font-size-sm;
   }
@@ -274,43 +274,43 @@
   &__label {
     @include m.font-base(v.$font-weight-semibold);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   &__required {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
   }
 
   &__error {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     margin: 0;
   }
 
   &__control {
     @include m.font-base;
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
 
     &::placeholder {
-      color: v.$color-gray-400;
+      color: v.fg(v.$color-gray-400);
     }
 
     &:focus {
       outline: none;
-      border-color: v.$color-primary;
-      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     &:disabled {
       background-color: v.$color-gray-50;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       cursor: not-allowed;
     }
   }

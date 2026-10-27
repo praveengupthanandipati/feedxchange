@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../../shared/components/icon";
 import { EMPTY_FORM, MAX_RATING, TESTIMONIAL_STATUSES, type Testimonial, type TestimonialForm } from "../testimonials.data";
 import { toForm, validateTestimonial, type FormErrors } from "../testimonials.utils";
 
@@ -97,7 +97,7 @@ const TestimonialOffcanvas = ({ testimonial, onSave, onClose }: TestimonialOffca
         <header className="testimonial-panel__header">
           <h2 id="testimonial-panel-title">{isEdit ? "Edit Testimonial" : "Create Testimonial"}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
 

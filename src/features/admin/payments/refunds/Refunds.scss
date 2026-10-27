@@ -14,7 +14,7 @@
     padding: v.$spacing-3 v.$spacing-5;
     border-radius: v.$radius-md;
     background-color: v.$color-success;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     box-shadow: v.$shadow-lg;
@@ -48,7 +48,7 @@
 
     h1 {
       @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-xl;
       margin: 0;
     }
@@ -61,17 +61,17 @@
 
   &__subtitle {
     @include m.font-heading(v.$font-weight-semibold);
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-lg;
     margin: v.$spacing-2 0 0;
   }
 
   &__notice {
     padding: v.$spacing-3 v.$spacing-4;
-    border: 1px solid rgba(v.$color-orange, 0.5);
+    border: 1px solid v.alpha(v.line(v.$color-orange), 0.5);
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-orange, 0.12);
-    color: v.$color-text;
+    background-color: v.alpha(v.$color-orange, 0.12);
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -81,7 +81,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.focus-ring(v.$color-orange);
   @include m.font-base(v.$font-weight-semibold);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -92,16 +92,16 @@
 
   &--info {
     background-color: v.$color-info;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-sky-40);
     }
   }
 
   &--primary {
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
       background-color: v.$color-primary-dark;
@@ -110,10 +110,10 @@
 
   &--danger {
     background-color: v.$color-danger;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #c73a30;
+      background-color: var(--fx-red-48);
     }
   }
 }
@@ -143,15 +143,15 @@
   &__dates {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
 
     &:focus-within {
-      border-color: v.$color-primary;
-      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     input {
@@ -162,13 +162,13 @@
       border: none;
       outline: none;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
 
     span {
       flex-shrink: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -188,7 +188,7 @@
 
   &__error {
     grid-column: 1 / -1;
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -203,9 +203,9 @@
   gap: v.$spacing-1 v.$spacing-6;
   margin: 0;
   padding: v.$spacing-3 v.$spacing-4;
-  border: 1px solid rgba(v.$color-info, 0.3);
+  border: 1px solid v.alpha(v.line(v.$color-info), 0.3);
   border-radius: v.$radius-md;
-  background-color: rgba(v.$color-info, 0.1);
+  background-color: v.alpha(v.$color-info, 0.1);
   font-size: v.$font-size-sm;
 
   > div {
@@ -217,13 +217,13 @@
 
   dt {
     @include m.font-base(v.$font-weight-medium);
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
   }
 
   dd {
     @include m.font-base(v.$font-weight-semibold);
     margin: 0;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     overflow-wrap: anywhere;
   }
 }
@@ -255,7 +255,7 @@
     flex-shrink: 0;
     border: none;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: 0.9rem;
     cursor: pointer;
     transition: filter v.$transition-fast;
@@ -270,7 +270,7 @@
 
     &--edit {
       background-color: v.$color-orange;
-      color: v.$color-navy-dark;
+      color: v.on(v.$color-navy-dark);
     }
 
     &--delete {
@@ -279,7 +279,7 @@
   }
 
   &__amount {
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
     font-weight: v.$font-weight-semibold;
   }
 
@@ -290,11 +290,11 @@
     font-weight: v.$font-weight-semibold;
 
     &--due {
-      color: v.$color-success;
+      color: v.fg(v.$color-success);
     }
 
     &--excess {
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
   }
 
@@ -311,7 +311,7 @@
   flex-wrap: wrap;
 
   p {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -326,10 +326,10 @@
       min-width: 2rem;
       height: 2rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
       transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -345,8 +345,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -366,7 +366,7 @@
 }
 
 .refunds-filters__error {
-  color: v.$color-danger;
+  color: v.fg(v.$color-danger);
   font-size: v.$font-size-sm;
   margin: 0;
 }
@@ -395,18 +395,18 @@
     label {
       @include m.font-base(v.$font-weight-semibold);
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
 
     input[type="text"],
     select {
       @include m.font-base;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
   }
@@ -434,14 +434,14 @@
       width: 7rem;
       height: 2rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-sm;
       text-align: right;
     }
 
     button {
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-sm;
       background: v.$color-bg;
       font-size: v.$font-size-sm;
@@ -452,10 +452,10 @@
   &__link-btn {
     @include m.flex(row, flex-start, center, v.$spacing-1);
     padding: 0.25rem 0.6rem;
-    border: 1px solid rgba(v.$color-danger, 0.5);
+    border: 1px solid v.alpha(v.line(v.$color-danger), 0.5);
     border-radius: v.$radius-sm;
     background: transparent;
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     cursor: pointer;
   }
@@ -464,14 +464,14 @@
     display: inline-block;
     padding: 0.1rem 0.5rem;
     border-radius: 999px;
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-semibold;
-    background-color: rgba(v.$color-success, 0.15);
-    color: v.$color-success;
+    background-color: v.alpha(v.$color-success, 0.15);
+    color: v.fg(v.$color-success);
 
     &--cancelled {
       background-color: v.$color-gray-50;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
     }
   }
 }

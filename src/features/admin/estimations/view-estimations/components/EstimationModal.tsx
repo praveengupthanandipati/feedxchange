@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { FiX } from "react-icons/fi";
+import { XIcon } from "../../../../../shared/components/icon";
 
 interface EstimationModalProps {
   titleId: string;
@@ -31,7 +31,7 @@ const EstimationModal = ({ titleId, title, onClose, children }: EstimationModalP
         <header>
           <h2 id={titleId}>{title}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
         {children}

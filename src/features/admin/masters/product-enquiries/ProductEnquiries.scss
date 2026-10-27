@@ -20,7 +20,7 @@
 
     h1 {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -37,11 +37,11 @@
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
@@ -56,15 +56,15 @@
       cursor: not-allowed;
     }
 
-    &--info { background-color: #50a5f1; }
-    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--info { background-color: var(--fx-sky-63); }
+    &--warning { background-color: v.$color-orange; color: v.on(v.$color-navy-dark); }
     &--navy { background-color: v.$color-navy; }
 
     &--sm {
       height: 2rem;
       padding: 0 v.$spacing-2;
       border-radius: v.$radius-sm;
-      font-size: 0.78rem;
+      font-size: max(11px, 0.78rem);
     }
   }
 
@@ -86,7 +86,7 @@
       position: absolute;
       top: 50%;
       left: v.$spacing-3;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       transform: translateY(-50%);
       pointer-events: none;
     }
@@ -94,12 +94,12 @@
     input {
       @include m.font-base;
       width: 100%;
-      height: 2.5rem;
+      height: var(--fx-control-height);
       padding: 0 v.$spacing-3 0 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid var(--fx-field-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       text-overflow: ellipsis;
       -webkit-appearance: none;
@@ -107,7 +107,8 @@
 
       &:focus {
         outline: none;
-        border-color: v.$color-navy;
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
       }
     }
   }
@@ -115,7 +116,7 @@
   &__message {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     margin: 0;
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
     font-size: v.$font-size-sm;
 
     svg { flex-shrink: 0; }
@@ -146,7 +147,7 @@
   }
 
   &__link {
-    color: v.$color-info;
+    color: v.fg(v.$color-info);
     text-decoration: none;
 
     &:hover { text-decoration: underline; }
@@ -161,13 +162,13 @@
     display: inline-block;
     padding: 0.1rem 0.4rem;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
-    font-size: 0.7rem;
+    color: v.fg(v.$color-white);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-bold;
     line-height: 1.4;
 
-    &--new { background-color: #f1b44c; }
-    &--active { background-color: #34c38f; }
+    &--new { background-color: var(--fx-amber-62); }
+    &--active { background-color: var(--fx-teal-48); }
     &--closed { background-color: v.$color-gray-500; }
   }
 
@@ -189,9 +190,9 @@
   &__cards-empty {
     grid-column: 1 / -1;
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
   }
@@ -199,7 +200,7 @@
   &__card {
     display: flex;
     flex-direction: column;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
 
@@ -214,14 +215,14 @@
     }
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
     dd {
       margin: 0.15rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -230,9 +231,9 @@
   &__card-top {
     @include m.flex(row, space-between, center, v.$spacing-2);
     padding: v.$spacing-2 v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
-    background-color: rgba(v.$color-navy, 0.06);
-    color: v.$color-navy;
+    border-bottom: 1px solid v.line(v.$color-border);
+    background-color: v.alpha(v.$color-navy, 0.06);
+    color: v.fg(v.$color-navy);
     font-size: v.$font-size-sm;
   }
 
@@ -258,7 +259,7 @@
 
     p {
       margin: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -272,10 +273,10 @@
       @include m.flex-center;
       min-width: 2.25rem;
       height: 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
@@ -286,8 +287,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -348,14 +349,14 @@
 
     h2 {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-lg;
     }
 
     p {
       margin: v.$spacing-1 0 0;
-      color: v.$color-text-muted;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.8rem);
       overflow-wrap: anywhere;
     }
 
@@ -368,7 +369,7 @@
       border: none;
       border-radius: v.$radius-sm;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: 1.4rem;
       cursor: pointer;
 
@@ -400,8 +401,8 @@
   }
 
   &__label {
-    color: v.$color-text;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text);
+    font-size: max(11px, 0.8rem);
     font-weight: v.$font-weight-medium;
   }
 
@@ -410,10 +411,10 @@
     width: 100%;
     min-height: 6.5rem;
     padding: v.$spacing-2 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     resize: vertical;
     -webkit-appearance: none;
@@ -421,13 +422,14 @@
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
   &__error {
-    color: v.$color-danger;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-danger);
+    font-size: max(11px, 0.75rem);
   }
 
   &__actions {

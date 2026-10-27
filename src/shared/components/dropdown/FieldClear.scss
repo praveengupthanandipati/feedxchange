@@ -1,0 +1,21 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+// The clear "x" inside a field: a 14px muted icon in a 24px click area, darker on hover and focus.
+.field-clear {
+  @include m.flex-center;
+  @include m.focus-ring;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: v.$radius-pill;
+  color: var(--fx-field-icon);
+  cursor: pointer;
+  transition: color v.$transition-fast, background-color v.$transition-fast;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--fx-field-icon-hover);
+    background-color: v.$color-gray-100;
+  }
+}

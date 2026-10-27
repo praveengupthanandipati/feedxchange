@@ -13,7 +13,7 @@ h2,
 h3,
 h4 {
   margin: 0;
-  color: v.$ink;
+  color: v.fg(v.$ink);
   font-family: v.$font-heading;
   font-weight: v.$fw-bold;
   line-height: 1.2;
@@ -50,7 +50,7 @@ textarea {
 }
 
 ::selection {
-  background-color: rgba(v.$orange-500, 0.35);
+  background-color: v.alpha(v.$orange-500, 0.35);
 }
 
 // ---------- Layout helpers ----------
@@ -86,11 +86,11 @@ textarea {
   &--dark {
     background-color: v.$navy-900;
     background-image: v.$gradient-dark;
-    color: rgba(v.$white, 0.85);
+    color: v.alpha(v.on(v.$white), 0.85);
 
     h2,
     h3 {
-      color: v.$white;
+      color: v.fg(v.$white);
     }
   }
 }
@@ -110,7 +110,7 @@ textarea {
 
   p {
     margin-top: v.$space-3;
-    color: v.$ink-soft;
+    color: v.fg(v.$ink-soft);
     font-size: v.$fs-lg;
   }
 
@@ -125,7 +125,7 @@ textarea {
   align-items: center;
   gap: v.$space-2;
   margin-bottom: v.$space-3;
-  color: v.$orange-600;
+  color: v.fg(v.$orange-600);
   font-size: v.$fs-xs;
   font-weight: v.$fw-semibold;
   letter-spacing: 0.12em;
@@ -148,7 +148,7 @@ textarea {
   padding: v.$space-2 v.$space-4;
   border-radius: v.$radius-sm;
   background-color: v.$navy-900;
-  color: v.$white;
+  color: v.on(v.$white);
 
   &:focus {
     top: v.$space-4;

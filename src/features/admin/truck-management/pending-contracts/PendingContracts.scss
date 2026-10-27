@@ -18,7 +18,7 @@
     gap: v.$spacing-3;
 
     h1 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-xl;
       margin: 0;
     }
@@ -35,14 +35,14 @@
   @include m.flex(column, center, center);
   min-height: 18rem;
   gap: v.$spacing-3;
-  color: v.$color-text-muted;
+  color: v.fg(v.$color-text-muted);
   font-size: v.$font-size-sm;
 
   &__spinner {
     width: 2rem;
     height: 2rem;
-    border: 3px solid v.$color-border;
-    border-top-color: v.$color-navy;
+    border: 3px solid v.line(v.$color-border);
+    border-top-color: v.line(v.$color-navy);
     border-radius: 50%;
     animation: pending-contracts-loader-spin 0.8s linear infinite;
   }
@@ -58,7 +58,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -66,18 +66,19 @@
   cursor: pointer;
   transition: background-color v.$transition-fast;
 
+  // a deeper blue than $color-info, so white text has 4.5:1 (WCAG AA)
   &--info {
-    background-color: v.$color-info;
-    color: v.$color-white;
+    background-color: var(--fx-sky-40);
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-blue-32);
     }
   }
 
   &--warning {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -127,10 +128,10 @@
 
   &__date-range {
     @include m.flex(row, flex-start, center, v.$spacing-1);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     min-width: 0;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
 
@@ -143,7 +144,7 @@
     .date-range-input__trigger {
       min-width: 0;
       padding-inline: v.$spacing-2;
-      font-size: 0.8125rem;
+      font-size: max(11px, 0.8125rem);
     }
 
     input {
@@ -153,13 +154,13 @@
       border: none;
       outline: none;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
 
     span {
       flex-shrink: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
 
@@ -177,12 +178,17 @@
   &__search {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     flex: 1 1 18rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
+
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
 
     input {
       flex: 1;
@@ -191,10 +197,10 @@
       outline: none;
       background: transparent;
       font-size: v.$font-size-sm;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
 
       &::placeholder {
-        color: v.$color-gray-400;
+        color: v.fg(v.$color-gray-400);
       }
     }
   }
@@ -203,17 +209,17 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border: none;
     border-radius: v.$radius-pill;
-    background-color: rgba(v.$color-danger, 0.1);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.1);
+    color: v.fg(v.$color-danger);
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: rgba(v.$color-danger, 0.18);
+      background-color: v.alpha(v.$color-danger, 0.18);
     }
   }
 }
@@ -231,23 +237,23 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border: none;
     border-radius: v.$radius-sm;
     background-color: v.$color-success;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: 0.85rem;
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: #227a46;
+      background-color: var(--fx-green-31);
     }
   }
 
   &__id-text {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     text-decoration: none;
     cursor: pointer;
 
@@ -269,12 +275,12 @@
   }
 
   &__qty--arranged {
-    color: v.$color-info;
+    color: v.fg(v.$color-info);
     font-weight: v.$font-weight-semibold;
   }
 
   &__qty--pending {
-    color: v.$color-orange-dark;
+    color: v.fg(v.$color-orange-dark);
     font-weight: v.$font-weight-semibold;
   }
 
@@ -283,8 +289,8 @@
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
-    font-size: 0.7rem;
+    color: v.on(v.$color-navy-dark);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
   }
@@ -299,7 +305,7 @@
   gap: v.$spacing-3;
 
   p {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -315,10 +321,10 @@
       min-width: 2.25rem;
       height: 2.25rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
       transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -334,8 +340,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -392,14 +398,14 @@
     @include m.flex(row, space-between, center);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
       font-size: v.$font-size-lg;
       margin: 0;
 
       strong {
-        color: v.$color-primary;
+        color: v.fg(v.$color-primary);
       }
     }
   }
@@ -412,14 +418,14 @@
     border: none;
     border-radius: v.$radius-pill;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 1.25rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -440,17 +446,17 @@
 
     p {
       @include m.flex(row, flex-start, center, v.$spacing-2);
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
       margin: 0;
 
       strong {
-        color: v.$color-text;
+        color: v.fg(v.$color-text);
       }
 
       svg {
         flex-shrink: 0;
-        color: v.$color-primary;
+        color: v.fg(v.$color-primary);
       }
     }
   }
@@ -462,7 +468,7 @@
 
     h3 {
       @include m.flex(row, flex-start, center, v.$spacing-2);
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-base;
       margin: 0;
     }
@@ -494,7 +500,7 @@
     gap: 0.15rem;
     padding: v.$spacing-3 v.$spacing-4;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
 
     span {
       @include m.font-heading(v.$font-weight-semibold);
@@ -512,20 +518,20 @@
     }
 
     &--success {
-      background: linear-gradient(135deg, v.$color-success 0%, #1d7a46 100%);
+      background: linear-gradient(135deg, v.$color-success 0%, var(--fx-green-30) 100%);
     }
 
     &--info {
-      background: linear-gradient(135deg, v.$color-info 0%, #1f6fae 100%);
+      background: linear-gradient(135deg, v.$color-info 0%, var(--fx-sky-40) 100%);
     }
 
     &--danger {
-      background: linear-gradient(135deg, v.$color-danger 0%, #b8352b 100%);
+      background: linear-gradient(135deg, v.$color-danger 0%, var(--fx-red-45) 100%);
     }
   }
 
   &__empty {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -537,7 +543,7 @@
   }
 
   &__truck-card {
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
   }
@@ -566,15 +572,15 @@
 
     svg {
       flex-shrink: 0;
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
     }
 
     strong {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
 
     span {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -585,18 +591,18 @@
     flex-wrap: wrap;
 
     > svg {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
     }
   }
 
   &__share-btn {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border-radius: v.$radius-sm;
     background-color: v.$color-navy;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
@@ -610,8 +616,8 @@
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
-    font-size: 0.7rem;
+    color: v.on(v.$color-navy-dark);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
   }
@@ -621,7 +627,7 @@
     grid-template-columns: 1fr;
     gap: v.$spacing-4;
     padding: v.$spacing-4;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     background-color: v.$color-bg-muted;
 
     @include m.respond-to(sm) {
@@ -638,17 +644,17 @@
     span {
       @include m.flex(row, flex-start, center, v.$spacing-1);
       @include m.font-base(v.$font-weight-semibold);
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
 
       svg {
         flex-shrink: 0;
-        color: v.$color-primary;
+        color: v.fg(v.$color-primary);
       }
     }
 
     p {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
       margin: 0;
       word-break: break-word;
@@ -660,9 +666,9 @@
     align-self: flex-start;
     padding: 0.2rem 0.6rem;
     border-radius: v.$radius-pill;
-    background-color: rgba(v.$color-orange, 0.15);
-    color: v.$color-orange-dark;
-    font-size: 0.7rem;
+    background-color: v.alpha(v.$color-orange, 0.15);
+    color: v.fg(v.$color-orange-dark);
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
   }
 }

@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
-import { FiImage, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon, ImageIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
@@ -17,7 +17,8 @@ import SuccessToast from "../../../../shared/components/toast/SuccessToast";
 import type { Category } from "../../../../core/store/categoryApi";
 import "../../contracts/NewContract.scss";
 import "./Categories.scss";
-import RowActionsMenu from "../../../../shared/components/table/RowActionsMenu";
+import RowActionsMenu from "../../../../shared/components/table/RowActionsMenu";
+
 import Can from "../../../../core/auth/Can";
 
 const PAGE_SIZE = 10;
@@ -322,7 +323,7 @@ if (error) {
 
         <div className="categories-upload">
           <div className="categories-upload__preview">
-            {imagePreview ? <img src={imagePreview} alt="Category" /> : <FiImage aria-hidden />}
+            {imagePreview ? <img src={imagePreview} alt="Category" /> : <ImageIcon aria-hidden />}
           </div>
           <button
             type="button"
@@ -429,7 +430,7 @@ if (error) {
               onClick={() => setCurrentPage(Math.max(1, currentPageClamped - 1))}
               aria-label="Previous page"
             >
-              <FiChevronLeft aria-hidden />
+              <ChevronLeftIcon aria-hidden />
             </button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <button
@@ -447,7 +448,7 @@ if (error) {
               onClick={() => setCurrentPage(Math.min(totalPages, currentPageClamped + 1))}
               aria-label="Next page"
             >
-              <FiChevronRight aria-hidden />
+              <ChevronRightIcon aria-hidden />
             </button>
           </div>
         </div>

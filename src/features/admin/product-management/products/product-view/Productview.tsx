@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiPackage } from "react-icons/fi";
+import { ArrowLeftIcon, PackageIcon } from "../../../../../shared/components/icon";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import Table from "../../../../../shared/components/table/Table";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
@@ -77,7 +77,7 @@ const Productview = () => {
     return (
       <div className="product-view">
         <Link to="/admin/products" className="product-view__back">
-          <FiArrowLeft aria-hidden /> Products
+          <ArrowLeftIcon aria-hidden /> Products
         </Link>
         <div className="product-view-card">
           <p>Loading product…</p>
@@ -90,7 +90,7 @@ const Productview = () => {
     return (
       <div className="product-view">
         <Link to="/admin/products" className="product-view__back">
-          <FiArrowLeft aria-hidden /> Products
+          <ArrowLeftIcon aria-hidden /> Products
         </Link>
         <div className="product-view-card">
           <p>No product found for id "{id}".</p>
@@ -110,7 +110,7 @@ const Productview = () => {
       <div className="product-view__topbar">
         <h1>{product.name}</h1>
         <Link to="/admin/products" className="product-view__back">
-          <FiArrowLeft aria-hidden /> Products
+          <ArrowLeftIcon aria-hidden /> Products
         </Link>
       </div>
 
@@ -137,7 +137,7 @@ const Productview = () => {
                 }}
               />
             ) : (
-              <FiPackage aria-hidden />
+              <PackageIcon aria-hidden />
             )}
           </div>
           <h2 className="product-view-profile__name">{product.name}</h2>
@@ -233,27 +233,27 @@ const Productview = () => {
                     }))}
                     margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
                   >
-                    <CartesianGrid vertical={false} stroke="#eef0f3" />
+                    <CartesianGrid vertical={false} stroke="var(--fx-chart-grid)" />
                     <XAxis
                       dataKey="label"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: "#9ea4ad", fontSize: 12 }}
+                      tick={{ fill: "var(--fx-chart-axis)", fontSize: 12 }}
                     />
                     <YAxis
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: "#9ea4ad", fontSize: 12 }}
+                      tick={{ fill: "var(--fx-chart-axis)", fontSize: 12 }}
                       width={56}
                     />
                     <Tooltip
-                      contentStyle={{ borderRadius: 8, border: "1px solid #e1e4e8", fontSize: 13 }}
+                      contentStyle={{ borderRadius: 8, border: "1px solid var(--fx-gray-90-line)", fontSize: 13 }}
                       formatter={(value) => [`₹${Number(value).toLocaleString("en-IN")}`, "Price"]}
                     />
                     <Line
                       type="monotone"
                       dataKey="price"
-                      stroke="#1b3664"
+                      stroke="var(--fx-brand-navy)"
                       strokeWidth={2}
                       dot={{ r: 3 }}
                       activeDot={{ r: 5 }}

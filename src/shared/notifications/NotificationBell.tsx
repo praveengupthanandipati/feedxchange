@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiBell } from "react-icons/fi";
+import { BellIcon } from "../components/icon";
 import {
   useGetInboxQuery,
   useGetUnreadCountQuery,
@@ -79,7 +79,7 @@ const NotificationBell = () => {
         aria-haspopup="true"
         title={connected ? "Notifications (live)" : "Notifications"}
       >
-        <FiBell aria-hidden />
+        <BellIcon aria-hidden />
         {unread > 0 && <span className="header__badge">{unread > 99 ? "99+" : unread}</span>}
       </button>
 

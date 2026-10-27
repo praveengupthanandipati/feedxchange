@@ -14,4 +14,10 @@ export interface TableColumn<T> {
   sortValue?: (row: T) => string | number;
   /** Plain-text value used for exporting; falls back to `sortValue` then the raw field. */
   exportValue?: (row: T) => string;
+  /** Starts hidden when the table offers the Columns menu (`columnToggle`). */
+  hidden?: boolean;
+  /** false keeps the column out of the Columns menu (always shown). */
+  hideable?: boolean;
+  /** "low": hidden on phones and small tablets (below 768px), to keep the important columns readable. */
+  priority?: "low";
 }

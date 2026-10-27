@@ -18,7 +18,7 @@
     gap: v.$spacing-3;
 
     h1 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-xl;
       margin: 0;
     }
@@ -35,7 +35,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -44,18 +44,19 @@
   transition: background-color v.$transition-fast;
   white-space: nowrap;
 
+  // a deeper blue than $color-info, so white text has 4.5:1 (WCAG AA)
   &--info {
-    background-color: v.$color-info;
-    color: v.$color-white;
+    background-color: var(--fx-sky-40);
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-blue-32);
     }
   }
 
   &--warning {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -91,7 +92,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -103,7 +104,7 @@
 
   &__apply {
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
       background-color: v.$color-primary-dark;
@@ -111,11 +112,11 @@
   }
 
   &__reset {
-    background-color: rgba(v.$color-danger, 0.1);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.1);
+    color: v.fg(v.$color-danger);
 
     &:hover {
-      background-color: rgba(v.$color-danger, 0.18);
+      background-color: v.alpha(v.$color-danger, 0.18);
     }
   }
 }
@@ -127,16 +128,16 @@
 .contract-summary-tabs {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  border-bottom: 1px solid v.$color-border;
+  border-bottom: 1px solid v.line(v.$color-border);
 
   button {
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
     border: none;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
     white-space: nowrap;
@@ -147,12 +148,12 @@
 
     &:hover:not(.is-active) {
       background-color: v.$color-bg-muted;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
 
     &.is-active {
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
   }
 

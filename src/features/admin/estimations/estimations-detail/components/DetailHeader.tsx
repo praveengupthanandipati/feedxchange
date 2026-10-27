@@ -1,4 +1,4 @@
-import { FiArrowLeft, FiDownload, FiEye, FiEyeOff, FiPrinter } from "react-icons/fi";
+import { ArrowLeftIcon, DownloadIcon, EyeIcon, EyeOffIcon, PrinterIcon } from "../../../../../shared/components/icon";
 import { Link } from "react-router-dom";
 
 interface DetailHeaderProps {
@@ -16,7 +16,7 @@ const DetailHeader = ({ backTo, filtersVisible, onToggleFilters, onPrint, onDown
     <h1>Estimations Detail</h1>
     <div className="estimation-detail__header-actions">
       <Link to={backTo} className="estimation-detail__back">
-        <FiArrowLeft aria-hidden /> Back
+        <ArrowLeftIcon aria-hidden /> Back
       </Link>
       <button
         type="button"
@@ -25,14 +25,14 @@ const DetailHeader = ({ backTo, filtersVisible, onToggleFilters, onPrint, onDown
         aria-expanded={filtersVisible}
         aria-controls="estimation-detail-filters"
       >
-        {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+        {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
         {filtersVisible ? "Hide" : "Show"}
       </button>
       <button type="button" className="estimation-detail__btn estimation-detail__btn--warning" onClick={onPrint} disabled={!canExport}>
-        <FiPrinter aria-hidden /> Print
+        <PrinterIcon aria-hidden /> Print
       </button>
       <button type="button" className="estimation-detail__btn estimation-detail__btn--warning" onClick={onDownload} disabled={!canExport}>
-        <FiDownload aria-hidden /> Download
+        <DownloadIcon aria-hidden /> Download
       </button>
     </div>
   </div>

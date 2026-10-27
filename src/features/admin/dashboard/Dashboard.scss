@@ -75,17 +75,17 @@
     @include m.flex(row, flex-start, center, v.$spacing-1);
     border: none;
     background: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     cursor: pointer;
 
     strong {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-weight: v.$font-weight-semibold;
     }
 
     &:hover {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
     }
   }
 }
@@ -110,7 +110,7 @@
   }
 
   &__label {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: v.$spacing-1 0 0;
   }
@@ -126,17 +126,17 @@
     margin: 0;
 
     span {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-weight: v.$font-weight-regular;
       margin-left: v.$spacing-1;
     }
 
     &--up {
-      color: v.$color-success;
+      color: v.fg(v.$color-success);
     }
 
     &--down {
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
   }
 }
@@ -150,18 +150,18 @@
     gap: v.$spacing-6;
     padding-bottom: v.$spacing-4;
     margin-bottom: v.$spacing-4;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
   }
 
   &__figure {
     @include m.font-heading(v.$font-weight-bold);
     font-size: v.$font-size-xl;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     margin: 0;
   }
 
   &__caption {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: v.$spacing-1 0 0;
   }
@@ -182,7 +182,7 @@
     li {
       @include m.flex(row, flex-start, center, v.$spacing-2);
       font-size: v.$font-size-sm;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
     }
 
     span {
@@ -198,18 +198,18 @@
 // ============================================================
 .dashboard-banner {
   background: linear-gradient(135deg, v.$color-navy 0%, v.$color-navy-dark 100%);
-  color: v.$color-white;
+  color: v.on(v.$color-white);
   display: flex;
   flex-direction: column;
   gap: v.$spacing-4;
 
   &__icon {
     @include m.flex-center;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: var(--fx-control-height-lg);
+    height: var(--fx-control-height-lg);
     border-radius: v.$radius-md;
-    background: rgba(v.$color-white, 0.12);
-    color: v.$color-orange-light;
+    background: v.alpha(v.$color-white, 0.12);
+    color: v.fg(v.$color-orange-light);
     font-size: 1.25rem;
   }
 
@@ -264,7 +264,7 @@
 
   &__name {
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   &__bar {
@@ -301,10 +301,13 @@
     @include m.flex-center;
     @include m.font-heading(v.$font-weight-semibold);
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
     border-radius: v.$radius-pill;
-    color: v.$color-white;
+    // a tint of the user's colour (--avatar, set per user) with the normal text colour: readable in every theme, where white
+    // or black initials on the full colour fall below 4.5:1 on some of them
+    background-color: color-mix(in srgb, var(--avatar) 22%, transparent);
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
   }
 
@@ -321,8 +324,8 @@
 
   &__location {
     @include m.flex(row, flex-start, center, 0.25rem);
-    color: v.$color-text-muted;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
     margin: 0.15rem 0 0;
   }
 
@@ -330,17 +333,17 @@
     flex-shrink: 0;
     padding: 0.2rem 0.65rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
 
     &--success {
-      background-color: rgba(v.$color-success, 0.12);
-      color: v.$color-success;
+      background-color: v.alpha(v.$color-success, 0.12);
+      color: v.fg(v.$color-success);
     }
 
     &--cancel {
-      background-color: rgba(v.$color-danger, 0.1);
-      color: v.$color-danger;
+      background-color: v.alpha(v.$color-danger, 0.1);
+      color: v.fg(v.$color-danger);
     }
   }
 
@@ -352,11 +355,11 @@
     font-weight: v.$font-weight-semibold;
 
     &--up {
-      color: v.$color-success;
+      color: v.fg(v.$color-success);
     }
 
     &--down {
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
   }
 }
@@ -383,18 +386,18 @@
     height: 0.55rem;
     margin-top: 0.35rem;
     border-radius: v.$radius-pill;
-    border: 2px solid v.$color-primary;
+    border: 2px solid v.line(v.$color-primary);
   }
 
   &__time {
-    font-size: 0.75rem;
-    color: v.$color-text-muted;
+    font-size: max(11px, 0.75rem);
+    color: v.fg(v.$color-text-muted);
     margin: 0 0 0.25rem;
   }
 
   &__text {
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     line-height: v.$line-height-base;
     margin: 0;
   }
@@ -416,8 +419,8 @@
     width: 3rem;
     height: 3rem;
     border-radius: v.$radius-pill;
-    background-color: #1877f2;
-    color: v.$color-white;
+    background-color: var(--fx-blue-52);
+    color: v.on(v.$color-white);
     font-size: 1.25rem;
   }
 
@@ -427,7 +430,7 @@
   }
 
   &__description {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     max-width: 26rem;
     margin: 0;

@@ -9,12 +9,12 @@
   flex-wrap: wrap;
 
   p {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
 
     strong {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-weight: v.$font-weight-semibold;
     }
   }
@@ -30,7 +30,7 @@
   border: none;
   border-radius: v.$radius-md;
   background-color: v.$color-orange;
-  color: v.$color-navy-dark;
+  color: v.on(v.$color-navy-dark);
   font-size: v.$font-size-sm;
   cursor: pointer;
   transition: background-color v.$transition-fast, opacity v.$transition-fast;
@@ -52,12 +52,12 @@
   &__table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     // A light fill across the whole sub-table (not just the header) reads
     // as visually distinct from the primary Contracts table above, whose
     // rows are white/transparent.
-    background-color: rgba(v.$color-primary, 0.04);
+    background-color: v.alpha(v.$color-primary, 0.04);
   }
 
   &__table {
@@ -69,10 +69,10 @@
 
     td {
       padding: v.$spacing-5 v.$spacing-6;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       text-align: left;
       white-space: nowrap;
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
     }
   }
 }
@@ -87,10 +87,10 @@ table.seller-buyer-accounts-invoices__table th {
   @include m.font-heading(v.$font-weight-semibold);
   padding: v.$spacing-4 v.$spacing-5;
   background-color: v.$color-bg-muted !important;
-  color: v.$color-text !important;
+  color: v.fg(v.$color-text) !important;
   text-align: left;
   white-space: nowrap;
-  border-bottom: 2px solid v.$color-primary;
+  border-bottom: 2px solid v.line(v.$color-primary);
 }
 
 // Scoped to this page's Contracts table only (via the className passed to
@@ -107,7 +107,7 @@ table.seller-buyer-accounts-invoices__table th {
 .seller-buyer-accounts-table {
   &__contract {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-weight: v.$font-weight-semibold;
   }
 
@@ -122,7 +122,7 @@ table.seller-buyer-accounts-invoices__table th {
     cursor: pointer;
 
     &:hover {
-      color: v.$color-primary-dark;
+      color: v.fg(v.$color-primary-dark);
       text-decoration: underline;
     }
   }
@@ -131,12 +131,12 @@ table.seller-buyer-accounts-invoices__table th {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border: none;
     border-radius: v.$radius-sm;
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
     font-size: 0.85rem;
     cursor: pointer;
     transition: background-color v.$transition-fast;
@@ -149,18 +149,18 @@ table.seller-buyer-accounts-invoices__table th {
   &__expand-btn {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border: none;
     border-radius: v.$radius-pill;
     background: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
     }
   }
 }

@@ -22,7 +22,7 @@
     padding: v.$spacing-3 v.$spacing-5;
     border-radius: v.$radius-md;
     background-color: v.$color-success;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     box-shadow: v.$shadow-lg;
@@ -49,8 +49,8 @@
   &__title {
     @include m.font-heading(v.$font-weight-semibold);
     padding-bottom: v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
-    color: v.$color-primary;
+    border-bottom: 1px solid v.line(v.$color-border);
+    color: v.fg(v.$color-primary);
     font-size: v.$font-size-xl;
     margin: 0;
   }
@@ -58,10 +58,10 @@
   &__hint {
     @include m.flex(row, flex-start, flex-start, v.$spacing-2);
     padding: v.$spacing-3 v.$spacing-4;
-    border: 1px solid rgba(v.$color-info, 0.3);
+    border: 1px solid v.alpha(v.line(v.$color-info), 0.3);
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-info, 0.08);
-    color: v.$color-info;
+    background-color: v.alpha(v.$color-info, 0.08);
+    color: v.fg(v.$color-info);
     font-size: v.$font-size-sm;
     margin: 0;
 
@@ -73,10 +73,10 @@
 
   &__error {
     padding: v.$spacing-3 v.$spacing-4;
-    border: 1px solid rgba(v.$color-danger, 0.3);
+    border: 1px solid v.alpha(v.line(v.$color-danger), 0.3);
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-danger, 0.08);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.08);
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -116,7 +116,7 @@
     width: 100%;
     margin-bottom: v.$spacing-3;
     padding: 0;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     + * {
@@ -144,12 +144,12 @@
   &__pill {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
-    min-height: 2.75rem;
+    min-height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     white-space: nowrap;
     transition: background-color v.$transition-fast, border-color v.$transition-fast, color v.$transition-fast,
@@ -158,29 +158,29 @@
     svg {
       flex-shrink: 0;
       font-size: 1rem;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       transition: color v.$transition-fast;
     }
   }
 
   &__option:hover &__pill {
-    border-color: v.$color-primary;
+    border-color: v.line(v.$color-primary);
     background-color: v.$color-bg-muted;
   }
 
   &__option input:checked + &__pill {
-    border-color: v.$color-primary;
+    border-color: v.line(v.$color-primary);
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     box-shadow: v.$shadow-sm;
 
     svg {
-      color: v.$color-orange;
+      color: v.fg(v.$color-orange);
     }
   }
 
   &__option input:focus-visible + &__pill {
-    outline: 2px solid v.$color-orange;
+    outline: 2px solid v.line(v.$color-orange);
     outline-offset: 2px;
   }
 }
@@ -207,12 +207,12 @@
 
   dt {
     @include m.font-base(v.$font-weight-semibold);
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
   }
 
   dd {
     margin: 0;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     overflow-wrap: anywhere;
   }
 }
@@ -239,29 +239,29 @@
 
   &__input {
     @include m.font-base;
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
     min-width: 11rem;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &::placeholder {
-      color: v.$color-gray-400;
+      color: v.fg(v.$color-gray-400);
     }
 
     &:focus {
       outline: none;
-      border-color: v.$color-primary;
-      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     &.has-error {
-      border-color: v.$color-danger;
+      border-color: v.line(v.$color-danger);
     }
   }
 
@@ -274,7 +274,7 @@
     min-width: 11rem;
 
     &.has-error .searchable-select__trigger {
-      border-color: v.$color-danger;
+      border-color: v.line(v.$color-danger);
     }
 
     // Lift the open dropdown above the rows below it.
@@ -288,30 +288,30 @@
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
     flex-shrink: 0;
-    width: 2.5rem;
-    height: 2.5rem;
-    border: 1px solid v.$color-border;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-size: 1.05rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, border-color v.$transition-fast;
 
     &:hover:not(:disabled) {
-      border-color: v.$color-primary;
+      border-color: v.line(v.$color-primary);
       background-color: v.$color-bg-muted;
     }
 
     &:disabled {
-      color: v.$color-gray-400;
+      color: v.fg(v.$color-gray-400);
       cursor: not-allowed;
     }
   }
 
   &__error {
-    color: v.$color-danger;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-danger);
+    font-size: max(11px, 0.8rem);
   }
 }
 
@@ -323,7 +323,7 @@
   flex-wrap: wrap;
 
   p {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -338,10 +338,10 @@
       min-width: 2rem;
       height: 2rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
       transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -357,8 +357,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -379,7 +379,7 @@
     z-index: v.$z-index-sticky;
     padding: v.$spacing-3 v.$spacing-4;
     background-color: v.$color-bg;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
 
     .payment-allocation-actions__cancel,
@@ -393,7 +393,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
     @include m.font-base(v.$font-weight-semibold);
-    height: 2.75rem;
+    height: var(--fx-control-height-lg);
     padding: 0 v.$spacing-6;
     border: none;
     border-radius: v.$radius-md;
@@ -410,7 +410,7 @@
 
   &__cancel {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -419,7 +419,7 @@
 
   &__save {
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover:not(:disabled) {
       background-color: v.$color-primary-dark;

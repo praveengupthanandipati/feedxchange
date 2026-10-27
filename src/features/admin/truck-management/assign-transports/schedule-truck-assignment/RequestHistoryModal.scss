@@ -44,11 +44,11 @@
     @include m.flex(row, space-between, center);
     padding-bottom: v.$spacing-4;
     margin-bottom: v.$spacing-4;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
       @include m.flex(row, flex-start, center, v.$spacing-2);
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-lg;
       margin: 0;
 
@@ -67,13 +67,13 @@
     border: none;
     border-radius: v.$radius-pill;
     background: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -85,7 +85,7 @@
   &__table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
   }
 
@@ -100,7 +100,7 @@
       @include m.font-heading(v.$font-weight-semibold);
       padding: v.$spacing-3 v.$spacing-4;
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
       font-size: v.$font-size-sm;
       text-align: left;
       white-space: nowrap;
@@ -108,9 +108,9 @@
 
     td {
       padding: v.$spacing-3 v.$spacing-4;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       white-space: nowrap;
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
     }
   }
 
@@ -122,18 +122,18 @@
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
 
     &--agreed {
       background-color: v.$color-success;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
 
     &--rejected {
       background-color: v.$color-danger;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
   }
 }

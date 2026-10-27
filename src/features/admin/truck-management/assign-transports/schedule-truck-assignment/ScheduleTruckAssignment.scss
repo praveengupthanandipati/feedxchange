@@ -12,7 +12,7 @@
     gap: v.$spacing-3;
 
     h2 {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-base;
       margin: 0;
     }
@@ -20,10 +20,10 @@
 
   &__add-btn {
     @include m.flex(row, center, center, v.$spacing-2);
-    @include m.button-variant(v.$color-info, v.$color-white, #1f6fae);
+    @include m.button-variant(v.$color-info, v.$color-white, var(--fx-sky-40));
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     font-size: v.$font-size-sm;
   }
@@ -44,23 +44,23 @@
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: v.$radius-pill;
-    font-size: 0.7rem;
+    font-size: max(11px, 0.7rem);
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
 
     &--pending {
       background-color: v.$color-orange;
-      color: v.$color-navy-dark;
+      color: v.on(v.$color-navy-dark);
     }
 
     &--assigned {
       background-color: v.$color-success;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
 
     &--cancelled {
       background-color: v.$color-danger;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
   }
 
@@ -68,11 +68,11 @@
     font-size: 1.1rem;
 
     &--on {
-      color: v.$color-success;
+      color: v.fg(v.$color-success);
     }
 
     &--off {
-      color: v.$color-danger;
+      color: v.fg(v.$color-danger);
     }
   }
 
@@ -85,7 +85,7 @@
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
     white-space: nowrap;
     cursor: pointer;
@@ -97,7 +97,7 @@
 
     &.is-active {
       background-color: v.$color-orange;
-      color: v.$color-navy-dark;
+      color: v.on(v.$color-navy-dark);
 
       &:hover {
         background-color: v.$color-orange-dark;
@@ -114,14 +114,14 @@
     border: none;
     border-radius: v.$radius-md;
     background-color: v.$color-success;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
     font-size: v.$font-size-sm;
     white-space: nowrap;
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: #227a46;
+      background-color: var(--fx-green-31);
     }
   }
 }
@@ -177,10 +177,10 @@
     @include m.flex(row, space-between, center);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-lg;
       margin: 0;
     }
@@ -194,14 +194,14 @@
     border: none;
     border-radius: v.$radius-pill;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 1.25rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -233,7 +233,7 @@
   &__radio {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-medium);
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     cursor: pointer;
 
@@ -277,56 +277,56 @@
   &__label {
     @include m.font-base(v.$font-weight-semibold);
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
   }
 
   &__required {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
   }
 
   &__control {
     @include m.font-base;
-    @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    @include m.field-focus-ring;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &::placeholder {
-      color: v.$color-gray-400;
+      color: v.fg(v.$color-gray-400);
     }
 
     &:focus {
       outline: none;
-      border-color: v.$color-primary;
-      box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.12);
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
   &__textarea {
     @include m.font-base(v.$font-weight-regular);
-    @include m.focus-ring(v.$color-orange);
+    @include m.field-focus-ring;
     width: 100%;
     min-height: 4.5rem;
     padding: v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     resize: vertical;
   }
 
   &__hint {
-    color: v.$color-text-muted;
-    font-size: 0.75rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
   }
 
   &__error {
-    color: v.$color-danger;
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -334,7 +334,7 @@
   &__checkbox {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-medium);
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     cursor: pointer;
 
@@ -351,7 +351,7 @@
     flex-wrap: wrap;
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
   }
 
   &__save,
@@ -359,7 +359,7 @@
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.font-base(v.$font-weight-semibold);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-5;
     border: none;
     border-radius: v.$radius-md;
@@ -370,7 +370,7 @@
 
   &__save {
     background-color: v.$color-primary;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
       background-color: v.$color-primary-dark;
@@ -379,10 +379,10 @@
 
   &__cancel {
     background-color: v.$color-danger;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #b8352b;
+      background-color: var(--fx-red-45);
     }
   }
 }

@@ -1,0 +1,106 @@
+@use "sass:color";
+@use "sass:list";
+@use "sass:map";
+@use "sass:math";
+@use "sass:meta";
+@use "sass:string";
+@use "palette" as p;
+
+// ============================================================
+// Colour helpers for values that are CSS custom properties.
+// The colour variables in _variables.scss hold var(--fx-<name>), not a Sass colour, so the theme can change them at runtime.
+// Sass cannot compute with a var(), so use these instead of rgba() / darken() / color.adjust():
+//
+//   alpha(v.$color-navy, 0.12)   the colour at 12% opacity            (was rgba(v.$color-navy, 0.12))
+//                                plain CSS: rgba(var(--fx-<name>-rgb), 0.12)
+//   shade(v.$color-danger, 8%)   8% darker, for hover / pressed        (was darken(v.$color-danger, 8%))
+//   fg(v.$color-primary)         the text / icon variant of the colour (color, fill, stroke)
+//   line(v.$color-border)        the border / outline variant          (border, outline)
+//   on(v.$color-white)           the colour exactly as the Light theme shows it, in every theme: text on a brand fill,
+//                                which keeps its fill in every theme
+//
+// In the Light theme all variants are the same colour; Dark and High contrast tune each for its job (see _themes.scss).
+// Every helper also accepts a plain Sass colour, and leaves anything it does not recognise (currentColor, inherit) as it is.
+// ============================================================
+
+/// The palette name inside var(--fx-<name>), or null.
+@function palette-name($value) {
+  @if meta.type-of($value) != "string" {
+    @return null;
+  }
+  $text: "#{$value}";
+  @if string.index($text, "var(--fx-") != 1 {
+    @return null;
+  }
+  $name: string.slice($text, 10, -2);
+  // a variant (…-fg, …-line, …-on) names the same colour
+  @each $suffix in ("-fg", "-line", "-on") {
+    $length: string.length($suffix);
+    @if string.length($name) > $length and string.slice($name, -$length) == $suffix {
+      $base: string.slice($name, 1, -$length - 1);
+      @if map.has-key(p.$palette, $base) {
+        @return $base;
+      }
+    }
+  }
+  @if map.has-key(p.$palette, $name) {
+    @return $name;
+  }
+  @return null;
+}
+
+/// var(--fx-<name>) for a palette colour; stops the build on a name that is not in _palette.scss.
+@function token($name) {
+  @if not map.has-key(p.$palette, $name) {
+    @error "Unknown colour `#{$name}`: add it to _palette.scss first.";
+  }
+  @return string.unquote("var(--fx-#{$name})");
+}
+
+@function -variant($value, $suffix) {
+  $name: palette-name($value);
+  @if $name {
+    @return string.unquote("var(--fx-#{$name}-#{$suffix})");
+  }
+  @return $value;
+}
+
+@function fg($value) {
+  @return -variant($value, "fg");
+}
+
+@function line($value) {
+  @return -variant($value, "line");
+}
+
+@function on($value) {
+  @return -variant($value, "on");
+}
+
+// rgba(var(--fx-<name>-rgb), a) rather than color-mix(): a legacy rgba() keeps gradients blending in sRGB exactly as before,
+// where color-mix() would switch them to Oklab and shift every gradient and anti-aliased edge slightly.
+@function alpha($value, $opacity) {
+  @if meta.type-of($value) == "color" {
+    @return color.change($value, $alpha: $opacity);
+  }
+  @if palette-name($value) {
+    $text: "#{$value}";
+    @return string.unquote("rgba(#{string.slice($text, 1, -2)}-rgb), #{$opacity})");
+  }
+  @return string.unquote("color-mix(in srgb, #{$value} #{math.percentage($opacity)}, transparent)");
+}
+
+@function shade($value, $amount) {
+  @if meta.type-of($value) == "color" {
+    @return color.adjust($value, $lightness: -$amount);
+  }
+  $name: palette-name($value);
+  $steps: null;
+  @if $name {
+    $steps: map.get(p.$shades, $name);
+  }
+  @if not $steps or not list.index($steps, $amount) {
+    @error "shade(#{$value}, #{$amount}) is not defined: add #{$amount} for this colour to $shades in _palette.scss.";
+  }
+  @return string.unquote("var(--fx-#{$name}-d#{math.div($amount, 1%)})");
+}

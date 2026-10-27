@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { FiMenu } from "react-icons/fi";
+import { MenuIcon } from "../../../shared/components/icon";
 import { useLocation } from "react-router-dom";
 import Logo from "../../../features/website/components/common/Logo";
 import DesktopNav from "./DesktopNav";
 import { JoinButton, LoginLink, WhatsAppButton } from "./HeaderActions";
 import MobileMenu from "./MobileMenu";
+import ThemePicker from "../../../shared/theme/ThemePicker";
 
 /**
  * Fixed site header: logo left, menu centre, "Join with us" + WhatsApp top right.
@@ -46,9 +47,10 @@ const Header = () => {
         <div className="site-header__actions">
           <LoginLink />
           <JoinButton />
+          <ThemePicker triggerClassName="site-theme" />
           <WhatsAppButton />
           <button type="button" className="site-header__toggle" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} aria-controls="mobile-menu" aria-label="Open menu">
-            <FiMenu aria-hidden />
+            <MenuIcon aria-hidden />
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { FiArrowLeft, FiFileText } from "react-icons/fi";
+import { ArrowLeftIcon, FileTextIcon } from "../../../../../../shared/components/icon";
 import InfoPanel from "../InfoPanel";
 import {
   useContractTruckDetails,
@@ -74,7 +74,7 @@ const ViewTrucksByContract = () => {
             )}
           </h1>
           <Link to="/admin/truck-management/open-pending-contracts" className="assign-transports-card__back">
-            <FiArrowLeft aria-hidden /> Back to Open &amp; Pending Contracts
+            <ArrowLeftIcon aria-hidden /> Back to Open &amp; Pending Contracts
           </Link>
         </div>
 
@@ -87,7 +87,7 @@ const ViewTrucksByContract = () => {
           <ViewTrucksByContractSummary contractNumber={contractNumber} />
         ) : (
           <InfoPanel
-            icon={FiFileText}
+            icon={FileTextIcon}
             title="No Contract Selected"
             description="Open a contract from the Open & Pending Contracts list and use the truck icon to view its trucks, or open this page from there directly."
             action={{ label: "Go to Open & Pending Contracts", to: "/admin/truck-management/open-pending-contracts" }}

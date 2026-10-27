@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { FiCheckCircle } from "react-icons/fi";
+import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import { CURRENT_ADMIN, initialUsers, type MasterUser, type UserForm } from "./users.data";
 import { digitsOnly, fullName } from "./users.utils";
@@ -70,7 +70,7 @@ const Users = () => {
 
       {message && (
         <p className="users__message" role="status">
-          <FiCheckCircle aria-hidden /> {message}
+          <CircleCheckBigIcon aria-hidden /> {message}
         </p>
       )}
 

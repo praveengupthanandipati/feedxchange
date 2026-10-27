@@ -1,4 +1,4 @@
-import { FiClock, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
+import { ClockIcon, MailIcon, MapPinIcon, PhoneIcon } from "../../../shared/components/icon";
 import ContactForm from "../components/contact/ContactForm";
 import PageHero from "../components/sections/PageHero";
 import { company } from "../data/content";
@@ -8,10 +8,10 @@ const Contact = () => {
   usePageTitle("Contact Us", "Talk to the FeedXchange team about buying, selling or moving feed ingredients.");
 
   const details = [
-    { icon: FiMapPin, title: "Visit us", body: company.address },
-    { icon: FiPhone, title: "Call us", body: company.phone, href: `tel:${company.phone.replace(/\s/g, "")}` },
-    { icon: FiMail, title: "Email us", body: company.email, href: `mailto:${company.email}` },
-    { icon: FiClock, title: "Working hours", body: company.hours },
+    { icon: MapPinIcon, title: "Visit us", body: company.address },
+    { icon: PhoneIcon, title: "Call us", body: company.phone, href: `tel:${company.phone.replace(/\s/g, "")}` },
+    { icon: MailIcon, title: "Email us", body: company.email, href: `mailto:${company.email}` },
+    { icon: ClockIcon, title: "Working hours", body: company.hours },
   ];
 
   return (

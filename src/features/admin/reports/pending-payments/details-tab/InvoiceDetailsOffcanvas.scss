@@ -53,11 +53,11 @@
     @include m.flex(row, space-between, center);
     flex-shrink: 0;
     padding: v.$spacing-4 v.$spacing-5;
-    border-bottom: 1px solid v.$color-border;
+    border-bottom: 1px solid v.line(v.$color-border);
 
     h2 {
       @include m.font-heading(v.$font-weight-semibold);
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-lg;
       margin: 0;
     }
@@ -72,14 +72,14 @@
     border: none;
     border-radius: v.$radius-pill;
     background-color: transparent;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: 1.25rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
     &:hover {
       background-color: v.$color-gray-100;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
     }
   }
 
@@ -95,7 +95,7 @@
 
   &__subheading {
     @include m.font-heading(v.$font-weight-semibold);
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-base;
     margin: 0;
   }
@@ -103,7 +103,7 @@
   &__table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
   }
 
@@ -118,16 +118,16 @@
       @include m.font-heading(v.$font-weight-semibold);
       padding: v.$spacing-3 v.$spacing-4;
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
       text-align: left;
       white-space: nowrap;
     }
 
     td {
       padding: v.$spacing-3 v.$spacing-4;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       white-space: normal;
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
     }
 
     tr:first-child td {
@@ -138,20 +138,20 @@
       min-width: 0;
 
       tr:first-child td {
-        border-top: 1px solid v.$color-border;
+        border-top: 1px solid v.line(v.$color-border);
       }
     }
   }
 
   &__label {
     @include m.font-base(v.$font-weight-semibold);
-    color: v.$color-text-muted !important;
+    color: v.fg(v.$color-text-muted) !important;
     white-space: nowrap;
     width: 40%;
   }
 
   &__empty {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     text-align: center;
   }
 }

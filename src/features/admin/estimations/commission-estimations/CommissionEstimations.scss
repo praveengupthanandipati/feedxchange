@@ -20,7 +20,7 @@
 
     h1 {
       margin: 0;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -48,11 +48,11 @@
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
@@ -68,7 +68,7 @@
     }
 
     &--info { background-color: v.$color-info; }
-    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--warning { background-color: v.$color-orange; color: v.on(v.$color-navy-dark); }
     &--navy { background-color: v.$color-navy; }
     &--danger { background-color: v.$color-danger; }
     &--wide { min-width: 7.5rem; }
@@ -82,19 +82,20 @@
     @include m.font-base;
     width: 100%;
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     -webkit-appearance: none;
     appearance: none;
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
 
     &--readonly {
@@ -151,8 +152,8 @@
 
   &__overview {
     padding: v.$spacing-3;
-    border-top: 1px solid v.$color-border;
-    background-color: #f7f6ef;
+    border-top: 1px solid v.line(v.$color-border);
+    background-color: var(--fx-gray-95-2);
     border-radius: 0 0 v.$radius-md v.$radius-md;
 
     @include m.respond-to(sm) {
@@ -161,7 +162,7 @@
 
     h2 {
       margin: 0 0 v.$spacing-3;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-lg;
     }
   }
@@ -197,14 +198,14 @@
     }
 
     dt {
-      color: v.$color-text;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text);
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
 
     dd {
       margin: 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-lg;
       font-weight: v.$font-weight-semibold;
       font-variant-numeric: tabular-nums;
@@ -221,14 +222,14 @@
     margin: 0;
     font-size: v.$font-size-sm;
 
-    &--success { color: v.$color-success; }
-    &--error { color: v.$color-danger; }
+    &--success { color: v.fg(v.$color-success); }
+    &--error { color: v.fg(v.$color-danger); }
 
     svg { flex-shrink: 0; }
   }
 
   &__message-link {
-    color: v.$color-info;
+    color: v.fg(v.$color-info);
     font-weight: v.$font-weight-semibold;
     text-decoration: underline;
     white-space: nowrap;
@@ -270,17 +271,18 @@
     width: 5rem;
     height: 2.2rem;
     padding: 0 v.$spacing-2;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     -webkit-appearance: none;
     appearance: none;
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
@@ -288,11 +290,11 @@
     display: inline-block;
     padding: 0.1rem 0.5rem;
     border-radius: v.$radius-pill;
-    font-size: 0.75rem;
+    font-size: max(11px, 0.75rem);
     font-weight: v.$font-weight-semibold;
 
-    &--buy { background-color: rgba(#50a5f1, 0.15); color: #1f6fae; }
-    &--sell { background-color: rgba(#34c38f, 0.15); color: #1f8a63; }
+    &--buy { background-color: rgba(var(--fx-sky-63-rgb), 0.15); color: var(--fx-sky-40-fg); }
+    &--sell { background-color: rgba(var(--fx-teal-48-rgb), 0.15); color: var(--fx-teal-33-fg); }
   }
 
   &__expand {
@@ -305,13 +307,13 @@
     border: none;
     border-radius: v.$radius-sm;
     background: transparent;
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-size: 1rem;
     cursor: pointer;
 
-    &:hover { background-color: rgba(v.$color-navy, 0.08); }
+    &:hover { background-color: v.alpha(v.$color-navy, 0.08); }
 
-    &[aria-expanded="true"] { background-color: rgba(v.$color-navy, 0.1); }
+    &[aria-expanded="true"] { background-color: v.alpha(v.$color-navy, 0.1); }
   }
 
   // ---------- Invoices under an expanded contract row ----------
@@ -350,10 +352,10 @@
     align-items: center;
     gap: v.$spacing-2;
     padding: v.$spacing-2 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
     cursor: pointer;
 
     input {
@@ -371,14 +373,14 @@
     gap: 0.1rem;
     min-width: 0;
 
-    span { color: v.$color-text-muted; }
+    span { color: v.fg(v.$color-text-muted); }
   }
 
   &__invoice-main {
     flex: 1;
     overflow-wrap: anywhere;
 
-    strong { color: v.$color-navy; }
+    strong { color: v.fg(v.$color-navy); }
   }
 
   &__invoice-figures {
@@ -389,8 +391,8 @@
 
   &__invoice-empty {
     margin: v.$spacing-2 0 0;
-    color: v.$color-text-muted;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
   }
 
   // ---------- Contract cards: 1 per row on phones, 2 on tablets ----------
@@ -412,20 +414,20 @@
   &__cards-empty {
     grid-column: 1 / -1;
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
   }
 
   &__card {
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
 
     &.is-selected {
-      border-color: v.$color-navy;
+      border-color: v.line(v.$color-navy);
       box-shadow: 0 0 0 1px v.$color-navy;
     }
 
@@ -438,29 +440,29 @@
     }
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
     dd {
       margin: 0.15rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
 
     .commission-estimations__commission {
       width: 100%;
-      height: 2.5rem;
+      height: var(--fx-control-height);
     }
   }
 
   &__card-top {
     @include m.flex(row, space-between, center, v.$spacing-2);
     padding: v.$spacing-2 v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
-    background-color: rgba(v.$color-navy, 0.06);
+    border-bottom: 1px solid v.line(v.$color-border);
+    background-color: v.alpha(v.$color-navy, 0.06);
     font-size: v.$font-size-sm;
 
     label {
@@ -476,10 +478,10 @@
       accent-color: v.$color-navy;
     }
 
-    strong { color: v.$color-navy; }
+    strong { color: v.fg(v.$color-navy); }
 
     span {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       white-space: nowrap;
     }
   }
@@ -489,20 +491,20 @@
   }
 
   &__card-total {
-    color: v.$color-navy !important;
+    color: v.fg(v.$color-navy) !important;
     font-weight: v.$font-weight-bold;
   }
 
   &__card-invoices {
     padding: v.$spacing-2 v.$spacing-3 v.$spacing-3;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     background-color: v.$color-gray-50;
   }
 
   &__card-invoices-toggle {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    color: v.$color-text-muted;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
   }
 
   // ---------- Pagination ----------
@@ -517,7 +519,7 @@
 
     p {
       margin: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -531,10 +533,10 @@
       @include m.flex-center;
       min-width: 2.25rem;
       height: 2.25rem;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
 
@@ -545,8 +547,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }
@@ -561,14 +563,14 @@
   &__summary-heading {
     h2 {
       margin: 0;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-lg;
     }
 
     p {
       margin: v.$spacing-1 0 0;
-      color: v.$color-text-muted;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.8rem);
     }
   }
 
@@ -586,7 +588,7 @@
   &__summary-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
   }
 
   &__summary-table {
@@ -604,22 +606,22 @@
 
     th {
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
       font-weight: v.$font-weight-semibold;
     }
 
     td + td,
     th + th {
-      border-left: 1px solid v.$color-border;
+      border-left: 1px solid v.line(v.$color-border);
     }
 
     tbody tr + tr td {
-      border-top: 1px solid v.$color-border;
+      border-top: 1px solid v.line(v.$color-border);
     }
   }
 
   &__summary-empty {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     text-align: center !important;
   }
 
@@ -644,8 +646,8 @@
     &--wide { grid-column: 1 / -1; }
 
     label {
-      color: v.$color-text;
-      font-size: 0.8rem;
+      color: v.fg(v.$color-text);
+      font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
     }
   }
@@ -659,7 +661,7 @@
     z-index: 2;
     margin: 0 calc(-1 * #{v.$spacing-5}) calc(-1 * #{v.$spacing-5});
     padding: v.$spacing-3 v.$spacing-5;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     border-radius: 0 0 v.$radius-md v.$radius-md;
     background-color: v.$color-bg;
 

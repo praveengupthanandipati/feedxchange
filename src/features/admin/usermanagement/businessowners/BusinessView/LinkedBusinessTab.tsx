@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FiRefreshCw, FiPlus, FiTrash2, FiUsers } from "react-icons/fi";
+import { PlusIcon, RefreshCwIcon, Trash2Icon, UsersIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import MultiSelect from "../../../../../shared/components/dropdown/MultiSelect";
@@ -63,7 +63,7 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
           aria-label={`Remove ${row.companyName} as a child business`}
           title="Remove child business"
         >
-          <FiTrash2 aria-hidden />
+          <Trash2Icon aria-hidden />
         </button>
       ),
     },
@@ -78,14 +78,14 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
           onClick={handleRefresh}
           disabled={refreshing}
         >
-          <FiRefreshCw aria-hidden className={refreshing ? "business-owner-detail__spin" : ""} />
+          <RefreshCwIcon aria-hidden className={refreshing ? "business-owner-detail__spin" : ""} />
           {refreshing ? "Refreshing..." : "Refresh Relationships"}
         </button>
       </div>
 
       <section className="business-owner-detail__linked-card">
         <h3>
-          <FiUsers aria-hidden /> Add Child Businesses
+          <UsersIcon aria-hidden /> Add Child Businesses
         </h3>
         <span className="business-owner-detail__label">Select Child Businesses</span>
         <div className="business-owner-detail__linked-controls">
@@ -102,7 +102,7 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
             onClick={handleAddChildren}
             disabled={selectedToAdd.length === 0}
           >
-            <FiPlus aria-hidden /> Add Children
+            <PlusIcon aria-hidden /> Add Children
           </button>
         </div>
         <p className="business-owner-detail__hint">

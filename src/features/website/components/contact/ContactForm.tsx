@@ -1,5 +1,5 @@
 import { useState, type SubmitEvent } from "react";
-import { FiCheckCircle, FiSend } from "react-icons/fi";
+import { CircleCheckBigIcon, SendIcon } from "../../../../shared/components/icon";
 
 interface ContactValues {
   name: string;
@@ -56,7 +56,7 @@ const ContactForm = ({ title = "Send us a message", submitLabel = "Send message"
   if (sent) {
     return (
       <div className="contact-form contact-form--sent" role="status">
-        <FiCheckCircle aria-hidden />
+        <CircleCheckBigIcon aria-hidden />
         <h2>Thank you!</h2>
         <p>Your message is on its way. Our team will get back to you within one business day.</p>
         <button type="button" className="btn-site btn-site--outline" onClick={() => setSent(false)}>
@@ -119,7 +119,7 @@ const ContactForm = ({ title = "Send us a message", submitLabel = "Send message"
         </div>
       </div>
       <button type="submit" className="btn-site btn-site--primary">
-        {submitLabel} <FiSend aria-hidden />
+        {submitLabel} <SendIcon aria-hidden />
       </button>
     </form>
   );

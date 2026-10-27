@@ -1,4 +1,4 @@
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { ChevronLeftIcon, ChevronRightIcon } from "../../../../../shared/components/icon";
 
 interface EstimationsPaginationProps {
   page: number;
@@ -17,7 +17,7 @@ const EstimationsPagination = ({ page, pageSize, shown, total, onPageChange }: E
       <p>{`Showing ${shown} of ${total} Results`}</p>
       <div className="view-estimations__pages">
         <button type="button" disabled={page === 1} onClick={() => onPageChange(page - 1)} aria-label="Previous page">
-          <FiChevronLeft aria-hidden />
+          <ChevronLeftIcon aria-hidden />
         </button>
         {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => (
           <button
@@ -31,7 +31,7 @@ const EstimationsPagination = ({ page, pageSize, shown, total, onPageChange }: E
           </button>
         ))}
         <button type="button" disabled={page === totalPages} onClick={() => onPageChange(page + 1)} aria-label="Next page">
-          <FiChevronRight aria-hidden />
+          <ChevronRightIcon aria-hidden />
         </button>
       </div>
     </nav>

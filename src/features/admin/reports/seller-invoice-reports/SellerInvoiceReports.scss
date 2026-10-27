@@ -18,7 +18,7 @@
     gap: v.$spacing-3;
 
     h1 {
-      color: v.$color-primary;
+      color: v.fg(v.$color-primary);
       font-size: v.$font-size-xl;
       margin: 0;
     }
@@ -35,7 +35,7 @@
   @include m.flex(row, center, center, v.$spacing-2);
   @include m.font-base(v.$font-weight-semibold);
   @include m.focus-ring(v.$color-orange);
-  height: 2.5rem;
+  height: var(--fx-control-height);
   padding: 0 v.$spacing-4;
   border: none;
   border-radius: v.$radius-md;
@@ -46,16 +46,16 @@
 
   &--info {
     background-color: v.$color-info;
-    color: v.$color-white;
+    color: v.on(v.$color-white);
 
     &:hover {
-      background-color: #1f6fae;
+      background-color: var(--fx-sky-40);
     }
   }
 
   &--warning {
     background-color: v.$color-orange;
-    color: v.$color-navy-dark;
+    color: v.on(v.$color-navy-dark);
 
     &:hover {
       background-color: v.$color-orange-dark;
@@ -109,23 +109,23 @@
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-danger, 0.1);
-    color: v.$color-danger;
+    background-color: v.alpha(v.$color-danger, 0.1);
+    color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
     cursor: pointer;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: rgba(v.$color-danger, 0.18);
+      background-color: v.alpha(v.$color-danger, 0.18);
     }
   }
 
   &__date-range {
     @include m.flex(row, flex-start, center, v.$spacing-2);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     min-width: 0;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
 
@@ -136,13 +136,13 @@
       border: none;
       outline: none;
       background: transparent;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
     }
 
     span {
       flex-shrink: 0;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-size: v.$font-size-sm;
     }
   }
@@ -156,15 +156,15 @@
   flex-wrap: wrap;
   padding: v.$spacing-3 v.$spacing-4;
   border-radius: v.$radius-md;
-  background-color: rgba(v.$color-info, 0.1);
+  background-color: v.alpha(v.$color-info, 0.1);
   font-size: v.$font-size-sm;
 
   span {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
   }
 
   strong {
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-weight: v.$font-weight-semibold;
   }
 }
@@ -174,17 +174,17 @@
 // ============================================================
 .seller-invoice-table {
   &__contract {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-weight: v.$font-weight-semibold;
   }
 
   &__qty--pending {
-    color: v.$color-primary;
+    color: v.fg(v.$color-primary);
     font-weight: v.$font-weight-semibold;
   }
 
   &__net-amount {
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
   }
 }
 
@@ -196,7 +196,7 @@
   flex-wrap: wrap;
 
   p {
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
   }
@@ -211,10 +211,10 @@
       min-width: 2rem;
       height: 2rem;
       padding: 0 v.$spacing-2;
-      border: 1px solid v.$color-border;
+      border: 1px solid v.line(v.$color-border);
       border-radius: v.$radius-md;
       background-color: v.$color-bg;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       cursor: pointer;
       transition: background-color v.$transition-fast, color v.$transition-fast;
@@ -230,8 +230,8 @@
 
       &.is-active {
         background-color: v.$color-primary;
-        border-color: v.$color-primary;
-        color: v.$color-white;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
       }
     }
   }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { FiArrowLeft, FiEdit2, FiFileText, FiSave, FiTruck, FiUpload } from "react-icons/fi";
+import { ArrowLeftIcon, FileTextIcon, PenIcon, SaveIcon, TruckIcon, UploadIcon } from "../../../../../../shared/components/icon";
 import InfoPanel from "../InfoPanel";
 import SearchableSelect from "../../../../../../shared/components/dropdown/SearchableSelect";
 import ContractSummaryPanel from "../../../contract-trucks/ContractSummaryPanel";
@@ -141,7 +141,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: Updat
       {notify.element}
       <div className="update-truck-status-card__header">
         <span className="update-truck-status-card__truck">
-          <FiTruck aria-hidden /> {truck.truckNumber}
+          <TruckIcon aria-hidden /> {truck.truckNumber}
         </span>
 
         <span className="update-truck-status-card__meta">
@@ -190,7 +190,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: Updat
                 onClick={() => invoiceInputRef.current?.click()}
                 disabled={uploading}
               >
-                <FiUpload aria-hidden /> {uploading ? "Uploading…" : "Upload Invoice"}
+                <UploadIcon aria-hidden /> {uploading ? "Uploading…" : "Upload Invoice"}
               </button>
               <input
                 ref={invoiceInputRef}
@@ -210,7 +210,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: Updat
               onClick={handleUpdate}
               disabled={!hasChanged || saving}
             >
-              <FiSave aria-hidden /> {saving ? "Updating…" : "Update"}
+              <SaveIcon aria-hidden /> {saving ? "Updating…" : "Update"}
             </button>
           )}
 
@@ -220,7 +220,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: Updat
               className="update-truck-status-card__edit"
               onClick={() => setEditing(true)}
             >
-              <FiEdit2 aria-hidden /> Edit Details
+              <PenIcon aria-hidden /> Edit Details
             </button>
           )}
         </div>
@@ -267,7 +267,7 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
   if (trucks.length === 0) {
     return (
       <InfoPanel
-        icon={FiTruck}
+        icon={TruckIcon}
         title="No Trucks Yet"
         description="This contract has no trucks assigned yet. Use Add Instant Truck or Schedule Dispatch first."
       />
@@ -311,7 +311,7 @@ const UpdateTruckStatus = () => {
             )}
           </h1>
           <Link to="/admin/truck-management/open-pending-contracts" className="assign-transports-card__back">
-            <FiArrowLeft aria-hidden /> Back to Open &amp; Pending Contracts
+            <ArrowLeftIcon aria-hidden /> Back to Open &amp; Pending Contracts
           </Link>
         </div>
 
@@ -327,7 +327,7 @@ const UpdateTruckStatus = () => {
           </>
         ) : (
           <InfoPanel
-            icon={FiFileText}
+            icon={FileTextIcon}
             title="No Contract Selected"
             description="Open a contract from the Open & Pending Contracts list and use Update Truck Status there."
             action={{ label: "Go to Open & Pending Contracts", to: "/admin/truck-management/open-pending-contracts" }}

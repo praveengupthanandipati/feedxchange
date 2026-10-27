@@ -20,7 +20,7 @@
 
     h1 {
       margin: 0;
-      color: v.$color-info;
+      color: v.fg(v.$color-info);
       font-size: v.$font-size-xl;
 
       @include m.respond-below(sm) {
@@ -39,11 +39,11 @@
   &__btn {
     @include m.flex(row, center, center, v.$spacing-2);
     @include m.focus-ring(v.$color-orange);
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-4;
     border: none;
     border-radius: v.$radius-md;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
     white-space: nowrap;
@@ -57,7 +57,7 @@
     }
 
     &--info { background-color: v.$color-info; }
-    &--warning { background-color: v.$color-orange; color: v.$color-navy-dark; }
+    &--warning { background-color: v.$color-orange; color: v.on(v.$color-navy-dark); }
     &--navy { background-color: v.$color-navy; }
     &--danger { background-color: v.$color-danger; }
   }
@@ -66,17 +66,18 @@
     @include m.font-base;
     width: 100%;
     min-width: 0;
-    height: 2.5rem;
+    height: var(--fx-control-height);
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-md;
     background-color: v.$color-bg;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
@@ -112,14 +113,14 @@
     align-items: center;
     gap: v.$spacing-1 v.$spacing-5;
     padding: v.$spacing-3 v.$spacing-4;
-    border: 1px solid rgba(v.$color-info, 0.35);
+    border: 1px solid v.alpha(v.line(v.$color-info), 0.35);
     border-radius: v.$radius-md;
-    background-color: rgba(v.$color-info, 0.12);
-    color: v.$color-text-muted;
+    background-color: v.alpha(v.$color-info, 0.12);
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
 
     strong {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       overflow-wrap: anywhere;
     }
   }
@@ -128,16 +129,16 @@
     @include m.flex(row, space-between, center, v.$spacing-3);
     padding: v.$spacing-3 v.$spacing-4;
     border-radius: v.$radius-md;
-    box-shadow: 0 1px 6px rgba(v.$color-navy, 0.12);
+    box-shadow: 0 1px 6px v.alpha(v.$color-navy, 0.12);
 
     span {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       font-weight: v.$font-weight-semibold;
     }
 
     strong {
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-lg;
     }
   }
@@ -161,7 +162,7 @@
   &__message {
     @include m.flex(row, flex-start, center, v.$spacing-2);
     margin: 0;
-    color: v.$color-success;
+    color: v.fg(v.$color-success);
     font-size: v.$font-size-sm;
   }
 
@@ -171,14 +172,15 @@
     width: 4.5rem;
     height: 2rem;
     padding: 0 v.$spacing-2;
-    border: 1px solid v.$color-border;
+    border: 1px solid var(--fx-field-border);
     border-radius: v.$radius-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
 
     &:focus {
       outline: none;
-      border-color: v.$color-navy;
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
     }
   }
 
@@ -194,36 +196,36 @@
     height: 1.9rem;
     border: none;
     border-radius: v.$radius-sm;
-    color: v.$color-white;
+    color: v.fg(v.$color-white);
     font-size: 0.85rem;
     cursor: pointer;
 
     &:hover { filter: brightness(0.9); }
 
-    &--view { background-color: #50a5f1; }
+    &--view { background-color: var(--fx-sky-63); }
     &--print { background-color: v.$color-navy; }
-    &--delete { background-color: #f46a6a; }
+    &--delete { background-color: var(--fx-red-69); }
   }
 
   // Round +/− toggle: outlined when closed, filled navy when the payments are open.
   &__expand {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);
-    width: 1.75rem;
-    height: 1.75rem;
-    border: 1.5px solid v.$color-navy;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
+    border: 1.5px solid v.line(v.$color-navy);
     border-radius: 50%;
     background: v.$color-bg;
-    color: v.$color-navy;
+    color: v.fg(v.$color-navy);
     font-size: 0.85rem;
     cursor: pointer;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
-    &:hover { background-color: rgba(v.$color-navy, 0.08); }
+    &:hover { background-color: v.alpha(v.$color-navy, 0.08); }
 
     &[aria-expanded="true"] {
       background-color: v.$color-navy;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
     }
   }
 
@@ -244,15 +246,15 @@
 
   &__cards-empty {
     padding: v.$spacing-4;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     text-align: center;
   }
 
   &__card {
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     overflow: hidden;
 
@@ -265,14 +267,14 @@
     }
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.7rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.7rem);
       text-transform: uppercase;
     }
 
     dd {
       margin: 0.15rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       overflow-wrap: anywhere;
     }
@@ -281,12 +283,12 @@
   &__card-top {
     @include m.flex(row, space-between, center, v.$spacing-2);
     padding: v.$spacing-2 v.$spacing-3;
-    border-bottom: 1px solid v.$color-border;
-    background-color: rgba(v.$color-navy, 0.06);
+    border-bottom: 1px solid v.line(v.$color-border);
+    background-color: v.alpha(v.$color-navy, 0.06);
     font-size: v.$font-size-sm;
 
-    strong { color: v.$color-navy; }
-    span { color: v.$color-text-muted; }
+    strong { color: v.fg(v.$color-navy); }
+    span { color: v.fg(v.$color-text-muted); }
   }
 
   &__card-full {
@@ -294,7 +296,7 @@
   }
 
   &__card-interest {
-    color: v.$color-navy !important;
+    color: v.fg(v.$color-navy) !important;
     font-size: v.$font-size-lg !important;
     font-weight: v.$font-weight-bold;
   }
@@ -305,7 +307,7 @@
     padding: 0 v.$spacing-3 v.$spacing-3;
 
     .interest-calc__icon-btn {
-      width: 2.5rem;
+      width: var(--fx-control-height);
       height: 2.25rem;
     }
   }
@@ -314,7 +316,7 @@
     padding: 0;
     border: none;
     background: none;
-    color: v.$color-info;
+    color: v.fg(v.$color-info);
     font-family: inherit;
     font-size: v.$font-size-sm;
     font-weight: v.$font-weight-semibold;
@@ -326,7 +328,7 @@
   &__payment-list {
     margin: 0;
     padding: 0;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     background-color: v.$color-gray-100;
     list-style: none;
 
@@ -335,20 +337,20 @@
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 0.1rem v.$spacing-2;
       padding: v.$spacing-2 v.$spacing-3;
-      font-size: 0.8rem;
+      font-size: max(11px, 0.8rem);
 
-      & + li { border-top: 1px solid v.$color-border; }
+      & + li { border-top: 1px solid v.line(v.$color-border); }
 
       span:nth-child(2) {
         grid-column: 1;
-        color: v.$color-text-muted;
+        color: v.fg(v.$color-text-muted);
       }
 
       strong {
         grid-column: 2;
         grid-row: 1 / span 2;
         align-self: center;
-        color: v.$color-navy;
+        color: v.fg(v.$color-navy);
       }
     }
   }
@@ -361,7 +363,7 @@
     z-index: 2;
     margin: 0 calc(-1 * #{v.$spacing-5}) calc(-1 * #{v.$spacing-5});
     padding: v.$spacing-3 v.$spacing-5;
-    border-top: 1px solid v.$color-border;
+    border-top: 1px solid v.line(v.$color-border);
     border-radius: 0 0 v.$radius-md v.$radius-md;
     background-color: v.$color-bg;
 
@@ -399,7 +401,7 @@
 
       h2 {
         margin: 0;
-        color: v.$color-navy;
+        color: v.fg(v.$color-navy);
         font-size: v.$font-size-lg;
       }
 
@@ -410,7 +412,7 @@
         border: none;
         border-radius: v.$radius-sm;
         background: transparent;
-        color: v.$color-text-muted;
+        color: v.fg(v.$color-text-muted);
         font-size: 1.1rem;
         cursor: pointer;
 
@@ -430,13 +432,13 @@
     }
 
     dt {
-      color: v.$color-text-muted;
-      font-size: 0.75rem;
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.75rem);
     }
 
     dd {
       margin: 0.1rem 0 0;
-      color: v.$color-text;
+      color: v.fg(v.$color-text);
       font-size: v.$font-size-sm;
       font-weight: v.$font-weight-semibold;
       overflow-wrap: anywhere;
@@ -448,7 +450,7 @@
     padding: v.$spacing-3;
     border-radius: v.$radius-md;
     background-color: v.$color-gray-100;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
     font-size: v.$font-size-sm;
     line-height: 1.7;
   }

@@ -1,6 +1,15 @@
 import { Component, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
-import { FiAlertCircle, FiBell, FiCheck, FiChevronDown, FiChevronUp, FiSend, FiSliders, FiX } from "react-icons/fi";
+import {
+  BellIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CircleAlertIcon,
+  SendIcon,
+  SlidersVerticalIcon,
+  XIcon,
+} from "../components/icon";
 import { useDispatchNotificationMutation } from "../../core/store/notificationPreferencesApi";
 import type { ResolveNotificationResult } from "../../core/store/notificationPreferencesApi";
 import type { ChannelCode } from "../../core/store/notificationsApi";
@@ -145,7 +154,7 @@ export const AutoNotifyProvider = ({ children }: { children: ReactNode }) => {
       {current && !customizing && (
         <div className={`auto-notify auto-notify--${current.phase}`} role="status" aria-live="polite">
           <div className="auto-notify__icon" aria-hidden>
-            {current.phase === "error" ? <FiAlertCircle /> : current.phase === "sent" ? <FiCheck /> : current.phase === "sending" ? <FiSend /> : <FiBell />}
+            {current.phase === "error" ? <CircleAlertIcon /> : current.phase === "sent" ? <CheckIcon /> : current.phase === "sending" ? <SendIcon /> : <BellIcon />}
           </div>
           <div className="auto-notify__body">
             {current.phase === "countdown" && (
@@ -160,7 +169,7 @@ export const AutoNotifyProvider = ({ children }: { children: ReactNode }) => {
             {current.phase === "countdown" && (
               <>
                 <button type="button" className="auto-notify__more" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>
-                  {expanded ? <FiChevronUp aria-hidden /> : <FiChevronDown aria-hidden />} Who gets it
+                  {expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />} Who gets it
                 </button>
                 {expanded && (
                   <ul className="auto-notify__list">
@@ -185,8 +194,8 @@ export const AutoNotifyProvider = ({ children }: { children: ReactNode }) => {
           <div className="auto-notify__actions">
             {current.phase === "countdown" && (
               <>
-                <button type="button" className="auto-notify__btn auto-notify__btn--primary" onClick={() => void send(current)}><FiSend aria-hidden /> Send now</button>
-                <button type="button" className="auto-notify__btn" onClick={() => patch(current.id, { customizing: true })}><FiSliders aria-hidden /> Customize</button>
+                <button type="button" className="auto-notify__btn auto-notify__btn--primary" onClick={() => void send(current)}><SendIcon aria-hidden /> Send now</button>
+                <button type="button" className="auto-notify__btn" onClick={() => patch(current.id, { customizing: true })}><SlidersVerticalIcon aria-hidden /> Customize</button>
                 <button type="button" className="auto-notify__btn auto-notify__btn--quiet" onClick={() => remove(current.id)}>Cancel</button>
               </>
             )}
@@ -197,7 +206,7 @@ export const AutoNotifyProvider = ({ children }: { children: ReactNode }) => {
               </>
             )}
             {(current.phase === "sent" || current.phase === "empty") && (
-              <button type="button" className="auto-notify__close" onClick={() => remove(current.id)} aria-label="Dismiss"><FiX aria-hidden /></button>
+              <button type="button" className="auto-notify__close" onClick={() => remove(current.id)} aria-label="Dismiss"><XIcon aria-hidden /></button>
             )}
           </div>
 

@@ -13,8 +13,8 @@
   width: min(36rem, calc(100vw - 2rem));
   padding: v.$spacing-4 v.$spacing-5;
   overflow: hidden;
-  border: 1px solid v.$color-border;
-  border-left: 4px solid v.$color-primary;
+  border: 1px solid v.line(v.$color-border);
+  border-left: 4px solid v.line(v.$color-primary);
   border-radius: v.$radius-lg;
   background-color: v.$color-white;
   box-shadow: v.$shadow-lg;
@@ -22,15 +22,15 @@
   animation: auto-notify-in 220ms ease-out;
 
   &--sent {
-    border-left-color: v.$color-success;
+    border-left-color: v.line(v.$color-success);
   }
 
   &--error {
-    border-left-color: v.$color-danger;
+    border-left-color: v.line(v.$color-danger);
   }
 
   &--empty {
-    border-left-color: v.$color-orange;
+    border-left-color: v.line(v.$color-orange);
   }
 
   &__icon {
@@ -39,18 +39,18 @@
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 50%;
-    background-color: rgba(v.$color-primary, 0.1);
-    color: v.$color-primary;
+    background-color: v.alpha(v.$color-primary, 0.1);
+    color: v.fg(v.$color-primary);
     font-size: 1.05rem;
 
     .auto-notify--sent & {
-      background-color: rgba(v.$color-success, 0.12);
-      color: v.$color-success;
+      background-color: v.alpha(v.$color-success, 0.12);
+      color: v.fg(v.$color-success);
     }
 
     .auto-notify--error & {
-      background-color: rgba(v.$color-danger, 0.12);
-      color: v.$color-danger;
+      background-color: v.alpha(v.$color-danger, 0.12);
+      color: v.fg(v.$color-danger);
     }
 
     .auto-notify--sending & svg {
@@ -65,7 +65,7 @@
     gap: v.$spacing-1;
     min-width: 0;
     font-size: v.$font-size-sm;
-    color: v.$color-text;
+    color: v.fg(v.$color-text);
 
     strong {
       @include m.font-base(v.$font-weight-semibold);
@@ -74,8 +74,8 @@
   }
 
   &__sub {
-    color: v.$color-text-muted;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
   }
 
   &__more {
@@ -84,8 +84,8 @@
     padding: 0;
     border: none;
     background: none;
-    color: v.$color-primary;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-primary);
+    font-size: max(11px, 0.8rem);
     cursor: pointer;
 
     &:hover {
@@ -104,7 +104,7 @@
     list-style: none;
     border-radius: v.$radius-md;
     background-color: v.$color-gray-50;
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
 
     li {
       display: flex;
@@ -113,7 +113,7 @@
     }
 
     .is-skipped {
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
       font-style: italic;
     }
   }
@@ -125,9 +125,9 @@
     em {
       padding: 0 0.45rem;
       border-radius: v.$radius-pill;
-      background-color: rgba(v.$color-primary, 0.1);
-      color: v.$color-primary;
-      font-size: 0.7rem;
+      background-color: v.alpha(v.$color-primary, 0.1);
+      color: v.fg(v.$color-primary);
+      font-size: max(11px, 0.7rem);
       font-style: normal;
     }
   }
@@ -146,11 +146,11 @@
     @include m.font-base(v.$font-weight-semibold);
     height: 2rem;
     padding: 0 v.$spacing-3;
-    border: 1px solid v.$color-border;
+    border: 1px solid v.line(v.$color-border);
     border-radius: v.$radius-md;
     background-color: v.$color-white;
-    color: v.$color-text;
-    font-size: 0.8rem;
+    color: v.fg(v.$color-text);
+    font-size: max(11px, 0.8rem);
     white-space: nowrap;
     cursor: pointer;
     transition: background-color v.$transition-fast;
@@ -160,9 +160,9 @@
     }
 
     &--primary {
-      border-color: v.$color-primary;
+      border-color: v.line(v.$color-primary);
       background-color: v.$color-primary;
-      color: v.$color-white;
+      color: v.on(v.$color-white);
 
       &:hover {
         background-color: v.$color-primary-dark;
@@ -171,18 +171,18 @@
 
     &--quiet {
       border-color: transparent;
-      color: v.$color-text-muted;
+      color: v.fg(v.$color-text-muted);
     }
   }
 
   &__close {
     @include m.flex-center;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
     border: none;
     border-radius: v.$radius-md;
     background: none;
-    color: v.$color-text-muted;
+    color: v.fg(v.$color-text-muted);
     cursor: pointer;
 
     &:hover {

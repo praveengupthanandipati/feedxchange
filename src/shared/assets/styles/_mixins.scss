@@ -92,20 +92,34 @@
   background: linear-gradient($angle, v.$color-navy 0%, v.$color-orange 100%);
 }
 
-@mixin card($padding: v.$spacing-5) {
+// Compact: one padding (--fx-card-padding, about 12px) at every width. $padding is kept for existing callers.
+@mixin card($padding: null) {
   background-color: v.$color-bg;
   border-radius: v.$radius-lg;
   box-shadow: v.$shadow-md;
-  padding: v.$spacing-4;
+  padding: var(--fx-card-padding);
+}
 
-  @include respond-to(md) {
-    padding: $padding;
+// A side list beside a detail panel (a finder, a sellers list): a flex column whose list scrolls inside it. From $from up it
+// is as tall as the visible area below the header and stays in view while the detail column scrolls. Give the list
+// `flex: 1 1 auto; min-height: 0; overflow-y: auto` and let the grid stretch the panel to the bottom of the page.
+@mixin side-panel($from: lg) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  @include respond-to($from) {
+    position: sticky;
+    top: 0;
+    // the header with its offset (4.5rem) and a gap below the panel
+    max-height: calc(100dvh - 4.5rem - #{v.$spacing-4});
   }
 }
 
-@mixin button-variant($bg, $color: v.$color-white, $bg-hover: darken($bg, 8%)) {
+// $color is text on the $bg fill, so it keeps its Light colour in every theme (on()); $bg-hover defaults to 8% darker.
+@mixin button-variant($bg, $color: v.$color-white, $bg-hover: v.shade($bg, 8%)) {
   background-color: $bg;
-  color: $color;
+  color: v.on($color);
   border: 1px solid transparent;
   border-radius: v.$radius-md;
   transition: background-color v.$transition-fast, box-shadow v.$transition-fast;
@@ -113,7 +127,7 @@
   &:hover,
   &:focus-visible {
     background-color: $bg-hover;
-    color: $color;
+    color: v.on($color);
   }
 
   &:disabled {
@@ -125,10 +139,22 @@
 // ============================================================
 // Accessibility
 // ============================================================
-@mixin focus-ring($color: v.$color-orange) {
+// The ring colour comes from the theme (--fx-focus-ring: navy on light pages, orange on dark ones), so it always has 3:1
+// against what is around it. $color is kept for existing callers and no longer changes the colour.
+@mixin focus-ring($color: null) {
   &:focus-visible {
-    outline: 2px solid $color;
+    outline: 2px solid var(--fx-focus-ring);
     outline-offset: 2px;
+  }
+}
+
+// Focus on a text field, select or date trigger: the soft grey glow (owner's choice), not the dark ring. High contrast
+// sets the tokens back to the strong ring.
+@mixin field-focus-ring {
+  &:focus-visible {
+    outline: var(--fx-field-focus-outline);
+    outline-offset: 2px;
+    box-shadow: var(--fx-field-focus-glow);
   }
 }
 

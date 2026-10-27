@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { FiTrash2 } from "react-icons/fi";
+import { Trash2Icon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import EmptyRowsState from "./EmptyRowsState";
@@ -152,7 +152,7 @@ const AdditionalContactsSection = ({ entries, onEntriesChange }: AdditionalConta
                   onClick={() => setPendingDeleteId(entry.id)}
                   aria-label="Remove contact"
                 >
-                  <FiTrash2 aria-hidden />
+                  <Trash2Icon aria-hidden />
                 </button>
               </div>
             ))}
@@ -360,7 +360,7 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
                   onClick={() => setPendingDeleteId(entry.id)}
                   aria-label="Remove address"
                 >
-                  <FiTrash2 aria-hidden />
+                  <Trash2Icon aria-hidden />
                 </button>
               </div>
             ))}

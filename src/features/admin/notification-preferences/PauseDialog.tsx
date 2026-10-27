@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { FiPauseCircle, FiX } from "react-icons/fi";
+import { CirclePauseIcon, XIcon } from "../../../shared/components/icon";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import { toIsoEnd } from "./preferenceUtils";
 
@@ -58,12 +58,12 @@ const PauseDialog = ({ open, subject, busy = false, error, onConfirm, onClose }:
     <div className="pref-modal__backdrop" onMouseDown={onClose}>
       <div className="pref-modal" role="dialog" aria-modal="true" aria-labelledby="pause-title" onMouseDown={(e) => e.stopPropagation()}>
         <header className="pref-modal__header">
-          <span className="pref-modal__icon" aria-hidden><FiPauseCircle /></span>
+          <span className="pref-modal__icon" aria-hidden><CirclePauseIcon /></span>
           <div>
             <h2 id="pause-title">Pause notifications</h2>
             <p>{subject} will not be notified while paused, except about events that are always sent.</p>
           </div>
-          <button type="button" className="pref-modal__close" onClick={onClose} aria-label="Close"><FiX aria-hidden /></button>
+          <button type="button" className="pref-modal__close" onClick={onClose} aria-label="Close"><XIcon aria-hidden /></button>
         </header>
 
         <div className="pref-modal__body">

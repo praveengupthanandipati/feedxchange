@@ -11,7 +11,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { FiUsers, FiMapPin, FiTag, FiTrendingUp, FiTrendingDown, FiBarChart2, FiActivity } from "react-icons/fi";
+import {
+  ActivityIcon,
+  ChartNoAxesColumnIcon,
+  MapPinIcon,
+  TagIcon,
+  TrendingDownIcon,
+  TrendingUpIcon,
+  UsersIcon,
+} from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import {
   sellers,
@@ -112,7 +120,7 @@ const ProductPrieHistory = () => {
       <div className="price-history-layout">
         <aside className="price-history-sellers">
           <div className="price-history-sellers__header">
-            <FiUsers aria-hidden /> Premium Sellers
+            <UsersIcon aria-hidden /> Premium Sellers
           </div>
           <ul className="price-history-sellers__list">
             {sellers.map((seller) => (
@@ -129,7 +137,7 @@ const ProductPrieHistory = () => {
                   <span className="price-history-sellers__info">
                     <strong>{seller.name}</strong>
                     <span>
-                      <FiMapPin aria-hidden /> {seller.city}
+                      <MapPinIcon aria-hidden /> {seller.city}
                     </span>
                   </span>
                 </button>
@@ -142,14 +150,14 @@ const ProductPrieHistory = () => {
           <div className="price-history-stats">
             <div className="price-history-stat">
               <span className="price-history-stat__icon">
-                <FiTag aria-hidden />
+                <TagIcon aria-hidden />
               </span>
               <strong>{formatINR(currentPrice)}</strong>
               <span>Current Price</span>
             </div>
             <div className="price-history-stat">
               <span className="price-history-stat__icon">
-                {dailyChangePercent >= 0 ? <FiTrendingUp aria-hidden /> : <FiTrendingDown aria-hidden />}
+                {dailyChangePercent >= 0 ? <TrendingUpIcon aria-hidden /> : <TrendingDownIcon aria-hidden />}
               </span>
               <strong className={dailyChangePercent >= 0 ? "is-up" : "is-down"}>
                 {dailyChangePercent >= 0 ? "+" : ""}
@@ -159,7 +167,7 @@ const ProductPrieHistory = () => {
             </div>
             <div className="price-history-stat">
               <span className="price-history-stat__icon">
-                <FiBarChart2 aria-hidden />
+                <ChartNoAxesColumnIcon aria-hidden />
               </span>
               <strong>{formatINR(avgPrice)}</strong>
               <span>Avg. Price</span>
@@ -169,7 +177,7 @@ const ProductPrieHistory = () => {
           <div className="price-history-analytics">
             <div className="price-history-analytics__header">
               <h2>
-                <FiActivity aria-hidden /> Price Analytics
+                <ActivityIcon aria-hidden /> Price Analytics
                 <span className="price-history-analytics__seller"> — {selectedSeller.name}</span>
               </h2>
               <div className="price-history-analytics__filter">
@@ -215,29 +223,29 @@ const ProductPrieHistory = () => {
 
             <ResponsiveContainer width="100%" height={320} minWidth={0}>
               <ComposedChart data={chartPoints} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="#eef0f3" />
+                <CartesianGrid vertical={false} stroke="var(--fx-chart-grid)" />
                 <XAxis
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "#9ea4ad", fontSize: 12 }}
+                  tick={{ fill: "var(--fx-chart-axis)", fontSize: 12 }}
                   minTickGap={16}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "#9ea4ad", fontSize: 12 }}
+                  tick={{ fill: "var(--fx-chart-axis)", fontSize: 12 }}
                   width={56}
                   tickFormatter={(value) => `₹${value}`}
                   label={{
                     value: "Price (₹)",
                     angle: -90,
                     position: "insideLeft",
-                    style: { fill: "#9ea4ad", fontSize: 12 },
+                    style: { fill: "var(--fx-chart-axis)", fontSize: 12 },
                   }}
                 />
                 <Tooltip
-                  contentStyle={{ borderRadius: 8, border: "1px solid #e1e4e8", fontSize: 13 }}
+                  contentStyle={{ borderRadius: 8, border: "1px solid var(--fx-gray-90-line)", fontSize: 13 }}
                   formatter={(value, name) => [
                     formatINR(Number(value)),
                     SERIES_LABELS[String(name)] ?? String(name),
@@ -246,8 +254,8 @@ const ProductPrieHistory = () => {
                 <Area
                   type="monotone"
                   dataKey="offerPrice"
-                  stroke="#2e9e5b"
-                  fill="#2e9e5b"
+                  stroke="var(--fx-chart-2)"
+                  fill="var(--fx-chart-2)"
                   fillOpacity={0.15}
                   strokeWidth={2}
                   dot={{ r: 3 }}
@@ -256,7 +264,7 @@ const ProductPrieHistory = () => {
                 <Line
                   type="monotone"
                   dataKey="originalPrice"
-                  stroke="#1b3664"
+                  stroke="var(--fx-brand-navy)"
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   activeDot={{ r: 5 }}
@@ -264,7 +272,7 @@ const ProductPrieHistory = () => {
                 <Line
                   type="monotone"
                   dataKey="resalePrice"
-                  stroke="#faa41a"
+                  stroke="var(--fx-chart-3)"
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   activeDot={{ r: 5 }}

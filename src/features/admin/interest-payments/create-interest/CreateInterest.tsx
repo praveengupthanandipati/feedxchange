@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  FiCheck,
-  FiCheckCircle,
-  FiEye,
-  FiEyeOff,
-  FiMinus,
-  FiPlus,
-  FiPrinter,
-  FiRefreshCw,
-  FiSave,
-  FiTrash2,
-  FiX,
-} from "react-icons/fi";
+  CheckIcon,
+  CircleCheckBigIcon,
+  EyeIcon,
+  EyeOffIcon,
+  MinusIcon,
+  PlusIcon,
+  PrinterIcon,
+  RefreshCwIcon,
+  SaveIcon,
+  Trash2Icon,
+  XIcon,
+} from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import DateRangeInput from "../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
@@ -67,7 +67,7 @@ const RowDetailsModal = ({ row, rate, onClose }: { row: CalculatedRow; rate: num
             {row.invoiceNo} · {row.contractNo}
           </h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            <FiX aria-hidden />
+            <XIcon aria-hidden />
           </button>
         </header>
         <dl>
@@ -224,13 +224,13 @@ const CreateInterest = () => {
   const actionButtons = (row: CalculatedRow) => (
     <div className="interest-calc__actions">
       <button type="button" className="interest-calc__icon-btn interest-calc__icon-btn--view" onClick={() => setViewing(row)} aria-label={`View ${row.invoiceNo}`} title="View">
-        <FiEye aria-hidden />
+        <EyeIcon aria-hidden />
       </button>
       <button type="button" className="interest-calc__icon-btn interest-calc__icon-btn--print" onClick={() => printRow(row, rate)} aria-label={`Print ${row.invoiceNo}`} title="Print">
-        <FiPrinter aria-hidden />
+        <PrinterIcon aria-hidden />
       </button>
       <button type="button" className="interest-calc__icon-btn interest-calc__icon-btn--delete" onClick={() => setDeleting(row)} aria-label={`Delete ${row.invoiceNo}`} title="Delete">
-        <FiTrash2 aria-hidden />
+        <Trash2Icon aria-hidden />
       </button>
     </div>
   );
@@ -245,7 +245,7 @@ const CreateInterest = () => {
         aria-expanded={open}
         aria-label={open ? `Hide payments for ${row.invoiceNo}` : `Show payments for ${row.invoiceNo}`}
       >
-        {open ? <FiMinus aria-hidden /> : <FiPlus aria-hidden />}
+        {open ? <MinusIcon aria-hidden /> : <PlusIcon aria-hidden />}
       </button>
     );
   };
@@ -281,7 +281,7 @@ const CreateInterest = () => {
             aria-expanded={filtersVisible}
             aria-controls="interest-calc-filters"
           >
-            {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+            {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {filtersVisible ? "Hide" : "Show"}
           </button>
           <button
@@ -290,7 +290,7 @@ const CreateInterest = () => {
             onClick={() => setExpandedKeys(allExpanded ? [] : rows.map((row) => row.id))}
             disabled={rows.length === 0}
           >
-            {allExpanded ? <FiMinus aria-hidden /> : <FiPlus aria-hidden />}
+            {allExpanded ? <MinusIcon aria-hidden /> : <PlusIcon aria-hidden />}
             {allExpanded ? "Collapse All" : "Expand All"}
           </button>
         </div>
@@ -325,10 +325,10 @@ const CreateInterest = () => {
           />
           <div className="interest-calc__filter-actions">
             <button type="button" className="interest-calc__btn interest-calc__btn--navy" onClick={handleApplyFilters}>
-              <FiCheck aria-hidden /> Apply
+              <CheckIcon aria-hidden /> Apply
             </button>
             <button type="button" className="interest-calc__btn interest-calc__btn--danger" onClick={handleResetFilters}>
-              <FiRefreshCw aria-hidden /> Reset
+              <RefreshCwIcon aria-hidden /> Reset
             </button>
           </div>
         </div>
@@ -359,13 +359,13 @@ const CreateInterest = () => {
         />
         <SearchableSelect options={conditionOptions} value={bulkCondition} onChange={setBulkCondition} placeholder="Select Condition Days" ariaLabel="Apply grace to invoices with condition days" />
         <button type="button" className="interest-calc__btn interest-calc__btn--navy" onClick={handleApplyBulkGrace} disabled={bulkGrace === ""}>
-          <FiCheck aria-hidden /> Apply
+          <CheckIcon aria-hidden /> Apply
         </button>
       </div>
 
       {message && (
         <p className="interest-calc__message" role="status">
-          <FiCheckCircle aria-hidden /> {message}
+          <CircleCheckBigIcon aria-hidden /> {message}
         </p>
       )}
 
@@ -424,10 +424,10 @@ const CreateInterest = () => {
 
       <div className="interest-calc__footer">
         <button type="button" className="interest-calc__btn interest-calc__btn--navy" onClick={handleSave} disabled={rows.length === 0}>
-          <FiSave aria-hidden /> Save
+          <SaveIcon aria-hidden /> Save
         </button>
         <button type="button" className="interest-calc__btn interest-calc__btn--danger" onClick={handleCancel}>
-          <FiX aria-hidden /> Cancel
+          <XIcon aria-hidden /> Cancel
         </button>
       </div>
 

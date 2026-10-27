@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiAlertCircle, FiCheckCircle, FiSave } from "react-icons/fi";
+import { CircleAlertIcon, CircleCheckBigIcon, SaveIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import DetailSection from "./DetailSection";
@@ -96,12 +96,12 @@ const ReassignTruck = () => {
         <div className="reassign__toolbar">
           {message && (
             <p className={`reassign__message reassign__message--${message.type}`} role="status">
-              {message.type === "error" ? <FiAlertCircle aria-hidden /> : <FiCheckCircle aria-hidden />}
+              {message.type === "error" ? <CircleAlertIcon aria-hidden /> : <CircleCheckBigIcon aria-hidden />}
               {message.text}
             </p>
           )}
           <button type="button" className="do-info__btn do-info__btn--primary reassign__save" onClick={handleSave}>
-            <FiSave aria-hidden /> Save
+            <SaveIcon aria-hidden /> Save
           </button>
         </div>
 

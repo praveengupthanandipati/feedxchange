@@ -79,13 +79,13 @@ const BusinessProfileStep = () => {
       </section>
 
       {existingProfileLoadError && (
-        <p className="new-contract__error" style={{ color: "#d92d20" }}>
+        <p className="new-contract__error" role="alert" style={{ color: "var(--fx-red-49-fg)" }}>
           Failed to load business profile.
         </p>
       )}
 
       {submitError && (
-        <p className="new-contract__error" style={{ color: "#d92d20" }}>
+        <p className="new-contract__error" role="alert" style={{ color: "var(--fx-red-49-fg)" }}>
           {submitError}
         </p>
       )}

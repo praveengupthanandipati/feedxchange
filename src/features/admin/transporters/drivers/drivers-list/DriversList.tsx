@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff, FiDownload, FiPlus } from "react-icons/fi";
+import { DownloadIcon, EyeIcon, EyeOffIcon, PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
@@ -14,7 +14,8 @@ import {
   useDeleteDriverMutation,
   type Driver,
 } from "../../../../../core/store/driversApi";
-import "./Drivers.scss";
+import "./Drivers.scss";
+
 import Can from "../../../../../core/auth/Can";
 
 const PAGE_SIZE = 10;
@@ -160,11 +161,11 @@ const DriversList = () => {
               className="drivers-btn drivers-btn--outline"
               onClick={() => setFiltersVisible((prev) => !prev)}
             >
-              {filtersVisible ? <FiEyeOff aria-hidden /> : <FiEye aria-hidden />}
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
             <button type="button" className="drivers-btn drivers-btn--warning" onClick={handleExport}>
-              <FiDownload aria-hidden /> Export
+              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["drivers-master.manage"]}>
               <button
@@ -172,7 +173,7 @@ const DriversList = () => {
                 className="drivers-btn drivers-btn--primary"
                 onClick={() => navigate("/admin/truck-management/transporters/driver-master/new")}
               >
-                <FiPlus aria-hidden /> New
+                <PlusIcon aria-hidden /> New
               </button>
             </Can>
           </div>
