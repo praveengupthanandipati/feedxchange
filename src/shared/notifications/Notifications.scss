@@ -1,0 +1,714 @@
+// Notification module styles. Plain CSS on top of Bootstrap (already loaded app-wide); class names are fx-* to stay out of other screens' way.
+
+.fx-toasts {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: min(22rem, calc(100vw - 2rem));
+}
+
+.fx-toast {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.75rem 1rem;
+  background: var(--fx-slate-17);
+  color: var(--fx-white-on);
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  font-size: 0.875rem;
+
+  strong {
+    font-weight: 600;
+  }
+
+  span {
+    opacity: 0.85;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+}
+
+// ---- bell dropdown -------------------------------------------------------------------------------------------------
+
+.fx-bell {
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 20rem;
+    overflow-y: auto;
+  }
+
+  &__item {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 0;
+    border-bottom: 1px solid var(--fx-gray-96-line);
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--fx-gray-97);
+    }
+
+    &.is-unread {
+      background: var(--fx-orange-96);
+    }
+  }
+
+  &__item-title {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  &__item-body {
+    display: block;
+    font-size: max(11px, 0.8rem);
+    color: var(--fx-slate-40-fg);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  &__item-time {
+    display: block;
+    font-size: max(11px, 0.7rem);
+    color: var(--fx-slate-58-fg);
+  }
+
+  &__dot {
+    flex-shrink: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-top: 0.35rem;
+    border-radius: 50%;
+    background: var(--fx-orange-53);
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: max(11px, 0.8rem);
+  }
+
+  &__link {
+    border: 0;
+    background: transparent;
+    color: var(--fx-orange-40-fg);
+    padding: 0;
+    cursor: pointer;
+    font-size: max(11px, 0.8rem);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ---- modal ---------------------------------------------------------------------------------------------------------
+
+.fx-modal {
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  &__box {
+    width: 100%;
+    max-width: 62rem;
+    max-height: calc(100vh - 3rem);
+    background: var(--fx-white);
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__box--narrow {
+    max-width: 32rem;
+  }
+
+  &__box--medium {
+    max-width: 44rem;
+  }
+
+  &__header,
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+  }
+
+  &__header {
+    border-bottom: 1px solid var(--fx-gray-90-line);
+
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+  }
+
+  &__footer {
+    border-top: 1px solid var(--fx-gray-90-line);
+    justify-content: flex-end;
+  }
+
+  &__body {
+    flex: 1;
+    min-height: 0;
+    padding: 0 1.25rem;
+    overflow-y: auto;
+
+    // content that is not the Notify panel gets its own breathing room top and bottom
+    > :first-child:not(.fx-notify) {
+      margin-top: 1.25rem;
+    }
+
+    > :last-child:not(.fx-notify) {
+      margin-bottom: 1.25rem;
+    }
+  }
+
+  &__close {
+    border: 0;
+    background: transparent;
+    font-size: 1.25rem;
+    cursor: pointer;
+  }
+}
+
+// ---- notify panel --------------------------------------------------------------------------------------------------
+
+.fx-notify {
+  &__channels th,
+  &__channels td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  &__channels th:first-child,
+  &__channels td:first-child {
+    text-align: left;
+  }
+
+  &__templates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  &__preview {
+    border: 1px solid var(--fx-gray-90-line);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    background: var(--fx-gray-98-2);
+
+    &.has-problems {
+      border-color: var(--fx-amber-50-line);
+      background: var(--fx-orange-96);
+    }
+
+    pre {
+      margin: 0.5rem 0 0;
+      white-space: pre-wrap;
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+  }
+
+  &__problem {
+    color: var(--fx-orange-37-fg);
+    font-size: max(11px, 0.8rem);
+  }
+}
+
+// ---- status pill ---------------------------------------------------------------------------------------------------
+
+.fx-status {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: max(11px, 0.75rem);
+  font-weight: 600;
+  background: var(--fx-gray-90);
+  color: var(--fx-slate-27-fg);
+
+  &--ok {
+    background: var(--fx-green-93);
+    color: var(--fx-green-24-fg);
+  }
+
+  &--wait {
+    background: var(--fx-amber-89);
+    color: var(--fx-orange-31-fg);
+  }
+
+  &--bad {
+    background: var(--fx-red-94);
+    color: var(--fx-red-35-fg);
+  }
+}
+
+// Where a recipient in the Notify dialog came from, when the dialog started from saved preferences.
+.fx-notify__tag {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  font-size: max(11px, 0.7rem);
+  font-weight: 600;
+  line-height: 1.4;
+
+  &--pref {
+    background: rgba(var(--fx-blue-32-rgb), 0.1);
+    color: var(--fx-blue-32-fg);
+  }
+
+  &--added {
+    background: rgba(var(--fx-amber-50-rgb), 0.16);
+    color: var(--fx-amber-27-fg);
+  }
+}
+
+// ---- the people list in the Notify dialog: one row per person, every channel visible, no sideways scrolling --------------
+
+.fx-notify {
+  padding-top: 1.25rem;
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__count {
+    color: var(--fx-slate-46-fg);
+    font-size: max(11px, 0.8rem);
+  }
+
+  &__tools {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 2rem;
+    padding: 0 0.6rem;
+    border: 1px solid var(--fx-field-border);
+    border-radius: 999px;
+    color: var(--fx-slate-46-fg);
+
+    input {
+      width: 11rem;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font-size: 0.85rem;
+      color: var(--fx-slate-11-fg);
+    }
+
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
+  }
+
+  // sticks to the bottom of the dialog so Send is always in reach, however long the list
+  &__actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin: 0.75rem -1.25rem 0;
+    padding: 0.85rem 1.25rem;
+    border-top: 1px solid var(--fx-gray-90-line);
+    background: var(--fx-white);
+  }
+}
+
+.fx-list {
+  --fx-cols: 5.6rem;
+  border: 1px solid var(--fx-gray-90-line);
+  border-radius: 0.6rem;
+  margin-bottom: 1rem;
+  overflow: clip; // not hidden: the column header must be able to stick
+
+  &__cols,
+  &__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(var(--fx-n, 4), var(--fx-cols));
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.75rem;
+  }
+
+  &__cols {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--fx-blue-32);
+    color: var(--fx-white-on);
+    font-size: max(11px, 0.78rem);
+    font-weight: 600;
+
+    span:not(:first-child) {
+      text-align: center;
+    }
+  }
+
+  &__ghead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--fx-gray-96);
+    border-top: 1px solid var(--fx-gray-90-line);
+    font-size: max(11px, 0.8rem);
+    color: var(--fx-slate-27-fg);
+
+    em {
+      margin-left: 0.3rem;
+      padding: 0 0.45rem;
+      border-radius: 999px;
+      background: var(--fx-gray-90);
+      font-style: normal;
+      font-size: max(11px, 0.7rem);
+    }
+  }
+
+  &__gall {
+    display: grid;
+    grid-template-columns: repeat(var(--fx-n, 4), var(--fx-cols));
+    gap: 0.4rem;
+    // lines the "All" buttons up under their channel columns
+    margin-right: 0;
+  }
+
+  &__all {
+    border: 0;
+    background: transparent;
+    color: var(--fx-blue-32-fg);
+    font-size: max(11px, 0.75rem);
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      text-decoration: underline;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    &.is-on {
+      color: var(--fx-slate-46-fg);
+    }
+  }
+
+  &__row {
+    border-top: 1px solid var(--fx-gray-96-line);
+
+    &:hover {
+      background: var(--fx-gray-98-2);
+    }
+  }
+
+  &__who {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.4rem;
+    min-width: 0;
+
+    strong {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    small {
+      flex-basis: 100%;
+      overflow: hidden;
+      color: var(--fx-slate-46-fg);
+      font-size: max(11px, 0.75rem);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+.fx-notify__tag {
+  margin-left: 0;
+}
+
+.fx-chan {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  height: 1.9rem;
+  border: 1px solid var(--fx-gray-84-line);
+  border-radius: 999px;
+  background: var(--fx-white);
+  color: var(--fx-slate-46-fg);
+  font-size: max(11px, 0.75rem);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+
+  input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: inherit;
+  }
+
+  &:hover:not(.is-off):not(.is-on) {
+    border-color: var(--fx-blue-32-line);
+    color: var(--fx-blue-32-fg);
+  }
+
+  &.is-on {
+    border-color: var(--fx-blue-32-line);
+    background: rgba(var(--fx-blue-32-rgb), 0.1);
+    color: var(--fx-blue-32-fg);
+    font-weight: 600;
+  }
+
+  &.is-off {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--fx-gray-98-2);
+  }
+
+  &:focus-within {
+    box-shadow: 0 0 0 3px rgba(var(--fx-amber-50-rgb), 0.4);
+  }
+}
+
+// narrow screens: icons only, and the names sit above the channels
+@media (max-width: 40rem) {
+  .fx-list {
+    --fx-cols: 2.4rem;
+
+    &__cols,
+    &__row {
+      grid-template-columns: 1fr;
+    }
+
+    &__cols {
+      display: none;
+    }
+
+    &__row {
+      grid-template-columns: repeat(var(--fx-n, 4), 1fr);
+    }
+
+    &__who {
+      grid-column: 1 / -1;
+    }
+
+    &__gall {
+      display: none;
+    }
+  }
+
+  .fx-chan span {
+    display: none;
+  }
+}
+
+// ---- confirmation after sending ------------------------------------------------------------------------------------
+
+.fx-done {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(var(--fx-green-24-line-rgb), 0.25);
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, var(--fx-green-96), var(--fx-gray-98));
+
+  strong {
+    display: block;
+    color: var(--fx-green-20-fg);
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 0.15rem 0 0;
+    color: var(--fx-slate-34-fg);
+    font-size: 0.85rem;
+  }
+
+  &__icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: var(--fx-green-36);
+    color: var(--fx-white-on);
+    font-size: 1.1rem;
+  }
+
+  &__channel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--fx-slate-27-fg);
+    font-size: 0.85rem;
+  }
+}
+
+.fx-list__cols--three,
+.fx-list__row--three {
+  grid-template-columns: minmax(0, 1fr) 9rem 7rem;
+}
+
+.fx-notify--done {
+  padding-bottom: 0;
+}
+
+// ---- a sent message in detail ---------------------------------------------------------------------------------------
+
+.fx-detail {
+  &__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.6rem 1.25rem;
+    margin: 0 0 1rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--fx-gray-90-line);
+    border-radius: 0.6rem;
+    background: var(--fx-gray-98-2);
+
+    dt {
+      margin-bottom: 0.15rem;
+      color: var(--fx-slate-46-fg);
+      font-size: max(11px, 0.72rem);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    small {
+      display: block;
+      color: var(--fx-slate-46-fg);
+      font-size: max(11px, 0.78rem);
+      font-weight: 400;
+    }
+  }
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  &__subject {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  &__body {
+    margin: 0 0 1rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--fx-green-90-line);
+    border-radius: 0.2rem 0.8rem 0.8rem 0.8rem;
+    background: var(--fx-green-96);
+    font-family: inherit;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  &__attempts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.45rem 0.8rem;
+      border: 1px solid var(--fx-gray-90-line);
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    small {
+      display: block;
+      color: var(--fx-slate-46-fg);
+      font-size: max(11px, 0.78rem);
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__num {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--fx-gray-90);
+    font-size: max(11px, 0.75rem);
+    font-weight: 600;
+  }
+}

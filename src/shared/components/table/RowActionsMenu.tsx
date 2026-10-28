@@ -1,0 +1,219 @@
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { type IconComponent, EllipsisVerticalIcon, EyeIcon, PenIcon, Trash2Icon } from "../icon";
+import { useAuth } from "../../../core/auth/AuthContext";
+import { useAnchoredPanel } from "../dropdown/useAnchoredPanel";
+import "./RowActionsMenu.scss";
+
+export interface RowAction {
+  key: string;
+  label: string;
+  icon: IconComponent;
+  onClick: () => void;
+  danger?: boolean;
+  /** Renders a separator line above this item, for grouping (e.g. destructive actions apart from the rest). */
+  dividerBefore?: boolean;
+}
+
+interface RowActionsMenuProps {
+  onEdit?: () => void;
+  onView?: () => void;
+  onDelete?: () => void;
+  /** Arbitrary menu items, for tables whose actions don't fit the Edit/View/Delete shape. Takes over the dropdown's contents; onEdit/onView/onDelete are ignored when this is set. */
+  actions?: RowAction[];
+  /** "inline" shows View/Edit/Delete as icon buttons revealed on row hover, instead of the "..." dropdown. */
+  variant?: "menu" | "inline";
+  /** Which edge the dropdown opens from. Default "right" (grows left) suits an Actions column placed last; use "left" (grows right) when Actions is the first column, so the menu doesn't overhang the table's left edge. */
+  menuAlign?: "left" | "right";
+  /** Overrides the trash icon for onDelete — for tables where the action isn't a literal delete (e.g. "release"). */
+  deleteIcon?: IconComponent;
+  /** Overrides the "Delete" label/tooltip for onDelete. */
+  deleteLabel?: string;
+  /** Non-interactive label rendered above the actions list (e.g. "Interest of Payments"), for grouping menu items under a heading. Only used with `actions`. */
+  menuHeader?: string;
+  /** When set, Edit and Delete only appear for users holding ANY of these permission keys (View is unaffected). */
+  manageKeys?: string[];
+}
+
+const RowActionsMenu = ({
+  onEdit: editHandler,
+  onView,
+  onDelete: deleteHandler,
+  actions,
+  variant = "menu",
+  menuAlign = "right",
+  deleteIcon: DeleteIcon = Trash2Icon,
+  deleteLabel = "Delete",
+  menuHeader,
+  manageKeys,
+}: RowActionsMenuProps) => {
+  const { can } = useAuth();
+  const canManage = !manageKeys || can(...manageKeys);
+  const onEdit = canManage ? editHandler : undefined;
+  const onDelete = canManage ? deleteHandler : undefined;
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLUListElement>(null);
+  // The menu is drawn in a portal against the viewport, so it is never clipped by the table wrapper
+  // and never runs off-screen — on the last rows it opens upward instead.
+  const { panelStyle } = useAnchoredPanel(open, triggerRef, {
+    minWidth: 160,
+    chromeHeight: 0,
+    fitContent: menuAlign === "left" ? "left" : "right",
+  });
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!menuRef.current?.contains(target) && !panelRef.current?.contains(target)) setOpen(false);
+    };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [open]);
+
+  // Nothing left to offer this user (e.g. a view-only role on an edit/delete-only menu).
+  if (!actions && !onEdit && !onView && !onDelete) return null;
+
+  if (variant === "inline") {
+  return (
+    <div className="row-actions row-actions--inline">
+      {onView && (
+        <button
+          type="button"
+          className="row-actions__icon-btn"
+          onClick={onView}
+          aria-label="View"
+          title="View"
+        >
+          <EyeIcon aria-hidden />
+        </button>
+      )}
+
+      {onEdit && (
+        <button
+          type="button"
+          className="row-actions__icon-btn"
+          onClick={onEdit}
+          aria-label="Edit"
+          title="Edit"
+        >
+          <PenIcon aria-hidden />
+        </button>
+      )}
+
+      {onDelete && (
+        <button
+          type="button"
+          className="row-actions__icon-btn row-actions__icon-btn--danger"
+          onClick={onDelete}
+          aria-label={deleteLabel}
+          title={deleteLabel}
+        >
+          <DeleteIcon aria-hidden />
+        </button>
+      )}
+    </div>
+  );
+}
+
+  return (
+    <div className="row-actions" ref={menuRef}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="row-actions__trigger"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-label="Row actions"
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
+        <EllipsisVerticalIcon aria-hidden />
+      </button>
+
+      {open &&
+        createPortal(
+        <ul className="row-actions__menu" ref={panelRef} style={panelStyle}>
+          {actions && menuHeader && <li className="row-actions__header">{menuHeader}</li>}
+          {actions ? (
+            actions.map((action) => (
+              <li key={action.key}>
+                {action.dividerBefore && <hr className="row-actions__divider" />}
+                <button
+                  type="button"
+                  className={action.danger ? "row-actions__item--danger" : ""}
+                  onClick={() => {
+                    setOpen(false);
+                    action.onClick();
+                  }}
+                >
+                  <action.icon aria-hidden />
+                  {action.label}
+                </button>
+              </li>
+            ))
+          ) : (
+            <>
+              {onEdit && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      onEdit();
+                    }}
+                  >
+                    <PenIcon aria-hidden />
+                    Edit
+                  </button>
+                </li>
+              )}
+              {onView && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      onView();
+                    }}
+                  >
+                    <EyeIcon aria-hidden />
+                    View
+                  </button>
+                </li>
+              )}
+              {onDelete && (
+                <li>
+                  <button
+                    type="button"
+                    className="row-actions__item--danger"
+                    onClick={() => {
+                      setOpen(false);
+                      onDelete();
+                    }}
+                  >
+                    <DeleteIcon aria-hidden />
+                    {deleteLabel}
+                  </button>
+                </li>
+              )}
+            </>
+          )}
+        </ul>,
+        document.body,
+      )}
+    </div>
+  );
+};
+
+export default RowActionsMenu;

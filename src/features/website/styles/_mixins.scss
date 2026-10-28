@@ -1,0 +1,69 @@
+@use "sass:map";
+@use "variables" as v;
+
+/// Styles from `$name` and wider.
+@mixin up($name) {
+  @media (min-width: map.get(v.$breakpoints, $name)) {
+    @content;
+  }
+}
+
+/// Styles below `$name` only.
+@mixin down($name) {
+  @media (max-width: calc(#{map.get(v.$breakpoints, $name)} - 1px)) {
+    @content;
+  }
+}
+
+/// Content column: 80% of the viewport from laptops up. Phones and tablets use the full width with
+/// side padding instead, since 80% would waste too much of a small screen.
+/// The smallest phones (320–374px, e.g. iPhone SE 1st gen), where every pixel in the header counts.
+@mixin tiny {
+  @media (max-width: 374.98px) {
+    @content;
+  }
+}
+
+@mixin container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: v.$space-4;
+  padding-left: v.$space-4;
+
+  @include up(md) {
+    padding-right: v.$space-6;
+    padding-left: v.$space-6;
+  }
+
+  @include up(lg) {
+    width: v.$container-width;
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 3px solid var(--fx-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/// Fluid heading size between a phone and a desktop value.
+@mixin fluid-type($min, $max) {
+  font-size: $min;
+  font-size: clamp(#{$min}, calc(#{$min} + 2vw), #{$max});
+}
+
+@mixin reset-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}

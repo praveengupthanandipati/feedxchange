@@ -20,7 +20,7 @@ self.addEventListener("push", (event) => {
         body: data.body || "",
         icon: "/favicon.png",
         tag: data.inboxId ? `fx-${data.inboxId}` : "fx",
-        data: { deepLink: data.deepLink || "/notifications" },
+        data: { deepLink: data.deepLink || "/admin/notifications" },
       });
     })(),
   );
@@ -28,7 +28,9 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const link = (event.notification.data && event.notification.data.deepLink) || "/notifications";
+  let link = (event.notification.data && event.notification.data.deepLink) || "/admin/notifications";
+  // links from the server may predate the /admin prefix
+  if (link.startsWith("/") && !link.startsWith("//") && link !== "/admin" && !link.startsWith("/admin/")) link = "/admin" + link;
   event.waitUntil(
     (async () => {
       const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });

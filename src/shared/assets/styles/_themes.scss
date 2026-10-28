@@ -1,0 +1,344 @@
+@use "sass:color";
+@use "sass:list";
+@use "sass:map";
+@use "sass:math";
+@use "palette" as p;
+@use "functions" as f;
+
+// ============================================================
+// Emits the design tokens as CSS custom properties. tokens.scss includes these once, on :root (Light) and on
+// [data-theme="..."] for the other themes; nothing else should define --fx-* properties.
+// ============================================================
+
+// ------------------------------------------------------------
+// Themes. Light is the palette as written. Dark and High contrast are worked out from it, colour by colour, by the job
+// the colour does, so every screen follows without per-screen work:
+//
+//   Light           fg    text colours that fail WCAG AA on white are darkened just enough to pass; nothing else changes
+//   Dark            bg    light surfaces and pale tints turn dark (white -> the page, gray-96 -> a raised panel, a pale
+//                         green badge -> a deep green one); saturated fills (buttons, the navy sidebar) stay as they are
+//                   fg    dark text turns light, mid colours (status, brand) lighten enough to read on the dark page
+//                   line  borders turn into a subtle light-on-dark line; coloured borders lighten like text
+//   High contrast   bg    as Light
+//                   fg    text darkens to near black (greys) or a deep shade of its hue (colours): 7:1 or more on white
+//                   line  borders darken so every edge is visible (3:1 or more against white)
+//
+// Text on a fill (on()) keeps its Light colour in every theme, because the fill keeps its colour too.
+// A new theme: add its rules here, then a [data-theme="..."] block in tokens.scss.
+// ------------------------------------------------------------
+
+@function -hsl($colour) {
+  @return (
+    color.channel($colour, "hue", $space: hsl),
+    color.channel($colour, "saturation", $space: hsl),
+    color.channel($colour, "lightness", $space: hsl)
+  );
+}
+
+/// Rebuilds an sRGB colour (written as hex in the CSS) from hue, saturation and lightness.
+@function -from-hsl($h, $s, $l) {
+  $c: color.to-space(hsl($h, math.clamp(0%, $s, 100%), math.clamp(0%, $l, 100%)), rgb);
+  @return rgb(
+    math.round(color.channel($c, "red", $space: rgb)),
+    math.round(color.channel($c, "green", $space: rgb)),
+    math.round(color.channel($c, "blue", $space: rgb))
+  );
+}
+
+/// WCAG relative luminance of an sRGB colour.
+@function -luminance($colour) {
+  $sum: 0;
+  $weights: ("red": 0.2126, "green": 0.7152, "blue": 0.0722);
+  @each $channel, $weight in $weights {
+    $value: math.div(color.channel($colour, $channel, $space: rgb), 255);
+    @if $value <= 0.04045 {
+      $value: math.div($value, 12.92);
+    } @else {
+      $value: math.pow(math.div($value + 0.055, 1.055), 2.4);
+    }
+    $sum: $sum + $value * $weight;
+  }
+  @return $sum;
+}
+
+@function -contrast-on-white($colour) {
+  @return math.div(1.05, -luminance($colour) + 0.05);
+}
+
+/// Light: text that would fail WCAG AA (4.5:1) on white is darkened just enough to reach 5.3:1, which also passes on the pale
+/// tinted badges. Light text (meant for dark panels) and every background, fill and border keep their exact colours.
+@function -light($colour, $role) {
+  @if $role != fg or -contrast-on-white($colour) >= 4.5 {
+    @return $colour;
+  }
+  $hsl: -hsl($colour);
+  @if list.nth($hsl, 3) >= 85% {
+    @return $colour;
+  }
+  $l: list.nth($hsl, 3);
+  $candidate: $colour;
+  @while -contrast-on-white($candidate) < 5.3 and $l > 0% {
+    $l: $l - 1%;
+    $candidate: -from-hsl(list.nth($hsl, 1), list.nth($hsl, 2), $l);
+  }
+  @return $candidate;
+}
+
+@function -dark($colour, $role) {
+  $hsl: -hsl($colour);
+  $h: list.nth($hsl, 1);
+  $s: list.nth($hsl, 2);
+  $l: list.nth($hsl, 3);
+  // neutral greys (and white) take the brand navy's hue, so the page, panels and borders are one family
+  @if $s < 12% and $role != fg {
+    $h: 218deg;
+    $s: 16%;
+  }
+  @if $role == bg {
+    @if $l >= 80% {
+      // white -> 9%, pale tints -> 10-16%, light greys -> up to ~24%: the page, raised panels and tinted badges
+      @return -from-hsl($h, math.min($s, 32%), 9% + (100% - $l) * 0.7);
+    }
+    @return $colour;
+  }
+  @if $role == fg {
+    @if $l >= 60% {
+      @return $colour;
+    }
+    @return -from-hsl($h, math.min($s, 80%), math.max(100% - $l * 0.75, 66%));
+  }
+  // line
+  @if $l >= 70% {
+    @return -from-hsl($h, math.min($s, 20%), 18% + (100% - $l) * 0.6);
+  }
+  @return -from-hsl($h, math.min($s, 70%), math.max(100% - $l * 0.75, 55%));
+}
+
+@function -high-contrast($colour, $role) {
+  $hsl: -hsl($colour);
+  $h: list.nth($hsl, 1);
+  $s: list.nth($hsl, 2);
+  $l: list.nth($hsl, 3);
+  $grey: $s < 15%;
+  @if $role == bg {
+    @return $colour;
+  }
+  @if $role == fg {
+    @if $l >= 85% {
+      @return $colour;
+    }
+    @if $grey {
+      @return -from-hsl($h, $s, math.min($l, 12%));
+    }
+    @return -from-hsl($h, $s, math.min($l, 28%));
+  }
+  // line
+  @if $grey or $l >= 70% {
+    @return -from-hsl($h, math.min($s, 20%), math.min($l, 38%));
+  }
+  @return -from-hsl($h, $s, math.min($l, 32%));
+}
+
+/// The value of one palette colour in a theme, for one job: bg (backgrounds, fills, shadows), fg (text, icons) or line (borders).
+@function theme-colour($colour, $theme, $role) {
+  @if $theme == dark {
+    @return -dark($colour, $role);
+  }
+  @if $theme == high-contrast {
+    @return -high-contrast($colour, $role);
+  }
+  @return -light($colour, $role);
+}
+
+/// --fx-<name>, --fx-<name>-fg, --fx-<name>-line for every palette colour, plus the hover shades.
+/// The Light theme also emits --fx-<name>-on (text on a brand fill), which no other theme changes.
+@mixin palette-tokens($theme) {
+  @each $name, $colour in p.$palette {
+    @if $theme == light {
+      @include -colour("#{$name}-on", $colour);
+    }
+    @include -colour($name, theme-colour($colour, $theme, bg));
+    @include -colour("#{$name}-fg", theme-colour($colour, $theme, fg));
+    @include -colour("#{$name}-line", theme-colour($colour, $theme, line));
+  }
+  @each $name, $steps in p.$shades {
+    @each $amount in $steps {
+      @include -colour("#{$name}-d#{math.div($amount, 1%)}", color.adjust(theme-colour(map.get(p.$palette, $name), $theme, bg), $lightness: -$amount));
+    }
+  }
+}
+
+/// Inside a dark brand panel, text and borders use their Light colours (the -on values): a theme that tunes text for its
+/// page colour must not tune text that sits on the navy sidebar or the website's dark sections.
+@mixin light-text-and-lines {
+  @each $name, $colour in p.$palette {
+    --fx-#{$name}-fg: var(--fx-#{$name}-on);
+    --fx-#{$name}-fg-rgb: var(--fx-#{$name}-on-rgb);
+    --fx-#{$name}-line: var(--fx-#{$name}-on);
+    --fx-#{$name}-line-rgb: var(--fx-#{$name}-on-rgb);
+  }
+}
+
+/// --fx-<name> as a colour and --fx-<name>-rgb as "r, g, b" for alpha() (rgba(var(--fx-<name>-rgb), 0.5)).
+@mixin -colour($name, $colour) {
+  --fx-#{$name}: #{$colour};
+  --fx-#{$name}-rgb: #{math.round(color.channel($colour, "red", $space: rgb))}, #{math.round(color.channel($colour, "green", $space: rgb))}, #{math.round(color.channel($colour, "blue", $space: rgb))};
+}
+
+/// Tinted surfaces (dashboard cards, attention rows): hue -> (tint fill, border colour, text / icon colour), palette names.
+/// Each hue becomes --fx-tint-<hue>-bg, -border, -accent and -fg. They are built from the palette's variants, so Dark
+/// turns the fill into a deep muted tint and lightens border and text on its own; High contrast drops the fill
+/// (tint-tokens-high-contrast). Text on a tint stays the normal text colour; the hue is for the bar, icon and border.
+$tints: (
+  "blue": ("slate-95", "sky-51", "sky-40"),
+  "teal": ("green-96", "teal-38", "teal-33"),
+  "green": ("green-94", "green-40", "green-31"),
+  "orange": ("orange-96", "orange-37", "orange-37"),
+  "amber": ("amber-89", "amber-33", "amber-33"),
+  "red": ("red-96", "red-56", "red-45"),
+  "purple": ("indigo-95", "violet-50", "violet-50"),
+);
+
+@mixin tint-tokens {
+  @each $hue, $set in $tints {
+    --fx-tint-#{$hue}-bg: var(--fx-#{list.nth($set, 1)});
+    --fx-tint-#{$hue}-border: var(--fx-#{list.nth($set, 2)}-line);
+    --fx-tint-#{$hue}-accent: var(--fx-#{list.nth($set, 3)}-line);
+    --fx-tint-#{$hue}-fg: var(--fx-#{list.nth($set, 3)}-fg);
+  }
+}
+
+/// High contrast: no tint fill (white), the border in the strong text colour of the hue.
+@mixin tint-tokens-high-contrast {
+  @each $hue, $set in $tints {
+    --fx-tint-#{$hue}-bg: var(--fx-white);
+    --fx-tint-#{$hue}-border: var(--fx-#{list.nth($set, 3)}-fg);
+  }
+}
+
+/// Everything that is not a colour: type, spacing, radius, shadow and density. Shared by the admin app and the website.
+@mixin scale-tokens {
+  @include tint-tokens;
+  // type
+  --fx-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --fx-font-heading: "Poppins", var(--fx-font-body);
+  --fx-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --fx-text-xs: max(11px, 0.75rem);
+  --fx-text-sm: 0.875rem;
+  --fx-text-base: 1rem;
+  --fx-text-lg: 1.125rem;
+  --fx-text-xl: 1.25rem;
+  --fx-text-2xl: 1.5rem;
+  --fx-text-3xl: 1.875rem;
+  --fx-text-4xl: 2.25rem;
+  --fx-text-5xl: 3rem;
+
+  // spacing, 4px steps
+  --fx-space-1: 0.25rem;
+  --fx-space-2: 0.5rem;
+  --fx-space-3: 0.75rem;
+  --fx-space-4: 1rem;
+  --fx-space-5: 1.5rem;
+  --fx-space-6: 2rem;
+  --fx-space-7: 3rem;
+  --fx-space-8: 4rem;
+  --fx-space-9: 6rem;
+
+  // radius
+  --fx-radius-1: 0.25rem;
+  --fx-radius-2: 0.5rem;
+  --fx-radius-3: 0.875rem;
+  --fx-radius-4: 1rem;
+  --fx-radius-5: 1.25rem;
+  --fx-radius-pill: 999px;
+
+  // shadows: the admin app's, then the website's softer ones
+  --fx-shadow-sm: 0 1px 2px #{f.alpha(f.token("gray-7"), 0.06)};
+  --fx-shadow-md: 0 4px 12px #{f.alpha(f.token("brand-navy"), 0.12)};
+  --fx-shadow-lg: 0 12px 32px #{f.alpha(f.token("brand-navy"), 0.18)};
+  --fx-site-shadow-sm: 0 1px 2px #{f.alpha(f.token("blue-11"), 0.06)}, 0 1px 3px #{f.alpha(f.token("blue-11"), 0.05)};
+  --fx-site-shadow-md: 0 12px 32px -12px #{f.alpha(f.token("blue-11"), 0.18)};
+  --fx-site-shadow-lg: 0 30px 60px -20px #{f.alpha(f.token("blue-11"), 0.3)};
+
+  // density: control, table and panel sizes. Everything is in rem, and the root size is small (tokens.scss: 13px in the
+  // admin app, 14px on the website, larger on touch screens), so these come out compact: a control is about 29px high in
+  // the admin app, a table row about 31px, a card has 12px of padding.
+  --fx-control-height: 2.25rem;
+  --fx-control-height-sm: 1.875rem;
+  --fx-control-height-lg: 2.5rem;
+  --fx-control-px: 0.75rem;
+  --fx-table-row-height: 2.375rem;
+  --fx-table-cell-py: 0.45rem;
+  --fx-table-cell-px: 0.75rem;
+  --fx-card-padding: 0.9375rem;
+  --fx-dialog-padding: 1.25rem;
+
+  // The edge of a text field, select or date picker: a soft neutral grey, by the owner's choice lighter than WCAG 1.4.11
+  // asks for (3:1). DELIBERATE EXCEPTION: rest #dcdcdc 1.37:1 on white, hover #cfcfcf 1.56:1, focus #bdbdbd 1.88:1. A
+  // focused field shows a soft grey glow instead of the dark focus ring (--fx-field-focus-*); buttons, links, checkboxes
+  // and menus keep the strong ring. Fixed greys (-on), so Dark sets its own (tokens.scss); High contrast keeps strong
+  // edges and the ring. See docs/design-tokens.md, "Field borders".
+  --fx-field-border: var(--fx-gray-86-on);
+  --fx-field-border-hover: var(--fx-gray-81-on);
+  --fx-field-border-focus: var(--fx-gray-74-on);
+  --fx-field-border-disabled: var(--fx-gray-91-on);
+  --fx-field-focus-glow: 0 0 0 3px rgba(128, 128, 128, 0.25);
+  // the small icons inside a field (chevron, calendar, clear "x"): muted, the clear "x" darker on hover
+  --fx-field-icon: var(--fx-slate-58-on);
+  --fx-field-icon-hover: var(--fx-slate-34-on);
+  // transparent rather than none, so Windows high-contrast (forced colours) still draws an outline
+  --fx-field-focus-outline: 2px solid transparent;
+
+  // focus ring, used by every focusable control: navy on the light page (orange is only 2:1 on white); each theme and the
+  // dark brand panels set their own
+  --fx-focus-ring: var(--fx-brand-navy-on);
+
+  // charts (recharts takes these as fill / stroke values): series colours in order, then grid lines and axis text
+  --fx-chart-1: var(--fx-sky-51);
+  --fx-chart-2: var(--fx-green-40);
+  --fx-chart-3: var(--fx-brand-orange);
+  --fx-chart-4: var(--fx-indigo-59);
+  --fx-chart-5: var(--fx-red-56);
+  --fx-chart-grid: var(--fx-gray-96-line);
+  --fx-chart-axis: var(--fx-slate-65-fg);
+}
+
+/// Bootstrap 5.3 reads these; pointing them at the tokens makes its components (forms, tables, modals, offcanvas, buttons)
+/// follow the brand and the theme.
+@mixin bootstrap-tokens {
+  --bs-body-font-family: var(--fx-font-body);
+  --bs-body-color: var(--fx-gray-12-fg);
+  --bs-body-color-rgb: var(--fx-gray-12-fg-rgb);
+  --bs-body-bg: var(--fx-white);
+  --bs-body-bg-rgb: var(--fx-white-rgb);
+  --bs-emphasis-color-rgb: var(--fx-gray-7-fg-rgb);
+  --bs-secondary-color-rgb: var(--fx-slate-39-fg-rgb);
+  --bs-secondary-bg-rgb: var(--fx-gray-96-rgb);
+  --bs-tertiary-bg-rgb: var(--fx-gray-98-2-rgb);
+  --bs-emphasis-color: var(--fx-gray-7-fg);
+  --bs-secondary-color: var(--fx-slate-39-fg);
+  --bs-secondary-bg: var(--fx-gray-96);
+  --bs-tertiary-color: var(--fx-slate-50-fg);
+  --bs-tertiary-bg: var(--fx-gray-98-2);
+  --bs-heading-color: var(--fx-gray-12-fg);
+  --bs-link-color: var(--fx-brand-navy-fg);
+  --bs-link-hover-color: var(--fx-blue-16-2-fg);
+  --bs-border-color: var(--fx-gray-90-line);
+  --bs-border-color-translucent: #{f.alpha(f.token("gray-7"), 0.175)};
+  --bs-primary: var(--fx-brand-navy);
+  --bs-secondary: var(--fx-slate-39);
+  --bs-success: var(--fx-green-40);
+  --bs-danger: var(--fx-red-56);
+  --bs-warning: var(--fx-brand-orange);
+  --bs-info: var(--fx-sky-51);
+  --bs-primary-text-emphasis: var(--fx-brand-navy-fg);
+  --bs-danger-text-emphasis: var(--fx-red-45-fg);
+  --bs-danger-bg-subtle: var(--fx-red-94);
+  --bs-danger-border-subtle: var(--fx-red-80-line);
+  --bs-form-valid-color: var(--fx-green-40-fg);
+  --bs-form-valid-border-color: var(--fx-green-40-line);
+  --bs-form-invalid-color: var(--fx-red-56-fg);
+  --bs-form-invalid-border-color: var(--fx-red-56-line);
+  --bs-focus-ring-color: #{f.alpha(f.token("brand-navy"), 0.25)};
+}

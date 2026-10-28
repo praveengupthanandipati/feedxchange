@@ -1,0 +1,150 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.searchable-select {
+  position: relative;
+  min-width: 10rem;
+
+  &__trigger {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    @include m.font-base(v.$font-weight-medium);
+    @include m.field-focus-ring;
+    width: 100%;
+    height: var(--fx-control-height);
+    padding: 0 v.$spacing-3;
+    border: 1px solid var(--fx-field-border);
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    > span:first-child {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: left;
+    }
+
+    // the clear "x" (FieldClear, with its own 24px click area) and the chevron, close together
+    .searchable-select__trigger-icons {
+      @include m.flex(row, flex-end, center, 0);
+      flex-shrink: 0;
+    }
+
+    svg {
+      flex-shrink: 0;
+      color: var(--fx-field-icon);
+      transition: transform v.$transition-fast;
+
+      &.is-open {
+        transform: rotate(180deg);
+      }
+    }
+
+    &:hover {
+      border-color: var(--fx-field-border-hover);
+    }
+
+    &:disabled {
+      border-color: var(--fx-field-border-disabled);
+      background-color: v.$color-gray-50;
+      color: v.fg(v.$color-text-muted);
+      cursor: not-allowed;
+
+      &:hover {
+        border-color: var(--fx-field-border-disabled);
+      }
+    }
+  }
+
+  // Placed by the component (fixed, against the viewport) — see positionPanel.
+  &__panel {
+    position: fixed;
+    max-width: calc(100vw - 1rem);
+    background-color: v.$color-bg;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    box-shadow: v.$shadow-lg;
+    z-index: v.$z-index-modal-top;
+    overflow: hidden;
+  }
+
+  &__search {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    padding: v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid var(--fx-field-border);
+    color: v.fg(v.$color-text-muted);
+
+    input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: v.$font-size-sm;
+      color: v.fg(v.$color-text);
+    }
+  }
+
+  &__add {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: max(24px, 1.75rem);
+    height: max(24px, 1.75rem);
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: v.alpha(v.$color-orange, 0.12);
+    color: v.fg(v.$color-orange-dark);
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.alpha(v.$color-orange, 0.22);
+    }
+  }
+
+  &__options {
+    list-style: none;
+    margin: 0;
+    padding: v.$spacing-2;
+    max-height: 14rem; // the component lowers this to fit the viewport
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    button {
+      @include m.font-base(v.$font-weight-medium);
+      width: 100%;
+      padding: v.$spacing-2 v.$spacing-3;
+      border: none;
+      border-radius: v.$radius-md;
+      background: transparent;
+      color: v.fg(v.$color-text);
+      font-size: v.$font-size-sm;
+      text-align: left;
+      overflow-wrap: anywhere;
+      cursor: pointer;
+      transition: background-color v.$transition-fast;
+
+      &:hover {
+        background-color: v.$color-gray-100;
+      }
+
+      &.is-selected {
+        background-color: v.alpha(v.$color-orange, 0.1);
+        color: v.fg(v.$color-orange-dark);
+        font-weight: v.$font-weight-semibold;
+      }
+    }
+  }
+
+  &__empty {
+    padding: v.$spacing-3;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+}

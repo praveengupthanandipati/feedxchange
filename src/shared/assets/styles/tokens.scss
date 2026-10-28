@@ -1,0 +1,244 @@
+// ============================================================
+// Design tokens as CSS custom properties, loaded once for the whole app and the website (main.tsx, after Bootstrap's CSS).
+// Values live in _palette.scss (colours) and _themes.scss (everything else); this file only places them.
+// ============================================================
+@use "themes" as t;
+@use "functions" as f;
+
+:root,
+[data-bs-theme="light"] {
+  @include t.palette-tokens(light);
+  @include t.scale-tokens;
+  @include t.bootstrap-tokens;
+}
+
+// ---------- Density ----------
+// Sizes are in rem, so the root size sets the density for everything at once: 13px in the admin app, 14px on the website
+// (percentages, so a larger browser font setting still counts). Touch screens get 15px / 16px, which keeps controls about
+// 36px high, and inputs at 16px so phones do not zoom into them. No text goes below 11px (see the font-size floors).
+html {
+  font-size: 87.5%;
+}
+
+html[data-app="admin"] {
+  font-size: 81.25%;
+}
+
+@media (pointer: coarse) {
+  html {
+    font-size: 100%;
+  }
+
+  html[data-app="admin"] {
+    font-size: 93.75%;
+  }
+
+  :root {
+    --fx-control-height: 2.5rem;
+    --fx-control-height-sm: 2.25rem;
+  }
+
+  input:not([type="checkbox"], [type="radio"], [type="range"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+// WCAG 2.2 target size: anything you can press is at least 24px high (buttons also 24px wide). :where() has no
+// specificity, so this only lifts controls that would otherwise be smaller; a link inside a sentence (inline) is exempt.
+:where(button, [role="button"]) {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+:where(a[href], [tabindex="0"]) {
+  min-height: 24px;
+}
+
+// A visible focus ring for anything a component did not style itself (zero specificity, so component styles win)
+:where(a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--fx-focus-ring);
+  outline-offset: 2px;
+}
+
+// Text fields do not get the dark ring (the owner's choice): their own styles show focus with the soft grey border and
+// glow (--fx-field-border-focus, --fx-field-focus-glow), on the field or on the box around it (:focus-within)
+:where(input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="range"], [type="color"], [type="file"], [type="image"]), select, textarea):focus-visible {
+  outline: var(--fx-field-focus-outline);
+}
+
+// Bootstrap's controls at the app's density
+.form-control,
+.form-select {
+  min-height: var(--fx-control-height);
+  border-color: var(--fx-field-border);
+  padding: 0.25rem var(--fx-control-px);
+  font-size: var(--fx-text-sm);
+  border-radius: var(--fx-radius-1);
+}
+
+.form-select {
+  padding-right: 2rem;
+  background-position: right 0.6rem center;
+}
+
+.btn {
+  --bs-btn-padding-y: 0.25rem;
+  --bs-btn-padding-x: var(--fx-control-px);
+  --bs-btn-font-size: var(--fx-text-sm);
+  --bs-btn-border-radius: var(--fx-radius-1);
+  min-height: var(--fx-control-height);
+}
+
+.btn-sm {
+  --bs-btn-padding-y: 0.125rem;
+  --bs-btn-padding-x: 0.5rem;
+  min-height: var(--fx-control-height-sm);
+}
+
+.modal {
+  --bs-modal-padding: var(--fx-dialog-padding);
+  --bs-modal-header-padding: 0.75rem var(--fx-dialog-padding);
+}
+
+.offcanvas {
+  --bs-offcanvas-padding-x: var(--fx-dialog-padding);
+  --bs-offcanvas-padding-y: 0.75rem;
+}
+
+.dropdown-menu {
+  --bs-dropdown-item-padding-y: 0.3rem;
+  --bs-dropdown-font-size: var(--fx-text-sm);
+}
+
+// Themes: data-theme on <html> is set before first paint by the script in index.html (src/shared/theme/theme.ts keeps it
+// in step afterwards). "Match my device" resolves to light or dark there, so CSS only knows these three.
+[data-theme="dark"] {
+  color-scheme: dark;
+  @include t.palette-tokens(dark);
+  --fx-focus-ring: var(--fx-brand-orange-on);
+  // soft neutral greys a few steps above the dark field (deliberate exception, see _themes.scss): #4a4a4a 2.05:1,
+  // hover #5c5c5c 2.71:1; focus #7a7a7a 4.22:1 keeps real contrast
+  --fx-field-border: var(--fx-gray-25-on);
+  --fx-field-border-hover: var(--fx-gray-29-on);
+  --fx-field-border-focus: var(--fx-gray-36-on);
+  --fx-field-border-disabled: var(--fx-gray-20-on);
+  --fx-field-focus-glow: 0 0 0 3px rgba(160, 160, 160, 0.25);
+  --fx-field-icon: var(--fx-slate-65-on);
+  --fx-field-icon-hover: var(--fx-slate-84-on);
+
+  // Bootstrap's select arrow and close button are drawn dark; draw them light.
+  --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23dee2e6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  --bs-btn-close-white-filter: invert(1) grayscale(100%) brightness(200%);
+  --bs-btn-close-filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="high-contrast"] {
+  color-scheme: light;
+  @include t.palette-tokens(high-contrast);
+  @include t.tint-tokens-high-contrast;
+  --fx-focus-ring: var(--fx-gray-7);
+  // the accessibility theme keeps strong field edges
+  --fx-field-border: var(--fx-slate-58-line);
+  --fx-field-border-hover: var(--fx-slate-58-line);
+  --fx-field-border-focus: var(--fx-gray-7);
+  --fx-field-border-disabled: var(--fx-slate-58-line);
+  --fx-field-focus-glow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+  --fx-field-focus-outline: 2px solid var(--fx-focus-ring);
+  --fx-field-icon: var(--fx-gray-7);
+  --fx-field-icon-hover: var(--fx-gray-7);
+}
+
+// The dark brand panels: the admin sidebar, the login brand panel and dashboard banner, and the website's hero, dark
+// sections, call-to-action box and footer. Light and High contrast tune text for a white page, so inside these panels text
+// keeps the colour it was designed with, and the focus ring is orange. A new dark panel goes in this list.
+$dark-panels: ".aside", ".login__panel", ".dashboard-banner", ".hero", ".page-hero", ".section--dark", ".cta__box", ".site-footer";
+
+:is(#{$dark-panels}) {
+  --fx-focus-ring: var(--fx-brand-orange-on);
+}
+
+:root:not([data-theme="dark"]) :is(#{$dark-panels}) {
+  @include t.light-text-and-lines;
+}
+
+// Bootstrap components whose colours are compiled in rather than read from the --bs-* variables above.
+.btn-primary {
+  --bs-btn-color: #{f.on(f.token("white"))};
+  --bs-btn-bg: var(--fx-brand-navy);
+  --bs-btn-border-color: var(--fx-brand-navy);
+  --bs-btn-hover-color: #{f.on(f.token("white"))};
+  --bs-btn-hover-bg: var(--fx-brand-navy-d8);
+  --bs-btn-hover-border-color: var(--fx-brand-navy-d8);
+  --bs-btn-active-color: #{f.on(f.token("white"))};
+  --bs-btn-active-bg: var(--fx-brand-navy-d10);
+  --bs-btn-active-border-color: var(--fx-brand-navy-d10);
+  --bs-btn-disabled-color: #{f.on(f.token("white"))};
+  --bs-btn-disabled-bg: var(--fx-brand-navy);
+  --bs-btn-disabled-border-color: var(--fx-brand-navy);
+  --bs-btn-focus-shadow-rgb: var(--fx-brand-navy-rgb);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--fx-brand-navy-fg);
+  --bs-btn-border-color: var(--fx-brand-navy-line);
+  --bs-btn-hover-color: #{f.on(f.token("white"))};
+  --bs-btn-hover-bg: var(--fx-brand-navy);
+  --bs-btn-hover-border-color: var(--fx-brand-navy);
+  --bs-btn-active-color: #{f.on(f.token("white"))};
+  --bs-btn-active-bg: var(--fx-brand-navy-d8);
+  --bs-btn-active-border-color: var(--fx-brand-navy-d8);
+  --bs-btn-disabled-color: var(--fx-brand-navy-fg);
+  --bs-btn-disabled-border-color: var(--fx-brand-navy-line);
+  --bs-btn-focus-shadow-rgb: var(--fx-brand-navy-rgb);
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--fx-slate-39-fg);
+  --bs-btn-border-color: var(--fx-gray-79-line);
+  --bs-btn-hover-color: var(--fx-gray-12-fg);
+  --bs-btn-hover-bg: var(--fx-gray-96);
+  --bs-btn-hover-border-color: var(--fx-gray-79-line);
+  --bs-btn-active-color: var(--fx-gray-12-fg);
+  --bs-btn-active-bg: var(--fx-gray-90);
+  --bs-btn-active-border-color: var(--fx-gray-79-line);
+  --bs-btn-disabled-color: var(--fx-slate-50-fg);
+  --bs-btn-disabled-border-color: var(--fx-gray-90-line);
+}
+
+.form-control,
+.form-select {
+  &:disabled {
+    border-color: var(--fx-field-border-disabled);
+  }
+
+  &:hover:not(:focus):not(:disabled):not(.is-invalid) {
+    border-color: var(--fx-field-border-hover);
+  }
+
+  &:focus {
+    border-color: var(--fx-field-border-focus);
+    box-shadow: var(--fx-field-focus-glow);
+  }
+}
+
+.form-check-input {
+  &:checked {
+    background-color: var(--fx-brand-navy);
+    border-color: var(--fx-brand-navy-line);
+  }
+
+  &:focus {
+    border-color: var(--fx-brand-navy-line);
+    box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+  }
+}
+
+.text-secondary {
+  color: var(--fx-slate-39-fg) !important;
+}
+
+.text-danger {
+  color: var(--fx-red-56-fg) !important;
+}

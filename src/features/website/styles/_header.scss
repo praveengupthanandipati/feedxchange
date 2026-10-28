@@ -1,0 +1,964 @@
+@use "variables" as v;
+@use "mixins" as m;
+
+$drawer-width: 22rem;
+
+// ---------- Logo ----------
+.site-logo {
+  @include m.focus-ring;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  border-radius: v.$radius-sm;
+
+  img {
+    width: auto;
+    height: 2.1rem;
+
+    @include m.tiny {
+      height: 1.7rem;
+    }
+
+    @include m.up(md) {
+      height: 2.4rem;
+    }
+  }
+
+  // Footer: the navy wordmark sits on a white pill so it stays readable on dark navy.
+  &--inverse {
+    padding: v.$space-2 v.$space-4;
+    border-radius: v.$radius-md;
+    background-color: v.$white;
+  }
+}
+
+// ---------- Fixed header ----------
+.site-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 50;
+  border-bottom: 1px solid transparent;
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+
+  // The background lives on a pseudo-element: backdrop-filter on the header itself would make it the
+  // containing block for the fixed off-canvas menu and break its positioning.
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    background-color: v.alpha(v.$white, 0.97);
+
+    // Frosted glass where supported; the near-opaque background above is the fallback.
+    @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+      background-color: v.alpha(v.$white, 0.82);
+      -webkit-backdrop-filter: saturate(180%) blur(14px);
+      backdrop-filter: saturate(180%) blur(14px);
+    }
+  }
+
+  &.is-scrolled {
+    border-color: v.line(v.$line);
+    box-shadow: 0 8px 24px -16px v.alpha(v.$navy-900, 0.35);
+  }
+
+  // Logo left · menu centre · actions right.
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-4;
+    height: v.$header-height;
+  }
+
+  &__actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: v.$space-2;
+
+    @include m.up(md) {
+      gap: v.$space-3;
+    }
+  }
+
+  &__toggle {
+    @include m.focus-ring;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid v.line(v.$line);
+    border-radius: v.$radius-md;
+    background-color: v.$white;
+    color: v.fg(v.$navy-900);
+    font-size: 1.35rem;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: v.line(v.$navy-600);
+    }
+
+    @include m.up(xl) {
+      display: none;
+    }
+  }
+}
+
+// Push the page below the fixed header.
+.site-main {
+  padding-top: v.$header-height;
+}
+
+// ---------- Join + WhatsApp ----------
+.site-join {
+  min-height: 2.75rem;
+
+  // Small phones: the button moves into the off-canvas menu.
+  .site-header__actions & {
+    @include m.down(sm) {
+      display: none;
+    }
+  }
+}
+
+// "Login" to the signed-in application: a quiet text link next to the buttons.
+.site-login {
+  @include m.focus-ring;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0 v.$space-2;
+  border-radius: v.$radius-md;
+  color: v.fg(v.$navy-900);
+  font-weight: 600;
+  white-space: nowrap;
+
+  &:hover {
+    color: v.fg(v.$navy-600);
+    text-decoration: underline;
+  }
+
+  // Small phones: the link moves into the off-canvas menu.
+  .site-header__actions & {
+    @include m.down(sm) {
+      display: none;
+    }
+  }
+
+  &--block {
+    justify-content: center;
+    width: 100%;
+    margin-bottom: v.$space-2;
+    border: 1px solid v.alpha(v.line(v.$navy-900), 0.18);
+  }
+}
+
+// Theme button: a quiet round button beside WhatsApp; on small phones it lives in the off-canvas menu.
+.site-theme {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid v.line(v.$line);
+  border-radius: 50%;
+  background-color: v.$surface;
+  color: v.fg(v.$navy-900);
+  font-size: 1.15rem;
+  transition: border-color 0.2s v.$ease;
+
+  &:hover {
+    border-color: v.line(v.$navy-600);
+  }
+
+  .site-header__actions & {
+    @include m.down(sm) {
+      display: none;
+    }
+  }
+}
+
+.mobile-menu__theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-3;
+  margin-bottom: v.$space-2;
+  color: v.fg(v.$ink-soft);
+  font-weight: 600;
+}
+
+.site-whatsapp {
+  @include m.focus-ring;
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background-color: var(--fx-green-49);
+  box-shadow: 0 8px 18px -8px rgba(var(--fx-green-49-rgb), 0.9);
+  color: v.on(v.$white);
+  font-size: 1.45rem;
+  transition: transform 0.2s v.$ease;
+
+  &:hover {
+    color: v.on(v.$white);
+    transform: scale(1.06);
+  }
+
+  // Gentle pulse ring to draw the eye.
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 0 rgba(var(--fx-green-49-rgb), 0.5);
+    animation: wa-pulse 2.4s ease-out infinite;
+  }
+
+  @include m.reduced-motion {
+    transition: none;
+
+    &::after {
+      animation: none;
+    }
+  }
+}
+
+@keyframes wa-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--fx-green-49-rgb), 0.5);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 12px rgba(var(--fx-green-49-rgb), 0);
+  }
+}
+
+// ---------- Desktop menu (xl+) ----------
+.site-nav {
+  display: none;
+
+  @include m.up(xl) {
+    display: block;
+  }
+
+  &__list {
+    @include m.reset-list;
+    display: flex;
+    align-items: center;
+    gap: v.$space-1;
+  }
+
+  &__link {
+    @include m.focus-ring;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: v.$space-2 v.$space-3;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: none;
+    color: v.fg(v.$ink-soft);
+    font-size: 0.95rem;
+    font-weight: v.$fw-medium;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    // Underline that grows from the centre.
+    &::after {
+      content: "";
+      position: absolute;
+      right: v.$space-3;
+      bottom: 0;
+      left: v.$space-3;
+      height: 2px;
+      border-radius: 2px;
+      background-color: v.$orange-500;
+      transform: scaleX(0);
+      transition: transform 0.3s v.$ease;
+    }
+
+    &:hover,
+    &.is-active {
+      color: v.fg(v.$navy-900);
+
+      &::after {
+        transform: scaleX(1);
+      }
+    }
+
+    &.is-active {
+      font-weight: v.$fw-semibold;
+    }
+  }
+}
+
+// ---------- Products dropdown ----------
+.nav-dropdown {
+  position: relative;
+
+  &__chevron {
+    font-size: 0.95rem;
+    transition: transform 0.3s v.$ease;
+  }
+
+  &.is-open &__chevron {
+    transform: rotate(180deg);
+  }
+
+  // Hidden state: faded, lowered and slightly shrunk. visibility waits for the fade-out to finish.
+  &__panel {
+    position: absolute;
+    top: calc(100% + 0.9rem);
+    left: 50%;
+    width: 36rem;
+    padding: v.$space-3;
+    border: 1px solid v.line(v.$line);
+    border-radius: v.$radius-lg;
+    background-color: v.$white;
+    box-shadow: v.$shadow-lg;
+    visibility: hidden;
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.98);
+    transform-origin: top center;
+    transition:
+      opacity 0.22s ease,
+      transform 0.3s v.$ease,
+      visibility 0s linear 0.3s;
+
+    // Invisible bridge over the gap, so moving the pointer down doesn't close the menu.
+    &::before {
+      content: "";
+      position: absolute;
+      top: -0.9rem;
+      right: 0;
+      left: 0;
+      height: 0.9rem;
+    }
+
+    // Little pointer arrow.
+    &::after {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      width: 12px;
+      height: 12px;
+      border-top: 1px solid v.line(v.$line);
+      border-left: 1px solid v.line(v.$line);
+      background-color: v.$white;
+      transform: translateX(-50%) rotate(45deg);
+    }
+  }
+
+  &.is-open &__panel {
+    visibility: visible;
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    transition:
+      opacity 0.22s ease,
+      transform 0.3s v.$ease;
+  }
+
+  &__grid {
+    @include m.reset-list;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$space-1;
+  }
+
+  &__item {
+    @include m.focus-ring;
+    display: flex;
+    align-items: flex-start;
+    gap: v.$space-3;
+    padding: v.$space-3;
+    border-radius: v.$radius-md;
+    transition: background-color 0.2s ease;
+
+    strong {
+      display: block;
+      color: v.fg(v.$navy-900);
+      font-size: v.$fs-sm;
+      font-weight: v.$fw-semibold;
+    }
+
+    small {
+      display: block;
+      margin-top: 0.15rem;
+      color: v.fg(v.$ink-muted);
+      font-size: v.$fs-xs;
+      line-height: 1.45;
+    }
+
+    &:hover {
+      background-color: v.$sky-50;
+
+      .nav-dropdown__icon {
+        background-color: v.$orange-500;
+        color: v.on(v.$navy-900);
+      }
+    }
+  }
+
+  &__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: v.$radius-sm;
+    background-color: v.$sky-100;
+    color: v.fg(v.$navy-600);
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  &__all {
+    @include m.focus-ring;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: v.$space-2;
+    margin-top: v.$space-2;
+    padding: v.$space-3;
+    border-radius: v.$radius-md;
+    background-color: v.$surface-alt;
+    color: v.fg(v.$navy-800);
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-semibold;
+
+    &:hover {
+      background-color: v.$sky-100;
+      color: v.fg(v.$navy-900);
+    }
+  }
+
+  @include m.reduced-motion {
+    &__panel,
+    &.is-open &__panel,
+    &__chevron {
+      transition: none;
+    }
+  }
+}
+
+// Two-pane products menu: categories | products of the chosen category.
+.nav-mega {
+  width: 40rem;
+
+  &__body {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: v.$space-3;
+    min-height: 16rem;
+  }
+
+  &__categories {
+    @include m.reset-list;
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-1;
+    padding-right: v.$space-3;
+    border-right: 1px solid v.line(v.$line);
+  }
+
+  &__category {
+    @include m.focus-ring;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-2;
+    width: 100%;
+    padding: v.$space-3;
+    border: none;
+    border-radius: v.$radius-md;
+    background: none;
+    color: v.fg(v.$ink);
+    text-align: left;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    strong {
+      display: block;
+      font-size: v.$fs-sm;
+      font-weight: v.$fw-semibold;
+    }
+
+    small {
+      display: block;
+      margin-top: 0.1rem;
+      color: v.fg(v.$ink-muted);
+      font-size: v.$fs-xs;
+    }
+
+    svg {
+      flex-shrink: 0;
+      color: v.fg(v.$ink-muted);
+      transition: transform 0.25s v.$ease;
+    }
+
+    &:hover {
+      background-color: v.$sky-50;
+    }
+
+    &.is-active {
+      background: linear-gradient(135deg, v.$navy-700, v.$navy-900);
+      color: v.on(v.$white);
+
+      small {
+        color: v.alpha(v.on(v.$white), 0.7);
+      }
+
+      svg {
+        color: v.fg(v.$orange-500);
+        transform: translateX(3px);
+      }
+    }
+  }
+
+  &__products {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: v.$space-2 v.$space-1;
+
+    ul {
+      @include m.reset-list;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$space-1;
+      animation: nav-mega-in 0.25s v.$ease;
+    }
+  }
+
+  &__title {
+    margin: 0 0 v.$space-2;
+    padding: 0 v.$space-3;
+    color: v.fg(v.$orange-600);
+    font-size: v.$fs-xs;
+    font-weight: v.$fw-semibold;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &__product {
+    @include m.focus-ring;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-2;
+    padding: 0.6rem v.$space-3;
+    border-radius: v.$radius-sm;
+    color: v.fg(v.$navy-900);
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-medium;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    svg {
+      flex-shrink: 0;
+      color: v.fg(v.$orange-600);
+      opacity: 0;
+      transform: translateX(-4px);
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s v.$ease;
+    }
+
+    &:hover,
+    &:focus-visible,
+    &.is-current {
+      background-color: v.$sky-50;
+      color: v.fg(v.$navy-600);
+
+      svg {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    &.is-current {
+      font-weight: v.$fw-semibold;
+    }
+  }
+
+  &__more {
+    @include m.focus-ring;
+    display: inline-flex;
+    align-items: center;
+    gap: v.$space-2;
+    margin-top: auto;
+    padding: v.$space-3 v.$space-3 0;
+    color: v.fg(v.$orange-600);
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-semibold;
+
+    &:hover {
+      color: v.fg(v.$navy-900);
+    }
+  }
+
+  @include m.reduced-motion {
+    &__products ul {
+      animation: none;
+    }
+
+    &__category svg,
+    &__product svg {
+      transition: none;
+    }
+  }
+}
+
+@keyframes nav-mega-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// ---------- Off-canvas menu (below xl) ----------
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 60;
+  visibility: hidden;
+  transition: visibility 0s linear 0.4s;
+
+  &.is-open {
+    visibility: visible;
+    transition: none;
+  }
+
+  @include m.up(xl) {
+    display: none;
+  }
+
+  &__backdrop {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 0;
+    border: none;
+    background-color: v.alpha(v.$navy-900, 0.5);
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.35s ease;
+
+    @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
+    }
+  }
+
+  &.is-open &__backdrop {
+    opacity: 1;
+  }
+
+  &__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: min(#{$drawer-width}, 88vw);
+    background-color: v.$white;
+    box-shadow: -20px 0 50px -20px v.alpha(v.$navy-900, 0.45);
+    transform: translateX(100%);
+    transition: transform 0.4s v.$ease;
+  }
+
+  &.is-open &__panel {
+    transform: none;
+  }
+
+  &__head {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-3;
+    height: v.$header-height;
+    padding: 0 v.$space-4 0 v.$space-5;
+    border-bottom: 1px solid v.line(v.$line);
+
+    .site-logo img {
+      height: 1.9rem;
+    }
+  }
+
+  &__close {
+    @include m.focus-ring;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    border-radius: 50%;
+    background-color: v.$surface-alt;
+    color: v.fg(v.$navy-900);
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      transform 0.3s v.$ease;
+
+    &:hover {
+      background-color: v.$sky-100;
+      transform: rotate(90deg);
+    }
+  }
+
+  &__nav {
+    flex: 1;
+    padding: v.$space-3 v.$space-4;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+
+    > ul {
+      @include m.reset-list;
+
+      // Links slide in one after another when the menu opens.
+      > li {
+        opacity: 0;
+        transform: translateX(16px);
+        transition:
+          opacity 0.3s ease,
+          transform 0.4s v.$ease;
+      }
+    }
+  }
+
+  &.is-open &__nav > ul > li {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(0.08s + var(--i, 0) * 0.04s);
+  }
+
+  &__link {
+    @include m.focus-ring;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.9rem v.$space-3;
+    border: none;
+    border-radius: v.$radius-md;
+    background: none;
+    color: v.fg(v.$ink);
+    font-size: v.$fs-base;
+    font-weight: v.$fw-medium;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover {
+      background-color: v.$surface-alt;
+      color: v.fg(v.$navy-900);
+    }
+
+    &.is-active {
+      background-color: v.$sky-50;
+      color: v.fg(v.$navy-700);
+      font-weight: v.$fw-semibold;
+    }
+  }
+
+  &__chevron {
+    color: v.fg(v.$ink-muted);
+    transition: transform 0.35s v.$ease;
+
+    [aria-expanded="true"] > & {
+      transform: rotate(180deg);
+    }
+  }
+
+  // Smooth height: animating grid rows 0fr → 1fr expands to the content's real height.
+  &__sub {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s v.$ease;
+
+    &.is-open {
+      grid-template-rows: 1fr;
+    }
+
+    > ul {
+      @include m.reset-list;
+      min-height: 0;
+      overflow: hidden;
+      margin-left: v.$space-4;
+      border-left: 2px solid v.line(v.$line);
+    }
+  }
+
+  &__sublink {
+    @include m.focus-ring;
+    display: block;
+    padding: 0.6rem v.$space-4;
+    border-radius: 0 v.$radius-sm v.$radius-sm 0;
+    color: v.fg(v.$ink-soft);
+    font-size: v.$fs-sm;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+
+    &:hover {
+      background-color: v.$surface-alt;
+      color: v.fg(v.$navy-900);
+    }
+
+    &.is-active {
+      box-shadow: inset 2px 0 0 v.$orange-500;
+      color: v.fg(v.$navy-900);
+      font-weight: v.$fw-semibold;
+    }
+  }
+
+  &__foot {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-2;
+    padding: v.$space-4 v.$space-5;
+    // Clears the iPhone home indicator.
+    padding-bottom: calc(#{v.$space-4} + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid v.line(v.$line);
+    background-color: v.$surface-alt;
+
+    > a {
+      display: inline-flex;
+      align-items: center;
+      gap: v.$space-2;
+      color: v.fg(v.$ink-soft);
+      font-size: v.$fs-sm;
+      overflow-wrap: anywhere;
+
+      &:hover {
+        color: v.fg(v.$navy-900);
+      }
+    }
+  }
+
+  &__cta {
+    display: flex;
+    align-items: center;
+    gap: v.$space-3;
+    margin-bottom: v.$space-2;
+
+    .site-join {
+      flex: 1;
+    }
+  }
+
+  @include m.reduced-motion {
+    &,
+    &__backdrop,
+    &__panel,
+    &__nav > ul > li,
+    &__sub,
+    &__chevron,
+    &__close {
+      transition: none !important;
+    }
+  }
+}
+
+// Mobile: a category inside Products, opening to list its products.
+.mobile-menu__category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-2;
+  width: 100%;
+  border: none;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+
+  small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    margin-left: v.$space-1;
+    padding: 0 0.35rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$sky-100;
+    color: v.fg(v.$navy-600);
+    font-size: max(11px, 0.6875rem);
+    font-weight: v.$fw-semibold;
+  }
+
+  &.is-expanded {
+    color: v.fg(v.$navy-900);
+    font-weight: v.$fw-semibold;
+  }
+}
+
+.mobile-menu__sub--nested > ul {
+  margin-left: v.$space-4;
+  border-left-color: v.alpha(v.line(v.$orange-500), 0.45);
+}
+
+.mobile-menu__product {
+  font-size: v.$fs-sm;
+}
+
+// Smallest phones: slightly smaller round buttons so logo + WhatsApp + menu fit in 320px.
+.site-header__toggle,
+.site-header__actions .site-whatsapp {
+  @include m.tiny {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}

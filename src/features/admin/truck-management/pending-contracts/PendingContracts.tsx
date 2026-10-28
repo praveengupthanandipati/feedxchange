@@ -1,0 +1,464 @@
+import { useEffect, useMemo, useState } from "react";
+import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
+import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
+import {
+  useGetAllContractsQuery,
+  useGetAllContractsByFiltersQuery,
+} from "../../../../core/store/contractsApi";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  HouseIcon,
+  PlusIcon,
+  SearchIcon,
+  TruckIcon,
+  UserIcon,
+  XIcon,
+} from "../../../../shared/components/icon";
+import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
+import Table from "../../../../shared/components/table/Table";
+import type { TableColumn } from "../../../../shared/components/table/table.types";
+import TruckList from "../contract-trucks/TruckList";
+import { useContractTruckDetails } from "../contract-trucks/useContractTruckDetails";
+import { buildPendingContractColumns } from "./pendingContracts.columns";
+import { type PendingContractRow } from "./pendingContracts.data";
+import "./PendingContracts.scss";
+
+const PAGE_SIZE = 10;
+const ALL_OPTION = { value: "All", label: "All" };
+
+function getExportCellValue(row: PendingContractRow, column: TableColumn<PendingContractRow>): string {
+  if (column.exportValue) return column.exportValue(row);
+  const raw = (row as unknown as Record<string, unknown>)[column.key];
+  return raw === undefined || raw === null ? "" : String(raw);
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+const PendingContractsLoader = () => (
+  <div
+    className="pending-contracts-loader"
+    role="status"
+    aria-live="polite"
+    aria-label="Loading pending contracts"
+  >
+    <div className="pending-contracts-loader__spinner" />
+    <span>Loading pending contracts...</span>
+  </div>
+);
+
+interface TruckTrackingDrawerProps {
+  open: boolean;
+  row: PendingContractRow | null;
+  onClose: () => void;
+}
+
+const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) => {
+  const { trucks, isLoading: trucksLoading } = useContractTruckDetails(row?.id ?? "", open && Boolean(row));
+
+  useEffect(() => {
+    if (!open) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [open, onClose]);
+
+  return createPortal(
+    <>
+      <div className={`truck-tracking-drawer__backdrop ${open ? "is-open" : ""}`} onClick={onClose} />
+      <div
+        className={`truck-tracking-drawer ${open ? "is-open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="truck-tracking-drawer-title"
+      >
+        {row && (
+          <>
+            <div className="truck-tracking-drawer__header">
+              <h2 id="truck-tracking-drawer-title">
+                Contract Number: <strong>{row.id}</strong>
+              </h2>
+              <button
+                type="button"
+                className="truck-tracking-drawer__close"
+                onClick={onClose}
+                aria-label="Close"
+              >
+                <XIcon aria-hidden />
+              </button>
+            </div>
+
+            <div className="truck-tracking-drawer__body">
+              <div className="truck-tracking-drawer__parties">
+                <p>
+                  <HouseIcon aria-hidden /> Seller: <strong>{row.seller}</strong>
+                </p>
+                <p>
+                  <UserIcon aria-hidden /> Buyer: <strong>{row.buyer}</strong>
+                </p>
+              </div>
+
+              <div className="truck-tracking-drawer__section-header">
+                <h3>
+                  <TruckIcon aria-hidden /> Truck Tracking Details
+                </h3>
+                <Link
+                  to={`/admin/truck-management/assign-transports?contract=${encodeURIComponent(row.id)}`}
+                  className="truck-tracking-drawer__add-btn"
+                >
+                  <PlusIcon aria-hidden /> Add / View Trucks
+                </Link>
+              </div>
+
+              <div className="truck-tracking-drawer__stats">
+                <div className="truck-tracking-drawer__stat truck-tracking-drawer__stat--total">
+                  <span>Total Qty</span>
+                  <strong>{row.cQty}</strong>
+                </div>
+                <div className="truck-tracking-drawer__stat truck-tracking-drawer__stat--success">
+                  <span>Despatched</span>
+                  <strong>{row.dQty}</strong>
+                </div>
+                <div className="truck-tracking-drawer__stat truck-tracking-drawer__stat--info">
+                  <span>Arranged</span>
+                  <strong>{row.aQty}</strong>
+                </div>
+                <div className="truck-tracking-drawer__stat truck-tracking-drawer__stat--danger">
+                  <span>Pending</span>
+                  <strong>{row.pQty}</strong>
+                </div>
+              </div>
+
+              <TruckList trucks={trucks} isLoading={trucksLoading} />
+            </div>
+          </>
+        )}
+      </div>
+    </>,
+    document.body,
+  );
+};
+
+const PendingContracts = () => {
+  const [sellerFilter, setSellerFilter] = useState("All");
+  const [buyerFilter, setBuyerFilter] = useState("All");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [scheduleFilter, setScheduleFilter] = useState("All");
+  const [keyword, setKeyword] = useState("");
+  const [filtersVisible, setFiltersVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [truckDrawerOpen, setTruckDrawerOpen] = useState(false);
+  const [truckDrawerRow, setTruckDrawerRow] = useState<PendingContractRow | null>(null);
+
+  const searchKeyword = keyword.trim();
+
+  const {
+    data: pendingContractApiRows,
+    isLoading,
+    error,
+  } = useGetAllContractsByFiltersQuery({
+    Status: "Pending",
+  });
+  const { data: allContracts, isLoading: isLoadingAllContracts } = useGetAllContractsQuery();
+
+  const activeContractIds = useMemo(
+    () =>
+      new Set(
+        (allContracts?.contracts ?? [])
+          .filter((contract) => contract.isActive)
+          .map((contract) => contract.id),
+      ),
+    [allContracts],
+  );
+
+  const apiRows = useMemo(
+    () => (allContracts ? pendingContractApiRows ?? [] : []).filter((row) => activeContractIds.has(row.contractId)).map((row) => {
+      const quantity = Number(row.basicDetails?.quantity ?? 0);
+      const quantityMeasure = row.basicDetails?.quantityMeasure || "MT";
+      const contractRate = Number(row.basicDetails?.contractRate ?? 0);
+      const dateValue = row.contractDate ? new Date(row.contractDate).getTime() : 0;
+
+      return {
+        id: row.contractNumber || String(row.contractId),
+        contractId: row.contractId,
+        date: row.contractDate ? new Date(row.contractDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "",
+        dateValue,
+        seller: row.sellerName || "N/A",
+        buyer: row.buyerName || "N/A",
+        cRate: `₹${contractRate.toLocaleString("en-IN")}`,
+        cRateValue: contractRate,
+        cQty: `${quantity} ${quantityMeasure}`,
+        cQtyValue: quantity,
+        dQty: "0 MT",
+        dQtyValue: 0,
+        aQty: "0 MT",
+        aQtyValue: 0,
+        pQty: `${quantity} ${quantityMeasure}`,
+        pQtyValue: quantity,
+        product: row.productName || "N/A",
+        fromDate: row.basicDetails?.deliveryFromDate ? new Date(row.basicDetails.deliveryFromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "",
+        toDate: row.basicDetails?.deliveryToDate ? new Date(row.basicDetails.deliveryToDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "",
+        deliveryType: row.basicDetails?.deliveryType || "N/A",
+        deliverySchedule: row.basicDetails?.deliverySchedule || "N/A",
+        paymentType: "N/A",
+        trucks: [],
+      } as PendingContractRow;
+    }),
+    [pendingContractApiRows, allContracts, activeContractIds],
+  );
+
+  const sellerOptions = useMemo(
+    () => [{ value: "All", label: "All Sellers" }, ...Array.from(new Set(apiRows.map((row) => row.seller).filter(Boolean))).map((value) => ({ value, label: value }))],
+    [apiRows],
+  );
+
+  const buyerOptions = useMemo(
+    () => [{ value: "All", label: "All Buyers" }, ...Array.from(new Set(apiRows.map((row) => row.buyer).filter(Boolean))).map((value) => ({ value, label: value }))],
+    [apiRows],
+  );
+
+  useEffect(() => {
+  }, [pendingContractApiRows, isLoading, error]);
+
+  const deliveryScheduleOptions = useMemo(() => {
+    const schedules = Array.from(new Set(apiRows.map((row) => row.deliverySchedule))).filter(
+      (schedule) => schedule && schedule !== "N/A",
+    );
+    return [ALL_OPTION, ...schedules.map((schedule) => ({ value: schedule, label: schedule }))];
+  }, [apiRows]);
+
+  const handleOpenTruckDetails = (row: PendingContractRow) => {
+    setTruckDrawerRow(row);
+    setTruckDrawerOpen(true);
+  };
+
+  const pendingContractColumns = useMemo(
+    () => buildPendingContractColumns({ onOpenTruckDetails: handleOpenTruckDetails }),
+    [],
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sellerFilter, buyerFilter, dateFrom, dateTo, scheduleFilter, keyword]);
+
+  const filteredRows = useMemo(() => {
+    const q = searchKeyword.toLowerCase();
+
+    return apiRows.filter((row) => {
+      if (sellerFilter !== "All" && row.seller !== sellerFilter) return false;
+      if (buyerFilter !== "All" && row.buyer !== buyerFilter) return false;
+      if (scheduleFilter !== "All" && row.deliverySchedule !== scheduleFilter) return false;
+
+      if (dateFrom && row.dateValue < new Date(dateFrom).getTime()) return false;
+      if (dateTo && row.dateValue > new Date(dateTo).getTime() + 24 * 60 * 60 * 1000 - 1) return false;
+
+      if (q) {
+        const haystack = [row.id, row.seller, row.buyer, row.product].join(" ").toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+
+      return true;
+    });
+  }, [apiRows, sellerFilter, buyerFilter, scheduleFilter, dateFrom, dateTo, searchKeyword]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  const currentPageClamped = Math.min(currentPage, totalPages);
+  const pagedRows = filteredRows.slice(
+    (currentPageClamped - 1) * PAGE_SIZE,
+    currentPageClamped * PAGE_SIZE,
+  );
+
+  const handleClearFilters = () => {
+    setSellerFilter("All");
+    setBuyerFilter("All");
+    setDateFrom("");
+    setDateTo("");
+    setScheduleFilter("All");
+    setKeyword("");
+  };
+
+  const handleExportToExcel = () => {
+    const headerRow = pendingContractColumns
+      .map((column) => `<th>${escapeHtml(column.header)}</th>`)
+      .join("");
+    const bodyRows = filteredRows
+      .map((row) => {
+        const cells = pendingContractColumns
+          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
+          .join("");
+        return `<tr>${cells}</tr>`;
+      })
+      .join("");
+
+    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
+    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "pending-contracts.xls";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="pending-contracts-page">
+      <div className="pending-contracts-card">
+        <div className="pending-contracts-card__header">
+          <h1>Pending Contract Transport</h1>
+          <div className="pending-contracts-card__actions">
+            <button
+              type="button"
+              className="pending-contracts-btn pending-contracts-btn--info"
+              onClick={() => setFiltersVisible((prev) => !prev)}
+            >
+              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
+              {filtersVisible ? "Hide" : "Show"}
+            </button>
+            <button
+              type="button"
+              className="pending-contracts-btn pending-contracts-btn--warning"
+              onClick={handleExportToExcel}
+            >
+              <DownloadIcon aria-hidden /> Export
+            </button>
+          </div>
+        </div>
+
+        {filtersVisible && (
+          <div className="pending-contracts-filters">
+            <div className="pending-contracts-filters__row">
+              <SearchableSelect
+                options={sellerOptions}
+                value={sellerFilter}
+                onChange={setSellerFilter}
+                placeholder="Select Sellers"
+                ariaLabel="Select Sellers"
+              />
+              <SearchableSelect
+                options={buyerOptions}
+                value={buyerFilter}
+                onChange={setBuyerFilter}
+                placeholder="Select Buyers"
+                ariaLabel="Select Buyers"
+              />
+              <div className="pending-contracts-filters__date-range">
+                <span className="pending-contracts-filters__date-label">From</span>
+                <DatePickerInput
+                  value={dateFrom}
+                  onChange={(value) => setDateFrom(value)}
+                  ariaLabel="Contract date range from"
+                  clearable
+                />
+                <span className="pending-contracts-filters__date-label">To</span>
+                <DatePickerInput
+                  value={dateTo}
+                  onChange={(value) => setDateTo(value)}
+                  ariaLabel="Contract date range to"
+                  clearable
+                />
+              </div>
+              <SearchableSelect
+                options={deliveryScheduleOptions}
+                value={scheduleFilter}
+                onChange={setScheduleFilter}
+                placeholder="Delivery Schedule"
+                ariaLabel="Filter by delivery schedule"
+              />
+            </div>
+
+            <div className="pending-contracts-filters__search-row">
+              <div className="pending-contracts-filters__search">
+                <SearchIcon aria-hidden />
+                <input
+                  type="text"
+                  value={keyword}
+                  onChange={(event) => setKeyword(event.target.value)}
+                  placeholder="Search by Contract No, Seller, Buyer, Product Name"
+                />
+              </div>
+              <button
+                type="button"
+                className="pending-contracts-filters__clear"
+                onClick={handleClearFilters}
+                title="Clear filters"
+                aria-label="Clear filters"
+              >
+                <XIcon aria-hidden />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isLoading || isLoadingAllContracts ? (
+          <PendingContractsLoader />
+        ) : (
+          <Table
+            columns={pendingContractColumns}
+            data={pagedRows}
+            rowKey={(row) => row.id}
+            emptyMessage="No pending contracts match the current filters."
+            minHeight
+          />
+        )}
+
+        <div className="pending-contracts-pagination">
+          <p>
+            {filteredRows.length === 0
+              ? "Showing 0 Results"
+              : `Showing ${(currentPageClamped - 1) * PAGE_SIZE + 1}-${Math.min(
+                  currentPageClamped * PAGE_SIZE,
+                  filteredRows.length,
+                )} of ${filteredRows.length} Results`}
+          </p>
+          <div className="pending-contracts-pagination__controls">
+            <button
+              type="button"
+              disabled={currentPageClamped === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              aria-label="Previous page"
+            >
+              <ChevronLeftIcon aria-hidden />
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+              <button
+                key={page}
+                type="button"
+                className={page === currentPageClamped ? "is-active" : ""}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              type="button"
+              disabled={currentPageClamped === totalPages}
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+              aria-label="Next page"
+            >
+              <ChevronRightIcon aria-hidden />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <TruckTrackingDrawer
+        open={truckDrawerOpen}
+        row={truckDrawerRow}
+        onClose={() => setTruckDrawerOpen(false)}
+      />
+    </div>
+  );
+};
+
+export default PendingContracts;

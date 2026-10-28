@@ -1,0 +1,155 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeftIcon, LogOutIcon, XIcon } from "../../../shared/components/icon";
+import logo from "../../../shared/assets/img/logo.png";
+import favIcon from "../../../shared/assets/img/fav.png";
+import { asideNavSections } from "./aside.data";
+import { filterNavSections, withLocalChildren, withLocalSections } from "./filterNav";
+import { toNavSections } from "../../../core/auth/menu";
+import { useAuth } from "../../../core/auth/AuthContext";
+import AsideMenuItem from "./AsideMenuItem";
+import { useSelectedContract } from "../../../core/context/SelectedContractContext";
+import "./aside.scss";
+
+// The Contract Dispatch Management children all act on one specific contract.
+// Once a contract has been picked they carry it along automatically; before that
+// they still open, and each screen asks for a contract itself.
+// (the built-in menu calls it "contract-dispatch-management", the Pages table "pending-contracts")
+const CONTRACT_SCOPED_ITEM_IDS = ["contract-dispatch-management", "pending-contracts"];
+
+const SCROLL_INDICATOR_TIMEOUT = 800;
+
+interface AsideProps {
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
+}
+
+const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
+  const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [openItemId, setOpenItemId] = useState<string | null>(null);
+  const scrollTimer = useRef<number | undefined>(undefined);
+  const { selectedContract } = useSelectedContract();
+  const { can, logout, menu } = useAuth();
+
+  // the phone drawer closes with Escape, like every other dialog
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onCloseMobile?.();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [mobileOpen, onCloseMobile]);
+
+  useEffect(() => () => window.clearTimeout(scrollTimer.current), []);
+
+  const navSections = useMemo(
+    () =>
+      withLocalSections(menu ? withLocalChildren(toNavSections(menu), can) : filterNavSections(asideNavSections, can)).map((section) => ({
+        ...section,
+        items: section.items.map((item) => {
+          if (!CONTRACT_SCOPED_ITEM_IDS.includes(item.id) || !selectedContract) return item;
+
+          return {
+            ...item,
+            children: item.children?.map((child) => ({
+              ...child,
+              path: `${child.path}?contract=${encodeURIComponent(selectedContract)}`,
+            })),
+          };
+        }),
+      })),
+    [selectedContract, can, menu],
+  );
+
+  const handleItemToggle = (id: string) => {
+    setOpenItemId((prev) => (prev === id ? null : id));
+  };
+
+  const handleNavScroll = () => {
+    setIsScrolling(true);
+    window.clearTimeout(scrollTimer.current);
+    scrollTimer.current = window.setTimeout(
+      () => setIsScrolling(false),
+      SCROLL_INDICATOR_TIMEOUT,
+    );
+  };
+
+  return (
+    <aside
+      className={`aside ${collapsed ? "aside--collapsed" : ""} ${mobileOpen ? "aside--mobile-open" : ""}`}
+      // open on a phone it is a modal drawer (focus stays inside: shared/a11y/modalFocus.ts)
+      {...(mobileOpen ? { role: "dialog", "aria-modal": true, "aria-label": "Menu" } : {})}
+    >
+      <div className="aside__brand">
+        <img
+          src={collapsed ? favIcon : logo}
+          alt="feedXchange"
+          className={collapsed ? "aside__logo-icon" : "aside__logo"}
+        />
+        <button
+          type="button"
+          className="aside__toggle"
+          onClick={() => setCollapsed((prev) => !prev)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+        >
+          <ChevronLeftIcon className={collapsed ? "is-rotated" : ""} />
+        </button>
+        <button
+          type="button"
+          className="aside__mobile-close"
+          onClick={onCloseMobile}
+          aria-label="Close menu"
+        >
+          <XIcon aria-hidden />
+        </button>
+      </div>
+
+      <nav
+        className={`aside__nav ${isScrolling ? "is-scrolling" : ""}`}
+        onScroll={handleNavScroll}
+      >
+        {navSections.map((section) => (
+          <div key={section.id} className="aside__section">
+            {section.title && (
+              <p className="aside__section-title">{section.title}</p>
+            )}
+            <ul className="aside__list">
+              {section.items.map((item) => (
+                <AsideMenuItem
+                  key={item.id}
+                  item={item}
+                  collapsed={collapsed}
+                  isOpen={openItemId === item.id}
+                  onToggle={handleItemToggle}
+                  onNavigate={onCloseMobile}
+                />
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+
+      <div className="aside__footer">
+        <button
+          type="button"
+          className="aside__cta"
+          title="Logout"
+          onClick={() => {
+            onCloseMobile?.();
+            logout();
+            navigate("/", { replace: true });
+          }}
+        >
+          {!collapsed && <span>Logout</span>}
+          <LogOutIcon aria-hidden />
+        </button>
+      </div>
+    </aside>
+  );
+};
+
+export default Aside;

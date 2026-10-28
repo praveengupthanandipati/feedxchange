@@ -1,0 +1,358 @@
+@use "../../../shared/assets/styles/variables" as v;
+@use "../../../shared/assets/styles/mixins" as m;
+
+.contracts-page {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  padding-bottom: v.$spacing-6;
+
+  &__summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: v.$spacing-3;
+    width: 100%;
+    max-width: 52rem;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$spacing-4;
+    }
+
+    @include m.respond-to(md) {
+      gap: v.$spacing-6;
+    }
+  }
+}
+
+.contracts-summary {
+  @include m.flex(row, space-between, center);
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 3.25rem;
+  gap: v.$spacing-2;
+  padding: 0.5rem 0.75rem;
+  border-radius: v.$radius-lg;
+  color: v.fg(v.$color-white);
+
+  @include m.respond-to(md) {
+    padding: 0.875rem 1.25rem;
+  }
+
+  span {
+    @include m.font-heading(v.$font-weight-semibold);
+    font-size: max(11px, 0.75rem);
+    min-width: 0;
+
+    @include m.respond-to(md) {
+      font-size: v.$font-size-base;
+    }
+  }
+
+  strong {
+    @include m.font-heading(v.$font-weight-bold);
+    font-size: v.$font-size-base;
+    white-space: nowrap;
+
+    @include m.respond-to(md) {
+      font-size: v.$font-size-xl;
+    }
+  }
+
+  &--primary {
+    background: linear-gradient(135deg, v.$color-navy 0%, v.$color-navy-dark 100%);
+  }
+
+  &--success {
+    background: linear-gradient(135deg, v.$color-success 0%, var(--fx-green-30) 100%);
+  }
+}
+
+.contracts-card {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__header {
+    @include m.flex(row, space-between, flex-start);
+    flex-wrap: wrap;
+    gap: v.$spacing-3;
+
+    h2 {
+      font-size: v.$font-size-lg;
+      margin: 0;
+    }
+
+    p {
+      color: v.fg(v.$color-text-muted);
+      font-size: v.$font-size-sm;
+      margin: v.$spacing-1 0 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-2;
+    flex-wrap: wrap;
+  }
+}
+
+.contracts-loader {
+  @include m.flex(column, center, center);
+  min-height: 18rem;
+  gap: v.$spacing-3;
+  color: v.fg(v.$color-text-muted);
+  font-size: v.$font-size-sm;
+
+  &__spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid v.line(v.$color-border);
+    border-top-color: v.line(v.$color-navy);
+    border-radius: 50%;
+    animation: contracts-loader-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes contracts-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.contracts-btn {
+  @include m.flex(row, center, center, v.$spacing-2);
+  @include m.font-base(v.$font-weight-semibold);
+  @include m.focus-ring(v.$color-orange);
+  height: var(--fx-control-height);
+  padding: 0 v.$spacing-4;
+  border: none;
+  border-radius: v.$radius-md;
+  font-size: v.$font-size-sm;
+  cursor: pointer;
+  transition: background-color v.$transition-fast, filter v.$transition-fast;
+
+  &--outline {
+    background-color: v.$color-white;
+    color: v.fg(v.$color-primary);
+    border: 1px solid v.line(v.$color-border);
+
+    &:hover {
+      background-color: v.$color-gray-50;
+    }
+  }
+
+  &--warning {
+    background-color: v.$color-orange;
+    color: v.on(v.$color-navy-dark);
+
+    &:hover {
+      background-color: v.$color-orange-dark;
+    }
+  }
+
+  &--primary {
+    background-color: v.$color-navy;
+    color: v.on(v.$color-white);
+
+    &:hover {
+      background-color: v.$color-navy-dark;
+    }
+  }
+}
+
+.contracts-filters {
+  @include m.flex(row, flex-start, center, v.$spacing-3);
+  flex-wrap: wrap;
+  padding: v.$spacing-4;
+  background-color: v.$color-bg-muted;
+  border-radius: v.$radius-md;
+
+  &__search {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex: 1 1 18rem;
+    height: var(--fx-control-height);
+    padding: 0 v.$spacing-3;
+    border: 1px solid var(--fx-field-border);
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text-muted);
+
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: v.$font-size-sm;
+      color: v.fg(v.$color-text);
+
+      &::placeholder {
+        color: v.fg(v.$color-gray-400);
+      }
+    }
+  }
+
+  &__date-range {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    font-size: v.$font-size-sm;
+    color: v.fg(v.$color-text-muted);
+
+    input {
+      height: var(--fx-control-height);
+      padding: 0 v.$spacing-2;
+      border: 1px solid var(--fx-field-border);
+      border-radius: v.$radius-md;
+      font-size: v.$font-size-sm;
+      color: v.fg(v.$color-text);
+    }
+  }
+
+  &__clear {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
+    border: none;
+    border-radius: v.$radius-pill;
+    background-color: v.alpha(v.$color-danger, 0.1);
+    color: v.fg(v.$color-danger);
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.alpha(v.$color-danger, 0.18);
+    }
+  }
+}
+
+.contracts-pagination {
+  @include m.flex(row, space-between, center);
+  flex-wrap: wrap;
+  gap: v.$spacing-3;
+
+  p {
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    margin: 0;
+  }
+
+  &__controls {
+    display: flex;
+    gap: v.$spacing-1;
+
+    button {
+      @include m.flex-center;
+      @include m.focus-ring(v.$color-orange);
+      min-width: 2.25rem;
+      height: 2.25rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.line(v.$color-border);
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.fg(v.$color-text);
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+      transition: background-color v.$transition-fast, color v.$transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-gray-100;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.is-active {
+        background-color: v.$color-primary;
+        border-color: v.line(v.$color-primary);
+        color: v.on(v.$color-white);
+      }
+    }
+  }
+}
+
+// ============================================================
+// Contract-specific table cells
+// ============================================================
+.contracts-table {
+  &__id {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    font-weight: v.$font-weight-semibold;
+    color: v.fg(v.$color-primary);
+  }
+
+  &__id-link {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      color: v.fg(v.$color-primary-dark);
+      text-decoration: underline;
+    }
+  }
+
+  &__copy {
+    @include m.flex-center;
+    border: none;
+    background: transparent;
+    color: v.fg(v.$color-text-muted);
+    cursor: pointer;
+    padding: 0.15rem;
+
+    &:hover {
+      color: v.fg(v.$color-primary);
+    }
+  }
+
+  &__name {
+    display: inline-flex;
+    align-items: center;
+    max-width: 12rem;
+  }
+
+  &__name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: v.fg(v.$color-primary);
+    text-decoration: underline;
+    text-decoration-color: v.alpha(v.fg(v.$color-primary), 0.35);
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: v.$radius-pill;
+    font-size: max(11px, 0.7rem);
+    font-weight: v.$font-weight-semibold;
+
+    &--pending {
+      background-color: v.alpha(v.$color-warning, 0.15);
+      color: v.fg(v.$color-orange-dark);
+    }
+
+    &--in-transit {
+      background-color: v.alpha(v.$color-info, 0.15);
+      color: v.fg(v.$color-info);
+    }
+
+    &--open {
+      background-color: v.alpha(v.$color-success, 0.15);
+      color: v.fg(v.$color-success);
+    }
+
+    &--rejected {
+      background-color: v.alpha(v.$color-danger, 0.15);
+      color: v.fg(v.$color-danger);
+    }
+  }
+}

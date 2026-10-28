@@ -1,0 +1,24 @@
+import { CirclePlusIcon, SearchIcon } from "../../../../../shared/components/icon";
+
+interface BannersHeaderProps {
+  search: string;
+  onSearchChange: (value: string) => void;
+  onNew: () => void;
+}
+
+const BannersHeader = ({ search, onSearchChange, onNew }: BannersHeaderProps) => (
+  <>
+    <div className="banners__header">
+      <h1>Banners</h1>
+      <button type="button" className="banners__btn banners__btn--navy" onClick={onNew}>
+        <CirclePlusIcon aria-hidden /> New
+      </button>
+    </div>
+    <div className="banners__search">
+      <SearchIcon aria-hidden />
+      <input type="search" placeholder="Search banners..." aria-label="Search banners" value={search} onChange={(event) => onSearchChange(event.target.value)} />
+    </div>
+  </>
+);
+
+export default BannersHeader;

@@ -1,0 +1,114 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+.confirm-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: v.$z-index-modal-top;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-4;
+}
+
+.confirm-dialog {
+  @include m.card(v.$spacing-6);
+  position: relative;
+  z-index: v.$z-index-modal-top;
+  width: 100%;
+  max-width: 24rem;
+  text-align: center;
+
+  &__icon {
+    @include m.flex-center;
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto v.$spacing-4;
+    border-radius: v.$radius-pill;
+    background-color: v.alpha(v.$color-danger, 0.12);
+    color: v.fg(v.$color-danger);
+    font-size: 1.5rem;
+  }
+
+  &__title {
+    font-size: v.$font-size-lg;
+    margin: 0 0 v.$spacing-2;
+  }
+
+  &__message {
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    margin: 0 0 v.$spacing-5;
+  }
+
+  &__reason {
+    text-align: left;
+    margin: 0 0 v.$spacing-5;
+
+    label {
+      display: block;
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-medium;
+      margin-bottom: v.$spacing-2;
+    }
+
+    textarea {
+      @include m.font-base;
+      width: 100%;
+      padding: v.$spacing-2 v.$spacing-3;
+      border: 1px solid var(--fx-field-border);
+      border-radius: v.$radius-md;
+      font-size: v.$font-size-sm;
+      resize: vertical;
+
+      &:focus {
+        outline: none;
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
+      }
+    }
+  }
+
+  &__actions {
+    @include m.flex(row, center, center, v.$spacing-3);
+  }
+
+  &__cancel,
+  &__confirm {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex: 1;
+    height: var(--fx-control-height);
+    border: none;
+    border-radius: v.$radius-md;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__cancel {
+    background-color: v.$color-white;
+    color: v.fg(v.$color-text);
+    border: 1px solid v.line(v.$color-border);
+
+    &:hover {
+      background-color: v.$color-gray-50;
+    }
+  }
+
+  &__confirm {
+    background-color: v.$color-danger;
+    color: v.on(v.$color-white);
+
+    &:hover {
+      background-color: v.shade(v.$color-danger, 8%);
+    }
+  }
+}

@@ -1,0 +1,125 @@
+@use "../../../../../shared/assets/styles/variables" as v;
+@use "../../../../../shared/assets/styles/mixins" as m;
+
+.details-tab {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+
+  &__search {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    width: 100%;
+    max-width: 20rem;
+    height: var(--fx-control-height);
+    padding: 0 v.$spacing-3;
+    border: 1px solid var(--fx-field-border);
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text-muted);
+
+    &:focus-within {
+      border-color: var(--fx-field-border-focus);
+      box-shadow: var(--fx-field-focus-glow);
+    }
+
+    input {
+      @include m.font-base;
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: v.fg(v.$color-text);
+      font-size: v.$font-size-sm;
+
+      &::placeholder {
+        color: v.fg(v.$color-gray-400);
+      }
+    }
+
+    @include m.respond-below(sm) {
+      max-width: 100%;
+    }
+  }
+
+  &__pagination {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+
+    p {
+      color: v.fg(v.$color-text-muted);
+      font-size: v.$font-size-sm;
+      margin: 0;
+    }
+
+    &-controls {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      flex-wrap: wrap;
+
+      button {
+        @include m.flex-center;
+        @include m.focus-ring(v.$color-orange);
+        min-width: 2rem;
+        height: 2rem;
+        padding: 0 v.$spacing-2;
+        border: 1px solid v.line(v.$color-border);
+        border-radius: v.$radius-md;
+        background-color: v.$color-bg;
+        color: v.fg(v.$color-text);
+        font-size: v.$font-size-sm;
+        cursor: pointer;
+        transition: background-color v.$transition-fast, color v.$transition-fast;
+
+        &:hover:not(:disabled) {
+          background-color: v.$color-bg-muted;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        &.is-active {
+          background-color: v.$color-primary;
+          border-color: v.line(v.$color-primary);
+          color: v.on(v.$color-white);
+        }
+      }
+    }
+  }
+}
+
+// ============================================================
+// Table cells
+// ============================================================
+.details-tab-table {
+  &__invoice-num {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    color: v.fg(v.$color-primary);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__view-btn {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    background-color: v.$color-info;
+    color: v.on(v.$color-white);
+    font-size: max(11px, 0.75rem);
+    cursor: pointer;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: var(--fx-sky-40);
+    }
+  }
+
+  &__overdue {
+    color: v.fg(v.$color-danger);
+    font-weight: v.$font-weight-semibold;
+  }
+}

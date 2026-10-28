@@ -1,0 +1,156 @@
+@use "variables" as v;
+@use "mixins" as m;
+
+// Scoped reset (loaded inside .fx-site).
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  color: v.fg(v.$ink);
+  font-family: v.$font-heading;
+  font-weight: v.$fw-bold;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    color: inherit;
+  }
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background-color: v.alpha(v.$orange-500, 0.35);
+}
+
+// ---------- Layout helpers ----------
+.site-main {
+  flex: 1 0 auto;
+}
+
+// Named site-container so it never collides with Bootstrap's .container.
+.site-container {
+  @include m.container;
+}
+
+// Every section has a soft gradient background; the solid colour underneath is the fallback.
+.section {
+  // 48px on phones → 64px on tablets → 96px on laptops.
+  padding: v.$space-7 0;
+  background-color: v.$white;
+  background-image: v.$gradient-light;
+
+  @include m.up(md) {
+    padding: v.$space-8 0;
+  }
+
+  @include m.up(lg) {
+    padding: v.$space-9 0;
+  }
+
+  &--alt {
+    background-color: v.$surface-alt;
+    background-image: v.$gradient-alt;
+  }
+
+  &--dark {
+    background-color: v.$navy-900;
+    background-image: v.$gradient-dark;
+    color: v.alpha(v.on(v.$white), 0.85);
+
+    h2,
+    h3 {
+      color: v.fg(v.$white);
+    }
+  }
+}
+
+.section-head {
+  max-width: 40rem;
+  margin: 0 auto v.$space-6;
+  text-align: center;
+
+  @include m.up(md) {
+    margin-bottom: v.$space-7;
+  }
+
+  h2 {
+    @include m.fluid-type(1.75rem, 2.5rem);
+  }
+
+  p {
+    margin-top: v.$space-3;
+    color: v.fg(v.$ink-soft);
+    font-size: v.$fs-lg;
+  }
+
+  &--left {
+    margin-left: 0;
+    text-align: left;
+  }
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  margin-bottom: v.$space-3;
+  color: v.fg(v.$orange-600);
+  font-size: v.$fs-xs;
+  font-weight: v.$fw-semibold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  &::before {
+    content: "";
+    width: 1.5rem;
+    height: 2px;
+    border-radius: 2px;
+    background-color: currentColor;
+  }
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: v.$space-4;
+  z-index: 100;
+  padding: v.$space-2 v.$space-4;
+  border-radius: v.$radius-sm;
+  background-color: v.$navy-900;
+  color: v.on(v.$white);
+
+  &:focus {
+    top: v.$space-4;
+  }
+}
