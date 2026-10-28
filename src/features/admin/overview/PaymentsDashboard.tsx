@@ -17,6 +17,7 @@ import { useAuth } from "../../../core/auth/AuthContext";
 import { useLazyGetInvoicesQuery, type Invoice } from "../../../core/store/sellerInvoiceApi";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
+import InfoPanel from "../truck-management/open-pending-contracts/contract-trucks/InfoPanel";
 import "./PaymentsDashboard.scss";
 
 interface DashboardEntry {
@@ -209,6 +210,14 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
               </button>
             )}
           </div>
+          {!contractFilter ? (
+            <InfoPanel
+              icon={FileTextIcon}
+              title="No Contract Selected"
+              description="Select a contract from the Contract filter above to see its payment summary and charts."
+            />
+          ) : (
+          <>
           <div className="payments-dashboard__grid">
             {metrics.map(({ label, value, icon: Icon, color }) => (
               <Link className={`payments-dashboard__card ${color}`} to="/admin/payments/seller-invoice" key={label}>
@@ -270,6 +279,8 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
                 )}
               </section>
             </div>
+          )}
+          </>
           )}
         </>
       )}

@@ -1,210 +1,230 @@
-import { useEffect, useMemo, useState } from "react";
-import { DownloadIcon, EyeIcon, EyeOffIcon } from "../../../../../shared/components/icon";
-import Table from "../../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../../shared/components/table/table.types";
-import Pagination from "../promoterslist/Pagination";
-import { buildPromoterDashboardColumns } from "./promoterDashboard.columns";
-import { promoterContracts, type PromoterContractRow } from "./promoterDashboard.data";
-import "../promoterslist/Promoters.scss";
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  ActivityIcon,
+  ArrowUpRightIcon,
+  TagIcon,
+  UserPlusIcon,
+  UsersIcon,
+} from "../../../../../shared/components/icon";
+import { useAuth } from "../../../../../core/auth/AuthContext";
+import { useGetPromoterProfileSummaryQuery } from "../../../../../core/store/promotersApi";
 import "./PromoterDashboard.scss";
 
-const PAGE_SIZE = 10;
-
-const formatINR = (value: number) => `₹${value.toLocaleString("en-IN")}`;
-
-function getExportCellValue(row: PromoterContractRow, column: TableColumn<PromoterContractRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
+const CHART_COLORS = ["var(--fx-chart-1)", "var(--fx-chart-2)", "var(--fx-chart-3)", "var(--fx-chart-4)", "var(--fx-chart-5)"];
 
 const PromoterDashboard = () => {
-  const [rows] = useState<PromoterContractRow[]>(promoterContracts);
-  const [filtersVisible, setFiltersVisible] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  const { can } = useAuth();
+  const canViewPromoters = can("profiles.promoter.view", "profiles.promoter.manage");
+  const canViewReferrals = can("profiles.referred");
+  const canViewPromoCodes = can("promocodes.view");
+  const {
+    data: promoters,
+    isFetching,
+    isError,
+  } = useGetPromoterProfileSummaryQuery(undefined, {
+    skip: !canViewPromoters,
+    refetchOnMountOrArgChange: true,
+  });
 
-  const [contractNumberInput, setContractNumberInput] = useState("");
-  const [sellerInput, setSellerInput] = useState("");
-  const [buyerInput, setBuyerInput] = useState("");
-  const [commissionInput, setCommissionInput] = useState("");
+  const summary = useMemo(() => {
+    const profiles = promoters ?? [];
+    return {
+      profiles,
+      activePromoters: profiles.filter((promoter) => promoter.status === "Active").length,
+      totalReferrals: profiles.reduce((total, promoter) => total + promoter.totalReferrals, 0),
+      activeReferrals: profiles.reduce((total, promoter) => total + promoter.totalActiveReferrals, 0),
+      topPromoters: [...profiles]
+        .sort((a, b) => b.totalReferrals - a.totalReferrals)
+        .slice(0, 5)
+        .map((promoter) => ({
+          name: promoter.tradingName || promoter.legalName,
+          referrals: promoter.totalReferrals,
+        })),
+      promoterStatuses: Array.from(
+        profiles.reduce((statuses, promoter) => {
+          statuses.set(promoter.status, (statuses.get(promoter.status) ?? 0) + 1);
+          return statuses;
+        }, new Map<string, number>()),
+        ([status, count]) => ({ status, count }),
+      ),
+    };
+  }, [promoters]);
 
-  const [contractNumberFilter, setContractNumberFilter] = useState("");
-  const [sellerFilter, setSellerFilter] = useState("");
-  const [buyerFilter, setBuyerFilter] = useState("");
-  const [commissionFilter, setCommissionFilter] = useState("");
-
-  const columns = useMemo(() => buildPromoterDashboardColumns(), []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [contractNumberFilter, sellerFilter, buyerFilter, commissionFilter]);
-
-  const filteredRows = useMemo(() => {
-    const contractNumberQ = contractNumberFilter.trim().toLowerCase();
-    const sellerQ = sellerFilter.trim().toLowerCase();
-    const buyerQ = buyerFilter.trim().toLowerCase();
-    const commissionQ = commissionFilter.trim();
-
-    return rows.filter((row) => {
-      if (contractNumberQ && !row.contractNumber.toLowerCase().includes(contractNumberQ)) return false;
-      if (sellerQ && !row.seller.toLowerCase().includes(sellerQ)) return false;
-      if (buyerQ && !row.buyer.toLowerCase().includes(buyerQ)) return false;
-      if (commissionQ && String(row.commissionPercent) !== commissionQ) return false;
-      return true;
-    });
-  }, [rows, contractNumberFilter, sellerFilter, buyerFilter, commissionFilter]);
-
-  const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
-  const currentPageClamped = Math.min(currentPage, Math.max(totalPages, 1));
-  const pagedRows = filteredRows.slice(
-    (currentPageClamped - 1) * PAGE_SIZE,
-    currentPageClamped * PAGE_SIZE,
-  );
-
-  const totalContracts = rows.length;
-  const totalAmount = rows.reduce((sum, row) => sum + row.totalAmount, 0);
-  const totalCommissionAmount = rows.reduce((sum, row) => sum + row.commissionAmount, 0);
-
-  const handleApply = () => {
-    setContractNumberFilter(contractNumberInput);
-    setSellerFilter(sellerInput);
-    setBuyerFilter(buyerInput);
-    setCommissionFilter(commissionInput);
+  const value = (count: number) => {
+    if (isFetching) return "…";
+    if (isError) return "—";
+    return count.toLocaleString("en-IN");
   };
 
-  const handleReset = () => {
-    setContractNumberInput("");
-    setSellerInput("");
-    setBuyerInput("");
-    setCommissionInput("");
-    setContractNumberFilter("");
-    setSellerFilter("");
-    setBuyerFilter("");
-    setCommissionFilter("");
-  };
+  const quickLinks = [
+    ...(canViewPromoters ? [{ label: "Promoter profiles", path: "/admin/promoters", icon: UsersIcon }] : []),
+    ...(canViewReferrals ? [{ label: "Referred profiles", path: "/admin/referred-profiles", icon: UserPlusIcon }] : []),
+    ...(canViewPromoCodes ? [{ label: "Promocodes", path: "/admin/promocodes", icon: TagIcon }] : []),
+  ];
 
-  const handleExport = () => {
-    const headerRow = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = columns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "promoter-dashboard.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
+  if (!canViewPromoters && quickLinks.length === 0) {
+    return (
+      <section className="promoter-overview">
+        <div className="promoter-overview__intro">
+          <p className="promoter-overview__eyebrow">PROMOTER OVERVIEW</p>
+          <h1 className="promoter-overview__heading">Promoter performance</h1>
+          <p className="promoter-overview__description">No promoter dashboard data or actions are available for your role.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <div className="promoter-dashboard">
-      <div className="promoter-dashboard__header">
-        <h1>Promoter Dashboard</h1>
-        <div className="promoter-dashboard__actions">
-          <button
-            type="button"
-            className="promoter-dashboard-btn promoter-dashboard-btn--info"
-            onClick={() => setFiltersVisible((prev) => !prev)}
-          >
-            {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
-            {filtersVisible ? "Hide" : "Show"}
-          </button>
-          <button
-            type="button"
-            className="promoter-dashboard-btn promoter-dashboard-btn--warning"
-            onClick={handleExport}
-          >
-            <DownloadIcon aria-hidden /> Export
-          </button>
+    <section className="promoter-overview" aria-label="Promoter dashboard">
+      <div className="promoter-overview__intro">
+        <div>
+          <p className="promoter-overview__eyebrow">PROMOTER OVERVIEW</p>
+          <h1 className="promoter-overview__heading">Promoter performance</h1>
+          <p className="promoter-overview__description">
+            Referral activity and promoter profile totals at a glance.
+          </p>
         </div>
       </div>
 
-      <div className="promoter-dashboard__summary">
-        <div className="promoter-summary promoter-summary--primary">
-          <span>Total Contracts</span>
-          <strong>{totalContracts}</strong>
-        </div>
-        <div className="promoter-summary promoter-summary--info">
-          <span>Total Amount</span>
-          <strong>{formatINR(totalAmount)}</strong>
-        </div>
-        <div className="promoter-summary promoter-summary--warning">
-          <span>Commission Amount</span>
-          <strong>{formatINR(totalCommissionAmount)}</strong>
-        </div>
-      </div>
-
-      <div className="promoter-dashboard__card">
-        {filtersVisible && (
-          <div className="promoter-dashboard__filters">
-            <input
-              type="text"
-              value={contractNumberInput}
-              onChange={(event) => setContractNumberInput(event.target.value)}
-              placeholder="Contract Number"
-              aria-label="Filter by contract number"
-            />
-            <input
-              type="text"
-              value={sellerInput}
-              onChange={(event) => setSellerInput(event.target.value)}
-              placeholder="Seller"
-              aria-label="Filter by seller"
-            />
-            <input
-              type="text"
-              value={buyerInput}
-              onChange={(event) => setBuyerInput(event.target.value)}
-              placeholder="Buyer"
-              aria-label="Filter by buyer"
-            />
-            <input
-              type="text"
-              value={commissionInput}
-              onChange={(event) => setCommissionInput(event.target.value)}
-              placeholder="Commission %"
-              aria-label="Filter by commission percent"
-            />
-            <button type="button" className="promoter-dashboard__apply" onClick={handleApply}>
-              Apply
-            </button>
-            <button type="button" className="promoter-dashboard__reset" onClick={handleReset}>
-              Reset
-            </button>
+      {canViewPromoters && (
+        <>
+          {isError && (
+            <p className="promoter-overview__message promoter-overview__message--error" role="alert">
+              Could not load promoter dashboard data. Please try again later.
+            </p>
+          )}
+          <div className="promoter-overview__grid">
+            <Link to="/admin/promoters" className="promoter-overview__card promoter-overview__card--navy">
+              <span className="promoter-overview__icon"><UsersIcon aria-hidden /></span>
+              <span className="promoter-overview__content">
+                <span className="promoter-overview__label">Promoter Profiles</span>
+                <strong className="promoter-overview__value">{value(summary.profiles.length)}</strong>
+              </span>
+            </Link>
+            <Link to="/admin/promoters" className="promoter-overview__card promoter-overview__card--blue">
+              <span className="promoter-overview__icon"><ActivityIcon aria-hidden /></span>
+              <span className="promoter-overview__content">
+                <span className="promoter-overview__label">Active Promoters</span>
+                <strong className="promoter-overview__value">{value(summary.activePromoters)}</strong>
+              </span>
+            </Link>
+            <Link to={canViewReferrals ? "/admin/referred-profiles" : "/admin/promoters"} className="promoter-overview__card promoter-overview__card--green">
+              <span className="promoter-overview__icon"><UserPlusIcon aria-hidden /></span>
+              <span className="promoter-overview__content">
+                <span className="promoter-overview__label">Total Referrals</span>
+                <strong className="promoter-overview__value">{value(summary.totalReferrals)}</strong>
+              </span>
+            </Link>
+            <Link to={canViewReferrals ? "/admin/referred-profiles" : "/admin/promoters"} className="promoter-overview__card promoter-overview__card--orange">
+              <span className="promoter-overview__icon"><UserPlusIcon aria-hidden /></span>
+              <span className="promoter-overview__content">
+                <span className="promoter-overview__label">Active Referrals</span>
+                <strong className="promoter-overview__value">{value(summary.activeReferrals)}</strong>
+              </span>
+            </Link>
           </div>
-        )}
 
-        <Table
-          columns={columns}
-          data={pagedRows}
-          rowKey={(row) => row.id}
-          emptyMessage="No contracts match the current filters."
-          minHeight
-        />
+          <div className="promoter-overview__lower">
+            <section className="promoter-overview__panel">
+              <div className="promoter-overview__panel-heading">
+                <span className="promoter-overview__panel-icon"><ActivityIcon aria-hidden /></span>
+                <div>
+                  <h2>Referral analytics</h2>
+                  <p>Top promoters by total referrals and profile status</p>
+                </div>
+              </div>
+              {isFetching ? (
+                <p className="promoter-overview__muted" role="status">Loading promoter analytics…</p>
+              ) : isError ? (
+                <p className="promoter-overview__muted">Referral analytics are unavailable because promoter data could not be loaded.</p>
+              ) : summary.profiles.length === 0 ? (
+                <p className="promoter-overview__muted">No promoter profiles found.</p>
+              ) : (
+                <div className="promoter-overview__charts">
+                  <div className="promoter-overview__chart">
+                    <h3>Top promoters by referrals</h3>
+                    <ResponsiveContainer width="100%" height={240} minWidth={0}>
+                      <BarChart data={summary.topPromoters} margin={{ top: 8, right: 8, left: -20, bottom: 8 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} />
+                        <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+                        <Tooltip />
+                        <Bar dataKey="referrals" name="Referrals" fill="var(--fx-chart-1)" radius={[5, 5, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="promoter-overview__chart">
+                    <h3>Promoter profile status</h3>
+                    <ResponsiveContainer width="100%" height={240} minWidth={0}>
+                      <PieChart>
+                        <Pie
+                          data={summary.promoterStatuses}
+                          dataKey="count"
+                          nameKey="status"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius="72%"
+                        >
+                          {summary.promoterStatuses.map((entry, index) => (
+                            <Cell key={entry.status} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+            </section>
 
-        <Pagination
-          currentPage={currentPageClamped}
-          totalPages={totalPages}
-          totalResults={filteredRows.length}
-          pageSize={PAGE_SIZE}
-          onPageChange={setCurrentPage}
-        />
-      </div>
-    </div>
+            {quickLinks.length > 0 && (
+              <section className="promoter-overview__panel promoter-overview__panel--links">
+                <h2>Quick access</h2>
+                <p>Open a promoter management area</p>
+                <div className="promoter-overview__links">
+                  {quickLinks.map(({ label, path, icon: Icon }) => (
+                    <Link to={path} key={path} className="promoter-overview__quick-link">
+                      <span><Icon aria-hidden />{label}</span>
+                      <ArrowUpRightIcon aria-hidden />
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        </>
+      )}
+
+      {!canViewPromoters && quickLinks.length > 0 && (
+        <section className="promoter-overview__panel promoter-overview__panel--links">
+          <h2>Quick access</h2>
+          <p>Open an area available to your role</p>
+          <div className="promoter-overview__links">
+            {quickLinks.map(({ label, path, icon: Icon }) => (
+              <Link to={path} key={path} className="promoter-overview__quick-link">
+                <span><Icon aria-hidden />{label}</span>
+                <ArrowUpRightIcon aria-hidden />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+    </section>
   );
 };
 

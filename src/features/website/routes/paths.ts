@@ -7,6 +7,8 @@ export const sitePaths = {
   blogs: "/blogs",
   contact: "/contact",
   join: "/join",
+  privacy: "/privacy",
+  terms: "/terms",
 } as const;
 
 /** One product's page, e.g. /products/maize-ddgs. */

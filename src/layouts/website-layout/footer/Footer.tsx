@@ -1,7 +1,14 @@
 import { useState, type SubmitEvent } from "react";
-import { ClockIcon, MailIcon, MapPinIcon, PhoneIcon, SendIcon } from "../../../shared/components/icon";
+import {
+  ClockIcon,
+  MailIcon,
+  MapPinIcon,
+  PhoneIcon,
+  SendIcon,
+} from "../../../shared/components/icon";
 import { Link } from "react-router-dom";
 import { company, footerColumns, socialLinks } from "../../../features/website/data/content";
+import { sitePaths } from "../../../features/website/routes/paths";
 import Logo from "../../../features/website/components/common/Logo";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -105,10 +112,10 @@ const Footer = () => {
           </p>
           <ul>
             <li>
-              <a href="#privacy">Privacy Policy</a>
+              <Link to={sitePaths.privacy}>Privacy Policy</Link>
             </li>
             <li>
-              <a href="#terms">Terms of Service</a>
+              <Link to={sitePaths.terms}>Terms &amp; Conditions</Link>
             </li>
           </ul>
         </div>

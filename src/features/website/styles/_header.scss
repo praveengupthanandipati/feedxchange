@@ -465,6 +465,191 @@ $drawer-width: 22rem;
   }
 }
 
+// Two-pane products menu: categories | products of the chosen category.
+.nav-mega {
+  width: 40rem;
+
+  &__body {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: v.$space-3;
+    min-height: 16rem;
+  }
+
+  &__categories {
+    @include m.reset-list;
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-1;
+    padding-right: v.$space-3;
+    border-right: 1px solid v.line(v.$line);
+  }
+
+  &__category {
+    @include m.focus-ring;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-2;
+    width: 100%;
+    padding: v.$space-3;
+    border: none;
+    border-radius: v.$radius-md;
+    background: none;
+    color: v.fg(v.$ink);
+    text-align: left;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    strong {
+      display: block;
+      font-size: v.$fs-sm;
+      font-weight: v.$fw-semibold;
+    }
+
+    small {
+      display: block;
+      margin-top: 0.1rem;
+      color: v.fg(v.$ink-muted);
+      font-size: v.$fs-xs;
+    }
+
+    svg {
+      flex-shrink: 0;
+      color: v.fg(v.$ink-muted);
+      transition: transform 0.25s v.$ease;
+    }
+
+    &:hover {
+      background-color: v.$sky-50;
+    }
+
+    &.is-active {
+      background: linear-gradient(135deg, v.$navy-700, v.$navy-900);
+      color: v.on(v.$white);
+
+      small {
+        color: v.alpha(v.on(v.$white), 0.7);
+      }
+
+      svg {
+        color: v.fg(v.$orange-500);
+        transform: translateX(3px);
+      }
+    }
+  }
+
+  &__products {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: v.$space-2 v.$space-1;
+
+    ul {
+      @include m.reset-list;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: v.$space-1;
+      animation: nav-mega-in 0.25s v.$ease;
+    }
+  }
+
+  &__title {
+    margin: 0 0 v.$space-2;
+    padding: 0 v.$space-3;
+    color: v.fg(v.$orange-600);
+    font-size: v.$fs-xs;
+    font-weight: v.$fw-semibold;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  &__product {
+    @include m.focus-ring;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-2;
+    padding: 0.6rem v.$space-3;
+    border-radius: v.$radius-sm;
+    color: v.fg(v.$navy-900);
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-medium;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    svg {
+      flex-shrink: 0;
+      color: v.fg(v.$orange-600);
+      opacity: 0;
+      transform: translateX(-4px);
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s v.$ease;
+    }
+
+    &:hover,
+    &:focus-visible,
+    &.is-current {
+      background-color: v.$sky-50;
+      color: v.fg(v.$navy-600);
+
+      svg {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    &.is-current {
+      font-weight: v.$fw-semibold;
+    }
+  }
+
+  &__more {
+    @include m.focus-ring;
+    display: inline-flex;
+    align-items: center;
+    gap: v.$space-2;
+    margin-top: auto;
+    padding: v.$space-3 v.$space-3 0;
+    color: v.fg(v.$orange-600);
+    font-size: v.$fs-sm;
+    font-weight: v.$fw-semibold;
+
+    &:hover {
+      color: v.fg(v.$navy-900);
+    }
+  }
+
+  @include m.reduced-motion {
+    &__products ul {
+      animation: none;
+    }
+
+    &__category svg,
+    &__product svg {
+      transition: none;
+    }
+  }
+}
+
+@keyframes nav-mega-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 // ---------- Off-canvas menu (below xl) ----------
 .mobile-menu {
   position: fixed;
@@ -720,6 +905,53 @@ $drawer-width: 22rem;
       transition: none !important;
     }
   }
+}
+
+// Mobile: a category inside Products, opening to list its products.
+.mobile-menu__category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-2;
+  width: 100%;
+  border: none;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+
+  small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    margin-left: v.$space-1;
+    padding: 0 0.35rem;
+    border-radius: v.$radius-pill;
+    background-color: v.$sky-100;
+    color: v.fg(v.$navy-600);
+    font-size: max(11px, 0.6875rem);
+    font-weight: v.$fw-semibold;
+  }
+
+  &.is-expanded {
+    color: v.fg(v.$navy-900);
+    font-weight: v.$fw-semibold;
+  }
+}
+
+.mobile-menu__sub--nested > ul {
+  margin-left: v.$space-4;
+  border-left-color: v.alpha(v.line(v.$orange-500), 0.45);
+}
+
+.mobile-menu__product {
+  font-size: v.$fs-sm;
 }
 
 // Smallest phones: slightly smaller round buttons so logo + WhatsApp + menu fit in 320px.

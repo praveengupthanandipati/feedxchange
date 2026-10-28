@@ -18,6 +18,7 @@ import { useGetProductsQuery } from "../../../core/store/productsApi";
 import { useGetAllActiveCategoriesQuery } from "../../../core/store/categoryApi";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
+import InfoPanel from "../truck-management/open-pending-contracts/contract-trucks/InfoPanel";
 import "./ProductsDashboard.scss";
 
 interface DashboardEntry {
@@ -145,7 +146,15 @@ const ProductsDashboard = ({ entries }: ProductsDashboardProps) => {
         </div>
       )}
 
-      {metrics.length > 0 && (
+      {canViewProducts && !categoryFilter && (
+        <InfoPanel
+          icon={LayoutGridIcon}
+          title="No Category Selected"
+          description="Select a category from the Category filter above to see its products, stock and price summary."
+        />
+      )}
+
+      {(!canViewProducts || categoryFilter) && metrics.length > 0 && (
         <div className="products-dashboard__grid">
           {metrics.map(({ label, value, icon: Icon, color, path }) => (
             <Link className={`products-dashboard__card ${color}`} to={path} key={label}>
@@ -159,7 +168,7 @@ const ProductsDashboard = ({ entries }: ProductsDashboardProps) => {
         </div>
       )}
 
-      {canViewProducts && (
+      {canViewProducts && categoryFilter && (
         <div className="products-dashboard__charts">
           <section className="products-dashboard__panel">
             <div className="products-dashboard__panel-heading">

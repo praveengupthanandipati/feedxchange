@@ -11,11 +11,13 @@ const Faqs = lazy(() => import("./faqs/Faqs"));
 const Blogs = lazy(() => import("./blogs/Blogs"));
 const Contact = lazy(() => import("./contact/Contact"));
 const JoinUs = lazy(() => import("./join/JoinUs"));
+const Privacy = lazy(() => import("./privacy/Privacy"));
+const Terms = lazy(() => import("./terms/Terms"));
 const NotFound = lazy(() => import("./not-found/NotFound"));
 
 /**
  * The public website's routes, mounted at the root of the domain inside the website layout:
- *   /  /about  /products  /products/:slug  /faqs  /blogs  /contact  /join   (anything else: 404)
+ *   /  /about  /products  /products/:slug  /faqs  /blogs  /contact  /join  /privacy  /terms   (anything else: 404)
  */
 export const websiteRoutes = (
   <>
@@ -28,6 +30,8 @@ export const websiteRoutes = (
     <Route path="blogs" element={<Blogs />} />
     <Route path="contact" element={<Contact />} />
     <Route path="join" element={<JoinUs />} />
+    <Route path="privacy" element={<Privacy />} />
+    <Route path="terms" element={<Terms />} />
     <Route path="*" element={<NotFound />} />
   </>
 );

@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ArrowUp,
   ArrowUpRight,
+  AtSign,
   Award,
   Ban,
   Bell,
@@ -46,6 +47,7 @@ import {
   FileText,
   Folder,
   Funnel,
+  Gift,
   HardDrive,
   Hash,
   House,
@@ -54,6 +56,7 @@ import {
   Info,
   Layers,
   LayoutGrid,
+  LifeBuoy,
   Link,
   List,
   Lock,
@@ -61,6 +64,7 @@ import {
   LogIn,
   LogOut,
   Mail,
+  Map as MapGlyph, // renamed: "Map" would shadow the built-in Map
   MapPin,
   Maximize,
   Maximize2,
@@ -119,6 +123,7 @@ export const ArrowLeftIcon = createIcon(ArrowLeft, "ArrowLeftIcon");
 export const ArrowRightIcon = createIcon(ArrowRight, "ArrowRightIcon");
 export const ArrowUpIcon = createIcon(ArrowUp, "ArrowUpIcon");
 export const ArrowUpRightIcon = createIcon(ArrowUpRight, "ArrowUpRightIcon");
+export const AtSignIcon = createIcon(AtSign, "AtSignIcon");
 export const AwardIcon = createIcon(Award, "AwardIcon");
 export const BanIcon = createIcon(Ban, "BanIcon");
 export const BellIcon = createIcon(Bell, "BellIcon");
@@ -158,6 +163,7 @@ export const FileIcon = createIcon(File, "FileIcon");
 export const FileTextIcon = createIcon(FileText, "FileTextIcon");
 export const FolderIcon = createIcon(Folder, "FolderIcon");
 export const FunnelIcon = createIcon(Funnel, "FunnelIcon");
+export const GiftIcon = createIcon(Gift, "GiftIcon");
 export const HardDriveIcon = createIcon(HardDrive, "HardDriveIcon");
 export const HashIcon = createIcon(Hash, "HashIcon");
 export const HouseIcon = createIcon(House, "HouseIcon");
@@ -166,6 +172,7 @@ export const InboxIcon = createIcon(Inbox, "InboxIcon");
 export const InfoIcon = createIcon(Info, "InfoIcon");
 export const LayersIcon = createIcon(Layers, "LayersIcon");
 export const LayoutGridIcon = createIcon(LayoutGrid, "LayoutGridIcon");
+export const LifeBuoyIcon = createIcon(LifeBuoy, "LifeBuoyIcon");
 export const LinkIcon = createIcon(Link, "LinkIcon");
 export const ListIcon = createIcon(List, "ListIcon");
 export const LockIcon = createIcon(Lock, "LockIcon");
@@ -173,6 +180,7 @@ export const LockOpenIcon = createIcon(LockOpen, "LockOpenIcon");
 export const LogInIcon = createIcon(LogIn, "LogInIcon");
 export const LogOutIcon = createIcon(LogOut, "LogOutIcon");
 export const MailIcon = createIcon(Mail, "MailIcon");
+export const MapIcon = createIcon(MapGlyph, "MapIcon");
 export const MapPinIcon = createIcon(MapPin, "MapPinIcon");
 export const Maximize2Icon = createIcon(Maximize2, "Maximize2Icon");
 export const MaximizeIcon = createIcon(Maximize, "MaximizeIcon");

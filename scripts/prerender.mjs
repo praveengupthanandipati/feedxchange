@@ -19,8 +19,9 @@ const siteUrl = (process.env.VITE_SITE_URL ?? "https://feedxchange.in").replace(
 
 // ---- the website's routes: the fixed pages plus one per product
 const content = readFileSync(join(root, "src/features/website/data/content.ts"), "utf8");
-const slugs = [...content.matchAll(/^\s*slug:\s*"([^"]+)"/gm)].map((m) => m[1]);
-const routes = ["/", "/about", "/products", ...slugs.map((s) => `/products/${s}`), "/faqs", "/blogs", "/contact", "/join"];
+// every product page: the full `products` entries and the one-line `catalogue` items (findProduct serves both)
+const slugs = [...new Set([...content.matchAll(/\bslug:\s*"([^"]+)"/g)].map((m) => m[1]))];
+const routes = ["/", "/about", "/products", ...slugs.map((s) => `/products/${s}`), "/faqs", "/blogs", "/contact", "/join", "/privacy", "/terms"];
 
 if (!existsSync(join(dist, "index.html"))) {
   console.error("prerender: dist/index.html is missing. Run `vite build` first.");

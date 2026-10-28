@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { ChevronDownIcon, MailIcon, PhoneIcon, XIcon } from "../../../shared/components/icon";
+import {
+  ChevronDownIcon,
+  MailIcon,
+  PhoneIcon,
+  XIcon,
+} from "../../../shared/components/icon";
 import { NavLink, useLocation } from "react-router-dom";
-import { company, navItems } from "../../../features/website/data/content";
-import { sitePaths } from "../../../features/website/routes/paths";
+import { catalogueCategories, categoryForSlug, company, navItems, productsIn } from "../../../features/website/data/content";
+import { productPath, sitePaths } from "../../../features/website/routes/paths";
 import Logo from "../../../features/website/components/common/Logo";
 import { JoinButton, LoginLink, WhatsAppButton } from "./HeaderActions";
 import ThemePicker from "../../../shared/theme/ThemePicker";
@@ -21,6 +26,8 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
   const closeRef = useRef<HTMLButtonElement>(null);
   // The Products accordion starts open when you're already on a product page.
   const [productsOpen, setProductsOpen] = useState(pathname.startsWith(sitePaths.products));
+  // On a product page, its category starts open too.
+  const [openCategory, setOpenCategory] = useState<string | null>(() => categoryForSlug(pathname.split("/").pop() ?? "")?.id ?? null);
 
   useEffect(() => {
     if (open) closeRef.current?.focus();
@@ -62,13 +69,42 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                             All products
                           </NavLink>
                         </li>
-                        {item.children.map((child) => (
-                          <li key={child.to}>
-                            <NavLink to={child.to} className={({ isActive }) => `mobile-menu__sublink ${isActive ? "is-active" : ""}`} tabIndex={productsOpen ? 0 : -1}>
-                              {child.label}
-                            </NavLink>
-                          </li>
-                        ))}
+                        {/* Each category opens to list its products. */}
+                        {catalogueCategories.map((category) => {
+                          const categoryOpen = productsOpen && openCategory === category.id;
+                          return (
+                            <li key={category.id}>
+                              <button
+                                type="button"
+                                className={`mobile-menu__sublink mobile-menu__category ${categoryOpen ? "is-expanded" : ""}`}
+                                aria-expanded={categoryOpen}
+                                aria-controls={`mobile-cat-${category.id}`}
+                                tabIndex={productsOpen ? 0 : -1}
+                                onClick={() => setOpenCategory((prev) => (prev === category.id ? null : category.id))}
+                              >
+                                <span>
+                                  {category.name} <small>{productsIn(category.id).length}</small>
+                                </span>
+                                <ChevronDownIcon aria-hidden className="mobile-menu__chevron" />
+                              </button>
+                              <div id={`mobile-cat-${category.id}`} className={`mobile-menu__sub mobile-menu__sub--nested ${categoryOpen ? "is-open" : ""}`}>
+                                <ul>
+                                  {productsIn(category.id).map((product) => (
+                                    <li key={product.slug}>
+                                      <NavLink
+                                        to={productPath(product.slug)}
+                                        className={({ isActive }) => `mobile-menu__sublink mobile-menu__product ${isActive ? "is-active" : ""}`}
+                                        tabIndex={categoryOpen ? 0 : -1}
+                                      >
+                                        {product.name}
+                                      </NavLink>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   </>

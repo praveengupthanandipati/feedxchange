@@ -1,4 +1,4 @@
-import { ClockIcon, MailIcon, MapPinIcon, PhoneIcon } from "../../../shared/components/icon";
+import { AtSignIcon, MapPinIcon, PhoneIcon } from "../../../shared/components/icon";
 import ContactForm from "../components/contact/ContactForm";
 import PageHero from "../components/sections/PageHero";
 import { company } from "../data/content";
@@ -7,31 +7,46 @@ import { usePageTitle } from "../hooks/usePageTitle";
 const Contact = () => {
   usePageTitle("Contact Us", "Talk to the FeedXchange team about buying, selling or moving feed ingredients.");
 
-  const details = [
-    { icon: MapPinIcon, title: "Visit us", body: company.address },
-    { icon: PhoneIcon, title: "Call us", body: company.phone, href: `tel:${company.phone.replace(/\s/g, "")}` },
-    { icon: MailIcon, title: "Email us", body: company.email, href: `mailto:${company.email}` },
-    { icon: ClockIcon, title: "Working hours", body: company.hours },
-  ];
-
   return (
     <>
       <PageHero title="Contact Us" text="Questions about pricing, onboarding or partnerships? We'd love to hear from you." />
       <section className="section">
         <div className="site-container contact-layout">
-          <ul className="contact-details" data-reveal>
-            {details.map(({ icon: Icon, title, body, href }) => (
-              <li key={title} className="contact-details__item">
-                <span className="feature-card__icon">
-                  <Icon aria-hidden />
+          {/* ---------- Contact details panel ---------- */}
+          <div className="contact-panel" data-reveal>
+            <div className="contact-panel__head">
+              <h2>We&rsquo;d love to hear from you.</h2>
+              <p>Our friendly team is always here to chat</p>
+            </div>
+
+            <ul className="contact-panel__grid">
+              <li className="contact-panel__item">
+                <span className="contact-panel__icon">
+                  <AtSignIcon aria-hidden />
                 </span>
-                <div>
-                  <h3>{title}</h3>
-                  {href ? <a href={href}>{body}</a> : <p>{body}</p>}
-                </div>
+                <h3>Email</h3>
+                <a href={`mailto:${company.email}`}>{company.email}</a>
               </li>
-            ))}
-          </ul>
+
+              <li className="contact-panel__item">
+                <span className="contact-panel__icon">
+                  <PhoneIcon aria-hidden />
+                </span>
+                <h3>Phone</h3>
+                <p>{company.hours}</p>
+                <a href={`tel:${company.phone.replace(/\s/g, "")}`}>{company.phone}</a>
+              </li>
+
+              <li className="contact-panel__item contact-panel__item--wide">
+                <span className="contact-panel__icon">
+                  <MapPinIcon aria-hidden />
+                </span>
+                <h3>Office</h3>
+                <address>{company.address}</address>
+              </li>
+            </ul>
+          </div>
+
           <ContactForm />
         </div>
       </section>

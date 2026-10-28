@@ -6,8 +6,10 @@ import {
   EyeIcon,
   FacebookIcon,
   FileTextIcon,
+  InfoIcon,
   InstagramIcon,
   LayoutGridIcon,
+  LifeBuoyIcon,
   LinkIcon,
   LinkedinIcon,
   PackageIcon,
@@ -16,6 +18,7 @@ import {
   TruckIcon,
   TwitterIcon,
   UserCheckIcon,
+  UsersIcon,
 } from "../../../shared/components/icon";
 import { productPath, sitePaths } from "../routes/paths";
 
@@ -107,6 +110,187 @@ export const products: Product[] = [
   },
 ];
 
+// ---------- Test catalogue (Products page). Images are a shared placeholder for now. ----------
+export interface Nutrient {
+  name: string;
+  min: string;
+  max: string;
+}
+
+export interface CatalogueCategory {
+  id: string;
+  name: string;
+  /** Test copy and specs used for every product in this category that has no full entry above. */
+  summary: string;
+  specs: { label: string; value: string }[];
+  /** Test nutrition ranges shown on the product page. */
+  nutrition: Nutrient[];
+  /** Typical price per MT (₹), used to generate test price history. */
+  basePrice: number;
+  /** "Nutritional Value and Uses": a bold value with its meaning under it. */
+  uses: { value: string; label: string }[];
+}
+
+export const catalogueCategories: CatalogueCategory[] = [
+  {
+    id: "doc",
+    name: "DOC",
+    summary: "De-oiled cake, a consistent and economical protein source for feed.",
+    specs: [
+      { label: "Protein", value: "28 – 48%" },
+      { label: "Oil", value: "≤ 1.5%" },
+      { label: "Packing", value: "50 kg bags" },
+    ],
+    nutrition: [
+      { name: "Protein", min: "44%", max: "48%" },
+      { name: "Fat", min: "0.5%", max: "1.5%" },
+      { name: "Moisture", min: "10%", max: "12%" },
+      { name: "Sand/silica", min: "1%", max: "2%" },
+      { name: "Crude Fiber", min: "5%", max: "7%" },
+    ],
+    basePrice: 38000,
+    uses: [
+      { value: "10ppb", label: "Aflatoxins" },
+      { value: "44 – 48%", label: "Crude protein, the main protein source in poultry and aqua feed" },
+      { value: "Poultry, Fish, Prawn & Cattle", label: "Feed plants that use it" },
+    ],
+  },
+  {
+    id: "grains",
+    name: "Grains",
+    summary: "Feed-quality grains, cleaned and graded for poultry and cattle rations.",
+    specs: [
+      { label: "Moisture", value: "≤ 14%" },
+      { label: "Foreign matter", value: "≤ 2%" },
+      { label: "Packing", value: "50 kg bags / loose" },
+    ],
+    nutrition: [
+      { name: "Protein", min: "8%", max: "10%" },
+      { name: "Fat", min: "3%", max: "4%" },
+      { name: "Moisture", min: "12%", max: "14%" },
+      { name: "Starch", min: "60%", max: "70%" },
+      { name: "Foreign Matter", min: "1%", max: "2%" },
+    ],
+    basePrice: 24000,
+    uses: [
+      { value: "20ppb", label: "Aflatoxins" },
+      { value: "60 – 70%", label: "Starch, the main energy source in poultry and cattle rations" },
+      { value: "Poultry & Cattle", label: "Feed plants that use it" },
+    ],
+  },
+  {
+    id: "distilled",
+    name: "Distilled Products",
+    summary: "High-protein distillery by-products with test reports for every lot.",
+    specs: [
+      { label: "Protein", value: "26 – 32%" },
+      { label: "Moisture", value: "≤ 10%" },
+      { label: "Packing", value: "50 kg bags / loose" },
+    ],
+    nutrition: [
+      { name: "Protein", min: "44%", max: "48%" },
+      { name: "Fat", min: "3%", max: "4%" },
+      { name: "Moisture", min: "10%", max: "12%" },
+      { name: "Sand/silica", min: "2%", max: "3%" },
+      { name: "Crude Fiber", min: "10%", max: "12%" },
+    ],
+    basePrice: 35000,
+    uses: [
+      { value: "10ppb", label: "Aflatoxins" },
+      { value: "44 – 48%", label: "Crude protein, a cost-effective partial replacement for soybean meal" },
+      { value: "Poultry, Fish & Cattle", label: "Feed plants that use it" },
+    ],
+  },
+  {
+    id: "crude-oil",
+    name: "Crude Oil",
+    summary: "Crude oils for refining and feed blending, with clear FFA specifications.",
+    specs: [
+      { label: "FFA", value: "As per contract" },
+      { label: "Moisture & impurities", value: "≤ 0.5%" },
+      { label: "Supply", value: "Tankers" },
+    ],
+    nutrition: [
+      { name: "FFA", min: "5%", max: "10%" },
+      { name: "Moisture", min: "0.2%", max: "0.5%" },
+      { name: "Impurities", min: "0.1%", max: "0.3%" },
+      { name: "Phosphatides", min: "1%", max: "2%" },
+    ],
+    basePrice: 95000,
+    uses: [
+      { value: "5 – 10%", label: "Free fatty acids (FFA)" },
+      { value: "Energy", label: "Added to feed to raise its energy density" },
+      { value: "Refineries & Feed Plants", label: "Who buys it" },
+    ],
+  },
+];
+
+export interface CatalogueItem {
+  /** Same slug as an entry in `products` when a full product page exists. */
+  slug: string;
+  name: string;
+  categoryId: CatalogueCategory["id"];
+}
+
+export const catalogue: CatalogueItem[] = [
+  { slug: "soya-doc", name: "Soya DOC", categoryId: "doc" },
+  { slug: "groundnut-doc", name: "Groundnut DOC", categoryId: "doc" },
+  { slug: "sunflower-doc", name: "Sunflower DOC", categoryId: "doc" },
+  { slug: "mustard-doc", name: "Mustard DOC", categoryId: "doc" },
+  { slug: "cottonseed-doc", name: "Cottonseed DOC", categoryId: "doc" },
+  { slug: "dorb", name: "DORB", categoryId: "doc" },
+  { slug: "maize", name: "Maize", categoryId: "grains" },
+  { slug: "broken-rice", name: "Broken Rice", categoryId: "grains" },
+  { slug: "bajra", name: "Bajra", categoryId: "grains" },
+  { slug: "jowar", name: "Jowar", categoryId: "grains" },
+  { slug: "maize-ddgs", name: "Maize DDGS", categoryId: "distilled" },
+  { slug: "rice-ddgs", name: "Rice DDGS", categoryId: "distilled" },
+  { slug: "crude-rice-bran-oil", name: "Crude Rice Bran Oil", categoryId: "crude-oil" },
+  { slug: "crude-soybean-oil", name: "Crude Soybean Oil", categoryId: "crude-oil" },
+  { slug: "crude-palm-oil", name: "Crude Palm Oil", categoryId: "crude-oil" },
+];
+
+export const categoryOf = (item: CatalogueItem) => catalogueCategories.find((category) => category.id === item.categoryId);
+
+export const productsIn = (categoryId: CatalogueCategory["id"]) => catalogue.filter((item) => item.categoryId === categoryId);
+
+/** Category for any product slug: catalogue items, plus the original category pages that aren't in the catalogue. */
+const extraProductCategories: Record<string, CatalogueCategory["id"]> = { "distilled-products": "distilled", "crude-oil": "crude-oil", doc: "doc" };
+
+export const categoryForSlug = (slug: string) => {
+  const item = catalogue.find((entry) => entry.slug === slug);
+  const id = item?.categoryId ?? extraProductCategories[slug];
+  return catalogueCategories.find((category) => category.id === id);
+};
+
+export const businessTypes = [
+  "Poultry Farm",
+  "Fish Farm",
+  "Prawn Farm",
+  "Cattle Feed Plant",
+  "Feed Manufacturer",
+  "Trader",
+  "Transporter",
+  "Referral Aggregator",
+  "Other",
+];
+
+/** The product shown at /products/:slug: its full entry if there is one, otherwise built from its catalogue category. */
+export const findProduct = (slug: string | undefined): Product | undefined => {
+  const full = products.find((product) => product.slug === slug);
+  if (full) return full;
+  const item = catalogue.find((entry) => entry.slug === slug);
+  const category = item && categoryOf(item);
+  if (!item || !category) return undefined;
+  return {
+    slug: item.slug,
+    name: item.name,
+    summary: category.summary,
+    description: `${item.name} sourced from verified manufacturers and traded through FeedXchange at transparent, real-time prices. Final specifications and pricing are confirmed when the contract is executed.`,
+    specs: category.specs,
+  };
+};
+
 export const navItems: NavItem[] = [
   { label: "Home", to: sitePaths.home },
   { label: "About", to: sitePaths.about },
@@ -119,12 +303,12 @@ export const navItems: NavItem[] = [
 export const company = {
   name: "FeedXchange",
   tagline: "The trusted marketplace for animal feed ingredients.",
-  email: "hello@feedxchange.example",
+  email: "contact@feedxchange.in",
   phone: "+91 98765 43210",
   /** Digits only, with country code, for wa.me links. */
   whatsapp: "919876543210",
-  address: "Plot 42, Agri Business Park, Vijayawada, Andhra Pradesh 520010",
-  hours: "Mon – Sat, 9:00 AM – 6:00 PM IST",
+  address: "174, 1st floor, Mahatma Gandhi Whole Commercial Complex, Mahendra Nagar, Gollapudi, Vijayawada, Andhra Pradesh - 521225",
+  hours: "Mon - Sat from 9am - 6pm",
 };
 
 export const whatsappLink = `https://wa.me/${company.whatsapp}?text=${encodeURIComponent("Hi FeedXchange, I'd like to know more.")}`;
@@ -396,13 +580,115 @@ export interface Faq {
   answer: string;
 }
 
-export const faqs: Faq[] = [
-  { question: "Who can trade on FeedXchange?", answer: "Feed mills, traders, processors and transporters registered in India. Every business completes a quick KYC check before its first trade." },
-  { question: "How are prices decided?", answer: "Buyers and sellers agree prices directly. Our live market board shows daily rates and trends for each product to help you negotiate." },
-  { question: "How is product quality assured?", answer: "Each consignment carries the seller's specification sheet and, where agreed, an independent lab report. Disputes are handled by our quality desk." },
-  { question: "Do you arrange transport?", answer: "Yes. Our partner transporters can be assigned to any contract, and every truck can be tracked from loading to delivery." },
-  { question: "When do sellers get paid?", answer: "Payments follow the terms in the contract. Invoices and payment advice are reconciled on the platform, so both sides always see the same status." },
-  { question: "Is there a joining fee?", answer: "Registration is free. A small, transparent service fee applies only to completed trades, with no hidden commissions." },
+export interface FaqCategory {
+  /** Anchor id, used by the category menu. */
+  id: string;
+  title: string;
+  icon: IconComponent;
+  items: Faq[];
+}
+
+export const faqCategories: FaqCategory[] = [
+  {
+    id: "general",
+    title: "General Information",
+    icon: InfoIcon,
+    items: [
+      {
+        question: "What is FeedXchange.in?",
+        answer:
+          "FeedXchange.in is India’s first dedicated B2B digital portal designed exclusively for the animal feed ingredient trade. Backed by the legacy of Sri Sai Raghavendra Trade Services, the platform connects buyers and sellers of raw materials (such as Deoiled Cakes, Grains, DDGS, Crude Oil etc) while providing transparent pricing, contract tracking, and integrated logistics.",
+      },
+      {
+        question: "Who can register on the platform?",
+        answer:
+          "The portal is built to support the entire animal feed raw material procurement ecosystem. This includes Poultry Farms, Fish Farms, Prawn Farms, Cattle Feed Plants, Feed Manufacturers, Enrolled Transporters, and Referral Aggregators.",
+      },
+      {
+        question: "Is there a fee to use the portal?",
+        answer:
+          "Currently, creating an account and accessing the digital portal is completely free. Should we introduce premium subscription features in the future, all users will be notified well in advance.",
+      },
+    ],
+  },
+  {
+    id: "contracts",
+    title: "Contracts, Pricing & Platform Usage",
+    icon: FileTextIcon,
+    items: [
+      {
+        question: "Are the prices shown on the portal final?",
+        answer:
+          "Because commodity markets are highly volatile, the prices displayed on the portal are indicative and meant for real-time market tracking. Final contract prices are always subject to confirmation at the exact time the deal is locked and executed.",
+      },
+      {
+        question: "Are the prices shown on the portal inclusive of GST and freight?",
+        answer:
+          "The indicative prices displayed on the portal are generally basic prices (Ex-factory/Ex-warehouse) unless explicitly stated otherwise. Applicable GST and negotiated freight charges will be clearly outlined when the final contract is executed.",
+      },
+      {
+        question: "Can I view my old, completed contracts?",
+        answer:
+          "Yes! One of the major benefits of FeedXchange.in is your personalized dashboard. You can access a full history of all your past contracts, associated vehicles, and shared KYC documents for your own auditing and record-keeping purposes.",
+      },
+      {
+        question: "What happens if there is a dispute over the quality of the materials?",
+        answer:
+          "We are committed to fair trade, so it’s a rare case to even occur. If there is a discrepancy in quality or delivery, we step in to actively mediate the dispute between the buyer and the supplier. If poor quality is proven, it will result in a debit to the supplier. Please note that all final financial settlements regarding quality claims are handled directly between the buyer and the supplier.",
+      },
+    ],
+  },
+  {
+    id: "payments",
+    title: "Payments & Fees",
+    icon: CreditCardIcon,
+    items: [
+      {
+        question: "Do I make payments for the goods through the FeedXchange portal?",
+        answer:
+          "No. To maintain absolute transparency, all payments for the physical goods are transferred directly from the Buyer's bank account to the Manufacturer/Supplier's bank account. FeedXchange does not act as a payment gateway for raw materials.",
+      },
+      {
+        question: "How do canvassing fees work?",
+        answer:
+          "For our services in facilitating the trade, negotiating best prices, and mediating disputes, a standard canvassing/service fee may apply depending on your specific trading agreement with us. If applicable, this fee is billed separately and paid directly to Sri Sai Raghavendra Trade Services.",
+      },
+    ],
+  },
+  {
+    id: "aggregators",
+    title: "Aggregators & Referrals",
+    icon: UsersIcon,
+    items: [
+      {
+        question: "What is the Aggregator program?",
+        answer:
+          "We believe in rewarding those who help our ecosystem grow. Aggregators are provided with a separate login to refer new buyers, sellers, or transporters to the platform. Based on successful onboarding and trading volume, Aggregators can earn referral bonuses and credits.",
+      },
+      {
+        question: "How do I track my successful referrals?",
+        answer:
+          "Aggregators have a dedicated login dashboard where they can see the status of the users they have referred (e.g., Pending KYC, Verified, Active).",
+      },
+      {
+        question: "When are referral bonuses credited?",
+        answer:
+          "Referral bonuses or credits are allocated based on our internal policies, typically after the referred user successfully completes their KYC and executes their first verified contract.",
+      },
+    ],
+  },
+  {
+    id: "support",
+    title: "Technical Support",
+    icon: LifeBuoyIcon,
+    items: [
+      {
+        question: "What should I do if I face a technical error or the portal is down?",
+        answer:
+          "If you experience any technical issues, you can reach out to our support team directly. During standard business hours, we also provide offline support for any urgent trade executions while the portal is being restored.",
+      },
+    ],
+  },
 ];
 
 export interface BlogPost {
