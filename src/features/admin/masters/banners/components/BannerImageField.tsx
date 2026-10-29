@@ -7,7 +7,7 @@ interface BannerImageFieldProps {
   image: string;
   fileName: string;
   error?: string;
-  onChange: (image: string, fileName: string) => void;
+  onChange: (image: string, fileName: string, file: File) => void;
 }
 
 /**
@@ -28,7 +28,7 @@ const BannerImageField = ({ image, fileName, error, onChange }: BannerImageField
     setFileError(problem);
     if (problem) return;
     try {
-      onChange(await readAsDataUrl(file), file.name);
+      onChange(await readAsDataUrl(file), file.name, file);
     } catch {
       setFileError("That image could not be read. Try another file.");
     }

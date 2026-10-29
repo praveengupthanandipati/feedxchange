@@ -8,6 +8,7 @@ import {
 } from "../../../shared/components/icon";
 import { Link } from "react-router-dom";
 import { company, footerColumns, socialLinks } from "../../../features/website/data/content";
+import { useCatalogue } from "../../../features/website/hooks/useCatalogue";
 import { sitePaths } from "../../../features/website/routes/paths";
 import Logo from "../../../features/website/components/common/Logo";
 
@@ -16,6 +17,12 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "error" | "done">("idle");
+  const { categories } = useCatalogue();
+  // Products column: the first 4 categories, each opening the Products page on it; just "All products" until they load.
+  const productLinks = categories.length
+    ? categories.slice(0, 4).map((category) => ({ label: category.name, to: `${sitePaths.products}?category=${category.id}` }))
+    : [{ label: "All products", to: sitePaths.products }];
+  const columns = [...footerColumns, { title: "Products", links: productLinks }];
 
   const subscribe = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,7 +49,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        {footerColumns.map((column) => (
+        {columns.map((column) => (
           <div key={column.title} className="site-footer__col">
             <h3>{column.title}</h3>
             <ul>

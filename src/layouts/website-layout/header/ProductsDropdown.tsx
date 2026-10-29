@@ -1,16 +1,14 @@
 import { useEffect, useId, useRef, useState, type FocusEvent } from "react";
 import { ArrowRightIcon, ChevronDownIcon, ChevronRightIcon } from "../../../shared/components/icon";
 import { Link, useLocation } from "react-router-dom";
-import { catalogueCategories, categoryForSlug, productsIn, type NavItem } from "../../../features/website/data/content";
+import type { NavItem } from "../../../features/website/data/content";
+import { useCatalogue } from "../../../features/website/hooks/useCatalogue";
 import { productPath, sitePaths } from "../../../features/website/routes/paths";
 
 const CLOSE_DELAY = 160;
 
-/** Category of the product page you're on, so the menu opens on it; otherwise the first category. */
-const startCategory = (pathname: string) => {
-  const slug = pathname.startsWith(`${sitePaths.products}/`) ? pathname.slice(sitePaths.products.length + 1) : "";
-  return categoryForSlug(slug)?.id ?? catalogueCategories[0].id;
-};
+/** Slug of the product page you are on, or "". */
+const slugIn = (pathname: string) => (pathname.startsWith(`${sitePaths.products}/`) ? pathname.slice(sitePaths.products.length + 1) : "");
 
 /**
  * Desktop "Products" menu: categories on the left, the chosen category's products on the right.
@@ -21,15 +19,18 @@ const startCategory = (pathname: string) => {
 const ProductsDropdown = ({ item }: { item: NavItem }) => {
   const { pathname, search } = useLocation();
   const [open, setOpen] = useState(false);
-  const [categoryId, setCategoryId] = useState(() => startCategory(pathname));
+  const { categories, productsIn, findBySlug } = useCatalogue();
+  // The category picked in the menu; "" until one is, which shows the current product's category (or the first).
+  const [categoryId, setCategoryId] = useState("");
   const closeTimer = useRef<number | undefined>(undefined);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
   const listId = useId();
   const active = pathname.startsWith(sitePaths.products);
 
-  const category = catalogueCategories.find((entry) => entry.id === categoryId) ?? catalogueCategories[0];
-  const items = productsIn(category.id);
+  const shownId = categoryId || findBySlug(slugIn(pathname))?.categoryId;
+  const category = categories.find((entry) => entry.id === shownId) ?? categories[0];
+  const items = category ? productsIn(category.id) : [];
 
   const cancelClose = () => window.clearTimeout(closeTimer.current);
   const openNow = () => {
@@ -44,7 +45,7 @@ const ProductsDropdown = ({ item }: { item: NavItem }) => {
   // Close after navigating (and re-centre on the new page's category); clear any pending timer on unmount.
   useEffect(() => {
     setOpen(false);
-    setCategoryId(startCategory(pathname));
+    setCategoryId("");
   }, [pathname, search]);
   useEffect(() => cancelClose, []);
 
@@ -84,8 +85,8 @@ const ProductsDropdown = ({ item }: { item: NavItem }) => {
         <div className="nav-mega__body">
           {/* ---------- Categories ---------- */}
           <ul className="nav-mega__categories" aria-label="Product categories">
-            {catalogueCategories.map((entry) => {
-              const selected = entry.id === category.id;
+            {categories.map((entry) => {
+              const selected = entry.id === category?.id;
               return (
                 <li key={entry.id}>
                   <button
@@ -111,21 +112,27 @@ const ProductsDropdown = ({ item }: { item: NavItem }) => {
 
           {/* ---------- Products in the chosen category ---------- */}
           <div id={listId} className="nav-mega__products" aria-live="polite">
-            <p className="nav-mega__title">{category.name}</p>
-            {/* Keyed so the list fades in again when the category changes. */}
-            <ul key={category.id}>
-              {items.map((product) => (
-                <li key={product.slug}>
-                  <Link to={productPath(product.slug)} className={`nav-mega__product ${pathname === productPath(product.slug) ? "is-current" : ""}`} tabIndex={tab}>
-                    {product.name}
-                    <ArrowRightIcon aria-hidden />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <Link to={`${sitePaths.products}?category=${category.id}`} className="nav-mega__more" tabIndex={tab}>
-              View all {category.name} <ArrowRightIcon aria-hidden />
-            </Link>
+            {category ? (
+              <>
+                <p className="nav-mega__title">{category.name}</p>
+                {/* Keyed so the list fades in again when the category changes. */}
+                <ul key={category.id}>
+                  {items.map((product) => (
+                    <li key={product.id}>
+                      <Link to={productPath(product.slug)} className={`nav-mega__product ${pathname === productPath(product.slug) ? "is-current" : ""}`} tabIndex={tab}>
+                        {product.name}
+                        <ArrowRightIcon aria-hidden />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link to={`${sitePaths.products}?category=${category.id}`} className="nav-mega__more" tabIndex={tab}>
+                  View all {category.name} <ArrowRightIcon aria-hidden />
+                </Link>
+              </>
+            ) : (
+              <p className="nav-mega__title">Loading products…</p>
+            )}
           </div>
         </div>
 

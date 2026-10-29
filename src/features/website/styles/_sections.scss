@@ -305,9 +305,17 @@ $search-height: 3.75rem;
     border-radius: v.$radius-sm;
     background-color: v.$sky-100;
     color: v.fg(v.$navy-600);
+    overflow: hidden;
     transition:
       background-color 0.15s ease,
       color 0.15s ease;
+
+    // A product photo, when the product has one.
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
   &__text {
@@ -1399,5 +1407,115 @@ $badge: 120px;
     button {
       pointer-events: auto;
     }
+  }
+}
+
+// ---------- Hero banners: the admin's banner images sliding behind the hero text ----------
+.hero__banners {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  // Behind the glows and the dot pattern (z-index -1), in front of the hero's own photo.
+  z-index: -2;
+
+  .swiper,
+  .swiper-slide {
+    height: 100%;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // The same duotone the hero puts over its photo, so the headline and search look exactly as before.
+  .swiper-slide::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image:
+      linear-gradient(180deg, rgba(var(--fx-slate-8-rgb), 0.35) 0%, rgba(var(--fx-slate-8-rgb), 0) 35%, rgba(var(--fx-slate-8-rgb), 0.6) 100%),
+      linear-gradient(
+        120deg,
+        rgba(var(--fx-blue-11-rgb), 0.92) 0%,
+        rgba(var(--fx-blue-29-rgb), 0.78) 30%,
+        rgba(var(--fx-cyan-24-rgb), 0.62) 62%,
+        rgba(var(--fx-amber-46-2-rgb), 0.55) 100%
+      );
+    pointer-events: none;
+  }
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: v.alpha(v.$white, 0.15);
+    color: v.fg(v.$white);
+    transition: background-color 0.2s ease;
+
+    svg {
+      width: 0.6rem;
+      height: 1rem;
+    }
+
+    &:hover {
+      background-color: v.$orange-500;
+      color: v.on(v.$navy-900);
+    }
+
+    // Phones and tablets: the dots are enough; arrows would crowd the headline and search.
+    @include m.down(lg) {
+      display: none;
+    }
+  }
+
+  // Short thin lines instead of dots: see-through, the current banner a little longer and orange.
+  .swiper-pagination {
+    bottom: v.$space-3;
+    line-height: 0;
+  }
+
+  // The bullet itself stays an invisible 24px tap target (tokens.scss lifts anything pressable to 24px); ::before draws the line.
+  .swiper-pagination-bullet {
+    position: relative;
+    width: 18px;
+    height: 24px;
+    margin: 0 1px;
+    border-radius: 0;
+    background: transparent;
+    opacity: 1;
+    transform: none;
+    vertical-align: middle;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 12px;
+      height: 2px;
+      border-radius: 1px;
+      background-color: v.$white;
+      opacity: 0.55;
+      transform: translate(-50%, -50%);
+      transition:
+        width 0.3s ease,
+        opacity 0.2s ease,
+        background-color 0.2s ease;
+    }
+  }
+
+  .swiper-pagination-bullet-active::before {
+    width: 20px;
+    background-color: v.$orange-500;
+    opacity: 1;
   }
 }

@@ -18,9 +18,34 @@ const dist = join(root, "dist");
 const siteUrl = (process.env.VITE_SITE_URL ?? "https://feedxchange.in").replace(/\/$/, "");
 
 // ---- the website's routes: the fixed pages plus one per product
-const content = readFileSync(join(root, "src/features/website/data/content.ts"), "utf8");
-// every product page: the full `products` entries and the one-line `catalogue` items (findProduct serves both)
-const slugs = [...new Set([...content.matchAll(/\bslug:\s*"([^"]+)"/g)].map((m) => m[1]))];
+// Products come from the API (GetAllProducts, public), like the website itself: VITE_API_URL, else .env.local / .env.
+const apiUrl = (
+  process.env.VITE_API_URL ||
+  [".env.local", ".env"]
+    .map((name) => join(root, name))
+    .filter((file) => existsSync(file))
+    .map((file) => readFileSync(file, "utf8").match(/^VITE_API_URL=(.+)$/m)?.[1]?.trim())
+    .find(Boolean) ||
+  "https://qa.feedxchange.in"
+).replace(/\/$/, "");
+// Same slug rule as the website (hooks/useCatalogue.ts): the SEO name, else the name made URL-friendly, else the id.
+const slugify = (value) => value.toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+let slugs = [];
+try {
+  const response = await fetch(`${apiUrl}/api/Product/GetAllProducts`, { signal: AbortSignal.timeout(20000) });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const body = await response.json();
+  const list = Array.isArray(body) ? body : (body?.result ?? body?.data ?? []);
+  slugs = [
+    ...new Set(
+      list
+        .filter((product) => product.isActive && !product.isDeleted)
+        .map((product) => product.seoName?.trim() || slugify(product.name?.trim() || "") || String(product.id)),
+    ),
+  ];
+} catch (error) {
+  console.warn(`prerender: could not load products from ${apiUrl} (${error.message}); product pages will not be prerendered or listed in the sitemap`);
+}
 const routes = ["/", "/about", "/products", ...slugs.map((s) => `/products/${s}`), "/faqs", "/blogs", "/contact", "/join", "/privacy", "/terms"];
 
 if (!existsSync(join(dist, "index.html"))) {

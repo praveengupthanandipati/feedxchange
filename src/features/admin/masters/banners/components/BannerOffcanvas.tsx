@@ -9,7 +9,8 @@ interface BannerOffcanvasProps {
   /** The banner being edited, or null to create a new one. */
   banner: Banner | null;
   banners: Banner[];
-  onSave: (form: BannerForm) => void;
+  /** Resolves to an error message to show in the panel, or null when saved. */
+  onSave: (form: BannerForm) => Promise<string | null>;
   onClose: () => void;
 }
 
@@ -19,6 +20,8 @@ const STATUSES: BannerStatus[] = ["Active", "Inactive"];
 const BannerOffcanvas = ({ banner, banners, onSave, onClose }: BannerOffcanvasProps) => {
   const [form, setForm] = useState<BannerForm>(banner ? toForm(banner) : EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const titleRef = useRef<HTMLInputElement>(null);
   const isEdit = banner !== null;
 
@@ -42,12 +45,17 @@ const BannerOffcanvas = ({ banner, banners, onSave, onClose }: BannerOffcanvasPr
     if (key in errors) setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (saving) return;
     const found = validateBanner(form, banners, banner?.id ?? null);
     setErrors(found);
     if (Object.values(found).some(Boolean)) return;
-    onSave(form);
+    setSaving(true);
+    setSaveError("");
+    const problem = await onSave(form);
+    setSaving(false);
+    if (problem) setSaveError(problem);
   };
 
   const field = (key: "title" | "linkUrl" | "priority", label: string, placeholder: string, type = "text") => (
@@ -97,8 +105,8 @@ const BannerOffcanvas = ({ banner, banners, onSave, onClose }: BannerOffcanvasPr
               image={form.image}
               fileName={form.fileName}
               error={errors.image}
-              onChange={(image, fileName) => {
-                setForm((prev) => ({ ...prev, image, fileName }));
+              onChange={(image, fileName, file) => {
+                setForm((prev) => ({ ...prev, image, fileName, file }));
                 setErrors((prev) => ({ ...prev, image: undefined }));
               }}
             />
@@ -115,11 +123,17 @@ const BannerOffcanvas = ({ banner, banners, onSave, onClose }: BannerOffcanvasPr
             </fieldset>
           </div>
 
+          {saveError && (
+            <p className="banner-panel__error" role="alert">
+              {saveError}
+            </p>
+          )}
+
           <div className="banner-panel__actions">
-            <button type="submit" className="banners__btn banners__btn--navy">
-              {isEdit ? "Update Banner" : "Create Banner"}
+            <button type="submit" className="banners__btn banners__btn--navy" disabled={saving}>
+              {saving ? "Saving…" : isEdit ? "Update Banner" : "Create Banner"}
             </button>
-            <button type="button" className="banners__btn banners__btn--warning" onClick={onClose}>
+            <button type="button" className="banners__btn banners__btn--warning" onClick={onClose} disabled={saving}>
               Cancel
             </button>
           </div>
