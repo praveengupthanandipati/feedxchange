@@ -4,6 +4,7 @@ import { ArrowLeftIcon, BellIcon, CreditCardIcon, PenLineIcon, PhoneIcon, Share2
 import { useGetTransporterProfileByIdQuery } from "../../../../../core/store/transportersApi";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
+import { openShare } from "../../../../../shared/utils/openShare";
 import { mapTransporterProfileDetail, toRecipientOptions } from "./transporterDetail.data";
 import OverviewTab from "./OverviewTab";
 import ContactsTab from "./ContactsTab";
@@ -41,7 +42,25 @@ const Transportview = () => {
   const profile = useMemo(() => (rawProfile ? mapTransporterProfileDetail(rawProfile) : null), [rawProfile]);
   const recipientOptions = useMemo(() => (profile ? toRecipientOptions(profile) : []), [profile]);
 
-  const handleShareProfile = (_payload: ShareModalPayload) => undefined;
+  // Sends the profile's main details through the chosen app to the picked contacts.
+  const handleShareProfile = ({ recipients, message, channel }: ShareModalPayload) => {
+    if (!profile) return;
+    const details = [
+      ["Transporter", profile.transporterLegalName],
+      ["Trading name", profile.tradingName],
+      ["Owner", profile.transporterOwnerName],
+      ["GST", profile.gstNumber],
+      ["Mobile", profile.mobile],
+      ["Email", profile.email],
+      ["Website", profile.website],
+      ["Location", [profile.city, profile.state].filter(Boolean).join(", ")],
+    ]
+      .filter(([, value]) => value)
+      .map(([label, value]) => `${label}: ${value}`);
+    const text = [message.trim(), ...details].filter(Boolean).join("\n");
+    const people = profile.contacts.filter((contact) => recipients.includes(contact.id)).map((contact) => ({ phone: contact.phone, email: contact.email }));
+    openShare(channel, people, text, `Transporter profile - ${profile.transporterLegalName}`);
+  };
 
   if (isFetching) {
     return (
@@ -135,7 +154,7 @@ const Transportview = () => {
         >
           {activeTab === "overview" && <OverviewTab profile={profile} />}
           {activeTab === "contacts" && <ContactsTab profile={profile} />}
-          {activeTab === "bank" && <BankDetailsTab profile={profile} />}
+          {activeTab === "bank" && <BankDetailsTab profile={profile} profileId={Number(id)} />}
           {/* View only: preferences are changed in the edit wizard's Notification Preferences step. */}
           {activeTab === "notifications" && canSeeNotifications && <ProfilePreferencesPanel profileId={Number(id)} compact readOnly />}
         </div>

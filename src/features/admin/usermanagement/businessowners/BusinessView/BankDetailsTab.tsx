@@ -5,6 +5,7 @@ import type { TableColumn } from "../../../../../shared/components/table/table.t
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
 import ShareInformationModal from "../../../../../shared/notifications/ShareInformationModal";
 import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
+import { openShare } from "../../../../../shared/utils/openShare";
 import type { BankRow, DocumentRow, BusinessOwnerProfile } from "./businessOwnerDetail.data";
 import { toRecipientOptions } from "./businessOwnerDetail.data";
 
@@ -47,9 +48,14 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
     {
       key: "download",
       header: "Download",
-      render: (row) => (
+      // The uploaded file itself (it used to download a text file holding only the file name). Opens in a new tab,
+      // since the file is on the API server and a cross-origin "download" attribute is ignored.
+      render: (row) =>
+        row.fileUrl ? (
         <a
-          href={`data:text/plain;charset=utf-8,${encodeURIComponent(row.fileName)}`}
+          href={row.fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           download={row.fileName}
           className="business-owner-detail__icon-link"
           aria-label={`Download ${row.fileName}`}
@@ -57,11 +63,19 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
         >
           <DownloadIcon aria-hidden />
         </a>
-      ),
+        ) : (
+          "—"
+        ),
     },
   ];
 
-  const handleSendDocuments = (_payload: ShareModalPayload) => {
+  // Sends the ticked documents (all of them when none are ticked) with their download links.
+  const handleSendDocuments = ({ recipients, message, channel }: ShareModalPayload) => {
+    const picked = selectedDocumentKeys.length ? profile.documents.filter((row) => selectedDocumentKeys.includes(row.id)) : profile.documents;
+    const lines = picked.map((row) => `- ${row.documentName}${row.registrationNumber ? ` (${row.registrationNumber})` : ""}${row.fileUrl ? `: ${row.fileUrl}` : ""}`);
+    const text = [message.trim(), `Documents of ${profile.businessLegalName}:`, ...lines].filter(Boolean).join("\n");
+    const people = profile.contacts.filter((contact) => recipients.includes(contact.id)).map((contact) => ({ phone: contact.phone, email: contact.email }));
+    openShare(channel, people, text, `Documents - ${profile.businessLegalName}`);
     setSelectedDocumentKeys([]);
   };
 

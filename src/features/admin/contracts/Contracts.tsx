@@ -25,7 +25,7 @@ import {
 import { buildContractColumns } from "./contracts.columns";
 import { useSuccessToast } from "../../../shared/components/toast/useSuccessToast";
 import SuccessToast from "../../../shared/components/toast/SuccessToast";
-import { dateRangeOptions, type Contract } from "./contracts.data";
+import { DEFAULT_DATE_RANGE, DEFAULT_STATUS_FILTER, dateRangeOptions, type Contract } from "./contracts.data";
 import ContractsDashboard from "./dashboard/ContractsDashboard";
 import { ATTENTION, inAttention, type AttentionKind, type MonthBar } from "./dashboard/contractsDashboard.utils";
 import { ChartColumnIcon } from "../../../shared/components/icon";
@@ -142,7 +142,7 @@ const ContractsLoader = () => {
 const Contracts = () => {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState(DEFAULT_STATUS_FILTER);
   const [rows, setRows] = useState<Contract[]>([]);
   //const [successMessage, setSuccessMessage] = useState("");
   const { message: successMessage, showSuccessMessage } = useSuccessToast();
@@ -161,7 +161,7 @@ const Contracts = () => {
   [contractStatuses],
 );
   const [deleteContract] = useDeleteContractMutation();
-  const [dateRangeFilter, setDateRangeFilter] = useState("All");
+  const [dateRangeFilter, setDateRangeFilter] = useState(DEFAULT_DATE_RANGE);
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -267,6 +267,15 @@ const Contracts = () => {
     setCurrentPage(1);
   }, [keyword, statusFilter, dateRangeFilter, customFrom, customTo, focus]);
 
+  // The default "Open" is matched to the status list's own value once it loads, so the Status dropdown shows it selected.
+  useEffect(() => {
+    if (normalizeStatus(statusFilter) !== normalizeStatus(DEFAULT_STATUS_FILTER)) return;
+    const open = contractStatuses.find(
+      (status) => normalizeStatus(status.statusName) === "open" || normalizeStatus(status.displayName) === "open",
+    );
+    if (open && open.statusName !== statusFilter) setStatusFilter(open.statusName);
+  }, [contractStatuses, statusFilter]);
+
 
 const filteredRows = useMemo(() => {
   const searchText = keyword.trim().toLowerCase();
@@ -294,6 +303,13 @@ const filteredRows = useMemo(() => {
     
 
     // Date filters
+    if (dateRangeFilter === "Yesterday") {
+      const yesterday = new Date(Date.now() - DAY_MS).toDateString();
+      if (!row.dateValue || new Date(row.dateValue).toDateString() !== yesterday) {
+        return false;
+      }
+    }
+
     if (dateRangeFilter === "Today") {
       const rowDate = new Date(row.dateValue);
       const today = new Date();

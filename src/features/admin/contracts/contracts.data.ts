@@ -116,9 +116,14 @@ export const statusOptions = [
   { value: "In-transit", label: "In Transit" },
 ];
 
+/** The list opens on the previous day's Open contracts: Yesterday in the date filter, Open in the status filter. */
+export const DEFAULT_DATE_RANGE = "Yesterday";
+export const DEFAULT_STATUS_FILTER = "Open";
+
 export const dateRangeOptions = [
   { value: "All", label: "All" },
   { value: "Today", label: "Today" },
+  { value: "Yesterday", label: "Yesterday" },
   { value: "Last 7 Days", label: "Last 7 Days" },
   { value: "Last 30 Days", label: "Last 30 Days" },
   { value: "Previous Month", label: "Previous Month" },

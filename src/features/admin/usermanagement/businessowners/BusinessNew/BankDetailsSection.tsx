@@ -2,8 +2,9 @@ import { useState } from "react";
 import { SearchIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
+import { fetchBankFromIfsc } from "../../../../../shared/utils/ifscLookup";
 import EmptyRowsState from "./EmptyRowsState";
-import { accountTypeOptions, ifscLookup } from "./newBusiness.data";
+import { accountTypeOptions } from "./newBusiness.data";
 
 export interface BankEntry {
   id: string;
@@ -64,12 +65,16 @@ const BankDetailsSection = ({
   const updateEntry = (id: string, patch: Partial<BankEntry>) =>
     onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
 
-  const lookupIfsc = (id: string, ifscCode: string) => {
-    const match = ifscLookup[ifscCode.trim().toUpperCase()];
+  const [lookingUpId, setLookingUpId] = useState<string | null>(null);
+
+  const lookupIfsc = async (id: string, ifscCode: string) => {
+    setLookingUpId(id);
+    const match = await fetchBankFromIfsc(ifscCode);
+    setLookingUpId(null);
     if (match) {
       updateEntry(id, { bankName: match.bankName, branchName: match.branch, ifscError: "" });
     } else {
-      updateEntry(id, { ifscError: "IFSC code not found" });
+      updateEntry(id, { ifscError: "IFSC code not found. Check the 11-character code, e.g. SBIN0000691." });
     }
   };
 
@@ -141,6 +146,7 @@ const BankDetailsSection = ({
                         type="button"
                         className="form-field__action"
                         onClick={() => lookupIfsc(entry.id, entry.ifscCode)}
+                        disabled={lookingUpId === entry.id}
                         aria-label="Look up IFSC code"
                         title="Look up bank details for this IFSC code"
                       >

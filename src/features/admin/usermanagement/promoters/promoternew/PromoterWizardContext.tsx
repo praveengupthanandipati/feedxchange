@@ -42,6 +42,8 @@ export interface PromoterDraft {
   // this session's first address save returns. Drives whether the next save
   // calls UpdateProfileAddress or bundles it into a create.
   billingAddressMeta: { addressId: number; createdBy: number; createdOn: string } | null;
+  /** Status toggle in Profile Settings. */
+  status: "Active" | "Inactive";
 }
 
 const emptyDraft = (): PromoterDraft => ({
@@ -82,6 +84,7 @@ const emptyDraft = (): PromoterDraft => ({
   remarks: "",
   documents: [],
   billingAddressMeta: null,
+  status: "Active",
 });
 
 interface PromoterWizardContextValue {

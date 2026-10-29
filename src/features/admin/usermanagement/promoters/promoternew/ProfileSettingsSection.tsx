@@ -1,14 +1,20 @@
 import { useState } from "react";
 import ToggleSwitch from "../../../../../shared/components/toggle/ToggleSwitch";
+import { usePromoterWizard } from "./PromoterWizardContext";
 import { profileSettingDefinitions } from "./promoterNew.data";
 
 const ProfileSettingsSection = () => {
+  // The status toggle is saved with the profile (draft.status); the other toggles have no backend field yet.
+  const { draft, updateDraft } = usePromoterWizard();
   const [values, setValues] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(profileSettingDefinitions.map((setting) => [setting.key, setting.defaultValue]))
   );
+  const valueOf = (key: string) => (key === "promoterStatus" ? draft.status === "Active" : values[key]);
 
-  const toggleSetting = (key: string) =>
-    setValues((prev) => ({ ...prev, [key]: !prev[key] }));
+  const toggleSetting = (key: string) => {
+    if (key === "promoterStatus") updateDraft({ status: draft.status === "Active" ? "Inactive" : "Active" });
+    else setValues((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   return (
     <div>
@@ -28,7 +34,7 @@ const ProfileSettingsSection = () => {
             </div>
             <div className="profile-settings-table__value">
               <ToggleSwitch
-                checked={values[setting.key]}
+                checked={valueOf(setting.key)}
                 onChange={() => toggleSetting(setting.key)}
                 ariaLabel={setting.title}
               />

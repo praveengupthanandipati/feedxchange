@@ -38,6 +38,8 @@ export interface TransporterDraft {
   // this session's first address save returns. Drives whether the next save
   // calls UpdateProfileAddress or bundles it into a create.
   billingAddressMeta: { addressId: number; createdBy: number; createdOn: string } | null;
+  /** Status toggle in Profile Settings. */
+  status: "Active" | "Inactive";
 }
 
 const emptyDraft = (): TransporterDraft => ({
@@ -70,6 +72,7 @@ const emptyDraft = (): TransporterDraft => ({
   primaryBankId: null,
   documents: [],
   billingAddressMeta: null,
+  status: "Active",
 });
 
 interface TransporterWizardContextValue {

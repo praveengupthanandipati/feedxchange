@@ -19,6 +19,7 @@ import {
 import { useGetProductsQuery } from "../../../../../core/store/productsApi";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
+import { openShare } from "../../../../../shared/utils/openShare";
 import { mapBusinessProfileDetail, toRecipientOptions } from "./businessOwnerDetail.data";
 import OverviewTab from "./OverviewTab";
 import ContactsTab from "./ContactsTab";
@@ -93,7 +94,26 @@ const BusinessOwnerDetail = () => {
   }, [rawProfile, details, businessLines, businessTypes, businessSubTypes, products]);
   const recipientOptions = useMemo(() => (profile ? toRecipientOptions(profile) : []), [profile]);
 
-  const handleShareProfile = (_payload: ShareModalPayload) => undefined;
+  // Sends the profile's main details through the chosen app to the picked contacts.
+  const handleShareProfile = ({ recipients, message, channel }: ShareModalPayload) => {
+    if (!profile) return;
+    const details = [
+      ["Business", profile.businessLegalName],
+      ["Trading name", profile.tradingName],
+      ["Line of business", profile.lineOfBusiness],
+      ["Business type", profile.businessType],
+      ["GST", profile.gstNumber],
+      ["Mobile", profile.mobile],
+      ["Email", profile.email],
+      ["Website", profile.website],
+      ["Location", [profile.location, profile.state].filter(Boolean).join(", ")],
+    ]
+      .filter(([, value]) => value)
+      .map(([label, value]) => `${label}: ${value}`);
+    const text = [message.trim(), ...details].filter(Boolean).join("\n");
+    const people = profile.contacts.filter((contact) => recipients.includes(contact.id)).map((contact) => ({ phone: contact.phone, email: contact.email }));
+    openShare(channel, people, text, `Business profile - ${profile.businessLegalName}`);
+  };
 
   if (isFetching) {
     return (

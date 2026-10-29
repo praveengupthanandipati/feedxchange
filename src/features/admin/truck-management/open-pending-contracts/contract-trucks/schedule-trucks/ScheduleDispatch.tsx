@@ -25,7 +25,7 @@ import { useNotifyPrompt } from "../../../../../../shared/notifications/useNotif
 type BillChangeOption = "direct" | "changeToBeDone";
 
 const DEFAULT_BILL_MESSAGE =
-  "Kindly contact SSRTS team or Buyer for Bill Change and release the vehicle with correct bill";
+  "Kindly contact FeedXchange team or Buyer for Bill Change and release the vehicle with correct bill";
 
 interface FormState {
   billChangeOption: BillChangeOption;

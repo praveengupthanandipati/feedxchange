@@ -275,10 +275,27 @@
     @include m.font-base(v.$font-weight-semibold);
     font-size: v.$font-size-sm;
     color: v.fg(v.$color-text);
+
+    // The info icon keeps its 24px tap target, but the negative margins stop it making this label taller than its
+    // neighbours', which pushed the field (e.g. Trading Name) below the others in its row.
+    .info-tooltip {
+      margin-block: -6px;
+      vertical-align: middle;
+    }
   }
 
   &__required {
     color: v.fg(v.$color-danger);
+  }
+
+  // Dropdowns and date pickers default to the standard control height; in a form they match the text fields (__control).
+  .searchable-select__trigger,
+  .date-range-input__trigger {
+    height: var(--fx-control-height-lg);
+  }
+
+  .multi-select__trigger {
+    min-height: var(--fx-control-height-lg);
   }
 
   &__error {

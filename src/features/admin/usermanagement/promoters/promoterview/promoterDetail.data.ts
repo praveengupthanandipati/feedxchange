@@ -1,4 +1,5 @@
 import type { SearchableSelectOption } from "../../../../../shared/components/dropdown/SearchableSelect";
+import { fileUrl } from "../../../../../shared/utils/fileUrl";
 import type { PromoterProfileDetail } from "../../../../../core/store/promotersApi";
 
 export interface DocumentRow {
@@ -9,6 +10,8 @@ export interface DocumentRow {
   issueAuthority: string;
   issueDate: string;
   fileName: string;
+  /** Link to the uploaded file, or "" when there is none. */
+  fileUrl: string;
 }
 
 export interface RegionRow {
@@ -77,6 +80,7 @@ export function mapPromoterProfileDetail(profile: PromoterProfileDetail): Promot
       issueAuthority: document.issuingAuthority,
       issueDate: document.issuedDate?.slice(0, 10) ?? "",
       fileName: document.fileName,
+      fileUrl: fileUrl(document.filePath),
     })),
   };
 }

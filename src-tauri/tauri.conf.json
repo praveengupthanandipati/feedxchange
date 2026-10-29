@@ -28,7 +28,7 @@
         "style-src": "'self' 'unsafe-inline'",
         "font-src": "'self' data:",
         "img-src": "'self' data: blob: https://qa.feedxchange.in",
-        "connect-src": "'self' ipc: http://ipc.localhost https://qa.feedxchange.in wss://qa.feedxchange.in https://api.postalpincode.in"
+        "connect-src": "'self' ipc: http://ipc.localhost https://qa.feedxchange.in wss://qa.feedxchange.in https://api.postalpincode.in https://ifsc.razorpay.com"
       },
       "dangerousDisableAssetCspModification": ["style-src"]
     }

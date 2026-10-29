@@ -161,6 +161,9 @@ interface BusinessOwnersFiltersProps {
   location: string;
   onLocationChange: (value: string) => void;
   locationOptions: FilterOption[];
+  group: string;
+  onGroupChange: (value: string) => void;
+  groupOptions: FilterOption[];
   onClear: () => void;
 }
 
@@ -175,6 +178,9 @@ const BusinessOwnersFilters = ({
   location,
   onLocationChange,
   locationOptions,
+  group,
+  onGroupChange,
+  groupOptions,
   onClear,
 }: BusinessOwnersFiltersProps) => {
   return (
@@ -201,6 +207,14 @@ const BusinessOwnersFilters = ({
         onChange={onLocationChange}
         placeholder="Select Location"
         ariaLabel="Filter by location"
+      />
+
+      <SearchableSelect
+        options={groupOptions}
+        value={group}
+        onChange={onGroupChange}
+        placeholder="Select Group"
+        ariaLabel="Filter by group"
       />
 
       <div className="business-owners-filters__search">
@@ -247,6 +261,7 @@ const Businessowners = () => {
   const [status, setStatus] = useState<string>(DEFAULT_STATUS_FILTER);
   const [businessType, setBusinessType] = useState("All");
   const [location, setLocation] = useState("All");
+  const [group, setGroup] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteOwner, setPendingDeleteOwner] = useState<BusinessOwner | null>(null);
@@ -299,9 +314,14 @@ const Businessowners = () => {
     [rows],
   );
 
+  const groupOptions = useMemo(
+    () => buildFilterOptions(rows.map((row) => row.groupName?.trim() ?? ""), "By Group"),
+    [rows],
+  );
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, status, businessType, location]);
+  }, [keyword, status, businessType, location, group]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
@@ -310,6 +330,7 @@ const Businessowners = () => {
       if (status !== "All" && row.status !== status) return false;
       if (businessType !== "All" && row.businessTypeName !== businessType) return false;
       if (location !== "All" && row.location !== location) return false;
+      if (group !== "All" && (row.groupName?.trim() ?? "") !== group) return false;
 
       if (q) {
         const haystack = [row.stateName, row.legalName, row.mobileNumber]
@@ -320,7 +341,7 @@ const Businessowners = () => {
 
       return true;
     });
-  }, [rows, keyword, status, businessType, location]);
+  }, [rows, keyword, status, businessType, location, group]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -334,6 +355,7 @@ const Businessowners = () => {
     setStatus(DEFAULT_STATUS_FILTER);
     setBusinessType("All");
     setLocation("All");
+    setGroup("All");
   };
 
   const handleExport = () => {
@@ -406,6 +428,9 @@ const Businessowners = () => {
             location={location}
             onLocationChange={setLocation}
             locationOptions={locationOptions}
+            group={group}
+            onGroupChange={setGroup}
+            groupOptions={groupOptions}
             onClear={handleClearFilters}
           />
         )}

@@ -29,7 +29,7 @@ export function buildPromoterProfilePayload(
     area: draft.area,
     referredBy: draft.referredBy,
     aboutProfile: draft.aboutProfile,
-    status: "Active",
+    status: draft.status,
     createdBy: currentUserId,
     promoterProfileDetails: {
       promoterCode: draft.promoterCode,
@@ -59,6 +59,7 @@ export function hydrateDraftFromPromoterProfile(profile: PromoterProfileDetail):
   return {
     promoterCode: details?.promoterCode ?? "",
     promoterName: profile.legalName,
+    status: /inactive/i.test(profile.status ?? "") ? "Inactive" : "Active",
     companyName: details?.companyName ?? "",
     tradingName: profile.tradingName,
     yearOfEstablishment: profile.yearOfEstablishment,

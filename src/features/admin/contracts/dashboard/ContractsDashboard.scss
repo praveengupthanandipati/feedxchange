@@ -205,6 +205,18 @@
       grid-column: auto / span 2;
     }
   }
+
+  // Top products / buyers / sellers: a full-width row of their own, three across on wide screens.
+  .cd-rankings {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: v.$spacing-3;
+
+    > .cd-panel {
+      grid-column: auto;
+    }
+  }
 }
 
 .cd-panel {

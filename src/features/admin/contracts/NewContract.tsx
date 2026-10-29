@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ArrowLeftIcon, EyeIcon, EyeOffIcon } from "../../../shared/components/icon";
 import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
 import ToggleSwitch from "../../../shared/components/toggle/ToggleSwitch";
+import ConfirmDialog from "../../../shared/components/dialog/ConfirmDialog";
 import type { Contract } from "./contracts.data";
 import {
   useGetContractByContractNumberQuery,
@@ -46,6 +47,9 @@ interface ConditionState {
   address: string;
   remarks: string;
 }
+
+/** Seller conditions the buyer's copy follows by default (the address is the buyer's own). */
+const FOLLOWED_CONDITION_KEYS = ["deliverySchedule", "fromDate", "toDate", "specificDays", "qualitySpecSource"] as const;
 
 const emptyCondition: ConditionState = {
   commission: "5",
@@ -110,6 +114,12 @@ const formatProfileAddress = (address: {
 
 /** Dropdown values backed by a database id are always digits. */
 const isProfileId = (value: string) => /^\d+$/.test(value);
+
+/** Today as YYYY-MM-DD in local time: a new contract is dated today by default. */
+const todayInputDate = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+};
 
 /** Narrows a hydrated value to an id, discarding nulls, names and NaN. */
 const asOptionId = (value: unknown) =>
@@ -200,7 +210,7 @@ const NewContract = () => {
   const [summaryVisible, setSummaryVisible] = useState(true);
   const [contractNumber, setContractNumber] = useState("");
 
-  const [contractDate, setContractDate] = useState("");
+  const [contractDate, setContractDate] = useState(todayInputDate);
   // The period the contract is valid for. Effective From follows the contract date until it is set by hand.
   const [effectiveFromInput, setEffectiveFromInput] = useState("");
   const [effectiveTo, setEffectiveTo] = useState("");
@@ -226,6 +236,8 @@ const NewContract = () => {
   const [immediateAdvancePercent, setImmediateAdvancePercent] = useState("");
   const [immediateAdvanceDate, setImmediateAdvanceDate] = useState("");
   const [balanceAdvanceDate, setBalanceAdvanceDate] = useState("");
+  // Set by hand (or loaded with an existing contract): stop following the delivery To Date.
+  const [balanceDateEdited, setBalanceDateEdited] = useState(() => Boolean(navState?.isEdit));
   const [sellerPaymentDueDays, setSellerPaymentDueDays] = useState("");
   const [buyerPaymentDueDays, setBuyerPaymentDueDays] = useState("");
   const [paymentRemarks, setPaymentRemarks] = useState("");
@@ -377,8 +389,17 @@ const NewContract = () => {
   const canNotify = usePermission("notifications.send");
   const notifyEventCode = navState?.isEdit ? "CONTRACT_UPDATED" : "CONTRACT_CREATED";
   const [notifyContract, setNotifyContract] = useState<string | null>(null);
-  // A new contract notifies by default; an edit does not, so fixing a typo never messages the buyer and seller by accident.
-  const [notifyAfterSave, setNotifyAfterSave] = useState(() => !navState?.isEdit);
+  // Buyer and seller hear about a new contract once it is approved, so by default it notifies only when saved as Approved and
+  // not back-dated; an edit never notifies by default. Ticking or unticking the box overrides this.
+  const isPastDate = Boolean(contractDate) && contractDate < todayInputDate();
+  const [notifyTouched, setNotifyTouched] = useState(false);
+  const [notifyChoice, setNotifyChoice] = useState(false);
+  const notifyAfterSave = notifyTouched ? notifyChoice : !navState?.isEdit && status && !isPastDate;
+  const setNotifyAfterSave = (value: boolean) => {
+    setNotifyTouched(true);
+    setNotifyChoice(value);
+  };
+  const [pastDateConfirmOpen, setPastDateConfirmOpen] = useState(false);
   const [notifyChoices, setNotifyChoices] = useState<NotifyChoices | null>(null);
    const [updateContract, { isLoading: isUpdating }] =
   useUpdateContractMutation();
@@ -508,15 +529,38 @@ const { data: products } = useGetProductsQuery();
       if (match) setSellerConditions((prev) => ({ ...prev, address: String(match.addressId) }));
     }, [sellerAddresses, sellerConditions.address]);
 
+    // "Delivery at" starts on the party's primary address, or its only address.
+    useEffect(() => {
+      if (sellerConditions.address) return;
+      const preferred = sellerAddresses.find((address) => address.isPrimary) ?? (sellerAddresses.length === 1 ? sellerAddresses[0] : undefined);
+      if (preferred) setSellerConditions((prev) => (prev.address ? prev : { ...prev, address: String(preferred.addressId) }));
+    }, [sellerAddresses, sellerConditions.address]);
+
+    useEffect(() => {
+      if (buyerConditions.address) return;
+      const preferred = buyerAddresses.find((address) => address.isPrimary) ?? (buyerAddresses.length === 1 ? buyerAddresses[0] : undefined);
+      if (preferred) setBuyerConditions((prev) => (prev.address ? prev : { ...prev, address: String(preferred.addressId) }));
+    }, [buyerAddresses, buyerConditions.address]);
+
     useEffect(() => {
       if (!buyerConditions.address || /^\d+$/.test(buyerConditions.address)) return;
       const match = findAddressByLabel(buyerAddresses, buyerConditions.address);
       if (match) setBuyerConditions((prev) => ({ ...prev, address: String(match.addressId) }));
     }, [buyerAddresses, buyerConditions.address]);
   
-  const baseRate = parseFloat(contractRate) || 0;
-  const gstAmount = Math.round(baseRate * ((parseFloat(gstPercent) || 0) / 100) * 100) / 100;
+  const enteredRate = parseFloat(contractRate) || 0;
+  const gstFraction = (parseFloat(gstPercent) || 0) / 100;
+  // Product rate: the rate before GST. Entered "Including GST" it is worked back out of the rate; otherwise it is the rate.
+  const baseRate = gstDetails === "including" ? Math.round((enteredRate / (1 + gstFraction)) * 100) / 100 : enteredRate;
+  const gstAmount = Math.round(baseRate * gstFraction * 100) / 100;
   const netRate = Math.round((baseRate + gstAmount) * 100) / 100;
+
+  // Forward Advance: Balance Advance Date is the forward contract's To Date (buyer's, else seller's) until set by hand.
+  const forwardToDate = buyerConditions.toDate || sellerConditions.toDate;
+  useEffect(() => {
+    if (paymentTerms !== "forward-advance" || balanceDateEdited || !forwardToDate) return;
+    setBalanceAdvanceDate(forwardToDate);
+  }, [paymentTerms, forwardToDate, balanceDateEdited]);
 
   const balanceAdvancePercent = immediateAdvancePercent
     ? Math.max(0, 100 - (parseFloat(immediateAdvancePercent) || 0))
@@ -598,8 +642,29 @@ const { data: products } = useGetProductsQuery();
   );
 
 
+  // The buyer's delivery schedule and quality specification follow the seller's while they still match it; once changed on the
+  // buyer side they stay as set.
   const handleSellerConditionChange = (patch: Partial<ConditionState>) => {
+    const follow: Partial<ConditionState> = {};
+    for (const key of FOLLOWED_CONDITION_KEYS) {
+      if (key in patch && buyerConditions[key] === sellerConditions[key]) follow[key] = patch[key];
+    }
     setSellerConditions((prev) => ({ ...prev, ...patch }));
+    if (Object.keys(follow).length > 0) setBuyerConditions((prev) => ({ ...prev, ...follow }));
+  };
+
+  // Picking a party fills its commission from its profile (seller: sell charge, buyer: buy charge); it stays editable.
+  const profileCharge = (profileId: string, key: "sellCharge" | "buyCharge") =>
+    businessProfiles?.find((profile) => String(profile.profileId) === profileId)?.[key];
+  const handleSellerPick = (value: string) => {
+    setSellerId(value);
+    const charge = profileCharge(value, "sellCharge");
+    if (charge) setSellerConditions((prev) => ({ ...prev, commission: String(charge) }));
+  };
+  const handleBuyerPick = (value: string) => {
+    setBuyerId(value);
+    const charge = profileCharge(value, "buyCharge");
+    if (charge) setBuyerConditions((prev) => ({ ...prev, commission: String(charge) }));
   };
 
   const handleBuyerConditionChange = (patch: Partial<ConditionState>) => {
@@ -611,7 +676,7 @@ const { data: products } = useGetProductsQuery();
       setter(event.target.value);
     };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (pastDateConfirmed = false) => {
   console.log("navState:", navState);
   console.log("contract:", navState?.contract);
   console.log("contractNumber:", contractNumber);
@@ -634,6 +699,12 @@ const { data: products } = useGetProductsQuery();
     return;
   }
 
+  // A new contract dated in the past is confirmed before it is saved.
+  if (!navState?.isEdit && isPastDate && !pastDateConfirmed) {
+    setPastDateConfirmOpen(true);
+    return;
+  }
+
   setFormError("");
 
   if (
@@ -651,7 +722,8 @@ const { data: products } = useGetProductsQuery();
 
     const quantity = Number(qty) || 0;
     const tolerance = Number(poTolerance) || 0;
-    const rate = Number(contractRate) || 0;
+    // Saved as the product rate (before GST) however it was entered, as every existing contract stores it.
+    const rate = baseRate;
     // Stored as the readable text ("5% GST", "FOR Delivery") so lists and messages can show them as they are.
     const gstDetailsLabel = gstDetailsOptions.find((option) => option.value === gstDetails)?.label ?? gstDetails;
     const deliveryTypeLabel = deliveryTypeOptions.find((option) => option.value === deliveryType)?.label ?? deliveryType;
@@ -1057,9 +1129,16 @@ const { data: products } = useGetProductsQuery();
     )
   );
 
+  const savedGstDetails = /includ/i.test(contract.gstDetails ?? "") ? "including" : contract.gstDetails ? "excluding" : "";
+  const savedGstPercent = contract.gst ? Number(String(contract.gst).replace("%", "")) || 0 : 5;
+  // The saved price is before GST; a contract entered "Including GST" shows its rate with the GST added back.
   setContractRate(
     contract.cRateValue !== undefined
-      ? String(contract.cRateValue)
+      ? String(
+          savedGstDetails === "including"
+            ? Math.round(Number(contract.cRateValue) * (1 + savedGstPercent / 100) * 100) / 100
+            : contract.cRateValue,
+        )
       : ""
   );
 
@@ -1069,7 +1148,7 @@ const { data: products } = useGetProductsQuery();
       : "5"
   );
 
-  setGstDetails(contract.gstDetails || "");
+  setGstDetails(savedGstDetails);
 
   setIndicativeFreight(
     contract.indicativeFreight !== undefined
@@ -1333,27 +1412,27 @@ const { data: products } = useGetProductsQuery();
 
           <div className="form-field">
             <span className="form-field__label">
-              Select Seller <span className="form-field__required">*</span>
-            </span>
-            <SearchableSelect
-              options={businessProfileOptions}
-              value={sellerId}
-              onChange={setSellerId}
-              placeholder="Seller"
-              ariaLabel="Select Seller"
-            />
-          </div>
-
-          <div className="form-field">
-            <span className="form-field__label">
               Select Buyer <span className="form-field__required">*</span>
             </span>
             <SearchableSelect
               options={businessProfileOptions}
               value={buyerId}
-              onChange={setBuyerId}
+              onChange={handleBuyerPick}
               placeholder="Buyer"
               ariaLabel="Select Buyer"
+            />
+          </div>
+
+          <div className="form-field">
+            <span className="form-field__label">
+              Select Seller <span className="form-field__required">*</span>
+            </span>
+            <SearchableSelect
+              options={businessProfileOptions}
+              value={sellerId}
+              onChange={handleSellerPick}
+              placeholder="Seller"
+              ariaLabel="Select Seller"
             />
           </div>
 
@@ -1367,6 +1446,19 @@ const { data: products } = useGetProductsQuery();
               onChange={setProductId}
               placeholder="Product"
               ariaLabel="Select Product"
+            />
+          </div>
+
+          <div className="form-field">
+            <span className="form-field__label">
+              Delivery Type <span className="form-field__required">*</span>
+            </span>
+            <SearchableSelect
+              options={deliveryTypeOptions}
+              value={deliveryType}
+              onChange={setDeliveryType}
+              placeholder="Delivery Type"
+              ariaLabel="Delivery Type"
             />
           </div>
 
@@ -1412,29 +1504,14 @@ const { data: products } = useGetProductsQuery();
 
           <div className="form-field">
             <span className="form-field__label">
-              Delivery Type <span className="form-field__required">*</span>
+              GST details <span className="form-field__required">*</span>
             </span>
             <SearchableSelect
-              options={deliveryTypeOptions}
-              value={deliveryType}
-              onChange={setDeliveryType}
-              placeholder="Delivery Type"
-              ariaLabel="Delivery Type"
-            />
-          </div>
-
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="contractRate">
-              Contract Rate (₹/MT) <span className="form-field__required">*</span>
-            </label>
-            <input
-              id="contractRate"
-              type="number"
-              min="0"
-              className="form-field__control"
-              placeholder="Rate Ex: 25,000"
-              value={contractRate}
-              onChange={handleNumberChange(setContractRate)}
+              options={gstDetailsOptions}
+              value={gstDetails}
+              onChange={setGstDetails}
+              placeholder="Select GST Details"
+              ariaLabel="GST details"
             />
           </div>
 
@@ -1453,21 +1530,23 @@ const { data: products } = useGetProductsQuery();
           </div>
 
           <div className="form-field">
-            <span className="form-field__label">
-              GST details <span className="form-field__required">*</span>
-            </span>
-            <SearchableSelect
-              options={gstDetailsOptions}
-              value={gstDetails}
-              onChange={setGstDetails}
-              placeholder="GST Details"
-              ariaLabel="GST details"
+            <label className="form-field__label" htmlFor="contractRate">
+              Rate (₹/MT) <span className="form-field__required">*</span>
+            </label>
+            <input
+              id="contractRate"
+              type="number"
+              min="0"
+              className="form-field__control"
+              placeholder="Rate Ex: 25,000"
+              value={contractRate}
+              onChange={handleNumberChange(setContractRate)}
             />
           </div>
 
           <div className="form-field">
             <label className="form-field__label" htmlFor="baseRate">
-              Base Rate
+              Product Rate
             </label>
             <input
               id="baseRate"
@@ -1863,7 +1942,10 @@ const { data: products } = useGetProductsQuery();
                 <DatePickerInput
                   id="balanceAdvanceDate"
                   value={balanceAdvanceDate}
-                  onChange={(value) => setBalanceAdvanceDate(value)}
+                  onChange={(value) => {
+                    setBalanceDateEdited(true);
+                    setBalanceAdvanceDate(value);
+                  }}
                   clearable
                 />
               </div>
@@ -1963,6 +2045,13 @@ const { data: products } = useGetProductsQuery();
                 ? "Notify the buyer and seller about this change"
                 : "Notify the buyer and seller when the contract is created"}
             </label>
+            {!navState?.isEdit && !notifyTouched && (!status || isPastDate) && (
+              <div className="form-text">
+                {isPastDate
+                  ? "The contract date is in the past, so no confirmation is sent unless you tick this."
+                  : "Saved as Pending: the buyer and seller are told when the contract is approved (Contract Status, Approve)."}
+              </div>
+            )}
             <div className="form-text">
               Choose the channels and the template for each below. After you click {navState?.isEdit ? "Update Contract" : "Create Contract"} you will see exactly who will receive what and can still change it before anything is sent.
             </div>
@@ -1985,7 +2074,7 @@ const { data: products } = useGetProductsQuery();
         <button
           type="button"
           className="new-contract__submit"
-          onClick={handleSubmit}
+          onClick={() => handleSubmit()}
           disabled={isSubmitting}
         >
           {isSubmitting
@@ -1995,6 +2084,18 @@ const { data: products } = useGetProductsQuery();
               : "Create Contract"}
         </button>
       </div>
+
+      <ConfirmDialog
+        open={pastDateConfirmOpen}
+        title="Contract date is in the past"
+        message={`The contract is dated ${contractDate}, before today. Save it with this date?`}
+        confirmLabel="Save with this date"
+        onConfirm={() => {
+          setPastDateConfirmOpen(false);
+          void handleSubmit(true);
+        }}
+        onCancel={() => setPastDateConfirmOpen(false)}
+      />
 
       <NotifyModal
         open={notifyContract !== null}

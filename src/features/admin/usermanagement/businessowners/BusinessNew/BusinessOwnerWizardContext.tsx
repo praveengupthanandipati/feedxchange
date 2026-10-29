@@ -41,6 +41,8 @@ export interface BusinessOwnerDraft {
   primaryBankId: string | null;
   documents: DocumentEntry[];
   billingAddressMeta: { addressId: number; createdBy: number; createdOn: string } | null;
+  /** Business Status toggle in Profile Settings. */
+  status: "Active" | "Inactive";
 }
 
 const emptyDraft = (): BusinessOwnerDraft => ({
@@ -78,6 +80,7 @@ const emptyDraft = (): BusinessOwnerDraft => ({
   bankAccounts: [],
   primaryBankId: null,
   documents: [],
+  status: "Active",
   billingAddressMeta: null,
 });
 

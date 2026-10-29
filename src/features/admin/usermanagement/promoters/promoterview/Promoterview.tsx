@@ -6,6 +6,7 @@ import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
+import { openShare } from "../../../../../shared/utils/openShare";
 import { useGetPromoterProfileByIdQuery } from "../../../../../core/store/promotersApi";
 import { mapPromoterProfileDetail, toRecipientOptions } from "./promoterDetail.data";
 import type { DocumentRow, RegionRow } from "./promoterDetail.data";
@@ -53,7 +54,22 @@ const Promoterview = () => {
   const profile = useMemo(() => (rawProfile ? mapPromoterProfileDetail(rawProfile) : null), [rawProfile]);
   const recipientOptions = useMemo(() => (profile ? toRecipientOptions(profile) : []), [profile]);
 
-  const handleShareProfile = (_payload: ShareModalPayload) => undefined;
+  // Sends the profile's main details through the chosen app to the promoter (the only recipient offered).
+  const handleShareProfile = ({ message, channel }: ShareModalPayload) => {
+    if (!profile) return;
+    const details = [
+      ["Promoter", profile.promoterName],
+      ["Promoter code", profile.promoterCode],
+      ["Company", profile.companyName],
+      ["Mobile", profile.mobileNumber],
+      ["Email", profile.emailId],
+      ["Address", profile.completeAddress],
+    ]
+      .filter(([, value]) => value)
+      .map(([label, value]) => `${label}: ${value}`);
+    const text = [message.trim(), ...details].filter(Boolean).join("\n");
+    openShare(channel, [{ phone: profile.mobileNumber, email: profile.emailId }], text, `Promoter profile - ${profile.promoterName}`);
+  };
   const handleSendMessage = (_payload: ShareModalPayload) => undefined;
 
   const regionColumns: TableColumn<RegionRow>[] = [
@@ -72,17 +88,24 @@ const Promoterview = () => {
     {
       key: "download",
       header: "Download",
-      render: (row) => (
-        <a
-          href={`data:text/plain;charset=utf-8,${encodeURIComponent(row.fileName)}`}
-          download={row.fileName}
-          className="promoters__link"
-          aria-label={`Download ${row.fileName}`}
-          title={`Download ${row.fileName}`}
-        >
-          <DownloadIcon aria-hidden /> Download
-        </a>
-      ),
+      // The uploaded file itself (it used to download a text file holding only the file name). Opens in a new tab,
+      // since the file is on the API server and a cross-origin "download" attribute is ignored.
+      render: (row) =>
+        row.fileUrl ? (
+          <a
+            href={row.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            download={row.fileName}
+            className="promoters__link"
+            aria-label={`Download ${row.fileName}`}
+            title={`Download ${row.fileName}`}
+          >
+            <DownloadIcon aria-hidden /> Download
+          </a>
+        ) : (
+          "—"
+        ),
     },
   ];
 

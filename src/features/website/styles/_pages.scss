@@ -2008,6 +2008,11 @@
     margin-top: v.$space-5;
   }
 
+  // The server turned the signup down (e.g. the email is already registered).
+  &__error {
+    margin-top: v.$space-4;
+  }
+
   &--sent {
     display: flex;
     flex-direction: column;
@@ -2133,6 +2138,11 @@
 
     &.is-empty {
       color: v.fg(v.$ink-muted);
+    }
+
+    // Type / sub type wait for the field before them.
+    &:disabled {
+      cursor: not-allowed;
     }
 
     option {
@@ -2765,8 +2775,10 @@
   }
 
   &__cover {
+    position: relative;
     display: flex;
     align-items: flex-end;
+    overflow: hidden;
     // Flatter on phones so a cover doesn't fill half the screen.
     aspect-ratio: 5 / 2;
 
@@ -2787,13 +2799,14 @@
       background: linear-gradient(135deg, v.$green-500, var(--fx-teal-24));
     }
 
-    span {
-      padding: 0.3rem 0.75rem;
-      border-radius: v.$radius-pill;
-      background-color: v.alpha(v.$white, 0.92);
-      color: v.fg(v.$navy-900);
-      font-size: v.$fs-xs;
-      font-weight: v.$fw-semibold;
+    // The post's own image covers the coloured background.
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
   }
 
@@ -2831,6 +2844,14 @@
       gap: 0.3rem;
     }
   }
+}
+
+// Loading / empty / error line in place of the blog grid.
+.blog-status {
+  padding: v.$space-7 0;
+  color: v.fg(v.$ink-muted);
+  font-size: v.$fs-base;
+  text-align: center;
 }
 
 // ============================================================

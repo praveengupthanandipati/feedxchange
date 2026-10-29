@@ -36,11 +36,10 @@ export const deliveryTypeOptions = [
   { value: "for-delivery", label: "FOR Delivery" },
 ];
 
+/** Whether the rate entered includes GST. The GST % itself is its own field. */
 export const gstDetailsOptions = [
-  { value: "5", label: "5% GST" },
-  { value: "12", label: "12% GST" },
-  { value: "18", label: "18% GST" },
-  { value: "0", label: "Exempt" },
+  { value: "including", label: "Including GST" },
+  { value: "excluding", label: "Excluding GST" },
 ];
 
 export const deliveryScheduleOptions = [

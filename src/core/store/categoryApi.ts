@@ -93,14 +93,14 @@ export const categoryApi = createApi({
   tagTypes: ["Category"],
 
   endpoints: (builder) => ({
-    // // ===========================
-    // // GET ALL CATEGORIES
-    // // ===========================
-    // getAllCategories: builder.query<Category[], void>({
-    //   query: () => "/api/Category/GetAllCategories",
-    //   transformResponse: transformCategories,
-    //   providesTags: ["Category"],
-    // }),
+    // ===========================
+    // GET ALL CATEGORIES (public: the website; includes inactive ones)
+    // ===========================
+    getAllCategories: builder.query<Category[], void>({
+      query: () => "/api/Category/GetAllCategories",
+      transformResponse: transformCategories,
+      providesTags: ["Category"],
+    }),
 
     // ===========================
     // GET ACTIVE CATEGORIES
@@ -188,6 +188,7 @@ export const categoryApi = createApi({
 });
 
 export const {
+  useGetAllCategoriesQuery,
   useGetAllActiveCategoriesQuery,
   useAddCategoryMutation,
   useUpdateCategoryMutation,

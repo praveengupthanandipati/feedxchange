@@ -87,7 +87,7 @@ const UserOffcanvas = ({ user, users, onSave, onClose }: UserOffcanvasProps) => 
 
         <form className="user-panel__body" onSubmit={handleSubmit} noValidate>
           <div className="user-panel__grid">
-            <FormField id="user-business" label="Select Business" required wide plainLabel error={errors.business} hint={businessLocked ? "Business is fixed for non-SSRTS admins." : undefined}>
+            <FormField id="user-business" label="Select Business" required wide plainLabel error={errors.business} hint={businessLocked ? "Business is fixed for non-FeedXchange admins." : undefined}>
               <SearchableSelect options={BUSINESS_OPTIONS} value={form.business} onChange={(business) => set("business", business)} placeholder="Select business" ariaLabel="Select Business" disabled={businessLocked} />
             </FormField>
 
