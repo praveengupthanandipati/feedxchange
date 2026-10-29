@@ -320,8 +320,12 @@ const ContractsDashboard = ({ contracts, loading, error, active, onStatus, onFoc
           </ol>
         </section>
 
-        <RankedList title="Top products by quantity" items={metrics.topProducts} unit="quantity" active={active.search} onPick={onSearch} />
-        <RankedList title="Top buyers by quantity" items={metrics.topBuyers} unit="quantity" active={active.search} onPick={onSearch} />
+        {/* Products, buyers and sellers side by side on wide screens. */}
+        <div className="cd-rankings">
+          <RankedList title="Top products by quantity" items={metrics.topProducts} unit="quantity" active={active.search} onPick={onSearch} />
+          <RankedList title="Top buyers by quantity" items={metrics.topBuyers} unit="quantity" active={active.search} onPick={onSearch} />
+          <RankedList title="Top sellers by quantity" items={metrics.topSellers} unit="quantity" active={active.search} onPick={onSearch} />
+        </div>
       </div>
     </section>
   );

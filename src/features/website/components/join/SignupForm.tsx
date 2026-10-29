@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type ReactNode, type SubmitEvent } from "react";
+import { useMemo, useState, type ChangeEvent, type ReactNode, type SubmitEvent } from "react";
 import {
   type IconComponent,
   ArrowRightIcon,
@@ -9,34 +9,47 @@ import {
   EyeIcon,
   EyeOffIcon,
   GiftIcon,
+  LayersIcon,
   LockIcon,
   MailIcon,
   SmartphoneIcon,
+  TagIcon,
   UserIcon,
 } from "../../../../shared/components/icon";
 import { Link } from "react-router-dom";
-import { businessTypes } from "../../data/content";
+import {
+  useGetAllBusinessLinesQuery,
+  useGetBusinessSubTypesQuery,
+  useGetBusinessTypesByLineQuery,
+} from "../../../../core/store/businessProfilesApi";
+import { useAddRegistrationDetailsMutation } from "../../../../core/store/registrationDetailsApi";
+import { apiErrorMessage } from "../../../../core/store/sellerInvoiceApi";
 import { sitePaths } from "../../routes/paths";
 
 interface SignupValues {
   firstName: string;
   lastName: string;
   business: string;
+  /** Ids from the business line / type / sub type lookups (the same ones the admin business profile uses). */
   line: string;
+  type: string;
+  subType: string;
   email: string;
   password: string;
   confirm: string;
   mobile: string;
   referral: string;
   agree: boolean;
+  /** Rates and updates by email / WhatsApp (optional). */
+  subscribe: boolean;
 }
 
 type Field = keyof SignupValues;
 type Errors = Partial<Record<Field, string>>;
 
-const EMPTY: SignupValues = { firstName: "", lastName: "", business: "", line: "", email: "", password: "", confirm: "", mobile: "", referral: "", agree: false };
+const EMPTY: SignupValues = { firstName: "", lastName: "", business: "", line: "", type: "", subType: "", email: "", password: "", confirm: "", mobile: "", referral: "", agree: false, subscribe: false };
 // Form order, so the first invalid field gets focus on submit.
-const ORDER: Field[] = ["firstName", "lastName", "business", "line", "email", "password", "confirm", "mobile", "referral", "agree"];
+const ORDER: Field[] = ["firstName", "lastName", "business", "line", "type", "subType", "email", "password", "confirm", "mobile", "referral", "agree"];
 
 const NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]*$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -54,7 +67,13 @@ const PASSWORD_RULES: { label: string; test: (value: string) => boolean }[] = [
 
 const STRENGTH = ["Too weak", "Weak", "Fair", "Good", "Strong", "Strong"];
 
-function validateField(key: Field, values: SignupValues): string | undefined {
+/** How many types / sub types the chosen line / type has: those fields are only required when there is something to pick. */
+interface OptionCounts {
+  types: number;
+  subTypes: number;
+}
+
+function validateField(key: Field, values: SignupValues, counts: OptionCounts): string | undefined {
   const value = values[key];
   const text = typeof value === "string" ? value.trim() : "";
   switch (key) {
@@ -73,6 +92,10 @@ function validateField(key: Field, values: SignupValues): string | undefined {
       return undefined;
     case "line":
       return text ? undefined : "Select your line of business.";
+    case "type":
+      return text || !values.line || counts.types === 0 ? undefined : "Select your type of business.";
+    case "subType":
+      return text || !values.type || counts.subTypes === 0 ? undefined : "Select your sub type of business.";
     case "email":
       if (!text) return "Enter your email ID.";
       return EMAIL_PATTERN.test(text) ? undefined : "Enter a valid email ID, e.g. name@company.com.";
@@ -99,9 +122,9 @@ function validateField(key: Field, values: SignupValues): string | undefined {
   }
 }
 
-const validateAll = (values: SignupValues): Errors =>
+const validateAll = (values: SignupValues, counts: OptionCounts): Errors =>
   ORDER.reduce<Errors>((errors, key) => {
-    const message = validateField(key, values);
+    const message = validateField(key, values, counts);
     return message ? { ...errors, [key]: message } : errors;
   }, {});
 
@@ -154,14 +177,38 @@ const SignupForm = () => {
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
   const [show, setShow] = useState({ password: false, confirm: false });
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState("");
+  const [addRegistration, { isLoading: submitting }] = useAddRegistrationDetailsMutation();
+
+  // Line → type → sub type, each list loaded once the one before it is chosen.
+  const { data: lines, isLoading: linesLoading } = useGetAllBusinessLinesQuery();
+  const { data: types, isFetching: typesLoading } = useGetBusinessTypesByLineQuery(values.line, { skip: !values.line });
+  const { data: subTypes, isFetching: subTypesLoading } = useGetBusinessSubTypesQuery(values.type, { skip: !values.type });
+  const lineOptions = useMemo(() => (lines ?? []).map((line) => ({ id: String(line.businessLineId), name: line.businessLineName })), [lines]);
+  const typeOptions = useMemo(
+    () => (values.line ? (types ?? []) : []).map((type) => ({ id: String(type.businessTypeId), name: type.businessTypeName })),
+    [types, values.line],
+  );
+  const subTypeOptions = useMemo(
+    () => (values.type ? (subTypes ?? []) : []).map((subType) => ({ id: String(subType.businessSubTypeId), name: subType.businessSubTypeName })),
+    [subTypes, values.type],
+  );
+  // While a list is loading it counts as "has options", so the field stays required.
+  const counts: OptionCounts = { types: typesLoading ? 1 : typeOptions.length, subTypes: subTypesLoading ? 1 : subTypeOptions.length };
+  const nameOf = (options: { id: string; name: string }[], id: string) => options.find((option) => option.id === id)?.name ?? "";
 
   const update = (key: Field, value: string | boolean) => {
     const next = { ...values, [key]: value };
+    // A new line clears its type and sub type; a new type clears its sub type.
+    if (key === "line") Object.assign(next, { type: "", subType: "" });
+    if (key === "type") next.subType = "";
     setValues(next);
     const recheck: Errors = {};
-    if (touched[key] || errors[key]) recheck[key] = validateField(key, next);
+    if (touched[key] || errors[key]) recheck[key] = validateField(key, next, counts);
+    if (key === "line") Object.assign(recheck, { type: undefined, subType: undefined });
+    if (key === "type") recheck.subType = undefined;
     // Changing the password re-checks the confirmation too.
-    if (key === "password" && (touched.confirm || errors.confirm)) recheck.confirm = validateField("confirm", next);
+    if (key === "password" && (touched.confirm || errors.confirm)) recheck.confirm = validateField("confirm", next, counts);
     if (Object.keys(recheck).length) setErrors((current) => ({ ...current, ...recheck }));
   };
 
@@ -172,12 +219,13 @@ const SignupForm = () => {
 
   const onBlur = (key: Field) => () => {
     setTouched((prev) => ({ ...prev, [key]: true }));
-    setErrors((prev) => ({ ...prev, [key]: validateField(key, values) }));
+    setErrors((prev) => ({ ...prev, [key]: validateField(key, values, counts) }));
   };
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const found = validateAll(values);
+    if (submitting) return;
+    const found = validateAll(values, counts);
     setErrors(found);
     setTouched(Object.fromEntries(ORDER.map((key) => [key, true])));
     const first = ORDER.find((key) => found[key]);
@@ -185,14 +233,36 @@ const SignupForm = () => {
       document.getElementById(`signup-${first}`)?.focus();
       return;
     }
-    // TODO: call the signup API and send the email OTP once it is available.
+    setSubmitError("");
+    try {
+      await addRegistration({
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        businessName: values.business.trim(),
+        lineOfBusiness: nameOf(lineOptions, values.line),
+        typeOfBusiness: nameOf(typeOptions, values.type),
+        subTypeOfBusiness: nameOf(subTypeOptions, values.subType),
+        email: values.email.trim(),
+        password: values.password,
+        phoneNumber: values.mobile.replace(/\D/g, ""),
+        referralCode: values.referral.trim() || null,
+        // Left to the server: a new registration starts pending until the email OTP is verified.
+        isActive: null,
+        isSubscribedToUpdates: values.subscribe,
+        status: null,
+        actionPerformedBy: 0,
+      }).unwrap();
+    } catch (error) {
+      setSubmitError(apiErrorMessage(error, "We couldn't create your account. Please try again."));
+      return;
+    }
     setSentTo(values.email.trim());
     setValues(EMPTY);
     setTouched({});
   };
 
   // Shared props for text inputs: id, change/blur handlers and error wiring.
-  const bind = (key: Exclude<Field, "agree">, hint = false) => ({
+  const bind = (key: Exclude<Field, "agree" | "subscribe">, hint = false) => ({
     id: `signup-${key}`,
     name: key,
     value: values[key],
@@ -242,11 +312,39 @@ const SignupForm = () => {
         <OutlinedField id="signup-line" label="Line of Business" required icon={BriefcaseIcon} error={errors.line}>
           <select {...bind("line")} className={values.line ? undefined : "is-empty"} aria-required>
             <option value="" disabled>
-              Select Line of Business
+              {linesLoading ? "Loading…" : "Select Line of Business"}
             </option>
-            {businessTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
+            {lineOptions.map((line) => (
+              <option key={line.id} value={line.id}>
+                {line.name}
+              </option>
+            ))}
+          </select>
+          <ChevronDownIcon aria-hidden className="su-field__chevron" />
+        </OutlinedField>
+
+        <OutlinedField id="signup-type" label="Type of Business" required icon={LayersIcon} error={errors.type}>
+          <select {...bind("type")} className={values.type ? undefined : "is-empty"} disabled={!values.line || typeOptions.length === 0} aria-required>
+            <option value="" disabled>
+              {!values.line ? "Select Line of Business first" : typesLoading ? "Loading…" : typeOptions.length ? "Select Type of Business" : "No types for this line"}
+            </option>
+            {typeOptions.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
+          </select>
+          <ChevronDownIcon aria-hidden className="su-field__chevron" />
+        </OutlinedField>
+
+        <OutlinedField id="signup-subType" label="Sub Type of Business" required icon={TagIcon} error={errors.subType}>
+          <select {...bind("subType")} className={values.subType ? undefined : "is-empty"} disabled={!values.type || subTypeOptions.length === 0} aria-required>
+            <option value="" disabled>
+              {!values.type ? "Select Type of Business first" : subTypesLoading ? "Loading…" : subTypeOptions.length ? "Select Sub Type" : "No sub types for this type"}
+            </option>
+            {subTypeOptions.map((subType) => (
+              <option key={subType.id} value={subType.id}>
+                {subType.name}
               </option>
             ))}
           </select>
@@ -352,7 +450,7 @@ const SignupForm = () => {
             <CheckIcon />
           </span>
           <span>
-            I agree to SSRTS{" "}
+            I agree to FeedXchange{" "}
             <Link to={sitePaths.terms} target="_blank" rel="noopener">
               Terms &amp; Conditions
             </Link>{" "}
@@ -368,8 +466,30 @@ const SignupForm = () => {
         )}
       </div>
 
-      <button type="submit" className="btn-site btn-site--primary btn-site--block signup-card__submit">
-        Verify Email &amp; Create An account <ArrowRightIcon aria-hidden />
+      <div className="su-agree">
+        <label htmlFor="signup-subscribe">
+          <input id="signup-subscribe" type="checkbox" checked={values.subscribe} onChange={onChange("subscribe")} />
+          <span className="su-agree__box" aria-hidden>
+            <CheckIcon />
+          </span>
+          <span>Send me daily rates and market updates</span>
+        </label>
+      </div>
+
+      {submitError && (
+        <p className="su-field__error signup-card__error" role="alert">
+          {submitError}
+        </p>
+      )}
+
+      <button type="submit" className="btn-site btn-site--primary btn-site--block signup-card__submit" disabled={submitting}>
+        {submitting ? (
+          "Creating your account…"
+        ) : (
+          <>
+            Verify Email &amp; Create An account <ArrowRightIcon aria-hidden />
+          </>
+        )}
       </button>
     </form>
   );

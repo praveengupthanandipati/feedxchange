@@ -93,6 +93,7 @@ export interface ContractsMetrics {
   months: MonthBar[];
   topProducts: Ranked[];
   topBuyers: Ranked[];
+  topSellers: Ranked[];
 }
 
 const STATUS_ORDER = ["pendingforapproval", "pending", "open", "partiallydispatched", "dispatched", "closed"];
@@ -180,6 +181,7 @@ export const buildMetrics = (all: PendingContractApiResponse[], now: number, mon
     months,
     topProducts: rank(contracts, (contract) => contract.productName, 5),
     topBuyers: rank(contracts, (contract) => contract.buyerName, 5),
+    topSellers: rank(contracts, (contract) => contract.sellerName, 5),
   };
 };
 

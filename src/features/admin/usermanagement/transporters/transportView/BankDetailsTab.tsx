@@ -4,14 +4,17 @@ import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
 import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
+import ShareInformationModal from "../../../../../shared/notifications/ShareInformationModal";
+import { openShare } from "../../../../../shared/utils/openShare";
 import type { BankRow, DocumentRow, TransporterProfile } from "./transporterDetail.data";
 import { toRecipientOptions } from "./transporterDetail.data";
 
 interface BankDetailsTabProps {
   profile: TransporterProfile;
+  profileId: number;
 }
 
-const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
+const BankDetailsTab = ({ profile, profileId }: BankDetailsTabProps) => {
   const [selectedBankKeys, setSelectedBankKeys] = useState<string[]>([]);
   const [selectedDocumentKeys, setSelectedDocumentKeys] = useState<string[]>([]);
   const [bankModalOpen, setBankModalOpen] = useState(false);
@@ -45,25 +48,34 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
     {
       key: "download",
       header: "Download",
-      render: (row) => (
-        <a
-          href={`data:text/plain;charset=utf-8,${encodeURIComponent(row.fileName)}`}
-          download={row.fileName}
-          className="business-owners__link"
-          aria-label={`Download ${row.fileName}`}
-          title={`Download ${row.fileName}`}
-        >
-          <DownloadIcon aria-hidden /> Download
-        </a>
-      ),
+      // The uploaded file itself (it used to download a text file holding only the file name). Opens in a new tab,
+      // since the file is on the API server and a cross-origin "download" attribute is ignored.
+      render: (row) =>
+        row.fileUrl ? (
+          <a
+            href={row.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            download={row.fileName}
+            className="business-owners__link"
+            aria-label={`Download ${row.fileName}`}
+            title={`Download ${row.fileName}`}
+          >
+            <DownloadIcon aria-hidden /> Download
+          </a>
+        ) : (
+          "—"
+        ),
     },
   ];
 
-  const handleSendBank = (_payload: ShareModalPayload) => {
-    setSelectedBankKeys([]);
-  };
-
-  const handleSendDocuments = (_payload: ShareModalPayload) => {
+  // Sends the ticked documents (all of them when none are ticked) with their download links.
+  const handleSendDocuments = ({ recipients, message, channel }: ShareModalPayload) => {
+    const picked = selectedDocumentKeys.length ? profile.documents.filter((row) => selectedDocumentKeys.includes(row.id)) : profile.documents;
+    const lines = picked.map((row) => `- ${row.documentType}${row.documentNumber ? ` (${row.documentNumber})` : ""}${row.fileUrl ? `: ${row.fileUrl}` : ""}`);
+    const text = [message.trim(), `Documents of ${profile.transporterLegalName}:`, ...lines].filter(Boolean).join("\n");
+    const people = profile.contacts.filter((contact) => recipients.includes(contact.id)).map((contact) => ({ phone: contact.phone, email: contact.email }));
+    openShare(channel, people, text, `Documents - ${profile.transporterLegalName}`);
     setSelectedDocumentKeys([]);
   };
 
@@ -117,14 +129,13 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
         />
       </section>
 
-      <ShareModal
+      {/* Real sending: pick people, channels and a template. The message carries the bank name only - never account number or IFSC. */}
+      <ShareInformationModal
         open={bankModalOpen}
-        title="Send Bank Details"
-        onClose={() => setBankModalOpen(false)}
-        onSend={handleSendBank}
-        recipientOptions={recipientOptions}
-        messagePlaceholder="Enter your message about bank details"
-        confirmLabel="Send Bank Details"
+        onClose={() => { setBankModalOpen(false); setSelectedBankKeys([]); }}
+        informationType="BANK_DETAILS"
+        profileId={profileId}
+        title="Send bank details"
       />
 
       <ShareModal

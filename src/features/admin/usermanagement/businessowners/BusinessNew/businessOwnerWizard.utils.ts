@@ -34,7 +34,7 @@ export function buildBusinessProfilePayload(
     area: draft.area,
     referredBy: draft.referredBy,
     aboutProfile: draft.aboutProfile,
-    status: "Active",
+    status: draft.status,
     createdBy: currentUserId,
     businessProfileDetails: {
       businessLineId: toNumber(draft.businessLineId),
@@ -97,6 +97,7 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
   return {
     legalName: profile.legalName ?? "",
     tradingName: profile.tradingName ?? "",
+    status: /inactive/i.test(profile.status ?? "") ? "Inactive" : "Active",
     yearOfEstablishment: profile.yearOfEstablishment ?? "",
     panNumber: profile.panNumber ?? "",
     gstNumber: profile.gstNumber ?? "",

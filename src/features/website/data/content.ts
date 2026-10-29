@@ -442,23 +442,6 @@ export const faqCategories: FaqCategory[] = [
   },
 ];
 
-export interface BlogPost {
-  title: string;
-  excerpt: string;
-  date: string;
-  readTime: string;
-  category: string;
-}
-
-export const blogPosts: BlogPost[] = [
-  { title: "Maize DDGS prices: what to expect this season", excerpt: "Ethanol output, monsoon crops and export demand are shaping DDGS prices. Here's what buyers should watch.", date: "18 Oct 2026", readTime: "5 min read", category: "Market" },
-  { title: "Choosing the right DOC for poultry feed", excerpt: "Soya, groundnut or rapeseed? A practical comparison of protein, cost and digestibility.", date: "09 Oct 2026", readTime: "7 min read", category: "Nutrition" },
-  { title: "How digital contracts cut payment delays", excerpt: "Clear terms, shared invoices and one audit trail mean fewer disputes and faster settlement.", date: "27 Sep 2026", readTime: "4 min read", category: "Platform" },
-  { title: "Fish farms: feeding for faster growth", excerpt: "Protein-rich ingredients and the right feeding schedule make a measurable difference in aqua yields.", date: "15 Sep 2026", readTime: "6 min read", category: "Aqua" },
-  { title: "DORB quality checks every buyer should know", excerpt: "Sand and silica, fibre and protein: the three numbers that tell you if a DORB lot is worth it.", date: "02 Sep 2026", readTime: "5 min read", category: "Quality" },
-  { title: "Tracking trucks from mill gate to warehouse", excerpt: "How live tracking and instant notifications keep buyers informed and drivers accountable.", date: "20 Aug 2026", readTime: "3 min read", category: "Logistics" },
-];
-
 export const socialLinks: { label: string; icon: IconComponent; href: string }[] = [
   { label: "LinkedIn", icon: LinkedinIcon, href: "https://www.linkedin.com/" },
   { label: "Twitter", icon: TwitterIcon, href: "https://twitter.com/" },

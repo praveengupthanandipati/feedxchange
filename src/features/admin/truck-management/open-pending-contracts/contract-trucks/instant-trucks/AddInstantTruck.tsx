@@ -15,7 +15,7 @@ import {
   useGetTruckAssignmentTypesQuery,
 } from "../../../../../../core/store/contractsApi";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../../core/store/transportersApi";
-import { useGetAllActiveTruckDetailsQuery } from "../../../../../../core/store/trucksApi";
+import { useAddTruckDetailsMutation, useGetAllActiveTruckDetailsQuery } from "../../../../../../core/store/trucksApi";
 import { getApiErrorMessage, useAddContractTrucksMutation } from "../../../../../../core/store/contractTrucksApi";
 import "../../../assign-transports/Assigntransports.scss";
 import "../../../assign-transports/instant-truck-assignment/InstantTruckAssignment.scss";
@@ -100,7 +100,8 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
   const [saved, setSaved] = useState(false);
 
   const { data: transporters } = useGetTransporterProfileSummaryQuery();
-  const { data: trucks } = useGetAllActiveTruckDetailsQuery();
+  const { data: trucks, refetch: refetchTrucks } = useGetAllActiveTruckDetailsQuery();
+  const [addTruckDetails, { isLoading: addingTruck }] = useAddTruckDetailsMutation();
 
   const [addContractTrucks, { isLoading: saving }] = useAddContractTrucksMutation();
   const notify = useNotifyPrompt();
@@ -185,6 +186,38 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
     setSubmitError("");
   };
 
+  const normalizeTruckNumber = (value: string) => value.replace(/[^a-z0-9]/gi, "").toUpperCase();
+
+  /**
+   * The truck's id. A number typed in (not in the truck master) is first added to the master under the chosen transporter
+   * with only its number; the transporter fills in the remaining truck details later from their login.
+   */
+  const resolveTruckId = async (currentUserId: number): Promise<number> => {
+    if (truckOptions.some((option) => option.value === form.truck)) return Number(form.truck);
+    const truckNumber = form.truck.trim().toUpperCase();
+    const existing = (trucks ?? []).find((truck) => normalizeTruckNumber(truck.truckNumber) === normalizeTruckNumber(truckNumber));
+    if (existing) return existing.truckId;
+
+    await addTruckDetails({
+      profileId: Number(form.transporter),
+      truckNumber,
+      registrationNumber: truckNumber,
+      truckType: "",
+      make: "",
+      model: "",
+      manufactureYear: 0,
+      capacity: 0,
+      capacityUnit: "",
+      fuelType: "",
+      ownershipType: "",
+      actionPerformedBy: currentUserId,
+    }).unwrap();
+    const refreshed = await refetchTrucks().unwrap();
+    const created = refreshed.find((truck) => normalizeTruckNumber(truck.truckNumber) === normalizeTruckNumber(truckNumber));
+    if (!created) throw new Error(`Truck ${truckNumber} was added but could not be found in the truck list.`);
+    return created.truckId;
+  };
+
   const handleSave = async () => {
     const nextErrors = validate();
     setErrors(nextErrors);
@@ -194,12 +227,21 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
     const currentUserId = Number(localStorage.getItem("userId")) || 0;
     const assignedOn = new Date(`${form.date}T${form.time}`).toISOString();
 
+    let truckId: number;
+    try {
+      truckId = await resolveTruckId(currentUserId);
+    } catch (error) {
+      const data = error && typeof error === "object" ? (error as { data?: unknown }).data : undefined;
+      setSubmitError(getApiErrorMessage(data) || "The new truck number could not be added. Please try again.");
+      return;
+    }
+
     try {
       const succeeded = await addContractTrucks({
         contractId,
         truckAssignmentTypeId,
         transporterProfileId: Number(form.transporter),
-        truckId: Number(form.truck),
+        truckId,
         driverId: Number(form.driverName),
         assignedOn,
         lrNumber: form.lrNumber.trim(),
@@ -271,7 +313,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
             <textarea
               id="bill-change-message"
               className="assign-truck-drawer__textarea"
-              placeholder="Kindly contact SSRTS team or Buyer for Bill Change..."
+              placeholder="Kindly contact FeedXchange team or Buyer for Bill Change..."
               value={form.billChangeMessage}
               onChange={(event) => setField("billChangeMessage", event.target.value)}
             />
@@ -298,12 +340,14 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
           <label className="assign-truck-drawer__label">
             Select Truck <span className="assign-truck-drawer__required">*</span>
           </label>
+          {/* A truck number that is not in the master can be typed in; it is added on save. */}
           <SearchableSelect
             options={truckOptions}
             value={form.truck}
             onChange={(value) => setField("truck", value)}
-            placeholder="Select Truck"
+            placeholder="Select or type a truck number"
             ariaLabel="Select Truck"
+            allowCustom
           />
           {errors.truck && <p className="assign-truck-drawer__error">{errors.truck}</p>}
         </div>
@@ -446,10 +490,10 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       {submitError && <p className="assign-truck-drawer__error">{submitError}</p>}
 
       <div className="assign-truck-drawer__footer">
-        <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving}>
-          <SaveIcon aria-hidden /> {saving ? "Saving…" : "Save & Send"}
+        <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving || addingTruck}>
+          <SaveIcon aria-hidden /> {saving || addingTruck ? "Saving…" : "Save & Send"}
         </button>
-        <button type="button" className="assign-truck-drawer__cancel" onClick={handleReset} disabled={saving}>
+        <button type="button" className="assign-truck-drawer__cancel" onClick={handleReset} disabled={saving || addingTruck}>
           <XIcon aria-hidden /> Reset
         </button>
       </div>

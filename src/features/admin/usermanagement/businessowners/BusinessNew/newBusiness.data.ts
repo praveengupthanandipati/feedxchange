@@ -70,13 +70,6 @@ export const accountTypeOptions = [
   { value: "overdraft", label: "Overdraft" },
 ];
 
-// TODO: replace with a real IFSC lookup API — this is a small mock table for the demo.
-export const ifscLookup: Record<string, { bankName: string; branch: string }> = {
-  SBIN0001234: { bankName: "State Bank of India", branch: "Vijayawada Main" },
-  HDFC0001111: { bankName: "HDFC Bank", branch: "Guntur Branch" },
-  ICIC0002222: { bankName: "ICICI Bank", branch: "Rajahmundry Branch" },
-  UTIB0003333: { bankName: "Axis Bank", branch: "Kakinada Branch" },
-};
 
 // ============================================================
 // 4. Documents

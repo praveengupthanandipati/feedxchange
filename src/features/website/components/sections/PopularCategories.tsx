@@ -17,7 +17,10 @@ const ICONS: [RegExp, IconComponent][] = [
 
 const iconFor = (name: string) => ICONS.find(([pattern]) => pattern.test(name))?.[1] ?? PackageIcon;
 
-/** Popular Categories: the catalogue's categories (GetAllProducts); each tile opens the Products page on that category. */
+/**
+ * Popular Categories: the active categories from GetAllCategories, in their admin priority order, each with its description
+ * (or its first products when it has none); each tile opens the Products page on that category.
+ */
 const PopularCategories = () => {
   const { categories, productsIn } = useCatalogue();
 
@@ -41,11 +44,11 @@ const PopularCategories = () => {
                   <span className="category-tile__text">
                     <strong>{category.name}</strong>
                     <small>
-                      {items
-                        .slice(0, 3)
-                        .map((product) => product.name)
-                        .join(", ")}
-                      {items.length > 3 ? ` and ${items.length - 3} more` : ""}
+                      {category.description ||
+                        `${items
+                          .slice(0, 3)
+                          .map((product) => product.name)
+                          .join(", ")}${items.length > 3 ? ` and ${items.length - 3} more` : ""}`}
                     </small>
                   </span>
                   <ArrowUpRightIcon aria-hidden className="category-tile__go" />

@@ -30,7 +30,7 @@ export function buildTransporterProfilePayload(
     groupName: draft.group,
     referredBy: draft.referralCode,
     aboutProfile: draft.aboutTransporter,
-    status: "Active",
+    status: draft.status,
     createdBy: currentUserId,
     transporterProfileDetails: {
       transporterLineId: toNumber(draft.transporterLineId),
@@ -76,6 +76,7 @@ export function hydrateDraftFromTransporterProfile(profile: TransporterProfileDe
   return {
     legalName: profile.legalName,
     tradingName: profile.tradingName,
+    status: /inactive/i.test(profile.status ?? "") ? "Inactive" : "Active",
     establishmentYear: profile.yearOfEstablishment,
     panNumber: profile.panNumber,
     gstNumber: profile.gstNumber,

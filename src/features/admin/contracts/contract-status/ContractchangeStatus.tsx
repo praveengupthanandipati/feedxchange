@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { EyeIcon, EyeOffIcon, LinkIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
@@ -226,6 +226,11 @@ const GetContractsDrawer = ({
 
 const ContractchangeStatus = () => {
   const navigate = useNavigate();
+  // Opened from a contract's row menu: ?contract=<number> picks it, &status=Open pre-selects the approval.
+  const [searchParams] = useSearchParams();
+  const linkedContract = searchParams.get("contract");
+  const linkedStatus = searchParams.get("status");
+  const [linkedDone, setLinkedDone] = useState(false);
 
   const [financialYear, setFinancialYear] = useState(financialYearOptions[2]?.value ?? "");
   const [contractNumber, setContractNumber] = useState("");
@@ -301,6 +306,22 @@ const ContractchangeStatus = () => {
       })),
     [contractsData],
   );
+
+  // Pick the linked contract once the contracts have loaded.
+  useEffect(() => {
+    if (linkedDone || !linkedContract || contractRows.length === 0) return;
+    setLinkedDone(true);
+    const match = contractRows.find((row) => row.contractNumber?.toLowerCase() === linkedContract.toLowerCase());
+    setContractNumber(linkedContract);
+    if (!match) {
+      setError(`No contract found for number "${linkedContract}".`);
+      return;
+    }
+    setError("");
+    setRecord(match);
+    setDetailsVisible(true);
+    setStatus(linkedStatus || (match.basicDetails?.calculatedStatus ?? ""));
+  }, [linkedDone, linkedContract, linkedStatus, contractRows]);
 
   const handleSearch = async () => {
     const trimmed = contractNumber.trim();

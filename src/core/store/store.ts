@@ -20,6 +20,8 @@ import { notificationsApi } from "./notificationsApi";
 import { notificationTemplatesApi } from "./notificationTemplatesApi";
 import { notificationPreferencesApi } from "./notificationPreferencesApi";
 import { bannersApi } from "./bannersApi";
+import { registrationDetailsApi } from "./registrationDetailsApi";
+import { bloggersApi } from "./bloggersApi";
 
 export const store = configureStore({
   reducer: {
@@ -44,6 +46,8 @@ export const store = configureStore({
     [notificationTemplatesApi.reducerPath]: notificationTemplatesApi.reducer,
     [notificationPreferencesApi.reducerPath]: notificationPreferencesApi.reducer,
     [bannersApi.reducerPath]: bannersApi.reducer,
+    [registrationDetailsApi.reducerPath]: registrationDetailsApi.reducer,
+    [bloggersApi.reducerPath]: bloggersApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -68,6 +72,8 @@ export const store = configureStore({
       notificationTemplatesApi.middleware,
       notificationPreferencesApi.middleware,
       bannersApi.middleware,
+      registrationDetailsApi.middleware,
+      bloggersApi.middleware,
     ),
 });
 

@@ -29,6 +29,8 @@ export interface BusinessOwner {
   stateName: string;
   businessTypeName: string;
   businessSubTypeName: string;
+  /** Business group, for the list's Group filter (may be missing or empty). */
+  groupName?: string | null;
   buyCharge: number;
   sellCharge: number;
 }

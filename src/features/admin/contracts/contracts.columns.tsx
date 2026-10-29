@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { MouseEvent } from "react";
-import { Link } from "react-router-dom";
-import { CheckIcon, CopyIcon } from "../../../shared/components/icon";
+import { Link, useNavigate } from "react-router-dom";
+import { ActivityIcon, CheckIcon, CircleCheckBigIcon, CopyIcon, PenIcon, Trash2Icon } from "../../../shared/components/icon";
+import { useAuth } from "../../../core/auth/AuthContext";
 import type { TableColumn } from "../../../shared/components/table/table.types";
 import InfoTooltip from "../../../shared/components/tooltip/InfoTooltip";
-import RowActionsMenu from "../../../shared/components/table/RowActionsMenu";
+import RowActionsMenu, { type RowAction } from "../../../shared/components/table/RowActionsMenu";
 import type { Contract } from "./contracts.data";
 
 const parseQtyOrNA = (value: string) => (value === "N/A" ? -1 : parseFloat(value));
@@ -62,6 +63,31 @@ const StatusBadge = ({ status }: { status: Contract["status"] }) => {
     </span>
   );
 };
+/** Statuses that mean the contract is waiting for approval. */
+const AWAITING_APPROVAL = new Set(["pending", "pendingforapproval"]);
+
+/**
+ * Row menu: Edit and Delete (contracts.manage), plus Approve (contracts waiting for approval) and Change status, which open the
+ * Contract Status screen with this contract picked (contract-status).
+ */
+const ContractRowActions = ({ row, onEdit, onDelete }: { row: Contract; onEdit: () => void; onDelete: () => void }) => {
+  const { can } = useAuth();
+  const navigate = useNavigate();
+  const canManage = can("contracts.manage");
+  const canChangeStatus = can("contract-status");
+  const statusPage = (status?: string) =>
+    navigate(`/admin/contract-status?contract=${encodeURIComponent(row.contractNumber)}${status ? `&status=${status}` : ""}`);
+  const awaitingApproval = AWAITING_APPROVAL.has((row.status ?? "").toLowerCase().replace(/[^a-z0-9]/g, ""));
+
+  const actions: RowAction[] = [
+    ...(canManage ? [{ key: "edit", label: "Edit", icon: PenIcon, onClick: onEdit }] : []),
+    ...(canChangeStatus && awaitingApproval ? [{ key: "approve", label: "Approve", icon: CircleCheckBigIcon, onClick: () => statusPage("Open") }] : []),
+    ...(canChangeStatus ? [{ key: "status", label: "Change status", icon: ActivityIcon, onClick: () => statusPage() }] : []),
+    ...(canManage ? [{ key: "delete", label: "Delete", icon: Trash2Icon, onClick: onDelete, danger: true, dividerBefore: true }] : []),
+  ];
+  return actions.length ? <RowActionsMenu actions={actions} /> : null;
+};
+
 interface ColumnHandlers {
   onEdit: (contract: Contract) => void;
   onDelete: (contract: Contract) => void;
@@ -86,7 +112,7 @@ export function buildContractColumns({ onEdit, onDelete }: ColumnHandlers): Tabl
       key: "actions",
       header: "",
       render: (row) => (
-        <RowActionsMenu manageKeys={["contracts.manage"]} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
+        <ContractRowActions row={row} onEdit={() => onEdit(row)} onDelete={() => onDelete(row)} />
       ),
     },
     {

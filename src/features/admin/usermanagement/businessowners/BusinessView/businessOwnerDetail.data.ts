@@ -1,3 +1,4 @@
+import { fileUrl } from "../../../../../shared/utils/fileUrl";
 import type { SearchableSelectOption } from "../../../../../shared/components/dropdown/SearchableSelect";
 import type { BusinessProfileDetail } from "../../../../../core/store/businessProfilesApi";
 
@@ -53,6 +54,8 @@ export interface DocumentRow {
   issueAuthority: string;
   issueDate: string;
   fileName: string;
+  /** Link to the uploaded file, or "" when there is none. */
+  fileUrl: string;
 }
 
 export interface BusinessOwnerProfile {
@@ -163,6 +166,7 @@ export function mapBusinessProfileDetail(profile: BusinessProfileDetail): Busine
       issueAuthority: document.issuingAuthority,
       issueDate: document.issuedDate?.slice(0, 10) ?? "",
       fileName: document.fileName,
+      fileUrl: fileUrl(document.filePath),
     })),
   };
 }

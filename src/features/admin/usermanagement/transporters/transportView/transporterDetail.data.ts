@@ -1,4 +1,5 @@
 import type { SearchableSelectOption } from "../../../../../shared/components/dropdown/SearchableSelect";
+import { fileUrl } from "../../../../../shared/utils/fileUrl";
 import type { TransporterProfileDetail } from "../../../../../core/store/transportersApi";
 
 export interface AddressRow {
@@ -39,6 +40,8 @@ export interface DocumentRow {
   issuingAuthority: string;
   issueDate: string;
   fileName: string;
+  /** Link to the uploaded file, or "" when there is none. */
+  fileUrl: string;
 }
 
 export interface TransporterProfile {
@@ -135,6 +138,7 @@ export function mapTransporterProfileDetail(profile: TransporterProfileDetail): 
       issuingAuthority: document.issuingAuthority,
       issueDate: document.issuedDate?.slice(0, 10) ?? "",
       fileName: document.fileName,
+      fileUrl: fileUrl(document.filePath),
     })),
   };
 }
