@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { SearchIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
-import { fetchBankFromIfsc } from "../../../../../shared/utils/ifscLookup";
+import { fetchBankFromIfsc, isValidIfsc } from "../../../../../shared/utils/ifscLookup";
 import EmptyRowsState from "./EmptyRowsState";
 import { accountTypeOptions } from "./newTransporter.data";
 
@@ -62,19 +62,35 @@ const BankDetailsSection = ({
     setPendingDeleteId(null);
   };
 
-  const updateEntry = (id: string, patch: Partial<BankEntry>) =>
-    onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
+  // Always the latest rows: an IFSC lookup finishes later, and must not undo what was typed meanwhile.
+  const entriesRef = useRef(entries);
+  entriesRef.current = entries;
+  const updateEntry = (id: string, patch: Partial<BankEntry>) => {
+    entriesRef.current = entriesRef.current.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry));
+    onEntriesChange(entriesRef.current);
+  };
 
   const [lookingUpId, setLookingUpId] = useState<string | null>(null);
 
   const lookupIfsc = async (id: string, ifscCode: string) => {
+    if (!isValidIfsc(ifscCode)) {
+      updateEntry(id, { ifscError: "Enter the 11-character IFSC code, e.g. SBIN0000691." });
+      return;
+    }
     setLookingUpId(id);
-    const match = await fetchBankFromIfsc(ifscCode);
-    setLookingUpId(null);
-    if (match) {
-      updateEntry(id, { bankName: match.bankName, cityBranch: match.branch, ifscError: "" });
-    } else {
-      updateEntry(id, { ifscError: "IFSC code not found. Check the 11-character code, e.g. SBIN0000691." });
+    try {
+      const match = await fetchBankFromIfsc(ifscCode);
+      // Typed on since: this answer is for an older code.
+      if (entriesRef.current.find((entry) => entry.id === id)?.ifscCode !== ifscCode) return;
+      if (match) {
+        updateEntry(id, { bankName: match.bankName, cityBranch: match.branch, ifscError: "" });
+      } else {
+        updateEntry(id, { ifscError: "IFSC code not found. Check the code, or type the bank and branch." });
+      }
+    } catch {
+      updateEntry(id, { ifscError: "Couldn't reach the IFSC lookup. Check your connection, or type the bank and branch." });
+    } finally {
+      setLookingUpId(null);
     }
   };
 
@@ -132,12 +148,15 @@ const BankDetailsSection = ({
                         type="text"
                         className="form-field__control"
                         value={entry.ifscCode}
-                        onChange={(event) =>
-                          updateEntry(entry.id, {
-                            ifscCode: event.target.value.toUpperCase(),
-                            ifscError: "",
-                          })
-                        }
+                        onChange={(event) => {
+                          const ifscCode = event.target.value.toUpperCase().replace(/\s/g, "").slice(0, 11);
+                          updateEntry(entry.id, { ifscCode, ifscError: "" });
+                          // A complete code looks itself up, like the pincode.
+                          if (isValidIfsc(ifscCode)) void lookupIfsc(entry.id, ifscCode);
+                        }}
+                        placeholder="e.g. SBIN0000691"
+                        maxLength={11}
+                        aria-busy={lookingUpId === entry.id}
                       />
                       <button
                         type="button"
