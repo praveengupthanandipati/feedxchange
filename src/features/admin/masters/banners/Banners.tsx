@@ -1,8 +1,16 @@
 import { useCallback, useMemo, useState } from "react";
 import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
-import { initialBanners, type Banner, type BannerForm } from "./banners.data";
-import { matchesSearch } from "./banners.utils";
+import { useAuth } from "../../../../core/auth/AuthContext";
+import {
+  useAddBannerMutation,
+  useDeleteBannerMutation,
+  useGetBannersQuery,
+  useUpdateBannerMutation,
+} from "../../../../core/store/bannersApi";
+import { apiErrorMessage } from "../../../../core/store/sellerInvoiceApi";
+import type { Banner, BannerForm } from "./banners.data";
+import { matchesSearch, toBanner } from "./banners.utils";
 import BannerCards from "./components/BannerCards";
 import BannerOffcanvas from "./components/BannerOffcanvas";
 import BannersHeader from "./components/BannersHeader";
@@ -15,13 +23,21 @@ const PAGE_SIZE = 10;
 /** Which banner the panel is open for: a new one, an existing one, or closed. */
 type PanelState = { mode: "closed" } | { mode: "create" } | { mode: "edit"; banner: Banner };
 
+type Notice = { kind: "success" | "error"; text: string } | null;
+
 const Banners = () => {
-  const [banners, setBanners] = useState<Banner[]>(initialBanners);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [panel, setPanel] = useState<PanelState>({ mode: "closed" });
   const [deleting, setDeleting] = useState<Banner | null>(null);
-  const [message, setMessage] = useState("");
+  const [notice, setNotice] = useState<Notice>(null);
+  const { userId } = useAuth();
+  const { data, isLoading, isError } = useGetBannersQuery();
+  const [addBanner] = useAddBannerMutation();
+  const [updateBanner] = useUpdateBannerMutation();
+  const [deleteBanner, { isLoading: isDeleting }] = useDeleteBannerMutation();
+
+  const banners = useMemo(() => (data ?? []).map(toBanner), [data]);
 
   const filtered = useMemo(
     () => banners.filter((banner) => matchesSearch(banner, search)).sort((a, b) => a.priority - b.priority),
@@ -31,27 +47,48 @@ const Banners = () => {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paged = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const emptyMessage = search.trim() ? "No banners match your search." : "No banners yet. Use New to add one.";
+  const emptyMessage = isLoading
+    ? "Loading banners…"
+    : isError
+      ? "The banners could not be loaded. Please refresh the page."
+      : search.trim()
+        ? "No banners match your search."
+        : "No banners yet. Use New to add one.";
 
   const closePanel = useCallback(() => setPanel({ mode: "closed" }), []);
+  const actionBy = Number(userId) || 0;
 
-  const handleSave = (form: BannerForm) => {
+  const handleSave = async (form: BannerForm): Promise<string | null> => {
     const values = {
       title: form.title.trim(),
       linkUrl: form.linkUrl.trim(),
       priority: Number(form.priority),
-      image: form.image,
-      status: form.status,
+      isActive: form.status === "Active",
     };
-    // TODO: send the banner (and uploaded image) to the API once the endpoint is available.
-    if (panel.mode === "edit") {
-      setBanners((prev) => prev.map((banner) => (banner.id === panel.banner.id ? { ...banner, ...values } : banner)));
-      setMessage(`"${values.title}" updated.`);
-    } else {
-      setBanners((prev) => [...prev, { id: `${Date.now()}`, ...values }]);
-      setMessage(`"${values.title}" created.`);
+    try {
+      if (panel.mode === "edit") {
+        await updateBanner({ id: panel.banner.id, ...values, updatedBy: actionBy, image: form.file }).unwrap();
+      } else {
+        if (!form.file) return "Choose a banner image.";
+        await addBanner({ ...values, actionPerfomedBy: actionBy, image: form.file }).unwrap();
+      }
+    } catch (error) {
+      return apiErrorMessage(error, "The banner could not be saved. Please try again.");
     }
+    setNotice({ kind: "success", text: `"${values.title}" ${panel.mode === "edit" ? "updated" : "created"}.` });
     closePanel();
+    return null;
+  };
+
+  const handleDelete = async () => {
+    if (!deleting) return;
+    try {
+      await deleteBanner({ bannerId: deleting.id, userId: actionBy }).unwrap();
+      setNotice({ kind: "success", text: `"${deleting.title}" deleted.` });
+    } catch (error) {
+      setNotice({ kind: "error", text: apiErrorMessage(error, "The banner could not be deleted. Please try again.") });
+    }
+    setDeleting(null);
   };
 
   return (
@@ -63,14 +100,17 @@ const Banners = () => {
           setPage(1);
         }}
         onNew={() => {
-          setMessage("");
+          setNotice(null);
           setPanel({ mode: "create" });
         }}
       />
 
-      {message && (
-        <p className="banners__message" role="status">
-          <CircleCheckBigIcon aria-hidden /> {message}
+      {notice && (
+        <p
+          className={`banners__message ${notice.kind === "error" ? "banners__message--error" : ""}`}
+          role={notice.kind === "error" ? "alert" : "status"}
+        >
+          {notice.kind === "success" && <CircleCheckBigIcon aria-hidden />} {notice.text}
         </p>
       )}
 
@@ -94,14 +134,9 @@ const Banners = () => {
         open={deleting !== null}
         title="Delete banner"
         message={deleting ? `Delete "${deleting.title}"? This cannot be undone.` : ""}
-        onConfirm={() => {
-          // TODO: send the delete to the API once the endpoint is available.
-          if (deleting) {
-            setBanners((prev) => prev.filter((banner) => banner.id !== deleting.id));
-            setMessage(`"${deleting.title}" deleted.`);
-          }
-          setDeleting(null);
-        }}
+        confirmLabel={isDeleting ? "Deleting…" : "Delete"}
+        confirmDisabled={isDeleting}
+        onConfirm={handleDelete}
         onCancel={() => setDeleting(null)}
       />
     </div>

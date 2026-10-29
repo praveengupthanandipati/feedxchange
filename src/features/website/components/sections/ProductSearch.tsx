@@ -1,11 +1,11 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { ArrowRightIcon, PackageIcon, SearchIcon, XIcon } from "../../../../shared/components/icon";
 import { useNavigate } from "react-router-dom";
-import { products } from "../../data/content";
+import { useCatalogue } from "../../hooks/useCatalogue";
 import { productPath } from "../../routes/paths";
 
-/** Chips under the search box. */
-const POPULAR = ["Soya DOC", "Maize DDGS", "DORB", "DOC"];
+/** How many "Popular Searches" chips: the first product of each category, up to this many. */
+const POPULAR_COUNT = 4;
 
 /**
  * Product search (ARIA combobox). Focusing the box lists every product; typing filters by name or
@@ -19,12 +19,23 @@ const ProductSearch = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
   const navigate = useNavigate();
+  const { products, categories, productsIn } = useCatalogue();
 
   const results = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) return products;
-    return products.filter((product) => product.name.toLowerCase().includes(term) || product.summary.toLowerCase().includes(term));
-  }, [query]);
+    return products.filter(
+      (product) =>
+        product.name.toLowerCase().includes(term) ||
+        product.categoryName.toLowerCase().includes(term) ||
+        product.description.toLowerCase().includes(term),
+    );
+  }, [products, query]);
+
+  const popular = categories
+    .map((category) => productsIn(category.id)[0])
+    .filter(Boolean)
+    .slice(0, POPULAR_COUNT);
 
   // Close when clicking / tapping anywhere outside the search.
   useEffect(() => {
@@ -71,7 +82,7 @@ const ProductSearch = () => {
           role="combobox"
           autoComplete="off"
           enterKeyHint="search"
-          placeholder="Search products, e.g. Soya DOC"
+          placeholder={`Search products${products[0] ? `, e.g. ${products[0].name}` : ""}`}
           aria-label="Search products"
           aria-expanded={open}
           aria-controls={listId}
@@ -107,7 +118,7 @@ const ProductSearch = () => {
         <ul id={listId} role="listbox" aria-label="Products">
           {results.map((product, index) => (
             <li
-              key={product.slug}
+              key={product.id}
               id={`${listId}-${product.slug}`}
               role="option"
               aria-selected={index === highlight}
@@ -118,11 +129,11 @@ const ProductSearch = () => {
               onClick={() => go(product.slug)}
             >
               <span className="product-search__thumb">
-                <PackageIcon aria-hidden />
+                {product.image ? <img src={product.image} alt="" loading="lazy" decoding="async" /> : <PackageIcon aria-hidden />}
               </span>
               <span className="product-search__text">
                 <strong>{product.name}</strong>
-                <small>{product.summary}</small>
+                <small>{product.categoryName}</small>
               </span>
               <ArrowRightIcon aria-hidden className="product-search__go" />
             </li>
@@ -138,18 +149,13 @@ const ProductSearch = () => {
       <div className="product-search__popular">
         <span>Popular Searches</span>
         <ul>
-          {POPULAR.map((name) => {
-            const product = products.find((item) => item.name === name);
-            return (
-              product && (
-                <li key={name}>
-                  <button type="button" onClick={() => go(product.slug)}>
-                    {name}
-                  </button>
-                </li>
-              )
-            );
-          })}
+          {popular.map((product) => (
+            <li key={product.id}>
+              <button type="button" onClick={() => go(product.slug)}>
+                {product.name}
+              </button>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

@@ -6,7 +6,8 @@ import {
   XIcon,
 } from "../../../shared/components/icon";
 import { NavLink, useLocation } from "react-router-dom";
-import { catalogueCategories, categoryForSlug, company, navItems, productsIn } from "../../../features/website/data/content";
+import { company, navItems } from "../../../features/website/data/content";
+import { useCatalogue } from "../../../features/website/hooks/useCatalogue";
 import { productPath, sitePaths } from "../../../features/website/routes/paths";
 import Logo from "../../../features/website/components/common/Logo";
 import { JoinButton, LoginLink, WhatsAppButton } from "./HeaderActions";
@@ -26,8 +27,10 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
   const closeRef = useRef<HTMLButtonElement>(null);
   // The Products accordion starts open when you're already on a product page.
   const [productsOpen, setProductsOpen] = useState(pathname.startsWith(sitePaths.products));
-  // On a product page, its category starts open too.
-  const [openCategory, setOpenCategory] = useState<string | null>(() => categoryForSlug(pathname.split("/").pop() ?? "")?.id ?? null);
+  const { categories, productsIn, findBySlug } = useCatalogue();
+  // The category opened by a tap; undefined until then, which opens the current product page's category.
+  const [pickedCategory, setOpenCategory] = useState<string | null | undefined>(undefined);
+  const openCategory = pickedCategory === undefined ? (findBySlug(pathname.split("/").pop())?.categoryId ?? null) : pickedCategory;
 
   useEffect(() => {
     if (open) closeRef.current?.focus();
@@ -70,7 +73,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                           </NavLink>
                         </li>
                         {/* Each category opens to list its products. */}
-                        {catalogueCategories.map((category) => {
+                        {categories.map((category) => {
                           const categoryOpen = productsOpen && openCategory === category.id;
                           return (
                             <li key={category.id}>
@@ -80,7 +83,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                                 aria-expanded={categoryOpen}
                                 aria-controls={`mobile-cat-${category.id}`}
                                 tabIndex={productsOpen ? 0 : -1}
-                                onClick={() => setOpenCategory((prev) => (prev === category.id ? null : category.id))}
+                                onClick={() => setOpenCategory(openCategory === category.id ? null : category.id)}
                               >
                                 <span>
                                   {category.name} <small>{productsIn(category.id).length}</small>
@@ -90,7 +93,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                               <div id={`mobile-cat-${category.id}`} className={`mobile-menu__sub mobile-menu__sub--nested ${categoryOpen ? "is-open" : ""}`}>
                                 <ul>
                                   {productsIn(category.id).map((product) => (
-                                    <li key={product.slug}>
+                                    <li key={product.id}>
                                       <NavLink
                                         to={productPath(product.slug)}
                                         className={({ isActive }) => `mobile-menu__sublink mobile-menu__product ${isActive ? "is-active" : ""}`}

@@ -27,7 +27,7 @@ const BannersTable = ({ rows, emptyMessage, onEdit, onDelete }: BannerListProps)
 
   return (
     <div className="banners__table-view">
-      <Table columns={columns} data={rows} rowKey={(row) => row.id} className="banners__table" emptyMessage={emptyMessage} />
+      <Table columns={columns} data={rows} rowKey={(row) => String(row.id)} className="banners__table" emptyMessage={emptyMessage} />
     </div>
   );
 };

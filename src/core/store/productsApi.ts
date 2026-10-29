@@ -171,6 +171,12 @@ export const productsApi = createApi({
       transformResponse: unwrapArray<Product>,
       providesTags: ["Product"],
     }),
+    // Public (no login): the website's catalogue. Includes inactive products, so callers filter on isActive / isDeleted.
+    getAllProducts: builder.query<Product[], void>({
+      query: () => "/api/Product/GetAllProducts",
+      transformResponse: unwrapArray<Product>,
+      providesTags: ["Product"],
+    }),
     getProductById: builder.query<Product | null, string>({
       query: (productId) => `/api/Product/GetProductByProductId?productId=${productId}`,
       transformResponse: unwrapObject<Product>,
@@ -209,6 +215,7 @@ export const productsApi = createApi({
 
 export const {
   useGetProductsQuery,
+  useGetAllProductsQuery,
   useGetProductByIdQuery,
   useGetProductsByCategoryIdQuery,
   useCreateProductMutation,

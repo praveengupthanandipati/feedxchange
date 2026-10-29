@@ -20,7 +20,7 @@ import {
   UserCheckIcon,
   UsersIcon,
 } from "../../../shared/components/icon";
-import { productPath, sitePaths } from "../routes/paths";
+import { sitePaths } from "../routes/paths";
 
 export interface NavLinkItem {
   label: string;
@@ -31,237 +31,6 @@ export interface NavLinkItem {
 export interface NavItem extends NavLinkItem {
   children?: NavLinkItem[];
 }
-
-export interface Product {
-  slug: string;
-  name: string;
-  /** One line for the menu and cards. */
-  summary: string;
-  description: string;
-  specs: { label: string; value: string }[];
-}
-
-export const products: Product[] = [
-  {
-    slug: "distilled-products",
-    name: "Distilled Products",
-    summary: "High-protein by-products from grain distilleries.",
-    description: "Energy- and protein-rich distillery by-products, sourced from audited plants and supplied with moisture and protein test reports for every lot.",
-    specs: [
-      { label: "Protein", value: "26 – 32%" },
-      { label: "Moisture", value: "≤ 10%" },
-      { label: "Packing", value: "50 kg bags / loose" },
-    ],
-  },
-  {
-    slug: "crude-oil",
-    name: "Crude Oil",
-    summary: "Crude edible oils for refining and feed blending.",
-    description: "Crude rice bran, soybean and cottonseed oils for refiners and feed millers, traded with transparent FFA and moisture specifications.",
-    specs: [
-      { label: "FFA", value: "As per contract" },
-      { label: "Moisture & impurities", value: "≤ 0.5%" },
-      { label: "Supply", value: "Tankers" },
-    ],
-  },
-  {
-    slug: "doc",
-    name: "DOC",
-    summary: "De-oiled cakes, the protein backbone of feed.",
-    description: "De-oiled cakes from solvent extraction plants across India: a consistent, economical protein source for poultry, cattle and aqua feed.",
-    specs: [
-      { label: "Protein", value: "28 – 48%" },
-      { label: "Oil", value: "≤ 1.5%" },
-      { label: "Packing", value: "50 kg bags" },
-    ],
-  },
-  {
-    slug: "maize-ddgs",
-    name: "Maize DDGS",
-    summary: "Distillers dried grains with solubles from maize.",
-    description: "Golden-coloured maize DDGS with high digestibility and energy, a cost-effective partial replacement for maize and soybean meal.",
-    specs: [
-      { label: "Protein", value: "≥ 28%" },
-      { label: "Fat", value: "≥ 8%" },
-      { label: "Aflatoxin", value: "≤ 20 ppb" },
-    ],
-  },
-  {
-    slug: "dorb",
-    name: "DORB",
-    summary: "De-oiled rice bran for cattle and poultry rations.",
-    description: "De-oiled rice bran with steady fibre and protein levels, widely used in cattle feed and as an economical filler in poultry rations.",
-    specs: [
-      { label: "Protein", value: "14 – 16%" },
-      { label: "Fibre", value: "≤ 14%" },
-      { label: "Sand & silica", value: "≤ 3%" },
-    ],
-  },
-  {
-    slug: "soya-doc",
-    name: "Soya DOC",
-    summary: "Premium soybean meal with high protein.",
-    description: "Hi-pro and standard soybean meal, the most widely used protein ingredient in poultry and aqua feed, with full traceability to the plant.",
-    specs: [
-      { label: "Protein", value: "46 – 48%" },
-      { label: "Urease activity", value: "0.05 – 0.2" },
-      { label: "Packing", value: "50 kg bags" },
-    ],
-  },
-];
-
-// ---------- Test catalogue (Products page). Images are a shared placeholder for now. ----------
-export interface Nutrient {
-  name: string;
-  min: string;
-  max: string;
-}
-
-export interface CatalogueCategory {
-  id: string;
-  name: string;
-  /** Test copy and specs used for every product in this category that has no full entry above. */
-  summary: string;
-  specs: { label: string; value: string }[];
-  /** Test nutrition ranges shown on the product page. */
-  nutrition: Nutrient[];
-  /** Typical price per MT (₹), used to generate test price history. */
-  basePrice: number;
-  /** "Nutritional Value and Uses": a bold value with its meaning under it. */
-  uses: { value: string; label: string }[];
-}
-
-export const catalogueCategories: CatalogueCategory[] = [
-  {
-    id: "doc",
-    name: "DOC",
-    summary: "De-oiled cake, a consistent and economical protein source for feed.",
-    specs: [
-      { label: "Protein", value: "28 – 48%" },
-      { label: "Oil", value: "≤ 1.5%" },
-      { label: "Packing", value: "50 kg bags" },
-    ],
-    nutrition: [
-      { name: "Protein", min: "44%", max: "48%" },
-      { name: "Fat", min: "0.5%", max: "1.5%" },
-      { name: "Moisture", min: "10%", max: "12%" },
-      { name: "Sand/silica", min: "1%", max: "2%" },
-      { name: "Crude Fiber", min: "5%", max: "7%" },
-    ],
-    basePrice: 38000,
-    uses: [
-      { value: "10ppb", label: "Aflatoxins" },
-      { value: "44 – 48%", label: "Crude protein, the main protein source in poultry and aqua feed" },
-      { value: "Poultry, Fish, Prawn & Cattle", label: "Feed plants that use it" },
-    ],
-  },
-  {
-    id: "grains",
-    name: "Grains",
-    summary: "Feed-quality grains, cleaned and graded for poultry and cattle rations.",
-    specs: [
-      { label: "Moisture", value: "≤ 14%" },
-      { label: "Foreign matter", value: "≤ 2%" },
-      { label: "Packing", value: "50 kg bags / loose" },
-    ],
-    nutrition: [
-      { name: "Protein", min: "8%", max: "10%" },
-      { name: "Fat", min: "3%", max: "4%" },
-      { name: "Moisture", min: "12%", max: "14%" },
-      { name: "Starch", min: "60%", max: "70%" },
-      { name: "Foreign Matter", min: "1%", max: "2%" },
-    ],
-    basePrice: 24000,
-    uses: [
-      { value: "20ppb", label: "Aflatoxins" },
-      { value: "60 – 70%", label: "Starch, the main energy source in poultry and cattle rations" },
-      { value: "Poultry & Cattle", label: "Feed plants that use it" },
-    ],
-  },
-  {
-    id: "distilled",
-    name: "Distilled Products",
-    summary: "High-protein distillery by-products with test reports for every lot.",
-    specs: [
-      { label: "Protein", value: "26 – 32%" },
-      { label: "Moisture", value: "≤ 10%" },
-      { label: "Packing", value: "50 kg bags / loose" },
-    ],
-    nutrition: [
-      { name: "Protein", min: "44%", max: "48%" },
-      { name: "Fat", min: "3%", max: "4%" },
-      { name: "Moisture", min: "10%", max: "12%" },
-      { name: "Sand/silica", min: "2%", max: "3%" },
-      { name: "Crude Fiber", min: "10%", max: "12%" },
-    ],
-    basePrice: 35000,
-    uses: [
-      { value: "10ppb", label: "Aflatoxins" },
-      { value: "44 – 48%", label: "Crude protein, a cost-effective partial replacement for soybean meal" },
-      { value: "Poultry, Fish & Cattle", label: "Feed plants that use it" },
-    ],
-  },
-  {
-    id: "crude-oil",
-    name: "Crude Oil",
-    summary: "Crude oils for refining and feed blending, with clear FFA specifications.",
-    specs: [
-      { label: "FFA", value: "As per contract" },
-      { label: "Moisture & impurities", value: "≤ 0.5%" },
-      { label: "Supply", value: "Tankers" },
-    ],
-    nutrition: [
-      { name: "FFA", min: "5%", max: "10%" },
-      { name: "Moisture", min: "0.2%", max: "0.5%" },
-      { name: "Impurities", min: "0.1%", max: "0.3%" },
-      { name: "Phosphatides", min: "1%", max: "2%" },
-    ],
-    basePrice: 95000,
-    uses: [
-      { value: "5 – 10%", label: "Free fatty acids (FFA)" },
-      { value: "Energy", label: "Added to feed to raise its energy density" },
-      { value: "Refineries & Feed Plants", label: "Who buys it" },
-    ],
-  },
-];
-
-export interface CatalogueItem {
-  /** Same slug as an entry in `products` when a full product page exists. */
-  slug: string;
-  name: string;
-  categoryId: CatalogueCategory["id"];
-}
-
-export const catalogue: CatalogueItem[] = [
-  { slug: "soya-doc", name: "Soya DOC", categoryId: "doc" },
-  { slug: "groundnut-doc", name: "Groundnut DOC", categoryId: "doc" },
-  { slug: "sunflower-doc", name: "Sunflower DOC", categoryId: "doc" },
-  { slug: "mustard-doc", name: "Mustard DOC", categoryId: "doc" },
-  { slug: "cottonseed-doc", name: "Cottonseed DOC", categoryId: "doc" },
-  { slug: "dorb", name: "DORB", categoryId: "doc" },
-  { slug: "maize", name: "Maize", categoryId: "grains" },
-  { slug: "broken-rice", name: "Broken Rice", categoryId: "grains" },
-  { slug: "bajra", name: "Bajra", categoryId: "grains" },
-  { slug: "jowar", name: "Jowar", categoryId: "grains" },
-  { slug: "maize-ddgs", name: "Maize DDGS", categoryId: "distilled" },
-  { slug: "rice-ddgs", name: "Rice DDGS", categoryId: "distilled" },
-  { slug: "crude-rice-bran-oil", name: "Crude Rice Bran Oil", categoryId: "crude-oil" },
-  { slug: "crude-soybean-oil", name: "Crude Soybean Oil", categoryId: "crude-oil" },
-  { slug: "crude-palm-oil", name: "Crude Palm Oil", categoryId: "crude-oil" },
-];
-
-export const categoryOf = (item: CatalogueItem) => catalogueCategories.find((category) => category.id === item.categoryId);
-
-export const productsIn = (categoryId: CatalogueCategory["id"]) => catalogue.filter((item) => item.categoryId === categoryId);
-
-/** Category for any product slug: catalogue items, plus the original category pages that aren't in the catalogue. */
-const extraProductCategories: Record<string, CatalogueCategory["id"]> = { "distilled-products": "distilled", "crude-oil": "crude-oil", doc: "doc" };
-
-export const categoryForSlug = (slug: string) => {
-  const item = catalogue.find((entry) => entry.slug === slug);
-  const id = item?.categoryId ?? extraProductCategories[slug];
-  return catalogueCategories.find((category) => category.id === id);
-};
 
 export const businessTypes = [
   "Poultry Farm",
@@ -275,26 +44,11 @@ export const businessTypes = [
   "Other",
 ];
 
-/** The product shown at /products/:slug: its full entry if there is one, otherwise built from its catalogue category. */
-export const findProduct = (slug: string | undefined): Product | undefined => {
-  const full = products.find((product) => product.slug === slug);
-  if (full) return full;
-  const item = catalogue.find((entry) => entry.slug === slug);
-  const category = item && categoryOf(item);
-  if (!item || !category) return undefined;
-  return {
-    slug: item.slug,
-    name: item.name,
-    summary: category.summary,
-    description: `${item.name} sourced from verified manufacturers and traded through FeedXchange at transparent, real-time prices. Final specifications and pricing are confirmed when the contract is executed.`,
-    specs: category.specs,
-  };
-};
-
 export const navItems: NavItem[] = [
   { label: "Home", to: sitePaths.home },
   { label: "About", to: sitePaths.about },
-  { label: "Products", to: sitePaths.products, children: products.map((product) => ({ label: product.name, to: productPath(product.slug) })) },
+  // children marks Products as a menu; its categories and products come from the API (useCatalogue) in the header menus.
+  { label: "Products", to: sitePaths.products, children: [] },
   { label: "FAQ's", to: sitePaths.faqs },
   { label: "Blogs", to: sitePaths.blogs },
   { label: "Contact", to: sitePaths.contact },
@@ -569,10 +323,7 @@ export const footerColumns: { title: string; links: NavLinkItem[] }[] = [
       { label: "Contact", to: sitePaths.contact },
     ],
   },
-  {
-    title: "Products",
-    links: products.slice(0, 4).map((product) => ({ label: product.name, to: productPath(product.slug) })),
-  },
+  // The footer adds a "Products" column from the API catalogue (useCatalogue).
 ];
 
 export interface Faq {

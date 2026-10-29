@@ -35,10 +35,17 @@ export const useScrollReveal = (rootRef: RefObject<HTMLElement | null>, disabled
 
     const watch = () => root.querySelectorAll<HTMLElement>("[data-reveal]:not([data-revealed])").forEach((el) => observer.observe(el));
     // New page content mounts after the route changes, so wait a frame before collecting elements.
-    const frame = requestAnimationFrame(watch);
+    let frame = requestAnimationFrame(watch);
+    // Content that arrives later (e.g. products loaded from the API) is picked up too, once per frame.
+    const mutations = new MutationObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(watch);
+    });
+    mutations.observe(root, { childList: true, subtree: true });
 
     return () => {
       cancelAnimationFrame(frame);
+      mutations.disconnect();
       observer.disconnect();
       // Re-added straight away by the next run; if motion was just turned off, everything shows.
       root.classList.remove("reveal-ready");

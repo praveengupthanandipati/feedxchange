@@ -1,6 +1,18 @@
+import { API_URL } from "../../../../core/api/api";
+import type { Banner as ApiBanner } from "../../../../core/store/bannersApi";
 import { IMAGE_TYPES, MAX_IMAGE_BYTES, type Banner, type BannerForm } from "./banners.data";
 
 export type FormErrors = Partial<Record<"title" | "linkUrl" | "priority" | "image", string>>;
+
+/** A banner from GetAllBanners as the screen shows it; fileName is a path on the API server. */
+export const toBanner = (banner: ApiBanner): Banner => ({
+  id: banner.id,
+  title: banner.title ?? "",
+  linkUrl: banner.link_URL ?? "",
+  priority: banner.priority,
+  image: banner.fileName ? `${API_URL}${banner.fileName}` : "",
+  status: banner.isActive ? "Active" : "Inactive",
+});
 
 export const toForm = (banner: Banner): BannerForm => ({
   title: banner.title,
@@ -8,6 +20,7 @@ export const toForm = (banner: Banner): BannerForm => ({
   priority: String(banner.priority),
   image: banner.image,
   fileName: "",
+  file: null,
   status: banner.status,
 });
 
@@ -20,7 +33,7 @@ const isHttpUrl = (value: string) => {
   }
 };
 
-export function validateBanner(form: BannerForm, banners: Banner[], editingId: string | null): FormErrors {
+export function validateBanner(form: BannerForm, banners: Banner[], editingId: number | null): FormErrors {
   const errors: FormErrors = {};
   if (!form.title.trim()) errors.title = "Enter the banner title.";
   else if (banners.some((banner) => banner.id !== editingId && banner.title.trim().toLowerCase() === form.title.trim().toLowerCase())) {

@@ -3,20 +3,21 @@ import { useSearchParams } from "react-router-dom";
 import CatalogueCard from "../components/common/CatalogueCard";
 import CtaBanner from "../components/sections/CtaBanner";
 import PageHero from "../components/sections/PageHero";
-import { catalogue, catalogueCategories } from "../data/content";
+import { useCatalogue } from "../hooks/useCatalogue";
 import { usePageTitle } from "../hooks/usePageTitle";
 
 const ALL = "all";
-const tabs = [{ id: ALL, name: "All Products" }, ...catalogueCategories];
 
 /**
  * Product catalogue with category tabs. The chosen tab lives in the URL (?category=doc), so it survives
  * a refresh and the back button returns to the same tab after opening a product.
  */
 const Products = () => {
-  usePageTitle("Products", "Distilled products, crude oil, DOC, maize DDGS, DORB and soya DOC: quality-tested feed ingredients on FeedXchange.");
+  usePageTitle("Products", "Oil cakes and DOC, grains, bran, edible oils and compound feed: quality-tested feed ingredients on FeedXchange.");
   const [params, setParams] = useSearchParams();
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const { products: catalogue, categories, isLoading, isError } = useCatalogue();
+  const tabs = [{ id: ALL, name: "All Products" }, ...categories];
 
   const activeId = tabs.some((tab) => tab.id === params.get("category")) ? (params.get("category") as string) : ALL;
   const activeTab = tabs.find((tab) => tab.id === activeId) ?? tabs[0];
@@ -70,14 +71,18 @@ const Products = () => {
           <div id="catalogue-panel" role="tabpanel" aria-labelledby={`tab-${activeId}`}>
             <div className="catalogue-head">
               <h2 id="catalogue-title">{activeTab.name}</h2>
-              <p>
-                {items.length} {items.length === 1 ? "product" : "products"}
+              <p role="status">
+                {isLoading
+                  ? "Loading products…"
+                  : isError
+                    ? "The products could not be loaded. Please refresh the page."
+                    : `${items.length} ${items.length === 1 ? "product" : "products"}`}
               </p>
             </div>
             {/* Keyed by tab so the cards replay their fade-in on every switch. */}
             <ul key={activeId} className="catalogue-grid">
               {items.map((item, index) => (
-                <CatalogueCard key={item.slug} item={item} index={index} />
+                <CatalogueCard key={item.id} item={item} index={index} />
               ))}
             </ul>
           </div>

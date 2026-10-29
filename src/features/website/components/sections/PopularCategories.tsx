@@ -1,27 +1,28 @@
 import { type IconComponent, ArrowUpRightIcon, PackageIcon } from "../../../../shared/components/icon";
 import { GiBeanstalk, GiBowlOfRice, GiChemicalTank, GiCorn, GiGrain, GiOilDrum } from "react-icons/gi";
 import { Link } from "react-router-dom";
-import { navItems, products } from "../../data/content";
+import { useCatalogue } from "../../hooks/useCatalogue";
+import { sitePaths } from "../../routes/paths";
 import SectionHead from "../common/SectionHead";
 
-/** Icon per category, keyed by the last part of its URL (the product slug). */
-const ICONS: Record<string, IconComponent> = {
-  "distilled-products": GiChemicalTank,
-  "crude-oil": GiOilDrum,
-  doc: GiGrain,
-  "maize-ddgs": GiCorn,
-  dorb: GiBowlOfRice,
-  "soya-doc": GiBeanstalk,
-};
+/** Icon per category, picked by a word in its name (categories come from the admin, so there is no fixed list). */
+const ICONS: [RegExp, IconComponent][] = [
+  [/oil\b(?!.*cake)/i, GiOilDrum],
+  [/cake|doc\b|meal/i, GiGrain],
+  [/grain|cereal|maize|corn/i, GiCorn],
+  [/bran|rice/i, GiBowlOfRice],
+  [/pulse|legume|bean/i, GiBeanstalk],
+  [/feed|distill|ddgs/i, GiChemicalTank],
+];
 
-const slugOf = (to: string) => to.split("/").pop() ?? "";
+const iconFor = (name: string) => ICONS.find(([pattern]) => pattern.test(name))?.[1] ?? PackageIcon;
 
-/**
- * Popular Categories. The names and links come from the header's Products dropdown, so the two always
- * match; each tile opens that category's product page.
- */
+/** Popular Categories: the catalogue's categories (GetAllProducts); each tile opens the Products page on that category. */
 const PopularCategories = () => {
-  const categories = navItems.find((item) => item.children)?.children ?? [];
+  const { categories, productsIn } = useCatalogue();
+
+  // Nothing to show until the catalogue has loaded (or if it fails); the rest of the home page carries on.
+  if (categories.length === 0) return null;
 
   return (
     <section className="section site-categories" aria-labelledby="categories-title">
@@ -29,18 +30,23 @@ const PopularCategories = () => {
         <SectionHead id="categories-title" eyebrow="Shop by category" title="Popular Categories" text="Browse the feed ingredients our buyers trade most." />
         <ul className="site-categories__grid">
           {categories.map((category, index) => {
-            const slug = slugOf(category.to);
-            const Icon = ICONS[slug] ?? PackageIcon;
-            const summary = products.find((product) => product.slug === slug)?.summary;
+            const Icon = iconFor(category.name);
+            const items = productsIn(category.id);
             return (
-              <li key={category.to} data-reveal data-reveal-delay={(index % 3) * 90}>
-                <Link to={category.to} className={`category-tile category-tile--${index % 6}`}>
+              <li key={category.id} data-reveal data-reveal-delay={(index % 3) * 90}>
+                <Link to={`${sitePaths.products}?category=${category.id}`} className={`category-tile category-tile--${index % 6}`}>
                   <span className="category-tile__icon">
                     <Icon aria-hidden />
                   </span>
                   <span className="category-tile__text">
-                    <strong>{category.label}</strong>
-                    {summary && <small>{summary}</small>}
+                    <strong>{category.name}</strong>
+                    <small>
+                      {items
+                        .slice(0, 3)
+                        .map((product) => product.name)
+                        .join(", ")}
+                      {items.length > 3 ? ` and ${items.length - 3} more` : ""}
+                    </small>
                   </span>
                   <ArrowUpRightIcon aria-hidden className="category-tile__go" />
                 </Link>

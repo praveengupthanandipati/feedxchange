@@ -19,6 +19,7 @@ import { paymentAdviceApi } from "./paymentAdviceApi";
 import { notificationsApi } from "./notificationsApi";
 import { notificationTemplatesApi } from "./notificationTemplatesApi";
 import { notificationPreferencesApi } from "./notificationPreferencesApi";
+import { bannersApi } from "./bannersApi";
 
 export const store = configureStore({
   reducer: {
@@ -42,6 +43,7 @@ export const store = configureStore({
     [notificationsApi.reducerPath]: notificationsApi.reducer,
     [notificationTemplatesApi.reducerPath]: notificationTemplatesApi.reducer,
     [notificationPreferencesApi.reducerPath]: notificationPreferencesApi.reducer,
+    [bannersApi.reducerPath]: bannersApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -65,6 +67,7 @@ export const store = configureStore({
       notificationsApi.middleware,
       notificationTemplatesApi.middleware,
       notificationPreferencesApi.middleware,
+      bannersApi.middleware,
     ),
 });
 

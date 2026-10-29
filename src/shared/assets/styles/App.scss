@@ -26,6 +26,22 @@ select:-webkit-autofill {
   transition: background-color 9999s ease-out 0s;
 }
 
+// The real <input type="file"> behind a custom "Upload" button (products, categories, profile documents): kept in the
+// page so the button can open the picker, but never shown. Global, because it was only in the business-owner styles and
+// so the browser's own short "Choose file" box showed over the button on screens that load first.
+.form-field__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 body {
   @include m.font-base;
   font-size: v.$font-size-base;

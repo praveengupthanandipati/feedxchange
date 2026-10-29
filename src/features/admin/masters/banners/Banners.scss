@@ -94,6 +94,8 @@
     font-size: v.$font-size-sm;
 
     svg { flex-shrink: 0; }
+
+    &--error { color: v.fg(v.$color-danger); }
   }
 
   // ---------- Table (sm+; phones get cards) ----------

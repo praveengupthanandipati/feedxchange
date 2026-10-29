@@ -8,7 +8,7 @@ import SectionHead from "../components/common/SectionHead";
 import EnquiryForm from "../components/products/EnquiryForm";
 import PriceHistory from "../components/products/PriceHistory";
 import PageHero from "../components/sections/PageHero";
-import { catalogue, categoryForSlug, findProduct } from "../data/content";
+import { useCatalogue } from "../hooks/useCatalogue";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { sitePaths } from "../routes/paths";
 import NotFound from "../not-found/NotFound";
@@ -17,15 +17,22 @@ const highlights = ["Sourced from KYC-verified sellers", "Specification sheet wi
 
 const ProductDetail = () => {
   const { slug } = useParams();
-  const product = findProduct(slug);
-  usePageTitle(product?.name ?? "Product not found", product?.description);
+  const { products: catalogue, findBySlug, isLoading } = useCatalogue();
+  const product = findBySlug(slug);
+  usePageTitle(product?.name ?? (isLoading ? "Products" : "Product not found"), product?.description);
 
+  if (isLoading) return <PageHero title="Loading product…" text="One moment, fetching the latest details." parent={{ label: "Products", to: sitePaths.products }} />;
   if (!product) return <NotFound />;
-  const category = categoryForSlug(product.slug);
+  const summary = `${product.categoryName} from verified manufacturers, at transparent, real-time prices.`;
+  const description =
+    product.description ||
+    `${product.name} sourced from verified manufacturers and traded through FeedXchange at transparent, real-time prices. Final specifications and pricing are confirmed when the contract is executed.`;
+  // The chart works in ₹ per MT; the catalogue price is usually per kg.
+  const pricePerMt = /kg/i.test(product.weightClause) ? product.price * 1000 : product.price;
 
   // Same category first, topped up from the rest of the catalogue: always 5 (one full row on laptops).
-  const rest = catalogue.filter((item) => item.slug !== product.slug);
-  const others = [...rest.filter((item) => item.categoryId === category?.id), ...rest.filter((item) => item.categoryId !== category?.id)].slice(0, 5);
+  const rest = catalogue.filter((item) => item.id !== product.id);
+  const others = [...rest.filter((item) => item.categoryId === product.categoryId), ...rest.filter((item) => item.categoryId !== product.categoryId)].slice(0, 5);
 
   const shareText = `${product.name} on FeedXchange: ${window.location.href}`;
   // Phones get the native share sheet; everything else opens WhatsApp with the link filled in.
@@ -37,7 +44,7 @@ const ProductDetail = () => {
 
   return (
     <>
-      <PageHero title={product.name} text={product.summary} parent={{ label: "Products", to: sitePaths.products }} />
+      <PageHero title={product.name} text={summary} parent={{ label: "Products", to: sitePaths.products }} />
 
       <section className="section pd">
         <div className="site-container pd__layout">
@@ -45,8 +52,8 @@ const ProductDetail = () => {
             {/* ---------- Product ---------- */}
             <article className="pd-card pd-product" aria-labelledby="pd-name" data-reveal>
               <div className="pd-product__image">
-                <img src={placeholderImage} alt={product.name} width={320} height={240} />
-                {category && <span className="catalogue-card__tag">{category.name}</span>}
+                <img src={product.image ?? placeholderImage} alt={product.name} width={320} height={240} />
+                <span className="catalogue-card__tag">{product.categoryName}</span>
               </div>
 
               <div className="pd-product__info">
@@ -58,7 +65,7 @@ const ProductDetail = () => {
                     <Share2Icon aria-hidden className="pd-share__icon" />
                   </a>
                 </div>
-                <p className="pd-product__text">{product.description}</p>
+                <p className="pd-product__text">{description}</p>
                 <ul className="check-list">
                   {highlights.map((line) => (
                     <li key={line}>
@@ -73,17 +80,17 @@ const ProductDetail = () => {
             </article>
 
             {/* ---------- Price history ---------- */}
-            {category && <PriceHistory seed={product.slug} basePrice={category.basePrice} />}
+            {pricePerMt > 0 && <PriceHistory seed={product.slug} basePrice={pricePerMt} />}
 
             {/* ---------- Nutrition ---------- */}
-            {category && (
+            {product.nutrition.length > 0 && (
               <section className="pd-card" aria-labelledby="pd-nutrition" data-reveal>
                 <div className="pd-card__head">
                   <h2 id="pd-nutrition">Nutritions</h2>
                   <p>Typical range per lot</p>
                 </div>
                 <ul className="nutrient-grid">
-                  {category.nutrition.map((nutrient) => (
+                  {product.nutrition.map((nutrient) => (
                     <li key={nutrient.name} className="nutrient">
                       <h3>{nutrient.name}</h3>
                       <dl>
@@ -103,13 +110,13 @@ const ProductDetail = () => {
             )}
 
             {/* ---------- Nutritional value and uses ---------- */}
-            {category && (
+            {product.uses.length > 0 && (
               <section className="pd-card" aria-labelledby="pd-uses" data-reveal>
                 <div className="pd-card__head">
                   <h2 id="pd-uses">Nutritional Value and Uses</h2>
                 </div>
                 <ul className="uses-list">
-                  {category.uses.map((use) => (
+                  {product.uses.map((use) => (
                     <li key={use.label}>
                       <CircleCheckBigIcon aria-hidden />
                       <div>
@@ -135,7 +142,7 @@ const ProductDetail = () => {
           <SectionHead id="more-title" eyebrow="Explore more" title="Other products" />
           <ul className="catalogue-grid">
             {others.map((item, index) => (
-              <CatalogueCard key={item.slug} item={item} index={index} />
+              <CatalogueCard key={item.id} item={item} index={index} />
             ))}
           </ul>
         </div>
