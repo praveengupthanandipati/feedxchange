@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -142,7 +142,11 @@ const ContractsLoader = () => {
 const Contracts = () => {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState(DEFAULT_STATUS_FILTER);
+  // ?focus=<attention group> (e.g. the Home dashboard's "Contract approval") opens on that group across all dates and statuses.
+  const [searchParams] = useSearchParams();
+  const linkedFocus = searchParams.get("focus");
+  const initialFocus = linkedFocus && linkedFocus in ATTENTION ? (linkedFocus as AttentionKind) : null;
+  const [statusFilter, setStatusFilter] = useState(initialFocus ? "" : DEFAULT_STATUS_FILTER);
   const [rows, setRows] = useState<Contract[]>([]);
   //const [successMessage, setSuccessMessage] = useState("");
   const { message: successMessage, showSuccessMessage } = useSuccessToast();
@@ -161,7 +165,7 @@ const Contracts = () => {
   [contractStatuses],
 );
   const [deleteContract] = useDeleteContractMutation();
-  const [dateRangeFilter, setDateRangeFilter] = useState(DEFAULT_DATE_RANGE);
+  const [dateRangeFilter, setDateRangeFilter] = useState(initialFocus ? "All" : DEFAULT_DATE_RANGE);
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -169,7 +173,7 @@ const Contracts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Contract | null>(null);
   // Overview above the list: attention group / month picked there (null = none), and whether it is shown
-  const [focus, setFocus] = useState<AttentionKind | null>(null);
+  const [focus, setFocus] = useState<AttentionKind | null>(initialFocus);
   const [monthStart, setMonthStart] = useState<number | null>(null);
   const [dashboardShown, setDashboardShown] = useState(readDashboardShown);
   const [now] = useState(() => Date.now());

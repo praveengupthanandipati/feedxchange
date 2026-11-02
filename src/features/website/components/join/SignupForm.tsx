@@ -23,6 +23,9 @@ import {
   useGetBusinessTypesByLineQuery,
 } from "../../../../core/store/businessProfilesApi";
 import { useAddRegistrationDetailsMutation } from "../../../../core/store/registrationDetailsApi";
+import { ADMIN_LOGIN } from "../../../../core/routes/adminPaths";
+import OtpVerification from "./OtpVerification";
+import SiteSelect from "./SiteSelect";
 import { apiErrorMessage } from "../../../../core/store/sellerInvoiceApi";
 import { sitePaths } from "../../routes/paths";
 
@@ -177,6 +180,9 @@ const SignupForm = () => {
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
   const [show, setShow] = useState({ password: false, confirm: false });
   const [sentTo, setSentTo] = useState<string | null>(null);
+  // After signup: the OTP step (a dialog over the form), then the "registration complete" card.
+  const [otpFor, setOtpFor] = useState<{ registrationId: number; email: string; phone: string } | null>(null);
+  const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState("");
   const [addRegistration, { isLoading: submitting }] = useAddRegistrationDetailsMutation();
 
@@ -234,8 +240,9 @@ const SignupForm = () => {
       return;
     }
     setSubmitError("");
+    let registrationId = 0;
     try {
-      await addRegistration({
+      const created = await addRegistration({
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
         businessName: values.business.trim(),
@@ -252,13 +259,27 @@ const SignupForm = () => {
         status: null,
         actionPerformedBy: 0,
       }).unwrap();
+      registrationId = Number(created?.userId) || 0;
     } catch (error) {
       setSubmitError(apiErrorMessage(error, "We couldn't create your account. Please try again."));
       return;
     }
-    setSentTo(values.email.trim());
+    // The form keeps its values until the OTP is verified, so "Start Over" can correct the email.
+    if (registrationId) setOtpFor({ registrationId, email: values.email.trim(), phone: values.mobile.replace(/\D/g, "") });
+    else setSentTo(values.email.trim());
+  };
+
+  const finishOtp = () => {
+    setVerifiedEmail(otpFor?.email ?? values.email.trim());
+    setOtpFor(null);
     setValues(EMPTY);
     setTouched({});
+  };
+
+  const startOver = () => {
+    setOtpFor(null);
+    // Back to the email field to correct it.
+    window.setTimeout(() => document.getElementById("signup-email")?.focus(), 0);
   };
 
   // Shared props for text inputs: id, change/blur handlers and error wiring.
@@ -273,6 +294,21 @@ const SignupForm = () => {
   });
 
   const passed = PASSWORD_RULES.filter((rule) => rule.test(values.password)).length;
+
+  if (verifiedEmail) {
+    return (
+      <div className="signup-card signup-card--sent" role="status">
+        <CircleCheckBigIcon aria-hidden />
+        <h2>Registration complete</h2>
+        <p>
+          Your email <strong>{verifiedEmail}</strong> is verified and your FeedXchange business account is ready. Log in to continue.
+        </p>
+        <Link to={ADMIN_LOGIN} className="btn-site btn-site--primary">
+          Log in <ArrowRightIcon aria-hidden />
+        </Link>
+      </div>
+    );
+  }
 
   if (sentTo) {
     return (
@@ -289,7 +325,7 @@ const SignupForm = () => {
     );
   }
 
-  return (
+  const form = (
     <form className="signup-card" onSubmit={handleSubmit} noValidate aria-labelledby="signup-title">
       <div className="signup-card__head">
         <h2 id="signup-title">Signup your Business Account</h2>
@@ -310,44 +346,46 @@ const SignupForm = () => {
         </OutlinedField>
 
         <OutlinedField id="signup-line" label="Line of Business" required icon={BriefcaseIcon} error={errors.line}>
-          <select {...bind("line")} className={values.line ? undefined : "is-empty"} aria-required>
-            <option value="" disabled>
-              {linesLoading ? "Loading…" : "Select Line of Business"}
-            </option>
-            {lineOptions.map((line) => (
-              <option key={line.id} value={line.id}>
-                {line.name}
-              </option>
-            ))}
-          </select>
+          <SiteSelect
+            id="signup-line"
+            value={values.line}
+            options={lineOptions}
+            placeholder={linesLoading ? "Loading…" : "Select Line of Business"}
+            onChange={(value) => update("line", value)}
+            onBlur={onBlur("line")}
+            invalid={Boolean(errors.line)}
+            describedBy={errors.line ? "signup-line-error" : undefined}
+          />
           <ChevronDownIcon aria-hidden className="su-field__chevron" />
         </OutlinedField>
 
         <OutlinedField id="signup-type" label="Type of Business" required icon={LayersIcon} error={errors.type}>
-          <select {...bind("type")} className={values.type ? undefined : "is-empty"} disabled={!values.line || typeOptions.length === 0} aria-required>
-            <option value="" disabled>
-              {!values.line ? "Select Line of Business first" : typesLoading ? "Loading…" : typeOptions.length ? "Select Type of Business" : "No types for this line"}
-            </option>
-            {typeOptions.map((type) => (
-              <option key={type.id} value={type.id}>
-                {type.name}
-              </option>
-            ))}
-          </select>
+          <SiteSelect
+            id="signup-type"
+            value={values.type}
+            options={typeOptions}
+            placeholder={!values.line ? "Select Line of Business first" : typesLoading ? "Loading…" : typeOptions.length ? "Select Type of Business" : "No types for this line"}
+            disabled={!values.line || typeOptions.length === 0}
+            onChange={(value) => update("type", value)}
+            onBlur={onBlur("type")}
+            invalid={Boolean(errors.type)}
+            describedBy={errors.type ? "signup-type-error" : undefined}
+          />
           <ChevronDownIcon aria-hidden className="su-field__chevron" />
         </OutlinedField>
 
         <OutlinedField id="signup-subType" label="Sub Type of Business" required icon={TagIcon} error={errors.subType}>
-          <select {...bind("subType")} className={values.subType ? undefined : "is-empty"} disabled={!values.type || subTypeOptions.length === 0} aria-required>
-            <option value="" disabled>
-              {!values.type ? "Select Type of Business first" : subTypesLoading ? "Loading…" : subTypeOptions.length ? "Select Sub Type" : "No sub types for this type"}
-            </option>
-            {subTypeOptions.map((subType) => (
-              <option key={subType.id} value={subType.id}>
-                {subType.name}
-              </option>
-            ))}
-          </select>
+          <SiteSelect
+            id="signup-subType"
+            value={values.subType}
+            options={subTypeOptions}
+            placeholder={!values.type ? "Select Type of Business first" : subTypesLoading ? "Loading…" : subTypeOptions.length ? "Select Sub Type" : "No sub types for this type"}
+            disabled={!values.type || subTypeOptions.length === 0}
+            onChange={(value) => update("subType", value)}
+            onBlur={onBlur("subType")}
+            invalid={Boolean(errors.subType)}
+            describedBy={errors.subType ? "signup-subType-error" : undefined}
+          />
           <ChevronDownIcon aria-hidden className="su-field__chevron" />
         </OutlinedField>
 
@@ -492,6 +530,23 @@ const SignupForm = () => {
         )}
       </button>
     </form>
+  );
+
+  // The OTP step opens as a dialog over the form, which keeps its values for "Start Over".
+  return (
+    <>
+      {form}
+      {otpFor && (
+        <OtpVerification
+          registrationId={otpFor.registrationId}
+          email={otpFor.email}
+          phone={otpFor.phone}
+          onVerified={finishOtp}
+          onStartOver={startOver}
+          onClose={() => setOtpFor(null)}
+        />
+      )}
+    </>
   );
 };
 

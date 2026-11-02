@@ -436,3 +436,465 @@
     margin: 0;
   }
 }
+
+// ============================================================
+// Live overview (HomeOverview) at the top
+// ============================================================
+// Home dashboard. Tinted pieces use the theme's tint tokens (--fx-tint-<hue>-*, see _themes.scss), so Light, Dark and
+// High contrast all work.
+@each $hue in (blue, teal, orange, purple, green) {
+  .home-kpi--#{$hue},
+  .home-action--#{$hue} {
+    --tint-bg: var(--fx-tint-#{$hue}-bg);
+    --tint-border: var(--fx-tint-#{$hue}-border);
+    --tint-accent: var(--fx-tint-#{$hue}-accent);
+    --tint-fg: var(--fx-tint-#{$hue}-fg);
+  }
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+
+  &__toolbar {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+  }
+
+  // Two per row even on phones (they are compact), four across on wide screens.
+  &__kpis {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: v.$spacing-2;
+
+    @include m.respond-to(sm) {
+      gap: v.$spacing-3;
+    }
+
+    @include m.respond-to(xl) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  // "Needs action": the fourth cell of the contract-card row (full width below the two-per-row layout), its three
+  // buttons stacked.
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.3rem;
+    min-width: 0;
+    grid-column: 1 / -1;
+
+    @include m.respond-to(xl) {
+      grid-column: auto;
+    }
+
+    .home-action {
+      justify-content: flex-start;
+      padding-top: 0.2rem;
+      padding-bottom: 0.2rem;
+    }
+
+    .home-action__title {
+      flex: 1;
+    }
+  }
+
+
+  &__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: v.$spacing-4;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}
+
+// ---------------- period toggle ----------------
+.home-periods {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid v.line(v.$color-border);
+  border-radius: v.$radius-md;
+  background-color: v.$color-bg;
+
+  button {
+    @include m.font-base(v.$font-weight-medium);
+    @include m.focus-ring(v.$color-orange);
+    min-height: 2rem;
+    padding: 0 v.$spacing-3;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    &:hover {
+      color: v.fg(v.$color-text);
+    }
+
+    &.is-active {
+      background-color: v.$color-navy;
+      color: v.on(v.$color-white);
+    }
+  }
+}
+
+// ---------------- shortcuts ----------------
+.home-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-2;
+
+  &__link {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-navy);
+    min-height: var(--fx-control-height);
+    padding: 0 v.$spacing-3;
+    border-radius: v.$radius-md;
+    background-color: v.$color-orange;
+    color: v.on(v.$color-navy-dark);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: none;
+
+    &:hover {
+      filter: brightness(0.95);
+      color: v.on(v.$color-navy-dark);
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    kbd {
+      padding: 0 0.3rem;
+      border-radius: v.$radius-sm;
+      background-color: v.alpha(v.$color-navy-dark, 0.12);
+      font-family: inherit;
+      font-size: max(11px, 0.7rem);
+      font-weight: v.$font-weight-medium;
+
+      // Phones have no Alt key.
+      @include m.respond-below(md) {
+        display: none;
+      }
+    }
+  }
+}
+
+// ---------------- KPI cards ----------------
+.home-kpi {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-3;
+  min-width: 0;
+  padding: v.$spacing-3 v.$spacing-4;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-2 v.$spacing-3;
+
+    .home-kpi__icon {
+      display: none;
+    }
+  }
+  border: 1px solid var(--tint-border, #{v.line(v.$color-border)});
+  border-left: 4px solid var(--tint-accent, #{v.line(v.$color-border)});
+  border-radius: v.$radius-lg;
+  background-color: v.$color-white;
+  box-shadow: v.$shadow-sm;
+
+  &__icon {
+    display: grid;
+    flex: 0 0 2rem;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--tint-bg);
+    color: var(--tint-fg);
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    min-width: 0;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__label {
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
+    font-weight: v.$font-weight-medium;
+  }
+
+  // The figure, with its change beside it.
+  &__value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15rem 0.5rem;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-lg;
+    font-weight: v.$font-weight-bold;
+    line-height: 1.2;
+  }
+
+  &__note {
+    overflow: hidden;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.72rem);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// "+12% vs last month"
+.home-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: max(11px, 0.75rem);
+  font-weight: v.$font-weight-semibold;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &--up {
+    color: v.fg(v.$color-success);
+  }
+
+  &--down {
+    color: v.fg(v.$color-danger);
+  }
+
+  &--flat,
+  &--none {
+    color: v.fg(v.$color-text-muted);
+    font-weight: v.$font-weight-medium;
+  }
+}
+
+// ---------------- action buttons: icon, title, count badge, arrow; the description is the hover text ----------------
+.home-action {
+  @include m.focus-ring(v.$color-orange);
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: v.$spacing-2;
+  padding: 0.35rem 0.75rem 0.35rem 0.4rem;
+  border: 1px solid var(--tint-border);
+  border-radius: 999px;
+  background-color: var(--tint-bg);
+  color: v.fg(v.$color-text);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: box-shadow v.$transition-fast, border-color v.$transition-fast;
+
+  &:hover {
+    border-color: var(--tint-accent);
+    box-shadow: v.$shadow-sm;
+    color: v.fg(v.$color-text);
+  }
+
+  &__icon {
+    display: grid;
+    flex: 0 0 1.6rem;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: v.$color-white;
+    color: var(--tint-fg);
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &__title {
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  // The count, as a pill right after the title.
+  &__count {
+    min-width: 1.5rem;
+    padding: 0.05rem 0.45rem;
+    border: 1px solid var(--tint-accent);
+    border-radius: 999px;
+    // Surface pill with the tint text: readable in Light, Dark and High contrast alike.
+    background-color: v.$color-white;
+    color: var(--tint-fg);
+    font-size: max(11px, 0.75rem);
+    font-weight: v.$font-weight-bold;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  &__go {
+    width: 14px;
+    height: 14px;
+    color: var(--tint-fg);
+    transition: transform v.$transition-fast;
+  }
+
+  &:hover &__go {
+    transform: translateX(2px);
+  }
+}
+
+// ---------------- cards with a chart / list / table ----------------
+.home-card {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  min-width: 0;
+  padding: v.$spacing-3 v.$spacing-4;
+  border: 1px solid v.line(v.$color-border);
+  border-radius: v.$radius-lg;
+  background-color: v.$color-white;
+  box-shadow: v.$shadow-sm;
+
+  &--message {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex-direction: row;
+    color: v.fg(v.$color-danger);
+  }
+
+  &__head {
+    @include m.flex(row, space-between, flex-start, v.$spacing-3);
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    margin: 0;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__sub {
+    margin: 0.15rem 0 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
+  }
+
+  &__empty {
+    margin: 0;
+    padding: v.$spacing-3 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    text-align: center;
+  }
+}
+
+.home-commodities {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__row {
+    @include m.flex(row, space-between, baseline, v.$spacing-2);
+    font-size: max(11px, 0.8rem);
+  }
+
+  &__name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: v.fg(v.$color-text);
+  }
+
+  &__value {
+    flex-shrink: 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.75rem);
+  }
+
+  &__bar {
+    display: block;
+    height: 4px;
+    margin-top: 0.2rem;
+    border-radius: 3px;
+    background-color: var(--fx-chart-grid);
+
+    span {
+      display: block;
+      height: 100%;
+      border-radius: 3px;
+      background-color: var(--fx-chart-1);
+    }
+  }
+}
+
+.home-prices {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: max(11px, 0.8rem);
+
+  th,
+  td {
+    padding: 0.35rem 0;
+    border-bottom: 1px solid v.line(v.$color-border);
+    text-align: right;
+  }
+
+  th:first-child {
+    padding-right: v.$spacing-2;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  thead th {
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.72rem);
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+  }
+
+  tbody th {
+    color: v.fg(v.$color-text);
+    font-weight: v.$font-weight-medium;
+  }
+
+  tbody tr:last-child th,
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .home-change {
+    justify-content: flex-end;
+  }
+}
+
+// Loading / empty / not-available line in the widgets that use live data.
+.dashboard-card__empty,
+.dashboard-analytics__empty {
+  margin: 0;
+  padding: v.$spacing-5 0;
+  color: v.fg(v.$color-text-muted);
+  font-size: v.$font-size-sm;
+  text-align: center;
+}

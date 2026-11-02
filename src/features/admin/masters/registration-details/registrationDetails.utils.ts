@@ -1,5 +1,34 @@
+import type { RegistrationDetail } from "../../../../core/store/registrationDetailsApi";
 import { downloadBlob } from "../../truck-management/seller-dispatches-new/update-seller-dispatch/invoicePdf";
-import type { Registration, RegistrationStatus } from "./registrationDetails.data";
+import { REGISTRATION_STATUSES, type Registration, type RegistrationStatus } from "./registrationDetails.data";
+
+/**
+ * The API sends the status as a number. ASSUMED to follow REGISTRATION_STATUSES' order, starting at 0
+ * (0 Pending, 1 Converted, 2 Membership Taken, 3 Not Interested, 4 Follow Up Later, 5 Rejected) - confirm with the backend.
+ * A status sent as its name is matched by name; anything unknown (or none) is Pending.
+ */
+const toStatus = (value: RegistrationDetail["status"]): RegistrationStatus => {
+  if (typeof value === "number") return REGISTRATION_STATUSES[value] ?? "Pending";
+  const byName = REGISTRATION_STATUSES.find((status) => status.toLowerCase() === (value ?? "").trim().toLowerCase());
+  return byName ?? "Pending";
+};
+
+/** The code UpdateRegistrationStatus takes for a status (same assumed order as toStatus). */
+export const toStatusCode = (status: RegistrationStatus) => Math.max(0, REGISTRATION_STATUSES.indexOf(status));
+
+/** A registration from GetAllRegistrationDetails as the screen shows it. */
+export const toRegistration = (detail: RegistrationDetail): Registration => ({
+  id: String(detail.id),
+  name: [detail.firstName, detail.lastName].map((part) => part?.trim()).filter(Boolean).join(" ") || "—",
+  phone: detail.phoneNumber ?? "",
+  email: detail.email ?? "",
+  registrationDate: detail.createdAt?.slice(0, 10) ?? "",
+  businessName: detail.businessName ?? "",
+  lineOfBusiness: detail.lineOfBusiness ?? "",
+  referralCode: detail.referralCode ?? "",
+  status: toStatus(detail.status),
+  reason: detail.remarks ?? "",
+});
 
 /** 2026-03-30 → 30/03/2026. Built by hand so every browser shows the same text. */
 export const formatRegistrationDate = (iso: string) => iso.split("-").reverse().join("/");

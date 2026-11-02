@@ -38,8 +38,8 @@ const BusinessProfileStep = () => {
         <h2 className="new-contract__section-title">1. Business Profile</h2>
         {!editId && (
           <p className="new-business__step-hint">
-            Business Profile is mandatory — save it to unlock Contacts &amp; Addresses, Documents, Bank
-            Details and Profile Settings.
+            Business Profile is mandatory — save it to unlock Contacts &amp; Addresses, Documents and Bank
+            Details.
           </p>
         )}
         <BusinessProfile

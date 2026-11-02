@@ -459,6 +459,11 @@
       }
     }
 
+    // Same height as the number fields beside it (the dropdown defaults to the smaller standard control height).
+    .searchable-select__trigger {
+      height: var(--fx-control-height-lg);
+    }
+
     // Let the numeric fields shrink to their narrow column.
     input[type="number"] {
       min-width: 0;

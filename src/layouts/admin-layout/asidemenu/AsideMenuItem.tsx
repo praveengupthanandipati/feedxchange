@@ -1,26 +1,26 @@
-import { useEffect, useRef, useState } from "react";
+import { createElement, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import { ChevronDownIcon } from "../../../shared/components/icon";
 import type { AsideNavChild, AsideNavItem } from "./aside.types";
+import { childIconFor } from "./iconMap";
 
 interface AsideMenuItemProps {
   item: AsideNavItem;
   collapsed: boolean;
+  /** The one open submenu is kept by the menu (accordion): opening this one closes any other. */
   isOpen: boolean;
   onToggle: (id: string) => void;
+  /** The current page is in this section: the menu opens it (and closes the others). */
+  onRouteActive: (id: string) => void;
   onNavigate?: () => void;
 }
 
 const FLYOUT_CLOSE_DELAY = 150;
 
-// null = no manual override, follow the automatic (route-driven) expand rules.
-type ManualState = "open" | "closed" | null;
-
-const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onNavigate }: AsideMenuItemProps) => {
+const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onRouteActive, onNavigate }: AsideMenuItemProps) => {
   const [flyoutOpen, setFlyoutOpen] = useState(false);
   const [flyoutPos, setFlyoutPos] = useState({ top: 0, left: 0 });
-  const [manualState, setManualState] = useState<ManualState>(null);
   const closeTimer = useRef<number | undefined>(undefined);
   const itemRef = useRef<HTMLLIElement>(null);
   const location = useLocation();
@@ -42,24 +42,23 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onNavigate }: AsideM
   const isSectionActive =
     (hasPath && isInsidePath(item.path!)) || Boolean(item.children?.some(isChildActive));
 
-  const autoExpanded = isOpen || (isSectionActive && !item.collapsedByDefault);
-  const expanded = manualState !== null ? manualState === "open" : autoExpanded;
+  const expanded = isOpen;
 
-  // A route change means the user navigated somewhere new — drop any manual
-  // open/close override so the section goes back to following the active route.
+  // Navigating into this section opens it (closing the others), unless it is meant to stay closed until clicked.
   useEffect(() => {
-    setManualState(null);
+    if (hasChildren && isSectionActive && !item.collapsedByDefault) onRouteActive(item.id);
+    // Only on navigation: a click elsewhere in the menu must not reopen this section.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const handleToggle = () => {
     if (collapsed) return; // collapsed rail relies on the hover flyout instead
-    setManualState(expanded ? "closed" : "open");
     onToggle(item.id);
   };
 
   const handleCollapse = () => {
-    if (collapsed || !hasChildren) return;
-    setManualState("closed");
+    if (collapsed || !hasChildren || !expanded) return;
+    onToggle(item.id);
   };
 
   const openFlyout = () => {
@@ -83,7 +82,9 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onNavigate }: AsideM
             className={`aside-item__child-link ${isChildActive(child) ? "is-active" : ""}`}
             onClick={onNavigate}
           >
-            {child.label}
+            {/* An icon picked from the page's name (pages have no icon of their own). */}
+            {createElement(childIconFor(child.label, child.path), { className: "aside-item__child-icon", "aria-hidden": true })}
+            <span>{child.label}</span>
           </NavLink>
         </li>
       ))}

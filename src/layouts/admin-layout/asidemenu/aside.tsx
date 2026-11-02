@@ -6,6 +6,7 @@ import favIcon from "../../../shared/assets/img/fav.png";
 import { asideNavSections } from "./aside.data";
 import { filterNavSections, withLocalChildren, withLocalSections } from "./filterNav";
 import { toNavSections } from "../../../core/auth/menu";
+import { isShownProfileStep } from "../../../features/admin/usermanagement/profileSettingsVisibility";
 import { useAuth } from "../../../core/auth/AuthContext";
 import AsideMenuItem from "./AsideMenuItem";
 import { useSelectedContract } from "../../../core/context/SelectedContractContext";
@@ -50,6 +51,8 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
       withLocalSections(menu ? withLocalChildren(toNavSections(menu), can) : filterNavSections(asideNavSections, can)).map((section) => ({
         ...section,
         items: section.items.map((item) => {
+          // Profile Settings is hidden for now (profileSettingsVisibility.ts), whichever menu it came from.
+          if (item.children?.some((child) => !isShownProfileStep(child))) item = { ...item, children: item.children.filter(isShownProfileStep) };
           if (!CONTRACT_SCOPED_ITEM_IDS.includes(item.id) || !selectedContract) return item;
 
           return {
@@ -125,6 +128,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
                   collapsed={collapsed}
                   isOpen={openItemId === item.id}
                   onToggle={handleItemToggle}
+                  onRouteActive={setOpenItemId}
                   onNavigate={onCloseMobile}
                 />
               ))}

@@ -242,3 +242,126 @@
     font-size: v.$font-size-base;
   }
 }
+
+// ---------- Forgot password / Register links, and the reset steps ----------
+.login {
+  &__switch {
+    margin: v.$spacing-4 0 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    text-align: center;
+
+    &--before {
+      margin: 0 0 v.$spacing-4;
+    }
+  }
+
+  &__link {
+    @include m.focus-ring(v.$color-orange);
+    padding: 0;
+    border: none;
+    background: none;
+    color: v.fg(v.$color-primary);
+    font: inherit;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: v.fg(v.$color-navy-dark);
+    }
+
+    &:disabled {
+      color: v.fg(v.$color-text-muted);
+      text-decoration: none;
+      cursor: default;
+    }
+  }
+
+  &__card--reset {
+    position: relative;
+  }
+
+  &__close {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    position: absolute;
+    top: v.$spacing-3;
+    right: v.$spacing-3;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: v.fg(v.$color-text-muted);
+    font-size: 1.25rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-gray-100;
+      color: v.fg(v.$color-text);
+    }
+  }
+
+  // Info / success (green tint), error (red tint): theme tint tokens.
+  &__notice {
+    margin: 0 0 v.$spacing-4;
+    padding: v.$spacing-3;
+    border: 1px solid var(--fx-tint-green-border);
+    border-radius: v.$radius-md;
+    background-color: var(--fx-tint-green-bg);
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    line-height: 1.5;
+
+    &--error {
+      border-color: var(--fx-tint-red-border);
+      background-color: var(--fx-tint-red-bg);
+    }
+  }
+
+  &__otp {
+    display: flex;
+    justify-content: center;
+    gap: v.$spacing-2;
+    margin: 0 0 v.$spacing-5;
+    padding: 0;
+    border: 0;
+
+    input {
+      @include m.font-base(v.$font-weight-semibold);
+      width: 3.25rem;
+      height: 3.5rem;
+      border: 1px solid var(--fx-field-border);
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg;
+      color: v.fg(v.$color-text);
+      font-size: 1.25rem;
+      text-align: center;
+
+      &:focus {
+        outline: none;
+        border-color: var(--fx-field-border-focus);
+        box-shadow: var(--fx-field-focus-glow);
+      }
+
+      &[aria-invalid="true"] {
+        border-color: v.line(v.$color-danger);
+      }
+    }
+  }
+
+  &__done {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    > svg {
+      width: 3rem;
+      height: 3rem;
+      margin-bottom: v.$spacing-3;
+      color: v.fg(v.$color-success);
+    }
+  }
+}

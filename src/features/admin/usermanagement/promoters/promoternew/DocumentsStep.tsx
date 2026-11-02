@@ -1,4 +1,6 @@
 import DocumentsSection from "./DocumentsSection";
+import { SHOW_PROFILE_SETTINGS } from "../../profileSettingsVisibility";
+import { usePermission } from "../../../../../core/auth/AuthContext";
 import { usePromoterWizard } from "./PromoterWizardContext";
 import { useRequirePromoterProfile } from "./useRequirePromoterProfile";
 import { useSaveDocumentsStep } from "./useSaveDocumentsStep";
@@ -6,8 +8,14 @@ import { useSaveDocumentsStep } from "./useSaveDocumentsStep";
 const DocumentsStep = () => {
   const { draft, updateDraft } = usePromoterWizard();
   const unlocked = useRequirePromoterProfile();
+  // Profile Settings is hidden for now (profileSettingsVisibility.ts): go on to Notification Preferences, or finish.
+  const hasPreferencesStep = usePermission("notification-preferences.view");
   const { submitting, submitError, handleSaveAndContinue } = useSaveDocumentsStep(
-    "/admin/promoters/profile-settings",
+    SHOW_PROFILE_SETTINGS
+      ? "/admin/promoters/profile-settings"
+      : hasPreferencesStep
+        ? "/admin/promoters/notification-preferences"
+        : "/admin/promoters",
   );
 
   if (!unlocked) return null;
@@ -35,7 +43,7 @@ const DocumentsStep = () => {
           onClick={handleSaveAndContinue}
           disabled={submitting}
         >
-          {submitting ? "Saving…" : "Save & Continue"}
+          {submitting ? "Saving…" : SHOW_PROFILE_SETTINGS || hasPreferencesStep ? "Save & Continue" : "Finish"}
         </button>
       </div>
     </>

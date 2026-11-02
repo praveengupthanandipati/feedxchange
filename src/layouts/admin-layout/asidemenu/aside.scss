@@ -333,7 +333,9 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
 
   &__child-link {
     @include m.font-base;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
     margin: v.$spacing-1 0 0 2.6rem;
     padding: v.$spacing-2 v.$spacing-3;
     border-radius: v.$radius-md;
@@ -343,17 +345,10 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
     white-space: nowrap;
     transition: background-color v.$transition-fast, color v.$transition-fast;
 
-    // one common bullet for every page under a Sub Module (pages have no icon of their own)
-    &::before {
-      content: "";
-      display: inline-block;
-      width: 0.4rem;
-      height: 0.4rem;
-      margin-right: v.$spacing-2;
-      border-radius: 50%;
-      background: currentColor;
-      opacity: 0.6;
-      vertical-align: middle;
+    > span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     &:hover {
@@ -365,6 +360,19 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
       color: v.fg(v.$color-orange-light);
       font-weight: v.$font-weight-semibold;
     }
+  }
+
+  // The page icon in front of each submenu label (in place of the old bullet dot).
+  &__child-icon {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    opacity: 0.75;
+  }
+
+  &__child-link:hover &__child-icon,
+  &__child-link.is-active &__child-icon {
+    opacity: 1;
   }
 
   // Flyout — portaled to <body> so it can escape the sidebar's own

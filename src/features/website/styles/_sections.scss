@@ -105,8 +105,11 @@
   }
 
   h1 {
-    @include m.fluid-type(2rem, 3.25rem);
-    max-width: 48rem;
+    // Two lines on laptops, broken where the title has its "\n"; more lines only on narrow screens.
+    @include m.fluid-type(1.625rem, 2.5rem);
+    max-width: 68rem;
+    white-space: pre-line;
+    text-wrap: balance;
     color: v.fg(v.$white);
     letter-spacing: -0.02em;
     text-shadow: 0 2px 24px v.alpha(v.$navy-900, 0.4);
@@ -587,13 +590,9 @@ $search-height: 3.75rem;
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: v.$space-6 v.$space-4;
     margin: 0;
-
-    @include m.up(lg) {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
   }
 
   // dt follows dd visually: big number on top, label under it.

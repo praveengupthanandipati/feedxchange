@@ -14,6 +14,8 @@ import {
   BellOff,
   Box,
   Briefcase,
+  Building2,
+  Calculator,
   Calendar,
   ChartColumn,
   ChartNoAxesColumn,
@@ -50,15 +52,19 @@ import {
   Gift,
   HardDrive,
   Hash,
+  History,
   House,
   Image,
   Inbox,
+  IndianRupee,
   Info,
+  Landmark,
   Layers,
   LayoutGrid,
   LifeBuoy,
   Link,
   List,
+  ListChecks,
   Lock,
   LockOpen,
   LogIn,
@@ -75,6 +81,7 @@ import {
   Minus,
   Monitor,
   Moon,
+  Newspaper,
   Package,
   Pen,
   PenLine,
@@ -82,9 +89,13 @@ import {
   Phone,
   Plus,
   Printer,
+  Quote,
+  Receipt,
   RefreshCw,
   RotateCcw,
+  Route,
   Save,
+  ScrollText,
   Search,
   Send,
   Settings,
@@ -94,6 +105,7 @@ import {
   SlidersVertical,
   Smartphone,
   SquareCheckBig,
+  SquareKanban,
   SquarePen,
   Star,
   Sun,
@@ -107,8 +119,10 @@ import {
   Upload,
   User,
   UserCheck,
+  UserCog,
   UserPlus,
   Users,
+  Wallet,
   Wrench,
   X,
   Zap,
@@ -130,6 +144,8 @@ export const BellIcon = createIcon(Bell, "BellIcon");
 export const BellOffIcon = createIcon(BellOff, "BellOffIcon");
 export const BoxIcon = createIcon(Box, "BoxIcon");
 export const BriefcaseIcon = createIcon(Briefcase, "BriefcaseIcon");
+export const Building2Icon = createIcon(Building2, "Building2Icon");
+export const CalculatorIcon = createIcon(Calculator, "CalculatorIcon");
 export const CalendarIcon = createIcon(Calendar, "CalendarIcon");
 export const ChartColumnIcon = createIcon(ChartColumn, "ChartColumnIcon");
 export const ChartNoAxesColumnIcon = createIcon(ChartNoAxesColumn, "ChartNoAxesColumnIcon");
@@ -166,15 +182,19 @@ export const FunnelIcon = createIcon(Funnel, "FunnelIcon");
 export const GiftIcon = createIcon(Gift, "GiftIcon");
 export const HardDriveIcon = createIcon(HardDrive, "HardDriveIcon");
 export const HashIcon = createIcon(Hash, "HashIcon");
+export const HistoryIcon = createIcon(History, "HistoryIcon");
 export const HouseIcon = createIcon(House, "HouseIcon");
 export const ImageIcon = createIcon(Image, "ImageIcon");
 export const InboxIcon = createIcon(Inbox, "InboxIcon");
+export const IndianRupeeIcon = createIcon(IndianRupee, "IndianRupeeIcon");
 export const InfoIcon = createIcon(Info, "InfoIcon");
+export const LandmarkIcon = createIcon(Landmark, "LandmarkIcon");
 export const LayersIcon = createIcon(Layers, "LayersIcon");
 export const LayoutGridIcon = createIcon(LayoutGrid, "LayoutGridIcon");
 export const LifeBuoyIcon = createIcon(LifeBuoy, "LifeBuoyIcon");
 export const LinkIcon = createIcon(Link, "LinkIcon");
 export const ListIcon = createIcon(List, "ListIcon");
+export const ListChecksIcon = createIcon(ListChecks, "ListChecksIcon");
 export const LockIcon = createIcon(Lock, "LockIcon");
 export const LockOpenIcon = createIcon(LockOpen, "LockOpenIcon");
 export const LogInIcon = createIcon(LogIn, "LogInIcon");
@@ -191,6 +211,7 @@ export const Minimize2Icon = createIcon(Minimize2, "Minimize2Icon");
 export const MinusIcon = createIcon(Minus, "MinusIcon");
 export const MonitorIcon = createIcon(Monitor, "MonitorIcon");
 export const MoonIcon = createIcon(Moon, "MoonIcon");
+export const NewspaperIcon = createIcon(Newspaper, "NewspaperIcon");
 export const PackageIcon = createIcon(Package, "PackageIcon");
 export const PenIcon = createIcon(Pen, "PenIcon");
 export const PenLineIcon = createIcon(PenLine, "PenLineIcon");
@@ -198,9 +219,13 @@ export const PercentIcon = createIcon(Percent, "PercentIcon");
 export const PhoneIcon = createIcon(Phone, "PhoneIcon");
 export const PlusIcon = createIcon(Plus, "PlusIcon");
 export const PrinterIcon = createIcon(Printer, "PrinterIcon");
+export const QuoteIcon = createIcon(Quote, "QuoteIcon");
+export const ReceiptIcon = createIcon(Receipt, "ReceiptIcon");
 export const RefreshCwIcon = createIcon(RefreshCw, "RefreshCwIcon");
 export const RotateCcwIcon = createIcon(RotateCcw, "RotateCcwIcon");
+export const RouteIcon = createIcon(Route, "RouteIcon");
 export const SaveIcon = createIcon(Save, "SaveIcon");
+export const ScrollTextIcon = createIcon(ScrollText, "ScrollTextIcon");
 export const SearchIcon = createIcon(Search, "SearchIcon");
 export const SendIcon = createIcon(Send, "SendIcon");
 export const SettingsIcon = createIcon(Settings, "SettingsIcon");
@@ -210,6 +235,7 @@ export const ShoppingBagIcon = createIcon(ShoppingBag, "ShoppingBagIcon");
 export const SlidersVerticalIcon = createIcon(SlidersVertical, "SlidersVerticalIcon");
 export const SmartphoneIcon = createIcon(Smartphone, "SmartphoneIcon");
 export const SquareCheckBigIcon = createIcon(SquareCheckBig, "SquareCheckBigIcon");
+export const SquareKanbanIcon = createIcon(SquareKanban, "SquareKanbanIcon");
 export const SquarePenIcon = createIcon(SquarePen, "SquarePenIcon");
 export const StarIcon = createIcon(Star, "StarIcon");
 export const SunIcon = createIcon(Sun, "SunIcon");
@@ -223,8 +249,10 @@ export const TruckIcon = createIcon(Truck, "TruckIcon");
 export const UploadIcon = createIcon(Upload, "UploadIcon");
 export const UserCheckIcon = createIcon(UserCheck, "UserCheckIcon");
 export const UserIcon = createIcon(User, "UserIcon");
+export const UserCogIcon = createIcon(UserCog, "UserCogIcon");
 export const UserPlusIcon = createIcon(UserPlus, "UserPlusIcon");
 export const UsersIcon = createIcon(Users, "UsersIcon");
+export const WalletIcon = createIcon(Wallet, "WalletIcon");
 export const WrenchIcon = createIcon(Wrench, "WrenchIcon");
 export const XIcon = createIcon(X, "XIcon");
 export const ZapIcon = createIcon(Zap, "ZapIcon");

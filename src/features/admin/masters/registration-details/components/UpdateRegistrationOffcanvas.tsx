@@ -6,7 +6,8 @@ import { STATUS_OPTIONS, type Registration, type RegistrationStatus, type Regist
 
 interface UpdateRegistrationOffcanvasProps {
   registration: Registration;
-  onSave: (update: RegistrationUpdate) => void;
+  /** Resolves to an error message to show in the panel, or null when saved. */
+  onSave: (update: RegistrationUpdate) => Promise<string | null>;
   onClose: () => void;
 }
 
@@ -14,6 +15,8 @@ interface UpdateRegistrationOffcanvasProps {
 const UpdateRegistrationOffcanvas = ({ registration, onSave, onClose }: UpdateRegistrationOffcanvasProps) => {
   const [form, setForm] = useState<RegistrationUpdate>({ status: registration.status, reason: registration.reason });
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const panelRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -31,10 +34,15 @@ const UpdateRegistrationOffcanvas = ({ registration, onSave, onClose }: UpdateRe
     };
   }, [onClose]);
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (saving) return;
     if (!form.status) return setError("Select a status.");
-    onSave({ ...form, reason: form.reason.trim() });
+    setSaving(true);
+    setSaveError("");
+    const problem = await onSave({ ...form, reason: form.reason.trim() });
+    setSaving(false);
+    if (problem) setSaveError(problem);
   };
 
   return createPortal(
@@ -89,11 +97,17 @@ const UpdateRegistrationOffcanvas = ({ registration, onSave, onClose }: UpdateRe
             />
           </div>
 
+          {saveError && (
+            <small className="registration-panel__error" role="alert">
+              {saveError}
+            </small>
+          )}
+
           <div className="registration-panel__actions">
-            <button type="submit" className="registrations__btn registrations__btn--navy">
-              Save
+            <button type="submit" className="registrations__btn registrations__btn--navy" disabled={saving}>
+              {saving ? "Saving…" : "Save"}
             </button>
-            <button type="button" className="registrations__btn registrations__btn--warning" onClick={onClose}>
+            <button type="button" className="registrations__btn registrations__btn--warning" onClick={onClose} disabled={saving}>
               Cancel
             </button>
           </div>

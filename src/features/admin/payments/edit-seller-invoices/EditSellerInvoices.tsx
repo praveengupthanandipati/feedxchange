@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronLeftIcon, ChevronRightIcon, CircleCheckBigIcon, CircleXIcon, PenIcon } from "../../../../shared/components/icon";
+import { ChevronLeftIcon, ChevronRightIcon, CircleCheckBigIcon, CircleXIcon, EyeIcon, EyeOffIcon, PenIcon } from "../../../../shared/components/icon";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
@@ -35,6 +35,47 @@ function formatDate(iso: string): string {
   return `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
 }
 
+/** The deductions of one invoice, in the row opened under it. */
+const DeductionLines = ({ invoice }: { invoice: Invoice }) => (
+  <div className="edit-invoices__deduction-lines">
+    <div className="edit-invoices__deduction-card">
+    <div className="edit-invoices__deduction-head">
+      <span className="edit-invoices__deduction-title">Deductions on {invoice.invoiceNumber}</span>
+      <span className="edit-invoices__deduction-count">
+        {invoice.deductions.length} deduction{invoice.deductions.length === 1 ? "" : "s"}
+      </span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col" className="is-num">Amount</th>
+          <th scope="col">Type</th>
+          <th scope="col">Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        {invoice.deductions.map((d) => (
+          <tr key={d.deductionId}>
+            <td>{formatDate(d.date)}</td>
+            <td className="is-num">{money(d.amount)}</td>
+            <td>{d.isTdsTcs ? <span className="edit-invoices__tag">TDS/TCS</span> : "Other"}</td>
+            <td>{d.remarks || "—"}</td>
+          </tr>
+        ))}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row">Total</th>
+          <td className="is-num">{money(invoice.deductionsTotal)}</td>
+          <td colSpan={2} />
+        </tr>
+      </tfoot>
+    </table>
+    </div>
+  </div>
+);
+
 /** Edit Seller Invoices: invoices that are not cleared can be edited or cancelled; cleared (paid) and cancelled ones are locked. */
 const EditSellerInvoices = () => {
   const [status, setStatus] = useState("Uncleared");
@@ -47,6 +88,10 @@ const EditSellerInvoices = () => {
   const [cancelling, setCancelling] = useState<Invoice | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [toast, setToast] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  // Invoices whose deductions are open in a row below them.
+  const [openDeductions, setOpenDeductions] = useState<string[]>([]);
+  const toggleDeductions = (key: string) =>
+    setOpenDeductions((prev) => (prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key]));
 
   const { data: years = [] } = useGetInvoiceFinancialYearsQuery(undefined, { refetchOnMountOrArgChange: true });
   const { data, isFetching, isError, error } = useGetInvoicesQuery(
@@ -88,6 +133,28 @@ const EditSellerInvoices = () => {
   };
 
   const columns: TableColumn<Invoice>[] = [
+    // First column: an icon that opens the invoice's deductions in a row below it (only when it has any).
+    {
+      key: "viewDeductions",
+      header: "",
+      width: "3rem",
+      render: (row) => {
+        if (row.deductions.length === 0) return null;
+        const open = openDeductions.includes(String(row.invoiceId));
+        return (
+          <button
+            type="button"
+            className="edit-invoices__view-deductions"
+            onClick={() => toggleDeductions(String(row.invoiceId))}
+            aria-expanded={open}
+            aria-label={`${open ? "Hide" : "View"} deductions on invoice ${row.invoiceNumber}`}
+            title="Deductions"
+          >
+            {open ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
+          </button>
+        );
+      },
+    },
     { key: "invoiceNumber", header: "Invoice #" },
     { key: "contractNumber", header: "Contract #" },
     { key: "sellerName", header: "Seller" },
@@ -100,23 +167,8 @@ const EditSellerInvoices = () => {
     {
       key: "deductions",
       header: "Deductions",
-      render: (row) =>
-        row.deductions.length === 0 ? (
-          "—"
-        ) : (
-          <div className="edit-invoices__deductions">
-            <strong>{money(row.deductionsTotal)}</strong>
-            <ul>
-              {row.deductions.map((d) => (
-                <li key={d.deductionId} title={d.remarks ?? undefined}>
-                  {formatDate(d.date)}: {money(d.amount)}
-                  {d.isTdsTcs && <span className="edit-invoices__tag">TDS/TCS</span>}
-                  {d.remarks && <em> – {d.remarks}</em>}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ),
+      align: "right",
+      render: (row) => (row.deductions.length === 0 ? "—" : money(row.deductionsTotal)),
     },
     { key: "payableAmount", header: "Payable", align: "right", render: (row) => money(row.payableAmount) },
     { key: "paidAmount", header: "Paid", align: "right", render: (row) => money(row.paidAmount) },
@@ -224,6 +276,8 @@ const EditSellerInvoices = () => {
           columns={columns}
           data={items}
           rowKey={(row) => String(row.invoiceId)}
+          expandedRowKeys={openDeductions}
+          renderExpandedRow={(row) => <DeductionLines invoice={row} />}
           emptyMessage={isFetching ? "Loading…" : "No invoices match these filters."}
           className="edit-invoices__table"
         />

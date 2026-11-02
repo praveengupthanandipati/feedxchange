@@ -132,6 +132,8 @@ $status-colors: (
 
   // ---------- Filters: stacked on phones, one row from tablet up ----------
   &__filters {
+    // Same field height as the business owner profile form (search, dropdown and buttons stay level).
+    --fx-control-height: var(--fx-control-height-lg);
     display: grid;
     grid-template-columns: 1fr;
     gap: v.$spacing-3;
@@ -154,8 +156,9 @@ $status-colors: (
     gap: 0.35rem;
     min-width: 0;
 
-    label,
-    span {
+    // Only the field's own label: a bare `span` also restyled the text inside the status dropdown.
+    > label,
+    .registrations__filter-label > span {
       color: v.fg(v.$color-text);
       font-size: max(11px, 0.8rem);
       font-weight: v.$font-weight-medium;
@@ -486,6 +489,7 @@ $status-colors: (
   }
 
   &__body {
+    --fx-control-height: var(--fx-control-height-lg);
     display: flex;
     flex: 1;
     flex-direction: column;

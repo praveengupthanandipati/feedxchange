@@ -72,8 +72,8 @@ const TransporterProfileStep = () => {
         <h2 className="new-contract__section-title">1. Transporter Profile</h2>
         {!editId && (
           <p className="new-business__step-hint">
-            Transporter Profile is mandatory — save it to unlock Contacts &amp; Addresses, Documents,
-            Bank Details and Profile Settings.
+            Transporter Profile is mandatory — save it to unlock Contacts &amp; Addresses, Documents and
+            Bank Details.
           </p>
         )}
         <div className="new-contract__grid">

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { SubmitEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRightIcon, EyeIcon, EyeOffIcon, LockIcon, MailIcon } from "../../../../shared/components/icon";
 import logo from "../../../../shared/assets/img/logo.png";
 import { useLoginMutation } from "../../../../core/store/authApi";
 import { useAuth } from "../../../../core/auth/AuthContext";
 import { clearSession, saveTokens, savePermissionKeys } from "../../../../core/auth/session";
+import { sitePaths } from "../../../website/routes/paths";
+import ResetPassword from "./ResetPassword";
 import "./Login.scss";
 
 const FEATURES = [
@@ -21,6 +23,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+  // "Forgot password? Reset Now" swaps the sign-in card for the reset steps.
+  const [resetting, setResetting] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
   const { reload } = useAuth();
 
@@ -116,6 +120,9 @@ const Login = () => {
       </div>
 
       <div className="login__form-wrapper">
+        {resetting ? (
+          <ResetPassword onBack={() => setResetting(false)} />
+        ) : (
         <form className="login__card" onSubmit={handleSubmit} noValidate>
           <h2>Welcome back</h2>
           <p className="login__subtitle">Sign in to continue to your dashboard.</p>
@@ -175,6 +182,13 @@ const Login = () => {
             Remember me
           </label>
 
+          <p className="login__switch login__switch--before">
+            Forgot password?{" "}
+            <button type="button" className="login__link" onClick={() => setResetting(true)}>
+              Reset Now
+            </button>
+          </p>
+
           <button type="submit" className="login__submit" disabled={isLoading}>
             {isLoading ? "Signing In…" : (
               <>
@@ -182,7 +196,15 @@ const Login = () => {
               </>
             )}
           </button>
+
+          <p className="login__switch">
+            Don&rsquo;t have an account?{" "}
+            <Link to={sitePaths.join} className="login__link">
+              Register
+            </Link>
+          </p>
         </form>
+        )}
       </div>
     </div>
   );

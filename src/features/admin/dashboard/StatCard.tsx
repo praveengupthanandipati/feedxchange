@@ -25,10 +25,12 @@ const StatCard = ({ stat }: StatCardProps) => {
           )}
         </div>
       </div>
-      <p className={`dashboard-stat__delta dashboard-stat__delta--${stat.deltaDirection}`}>
-        <DeltaIcon aria-hidden />
-        {stat.deltaPercent}%<span>since last week</span>
-      </p>
+      {!stat.hideDelta && (
+        <p className={`dashboard-stat__delta dashboard-stat__delta--${stat.deltaDirection}`}>
+          <DeltaIcon aria-hidden />
+          {stat.deltaPercent}%<span>{stat.deltaLabel ?? "since last week"}</span>
+        </p>
+      )}
     </div>
   );
 };

@@ -9,6 +9,7 @@ import StatsBand from "../components/sections/StatsBand";
 import Testimonials from "../components/sections/Testimonials";
 import WhyChooseUs from "../components/sections/WhyChooseUs";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { sitePaths } from "../routes/paths";
 
 /** Website index page. */
 const Home = () => {
@@ -19,13 +20,14 @@ const Home = () => {
       <Hero />
       <PartnersStrip />
       <PopularCategories />
+      <CtaBanner title="Find best matching raw material prices for your animal feed" text="" action={{ label: "Send an Enquiry", to: sitePaths.contact }} />
       <ServicesGrid />
       <DealingPartners />
       <WhyChooseUs />
       <StatsBand />
       <HowItWorks />
       <Testimonials />
-      <CtaBanner />
+      <CtaBanner title="Join Hands with FeedXchange – Your Trusted Partner in Animal Feed & Livestock Trade Success" text="" action={{ label: "Let's work together", to: sitePaths.join }} />
     </>
   );
 };

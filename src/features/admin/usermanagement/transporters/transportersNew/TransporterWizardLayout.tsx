@@ -1,5 +1,6 @@
 import { usePermission } from "../../../../../core/auth/AuthContext";
 import WizardLayout from "../../../../../shared/components/wizard/WizardLayout";
+import { isShownProfileStep } from "../../profileSettingsVisibility";
 import { TransporterWizardProvider, useTransporterWizard } from "./TransporterWizardContext";
 import "../../../contracts/NewContract.scss";
 import "../../businessowners/BusinessNew/Newbusiness.scss";
@@ -11,7 +12,7 @@ const STEPS = [
   { path: "/admin/transporters/documents", label: "Documents" },
   { path: "/admin/transporters/bank-details", label: "Bank Details" },
   { path: "/admin/transporters/profile-settings", label: "Profile Settings" },
-];
+].filter(isShownProfileStep);
 const PREFERENCES_STEP = { path: "/admin/transporters/notification-preferences", label: "Notification Preferences" };
 
 const TransporterWizardLayoutInner = () => {

@@ -94,14 +94,18 @@ const ProductDetail = () => {
                     <li key={nutrient.name} className="nutrient">
                       <h3>{nutrient.name}</h3>
                       <dl>
-                        <div>
-                          <dt>Min</dt>
-                          <dd>{nutrient.min}</dd>
-                        </div>
-                        <div>
-                          <dt>Max</dt>
-                          <dd>{nutrient.max}</dd>
-                        </div>
+                        {nutrient.min && (
+                          <div>
+                            <dt>Min</dt>
+                            <dd>{nutrient.min}</dd>
+                          </div>
+                        )}
+                        {nutrient.max && (
+                          <div>
+                            <dt>Max</dt>
+                            <dd>{nutrient.max}</dd>
+                          </div>
+                        )}
                       </dl>
                     </li>
                   ))}

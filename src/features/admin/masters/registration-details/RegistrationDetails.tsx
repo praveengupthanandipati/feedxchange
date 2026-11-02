@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
 import { CircleCheckBigIcon } from "../../../../shared/components/icon";
-import { initialRegistrations, REGISTRATION_STATUSES, type Registration, type RegistrationStatus, type RegistrationUpdate } from "./registrationDetails.data";
-import { exportRegistrations, matchesSearch } from "./registrationDetails.utils";
+import { useAuth } from "../../../../core/auth/AuthContext";
+import { useGetAllRegistrationDetailsQuery, useUpdateRegistrationStatusMutation } from "../../../../core/store/registrationDetailsApi";
+import { apiErrorMessage } from "../../../../core/store/sellerInvoiceApi";
+import { REGISTRATION_STATUSES, type Registration, type RegistrationStatus, type RegistrationUpdate } from "./registrationDetails.data";
+import { exportRegistrations, matchesSearch, toRegistration, toStatusCode } from "./registrationDetails.utils";
 import RegistrationCards from "./components/RegistrationCards";
 import RegistrationFilters from "./components/RegistrationFilters";
 import RegistrationHeader from "./components/RegistrationHeader";
@@ -13,7 +16,10 @@ import "./RegistrationDetails.scss";
 const PAGE_SIZE = 10;
 
 const RegistrationDetails = () => {
-  const [registrations, setRegistrations] = useState<Registration[]>(initialRegistrations);
+  const { data, isLoading, isError } = useGetAllRegistrationDetailsQuery();
+  const [updateRegistrationStatus] = useUpdateRegistrationStatusMutation();
+  const { userId } = useAuth();
+  const registrations = useMemo<Registration[]>(() => (data ?? []).map(toRegistration), [data]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
@@ -39,7 +45,13 @@ const RegistrationDetails = () => {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paged = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const emptyMessage = search.trim() || status ? "No registrations match the current filters." : "No registrations yet.";
+  const emptyMessage = isLoading
+    ? "Loading registrations…"
+    : isError
+      ? "The registrations could not be loaded. Please refresh the page."
+      : search.trim() || status
+        ? "No registrations match the current filters."
+        : "No registrations yet.";
 
   const changeStatus = (value: string) => {
     setStatus(value);
@@ -48,12 +60,22 @@ const RegistrationDetails = () => {
 
   const closePanel = useCallback(() => setUpdating(null), []);
 
-  const handleSave = (update: RegistrationUpdate) => {
-    if (!updating) return;
-    // TODO: send the update to the API once the endpoint is available.
-    setRegistrations((prev) => prev.map((registration) => (registration.id === updating.id ? { ...registration, ...update } : registration)));
+  // Saved to the API; the list reloads with the new status.
+  const handleSave = async (update: RegistrationUpdate): Promise<string | null> => {
+    if (!updating) return null;
+    try {
+      await updateRegistrationStatus({
+        registrationId: Number(updating.id),
+        actionPerformedBy: Number(userId) || 0,
+        status: toStatusCode(update.status),
+        remarks: update.reason,
+      }).unwrap();
+    } catch (error) {
+      return apiErrorMessage(error, "The status could not be updated. Please try again.");
+    }
     setMessage(`${updating.name} updated to ${update.status}.`);
     closePanel();
+    return null;
   };
 
   return (
