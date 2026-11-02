@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useGetAllBloggersQuery } from "../../../../core/store/bloggersApi";
 import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
-import { initialBlogs, type Blog, type BlogForm } from "./blogs.data";
+import { fromBlogger, type Blog, type BlogForm } from "./blogs.data";
 import { matchesSearch } from "./blogs.utils";
 import BlogCards from "./components/BlogCards";
 import BlogOffcanvas from "./components/BlogOffcanvas";
@@ -17,7 +18,12 @@ const PAGE_SIZE = 10;
 type PanelState = { mode: "closed" } | { mode: "create" } | { mode: "edit"; blog: Blog };
 
 const Blogs = () => {
-  const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
+  // The list comes from GetAllBloggers; Add / Edit / Delete only change this copy until their APIs are connected.
+  const { data, isLoading, isError } = useGetAllBloggersQuery();
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  useEffect(() => {
+    if (data) setBlogs(data.map(fromBlogger));
+  }, [data]);
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -34,7 +40,13 @@ const Blogs = () => {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paged = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const emptyMessage = search.trim() || status ? "No blogs match the current filters." : "No blogs yet. Use New to add one.";
+  const emptyMessage = isLoading
+    ? "Loading blogs…"
+    : isError
+      ? "The blogs could not be loaded. Please refresh the page."
+      : search.trim() || status
+        ? "No blogs match the current filters."
+        : "No blogs yet. Use New to add one.";
 
   const closePanel = useCallback(() => setPanel({ mode: "closed" }), []);
 

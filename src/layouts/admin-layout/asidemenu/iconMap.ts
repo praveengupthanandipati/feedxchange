@@ -2,26 +2,59 @@ import {
   type IconComponent,
   ActivityIcon,
   BellIcon,
+  BoxIcon,
   BriefcaseIcon,
+  Building2Icon,
+  CalculatorIcon,
+  CalendarIcon,
+  ChartColumnIcon,
   ChartPieIcon,
+  CirclePlusIcon,
   ClipboardIcon,
+  ClockIcon,
   CopyIcon,
+  CreditCardIcon,
+  EyeIcon,
+  FileIcon,
   FileTextIcon,
   FolderIcon,
+  HistoryIcon,
   HouseIcon,
+  ImageIcon,
+  InboxIcon,
+  IndianRupeeIcon,
+  InfoIcon,
+  LandmarkIcon,
   LayoutGridIcon,
+  ListChecksIcon,
+  ListIcon,
+  MapIcon,
+  MapPinIcon,
   MessageSquareIcon,
+  NewspaperIcon,
   PackageIcon,
+  PenLineIcon,
   PercentIcon,
+  QuoteIcon,
+  ReceiptIcon,
+  RotateCcwIcon,
+  RouteIcon,
+  ScrollTextIcon,
   SendIcon,
   SettingsIcon,
   ShieldIcon,
   SlidersVerticalIcon,
   SquareCheckBigIcon,
+  SquareKanbanIcon,
   TagIcon,
+  TrendingUpIcon,
   TruckIcon,
+  UserCheckIcon,
+  UserCogIcon,
+  UserIcon,
   UserPlusIcon,
   UsersIcon,
+  WalletIcon,
 } from "../../../shared/components/icon";
 
 /**
@@ -55,3 +88,75 @@ const icons: Record<string, IconComponent> = {
 };
 
 export const iconFor = (name: string | null | undefined): IconComponent => (name && icons[name]) || FolderIcon;
+
+/**
+ * Icon for a submenu page (the database stores no icon for pages): the first rule whose words appear in the label, else
+ * in the path, wins, so the more specific rules come first. Works for the local menu and the menu from the API alike.
+ */
+const CHILD_ICON_RULES: [RegExp, IconComponent][] = [
+  // reports
+  [/seller invoice report|invoice report/i, ChartColumnIcon],
+  [/account statement|statement/i, ScrollTextIcon],
+  [/monthly report/i, CalendarIcon],
+  [/seller buyer account/i, BriefcaseIcon],
+  [/contract summary|summary/i, ClipboardIcon],
+  [/pending payment/i, ClockIcon],
+  [/pending suppl/i, BoxIcon],
+  [/truck history|do truck|price history|history/i, HistoryIcon],
+  [/price tracking|tracking/i, TrendingUpIcon],
+  // payments and invoices
+  [/refund/i, RotateCcwIcon],
+  [/payment advice/i, IndianRupeeIcon],
+  [/allocation/i, WalletIcon],
+  [/edit .*invoice/i, PenLineIcon],
+  [/seller invoice/i, ReceiptIcon],
+  [/freight/i, IndianRupeeIcon],
+  // enquiries (before "contacts", so Contact Enquiry is an enquiry)
+  [/product enquiry/i, InboxIcon],
+  [/enquir/i, MessageSquareIcon],
+  // profiles (wizard steps)
+  [/business profile/i, Building2Icon],
+  [/transporter profile/i, TruckIcon],
+  [/promoter profile|profile$/i, UserIcon],
+  [/profile settings|settings/i, SettingsIcon],
+  [/notif/i, BellIcon],
+  [/contacts?|address/i, MapPinIcon],
+  [/document/i, FileIcon],
+  [/bank/i, LandmarkIcon],
+  // masters and administration
+  [/assign .*user/i, UserCogIcon],
+  [/assign .*role|role|permission/i, ShieldIcon],
+  [/menu/i, ListIcon],
+  [/template/i, ScrollTextIcon],
+  [/banner/i, ImageIcon],
+  [/subscription/i, CreditCardIcon],
+  [/testimonial/i, QuoteIcon],
+  [/blog/i, NewspaperIcon],
+  [/registration/i, UserPlusIcon],
+  [/users?$/i, UsersIcon],
+  [/task list/i, ListChecksIcon],
+  [/board/i, SquareKanbanIcon],
+  // contracts and trucks
+  [/dashboard|overview/i, LayoutGridIcon],
+  [/approv/i, SquareCheckBigIcon],
+  [/driver/i, UserCheckIcon],
+  [/trip|route/i, RouteIcon],
+  [/schedule/i, CalendarIcon],
+  [/map/i, MapIcon],
+  [/truck|dispatch|transport/i, TruckIcon],
+  [/status/i, ActivityIcon],
+  [/pending/i, ClockIcon],
+  [/product/i, PackageIcon],
+  // generic actions, ahead of the module words (Create Interest, View Interest Detail)
+  [/create|generate|new|add/i, CirclePlusIcon],
+  [/detail/i, InfoIcon],
+  [/view/i, EyeIcon],
+  [/commission|estimation/i, CalculatorIcon],
+  [/interest/i, PercentIcon],
+  [/invoice|contract/i, FileTextIcon],
+];
+
+export const childIconFor = (label: string, path = ""): IconComponent =>
+  CHILD_ICON_RULES.find(([pattern]) => pattern.test(label))?.[1] ??
+  CHILD_ICON_RULES.find(([pattern]) => pattern.test(path))?.[1] ??
+  FileIcon;

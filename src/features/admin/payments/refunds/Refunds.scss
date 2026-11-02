@@ -238,6 +238,11 @@
     min-width: 56rem;
   }
 
+  // Receipts show every field the API returns (15 columns): more room before it scrolls sideways.
+  &--receipts .table {
+    min-width: 88rem;
+  }
+
   th,
   td {
     vertical-align: middle;

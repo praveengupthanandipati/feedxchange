@@ -69,9 +69,19 @@ export const whatsappLink = `https://wa.me/${company.whatsapp}?text=${encodeURIC
 
 export const hero = {
   eyebrow: "Agri-commerce, simplified",
-  title: "Trade feed ingredients with confidence",
-  text: "Live prices, verified sellers and tracked deliveries, on one platform.",
+  /** The line break is kept on wide screens (see .hero h1). */
+  title: "India's 1st dedicated digital portal for tracking\nyour animal feed ingredients",
+  text: "Your trusted partner for procurement of Premium Animal Feed Raw Material Ingredients in India.",
 };
+
+/** "Popular Searches" under the home search: chip label and the product (SEO name) it opens; hidden if that product is missing. */
+export const popularSearches = [
+  { label: "Soya DOC", slug: "soya-doc" },
+  { label: "GN DOC", slug: "groundnut-doc" },
+  { label: "DORB", slug: "de-oiled-rice-bran-dorb" },
+  { label: "Rapeseed DOC", slug: "mustard-doc" },
+  { label: "Rice DDGS", slug: "rice-ddgs" },
+];
 
 export interface Stat {
   value: string;
@@ -79,27 +89,9 @@ export interface Stat {
 }
 
 export const stats: Stat[] = [
-  { value: "1,200+", label: "Verified businesses" },
-  { value: "85K MT", label: "Traded every year" },
-  { value: "350+", label: "Partner transporters" },
-  { value: "99.2%", label: "On-time settlements" },
-];
-
-export const partners = [
-  "Raghavendra Seeds",
-  "Eswar Industries",
-  "Lakshmi Poultry",
-  "Elite Agro Foods",
-  "SL International",
-  "Purnima Feeds",
-  "Sri Venkateswara Mills",
-  "Coastal Aqua Feeds",
-  "Godavari Cattle Feeds",
-  "Sai Poultry Farms",
-  "Krishna Agro Exports",
-  "Andhra Oil Seeds",
-  "Jawahar Roadlines",
-  "Deccan Protein Foods",
+  { value: "20+", label: "Products" },
+  { value: "500+", label: "Satisfied buyers" },
+  { value: "25+", label: "States and regions" },
 ];
 
 export interface Service {
@@ -119,9 +111,9 @@ export const services: Service[] = [
 
 export const reasons = [
   "One platform for buying, selling, logistics and payments",
-  "Transparent pricing with no hidden commissions",
+  "Trusted Supplier Network: verified vendors with raw materials made from premium quality products",
   "Dedicated relationship manager for every business",
-  "Real-time notifications on every contract and truck",
+  "Contract Movement and Vehicle Tracking: integrated vehicle tracking details",
 ];
 
 export interface Step {
@@ -206,22 +198,22 @@ export const dealingPartners: DealingPartner[] = [
   {
     kind: "poultry",
     title: "Poultry Farms",
-    text: "FeedXchange connects poultry farms to verified feed suppliers for bulk deals on quality ingredients (soy, maize, additives) at competitive rates.",
+    text: "FeedXchange connects poultry farms to verified raw material suppliers for best deals on quality ingredients (Soya DOC, DORB, GN DOC etc) at competitive rates.",
   },
   {
     kind: "fish",
     title: "Fish Farms",
-    text: "FeedXchange links fish farms with trusted suppliers for high-quality feed and nutrition, ensuring healthy stock and better yields.",
+    text: "FeedXchange links fish farms with trusted suppliers for high-quality ingredients (GN Oil Cake, DORB, Soya DOC etc) and nutrition, ensuring healthy stock and better yields.",
   },
   {
     kind: "prawn",
-    title: "Prawn Farms",
-    text: "Prawn farms benefit from FeedXchange's network of reliable suppliers, getting the best prices and quality for all farming needs.",
+    title: "Prawn Feed",
+    text: "Prawn Feed units benefit from FeedXchange's network of reliable certified suppliers for procurement of Soya DOC Hi-Pro etc.",
   },
   {
     kind: "cattle",
     title: "Cattle Farms",
-    text: "Cattle farms can source bulk feed and supplements through FeedXchange, streamlining procurement and improving herd health.",
+    text: "Cattle farms can source bulk feed and supplements through FeedXchange network streamlining procurement and improving herd health.",
   },
 ];
 

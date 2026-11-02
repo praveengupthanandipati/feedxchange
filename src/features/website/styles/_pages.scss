@@ -2071,6 +2071,17 @@
     }
   }
 
+  // A dropdown waiting for the field before it (Type, Sub Type): muted fill and dashed edge, so it reads as not yet usable.
+  &__box:has(.su-select__button:disabled) {
+    border-style: dashed;
+    background-color: v.$surface-alt;
+
+    .su-field__icon,
+    .su-field__chevron {
+      opacity: 0.5;
+    }
+  }
+
   &__label {
     position: absolute;
     top: 0;
@@ -2132,21 +2143,124 @@
     display: none;
   }
 
-  select {
-    padding-right: 1.75rem;
+  // ---------- Compact dropdown (SiteSelect): Line / Type / Sub Type of Business ----------
+  // The list opens under the field, no wider than it, about six rows tall, then scrolls; colours from the theme.
+  .su-select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .su-select__button {
+    display: block;
+    width: 100%;
+    height: 3.1rem;
+    padding: 0 1.75rem 0 0;
+    border: none;
+    background: transparent;
+    color: v.fg(v.$ink);
+    font: inherit;
+    // 16px stops iOS Safari zooming in.
+    font-size: 1rem;
+    text-align: left;
+    // Long placeholders ("Select Type of Business first") end in "…".
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     cursor: pointer;
+
+    // Focus shows on the whole field (its glow from .su-field__box:focus-within), not as a box inside it.
+    &:focus-visible {
+      outline: none;
+    }
 
     &.is-empty {
       color: v.fg(v.$ink-muted);
     }
 
-    // Type / sub type wait for the field before them.
+    // Type / Sub Type wait for the field before them.
     &:disabled {
+      color: v.fg(v.$ink-muted);
       cursor: not-allowed;
     }
+  }
 
-    option {
+  .su-select__panel {
+    position: absolute;
+    top: calc(100% + 0.3rem);
+    right: 0;
+    left: 0;
+    z-index: 30;
+    overflow: hidden;
+    border: 1px solid v.line(v.$line);
+    border-radius: v.$radius-md;
+    background-color: v.$surface;
+    box-shadow: v.$shadow-lg;
+  }
+
+  .su-select__search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.75rem;
+    border-bottom: 1px solid v.line(v.$line);
+
+    svg {
+      flex-shrink: 0;
+      width: 1rem;
+      height: 1rem;
+      color: v.fg(v.$ink-muted);
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      // The form's field inputs are tall; this one is a compact search line.
+      height: 1.75rem;
+      padding: 0;
+      border: none;
+      outline: none;
+      background: transparent;
       color: v.fg(v.$ink);
+      font: inherit;
+      font-size: v.$fs-sm;
+
+      &::placeholder {
+        color: v.fg(v.$ink-muted);
+      }
+    }
+  }
+
+  .su-select__list {
+    max-height: 13.5rem;
+    margin: 0;
+    padding: 0.3rem;
+    overflow-y: auto;
+    list-style: none;
+    overscroll-behavior: contain;
+  }
+
+  .su-select__empty {
+    padding: 0.6rem 0.75rem;
+    color: v.fg(v.$ink-muted);
+    font-size: v.$fs-sm;
+    text-align: center;
+  }
+
+  .su-select__option {
+    padding: 0.5rem 0.75rem;
+    border-radius: v.$radius-sm;
+    color: v.fg(v.$ink);
+    font-size: v.$fs-sm;
+    line-height: 1.3;
+    cursor: pointer;
+
+    &.is-active {
+      background-color: v.$surface-alt;
+    }
+
+    &[aria-selected="true"] {
+      color: v.fg(v.$navy-600);
+      font-weight: v.$fw-semibold;
     }
   }
 
@@ -3565,5 +3679,228 @@
     color: v.fg(v.$ink-soft);
     font-size: v.$fs-lg;
     line-height: 1.8;
+  }
+}
+
+// ============================================================
+// Join with us: OTP verification dialog (after signup)
+// Theme tokens throughout, so it follows Light, Dark and High contrast like the rest of the site.
+// ============================================================
+.otp-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: v.$space-4;
+  overflow-y: auto;
+
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: v.alpha(v.$navy-900, 0.55);
+  }
+
+  &__panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-3;
+    width: min(100%, 34rem);
+    padding: v.$space-6 v.$space-5 v.$space-5;
+    border-radius: v.$radius-lg;
+    background-color: v.$surface;
+    box-shadow: v.$shadow-lg;
+    text-align: center;
+
+    @include m.up(md) {
+      padding: v.$space-7 v.$space-6 v.$space-6;
+    }
+
+    h2 {
+      margin: 0;
+      @include m.fluid-type(1.35rem, 1.65rem);
+    }
+  }
+
+  &__close {
+    @include m.focus-ring;
+    position: absolute;
+    top: v.$space-3;
+    right: v.$space-3;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: v.fg(v.$ink-soft);
+    font-size: 1.35rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$surface-alt;
+      color: v.fg(v.$ink);
+    }
+  }
+
+  // Phone with a tick.
+  &__art {
+    width: 4.5rem;
+    height: 6rem;
+  }
+
+  &__art-body {
+    fill: v.$navy-700;
+  }
+
+  &__art-screen {
+    fill: v.$sky-100;
+  }
+
+  &__art-notch {
+    fill: v.$navy-600;
+  }
+
+  &__art-ring {
+    fill: v.$navy-700;
+  }
+
+  &__art-badge {
+    fill: v.$green-500;
+  }
+
+  &__art-tick {
+    fill: none;
+    stroke: v.$white;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &__text {
+    margin: 0;
+    color: v.fg(v.$ink-soft);
+    font-size: v.$fs-sm;
+  }
+
+  &__contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: v.$space-3;
+    width: 100%;
+    margin: 0;
+    padding: v.$space-3 v.$space-4;
+    border-radius: v.$radius-md;
+    background-color: v.$surface-alt;
+
+    @include m.up(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    dt {
+      color: v.fg(v.$ink-muted);
+      font-size: v.$fs-xs;
+    }
+
+    dd {
+      margin: 0.15rem 0 0;
+      color: v.fg(v.$ink);
+      font-weight: v.$fw-semibold;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  // Info (green tint), success (green tint), error (red tint).
+  &__notice {
+    width: 100%;
+    margin: 0;
+    padding: v.$space-3 v.$space-4;
+    border: 1px solid var(--fx-tint-green-border);
+    border-radius: v.$radius-md;
+    background-color: var(--fx-tint-green-bg);
+    color: v.fg(v.$ink);
+    font-size: v.$fs-sm;
+    line-height: 1.5;
+
+    &--error {
+      border-color: var(--fx-tint-red-border);
+      background-color: var(--fx-tint-red-bg);
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-4;
+    width: 100%;
+  }
+
+  &__boxes {
+    display: flex;
+    justify-content: center;
+    gap: v.$space-2;
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    input {
+      @include m.focus-ring;
+      width: 3.25rem;
+      height: 3.5rem;
+      border: 1px solid v.line(v.$line);
+      border-radius: v.$radius-md;
+      background-color: v.$surface;
+      color: v.fg(v.$ink);
+      // 16px+ stops iOS Safari zooming in.
+      font-size: 1.25rem;
+      font-weight: v.$fw-semibold;
+      text-align: center;
+      -webkit-appearance: none;
+      appearance: none;
+
+      &:focus {
+        border-color: v.line(v.$navy-600);
+      }
+
+      &.has-error {
+        border-color: var(--fx-red-55-line);
+      }
+    }
+  }
+
+  &__resend {
+    margin: 0;
+    color: v.fg(v.$ink-soft);
+    font-size: v.$fs-sm;
+
+    button {
+      @include m.focus-ring;
+      padding: 0;
+      border: none;
+      background: none;
+      color: v.fg(v.$navy-600);
+      font: inherit;
+      font-weight: v.$fw-semibold;
+      text-decoration: underline;
+      cursor: pointer;
+
+      &:disabled {
+        color: v.fg(v.$ink-muted);
+        text-decoration: none;
+        cursor: default;
+      }
+    }
+  }
+
+  &__restart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-2;
+    color: v.fg(v.$ink-soft);
+    font-size: v.$fs-sm;
   }
 }

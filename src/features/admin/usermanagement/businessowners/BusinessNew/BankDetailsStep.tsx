@@ -1,4 +1,6 @@
 import BankDetailsSection from "./BankDetailsSection";
+import { SHOW_PROFILE_SETTINGS } from "../../profileSettingsVisibility";
+import { usePermission } from "../../../../../core/auth/AuthContext";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
 import { useRequireBusinessProfile } from "./useRequireBusinessProfile";
 import { useSaveBankDetailsStep } from "./useSaveBankDetailsStep";
@@ -6,8 +8,14 @@ import { useSaveBankDetailsStep } from "./useSaveBankDetailsStep";
 const BankDetailsStep = () => {
   const { draft, updateDraft } = useBusinessOwnerWizard();
   const unlocked = useRequireBusinessProfile();
+  // Profile Settings is hidden for now (profileSettingsVisibility.ts): go on to Notification Preferences, or finish.
+  const hasPreferencesStep = usePermission("notification-preferences.view");
   const { submitting, submitError, handleSaveAndContinue } = useSaveBankDetailsStep(
-    "/admin/business-owners/profile-settings",
+    SHOW_PROFILE_SETTINGS
+      ? "/admin/business-owners/profile-settings"
+      : hasPreferencesStep
+        ? "/admin/business-owners/notification-preferences"
+        : "/admin/business-owners",
   );
 
   if (!unlocked) return null;
@@ -37,7 +45,7 @@ const BankDetailsStep = () => {
           onClick={handleSaveAndContinue}
           disabled={submitting}
         >
-          {submitting ? "Saving…" : "Save & Continue"}
+          {submitting ? "Saving…" : SHOW_PROFILE_SETTINGS || hasPreferencesStep ? "Save & Continue" : "Finish"}
         </button>
       </div>
     </>

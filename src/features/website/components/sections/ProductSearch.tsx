@@ -1,11 +1,9 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { ArrowRightIcon, PackageIcon, SearchIcon, XIcon } from "../../../../shared/components/icon";
 import { useNavigate } from "react-router-dom";
+import { popularSearches } from "../../data/content";
 import { useCatalogue } from "../../hooks/useCatalogue";
 import { productPath } from "../../routes/paths";
-
-/** How many "Popular Searches" chips: the first product of each category, up to this many. */
-const POPULAR_COUNT = 4;
 
 /**
  * Product search (ARIA combobox). Focusing the box lists every product; typing filters by name or
@@ -19,7 +17,7 @@ const ProductSearch = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
   const navigate = useNavigate();
-  const { products, categories, productsIn } = useCatalogue();
+  const { products, findBySlug } = useCatalogue();
 
   const results = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -32,10 +30,7 @@ const ProductSearch = () => {
     );
   }, [products, query]);
 
-  const popular = categories
-    .map((category) => productsIn(category.id)[0])
-    .filter(Boolean)
-    .slice(0, POPULAR_COUNT);
+  const popular = popularSearches.filter((search) => findBySlug(search.slug));
 
   // Close when clicking / tapping anywhere outside the search.
   useEffect(() => {
@@ -149,10 +144,10 @@ const ProductSearch = () => {
       <div className="product-search__popular">
         <span>Popular Searches</span>
         <ul>
-          {popular.map((product) => (
-            <li key={product.id}>
-              <button type="button" onClick={() => go(product.slug)}>
-                {product.name}
+          {popular.map((search) => (
+            <li key={search.slug}>
+              <button type="button" onClick={() => go(search.slug)}>
+                {search.label}
               </button>
             </li>
           ))}

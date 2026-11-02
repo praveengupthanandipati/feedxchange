@@ -141,9 +141,12 @@ const Refunds = () => {
   const receiptColumns: TableColumn<Receipt>[] = [
     { key: "receiptNumber", header: "Receipt #" },
     { key: "receiptDate", header: "Date", render: (r) => formatDate(r.receiptDate) },
-    { key: "contractNumber", header: "Contract #", render: (r) => r.contractNumber ?? "—" },
+    { key: "kind", header: "Type", render: (r) => r.kind || "—" },
+    { key: "contractNumber", header: "Contract #", render: (r) => r.contractNumber || "—" },
     { key: "paymentMode", header: "Mode" },
-    { key: "reference", header: "Reference", render: (r) => r.reference ?? "—" },
+    { key: "bankName", header: "Bank", render: (r) => r.bankName || "—" },
+    { key: "reference", header: "Reference", render: (r) => r.reference || "—" },
+    { key: "towards", header: "Towards", render: (r) => r.towards || "—" },
     { key: "amount", header: "Receipt Amount", align: "right", render: (r) => money(r.amount) },
     { key: "allocatedAmount", header: "Allocated", align: "right", render: (r) => money(r.allocatedAmount) },
     { key: "refundedAmount", header: "Refunded", align: "right", render: (r) => money(r.refundedAmount) },
@@ -152,6 +155,12 @@ const Refunds = () => {
       header: "Unallocated",
       align: "right",
       render: (r) => <span className="refunds-table__amount">{money(r.unallocatedAmount)}</span>,
+    },
+    { key: "remarks", header: "Remarks", render: (r) => r.remarks || "—" },
+    {
+      key: "status",
+      header: "Status",
+      render: (r) => (r.status ? <span className={`refunds-table__status refunds-table__status--${r.status.toLowerCase()}`}>{r.status}</span> : "—"),
     },
     {
       key: "refundNow",

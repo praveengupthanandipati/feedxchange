@@ -80,7 +80,7 @@ const PromoterProfileStep = () => {
         <h2 className="new-contract__section-title">1. Basic Information</h2>
         {!editId && (
           <p className="new-business__step-hint">
-            Promoter Profile is mandatory — save it to unlock Documents and Profile Settings.
+            Promoter Profile is mandatory — save it to unlock Documents.
           </p>
         )}
         <div className="new-contract__grid">
