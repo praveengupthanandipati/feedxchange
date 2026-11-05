@@ -13,12 +13,14 @@ interface AsideMenuItemProps {
   onToggle: (id: string) => void;
   /** The current page is in this section: the menu opens it (and closes the others). */
   onRouteActive: (id: string) => void;
+  /** Navigated to a page outside this section: close it if it is the open one. */
+  onRouteLeft: (id: string) => void;
   onNavigate?: () => void;
 }
 
 const FLYOUT_CLOSE_DELAY = 150;
 
-const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onRouteActive, onNavigate }: AsideMenuItemProps) => {
+const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onRouteActive, onRouteLeft, onNavigate }: AsideMenuItemProps) => {
   const [flyoutOpen, setFlyoutOpen] = useState(false);
   const [flyoutPos, setFlyoutPos] = useState({ top: 0, left: 0 });
   const closeTimer = useRef<number | undefined>(undefined);
@@ -44,9 +46,12 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onRouteActive, onNav
 
   const expanded = isOpen;
 
-  // Navigating into this section opens it (closing the others), unless it is meant to stay closed until clicked.
+  // Navigating into this section opens it (closing the others), unless it is meant to stay closed until clicked;
+  // navigating anywhere outside it (another section, or a page with no submenu) closes it.
   useEffect(() => {
-    if (hasChildren && isSectionActive && !item.collapsedByDefault) onRouteActive(item.id);
+    if (!hasChildren) return;
+    if (isSectionActive && !item.collapsedByDefault) onRouteActive(item.id);
+    else if (!isSectionActive) onRouteLeft(item.id);
     // Only on navigation: a click elsewhere in the menu must not reopen this section.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);

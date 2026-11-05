@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { API_URL } from "../../../core/api/api";
 import { useGetAllCategoriesQuery, type Category } from "../../../core/store/categoryApi";
 import { parseProductFeatures, useGetAllProductsQuery, type Product } from "../../../core/store/productsApi";
+import { compareProducts } from "../../../shared/utils/productOrder";
 
 export interface Nutrient {
   name: string;
@@ -69,7 +70,8 @@ function toCatalogueProduct(product: Product, categoriesById: Map<string, Catego
 }
 
 /**
- * The website's product catalogue, both lists public: active products from GetAllProducts sorted by name, and the
+ * The website's product catalogue, both lists public: active products from GetAllProducts (by category priority, then the
+ * product order from the products document - shared/utils/productOrder), and the
  * active categories from GetAllCategories in their admin priority order (only those with products). Every component
  * calling this shares the same two requests (RTK Query caches them).
  */
@@ -86,8 +88,7 @@ export function useCatalogue() {
 
     const products = (data ?? [])
       .filter((product) => product.isActive && !product.isDeleted)
-      .map((product) => toCatalogueProduct(product, categoriesById))
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .map((product) => toCatalogueProduct(product, categoriesById));
 
     const categories: CatalogueCategory[] = [...activeCategories]
       .sort((a, b) => a.priority - b.priority)
@@ -97,6 +98,12 @@ export function useCatalogue() {
       if (!categories.some((category) => category.id === product.categoryId)) categories.push({ id: product.categoryId, name: product.categoryName, description: "" });
     }
     const withProducts = categories.filter((category) => products.some((product) => product.categoryId === category.id));
+    const categoryRank = new Map(withProducts.map((category, index) => [category.id, index]));
+    products.sort(
+      (a, b) =>
+        (categoryRank.get(a.categoryId) ?? 0) - (categoryRank.get(b.categoryId) ?? 0) ||
+        compareProducts({ seoName: a.slug, name: a.name }, { seoName: b.slug, name: b.name }),
+    );
 
     return {
       products,

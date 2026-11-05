@@ -26,6 +26,9 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
+/** Wizard step that Edit opens for each tab. */
+const EDIT_STEP_FOR_TAB: Partial<Record<TabId, string>> = {contacts: "contacts",bank: "bank-details",notifications: "notification-preferences"};
+
 const Transportview = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -109,7 +112,7 @@ const Transportview = () => {
               <button
                 type="button"
                 className="transporters-btn transporters-btn--outline"
-                onClick={() => navigate(`/admin/transporters/profile?id=${id}`)}
+                onClick={() => navigate(`/admin/transporters/profile?id=${id}${EDIT_STEP_FOR_TAB[activeTab] ? `&step=${EDIT_STEP_FOR_TAB[activeTab]}` : ""}`)}
               >
                 <PenLineIcon aria-hidden /> Edit
               </button>

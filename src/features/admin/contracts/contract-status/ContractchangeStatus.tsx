@@ -268,6 +268,10 @@ const ContractchangeStatus = () => {
     [contractStatusOptions],
   );
 
+  // The contract's status comes as a display name ("Partially Dispatched"); the dropdown's values are status names.
+  const statusNameOf = (current: string | null | undefined) =>
+    contractStatusOptions?.find((option) => option.displayName === current || option.statusName === current)?.statusName ?? "";
+
   const { data: contractsData, isLoading: searching } = useGetAllContractsQuery();
   const [updateContractStatus, { isLoading: updating }] = useUpdateContractStatusMutation();
 
@@ -320,7 +324,7 @@ const ContractchangeStatus = () => {
     setError("");
     setRecord(match);
     setDetailsVisible(true);
-    setStatus(linkedStatus || (match.basicDetails?.calculatedStatus ?? ""));
+    setStatus(linkedStatus || statusNameOf(match.basicDetails?.calculatedStatus));
   }, [linkedDone, linkedContract, linkedStatus, contractRows]);
 
   const handleSearch = async () => {
@@ -345,7 +349,7 @@ const ContractchangeStatus = () => {
       setError("");
       setRecord(match);
       setDetailsVisible(true);
-      setStatus(match.basicDetails?.calculatedStatus ?? "");
+      setStatus(statusNameOf(match.basicDetails?.calculatedStatus));
     } catch {
       setError("Failed to search for the contract.");
       setRecord(null);
@@ -382,7 +386,7 @@ const ContractchangeStatus = () => {
     setError("");
     setRecord(row);
     setDetailsVisible(true);
-    setStatus(row.basicDetails?.calculatedStatus ?? "");
+    setStatus(statusNameOf(row.basicDetails?.calculatedStatus));
   };
 
   const handleChange = async () => {
@@ -557,6 +561,7 @@ const ContractchangeStatus = () => {
                   value={basicDetails?.netRate != null ? formatINR(basicDetails.netRate) : ""}
                 />
                 <DetailField label="Contract Value" value={contractValue} />
+                <DetailField label="Current Status" value={basicDetails?.calculatedStatus} />
               </div>
             )
           )}
@@ -564,13 +569,13 @@ const ContractchangeStatus = () => {
 
         <div className="contract-change-status__toggle-bar">
           <div className="form-field">
-            <span className="form-field__label">Status</span>
+            <span className="form-field__label">New Status</span>
             <SearchableSelect
               options={statusOptions}
               value={status}
               onChange={setStatus}
               placeholder="Select Status"
-              ariaLabel="Status"
+              ariaLabel="New Status"
               disabled={!record}
             />
           </div>

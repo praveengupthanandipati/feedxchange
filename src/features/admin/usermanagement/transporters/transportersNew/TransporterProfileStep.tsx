@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../../shared/components/tooltip/InfoTooltip";
 import { groupOptions, establishmentYearOptions } from "./newTransporter.data";
@@ -61,6 +61,15 @@ const TransporterProfileStep = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingProfile]);
+
+  // Opened from a view screen's Edit with ?step=: once the profile has loaded, go on to that step (the tab that was open).
+  const navigate = useNavigate();
+  const editStep = searchParams.get("step");
+  useEffect(() => {
+    if (editId && profileId && editStep && ["contacts","documents","bank-details","notification-preferences"].includes(editStep)) {
+      navigate(`/admin/transporters/${editStep}`, { replace: true });
+    }
+  }, [editId, profileId, editStep, navigate]);
 
   if (editId && !profileId && loadingExistingProfile) {
     return <div className="new-business__loading">Loading transporter profile…</div>;

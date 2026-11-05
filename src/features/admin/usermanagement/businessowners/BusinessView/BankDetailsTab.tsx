@@ -36,6 +36,26 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
       header: "Primary",
       render: (row) => (row.isPrimary ? <span className="business-owner-detail__tag">Primary</span> : "—"),
     },
+    {
+      key: "proof",
+      header: "Bank Proof",
+      render: (row) =>
+        row.proofFileUrl ? (
+          <a
+            href={row.proofFileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            download={row.proofFileName}
+            className="business-owner-detail__icon-link"
+            aria-label={`Download ${row.proofFileName ?? "bank proof"}`}
+            title={`Download ${row.proofFileName ?? "bank proof"}`}
+          >
+            <DownloadIcon aria-hidden />
+          </a>
+        ) : (
+          "—"
+        ),
+    },
   ];
 
   const documentColumns: TableColumn<DocumentRow>[] = [

@@ -30,6 +30,9 @@ export interface BankRow {
   bankName: string;
   branchIfsc: string;
   isPrimary: boolean;
+  /** Bank proof (cancelled cheque / passbook): not in the bank account API yet, so empty until the backend adds it. */
+  proofFileName?: string;
+  proofFileUrl?: string;
 }
 
 export interface DocumentRow {

@@ -44,6 +44,9 @@ export interface BankRow {
   bankName: string;
   branchIfsc: string;
   isPrimary: boolean;
+  /** Bank proof (cancelled cheque / passbook): not in the bank account API yet, so empty until the backend adds it. */
+  proofFileName?: string;
+  proofFileUrl?: string;
 }
 
 export interface DocumentRow {
@@ -80,6 +83,9 @@ export interface BusinessOwnerProfile {
   panNumber: string;
   gstNumber: string;
   businessDescription: string;
+  /** Default brokerage for any product (the table below has the product-wise ones). */
+  buyBrokerageCharges: string;
+  sellBrokerageCharges: string;
   brokerageCharges: BrokerageChargeRow[];
   capacity: CapacityRow[];
   addresses: AddressRow[];
@@ -117,6 +123,8 @@ export function mapBusinessProfileDetail(profile: BusinessProfileDetail): Busine
     panNumber: profile.panNumber ?? "",
     gstNumber: profile.gstNumber ?? "",
     businessDescription: profile.aboutProfile ?? "",
+    buyBrokerageCharges: details?.buyBrokerageCharges != null ? String(details.buyBrokerageCharges) : "",
+    sellBrokerageCharges: details?.sellBrokerageCharges != null ? String(details.sellBrokerageCharges) : "",
     brokerageCharges: (profile.buySellCharges ?? []).map((charge) => ({
       productId: charge.productId,
       product: charge.productName,

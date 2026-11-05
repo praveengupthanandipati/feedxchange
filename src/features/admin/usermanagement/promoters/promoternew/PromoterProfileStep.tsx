@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../../shared/components/tooltip/InfoTooltip";
 import {
@@ -50,6 +50,15 @@ const PromoterProfileStep = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingProfile, editId]);
+
+  // Opened from a view screen's Edit with ?step=: once the profile has loaded, go on to that step (the tab that was open).
+  const navigate = useNavigate();
+  const editStep = searchParams.get("step");
+  useEffect(() => {
+    if (editId && profileId && editStep && ["documents","notification-preferences"].includes(editStep)) {
+      navigate(`/admin/promoters/${editStep}`, { replace: true });
+    }
+  }, [editId, profileId, editStep, navigate]);
 
   if (editId && !profileId && loadingExistingProfile) {
     return <div className="new-business__loading">Loading promoter profile…</div>;

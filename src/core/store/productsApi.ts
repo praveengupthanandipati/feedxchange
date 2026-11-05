@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { apiBaseQuery } from "../api/baseQuery";
+import { compareProducts } from "../../shared/utils/productOrder";
 
 export interface ProductPriceHistoryEntry {
   id: number;
@@ -154,6 +155,9 @@ function unwrapArray<T>(payload: unknown): T[] {
   return [];
 }
 
+/** Product lists come back in the products document's order (shared/utils/productOrder), not the API's. */
+const toOrderedProducts = (payload: unknown) => unwrapArray<Product>(payload).sort(compareProducts);
+
 function unwrapObject<T>(payload: unknown): T | null {
   const envelope = payload as { result?: unknown; data?: unknown } | null | undefined;
   if (envelope?.result) return envelope.result as T;
@@ -168,13 +172,13 @@ export const productsApi = createApi({
   endpoints: (builder) => ({
     getProducts: builder.query<Product[], void>({
       query: () => "/api/Product/GetAllActiveProducts",
-      transformResponse: unwrapArray<Product>,
+      transformResponse: toOrderedProducts,
       providesTags: ["Product"],
     }),
     // Public (no login): the website's catalogue. Includes inactive products, so callers filter on isActive / isDeleted.
     getAllProducts: builder.query<Product[], void>({
       query: () => "/api/Product/GetAllProducts",
-      transformResponse: unwrapArray<Product>,
+      transformResponse: toOrderedProducts,
       providesTags: ["Product"],
     }),
     getProductById: builder.query<Product | null, string>({
@@ -184,7 +188,7 @@ export const productsApi = createApi({
     }),
     getProductsByCategoryId: builder.query<Product[], string>({
       query: (categoryId) => `/api/Product/GetProductsByCategoryId?categoryId=${categoryId}`,
-      transformResponse: unwrapArray<Product>,
+      transformResponse: toOrderedProducts,
       providesTags: ["Product"],
     }),
     createProduct: builder.mutation<number, CreateProductPayload>({

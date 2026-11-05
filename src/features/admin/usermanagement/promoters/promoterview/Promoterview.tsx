@@ -25,6 +25,9 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
+/** Wizard step that Edit opens for each tab. */
+const EDIT_STEP_FOR_TAB: Partial<Record<TabId, string>> = {notifications: "notification-preferences"};
+
 interface DetailFieldProps {
   label: string;
   value: ReactNode;
@@ -154,7 +157,7 @@ const Promoterview = () => {
               <button
                 type="button"
                 className="promoters-btn promoters-btn--outline"
-                onClick={() => navigate(`/admin/promoters/profile?id=${id}`)}
+                onClick={() => navigate(`/admin/promoters/profile?id=${id}${EDIT_STEP_FOR_TAB[activeTab] ? `&step=${EDIT_STEP_FOR_TAB[activeTab]}` : ""}`)}
               >
                 <PenLineIcon aria-hidden /> Edit
               </button>
