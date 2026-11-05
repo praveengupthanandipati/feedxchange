@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import BusinessProfile from "./BusinessProfile";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
 import { useSaveBusinessProfileMainStep } from "./useSaveBusinessProfileMainStep";
@@ -27,6 +27,15 @@ const BusinessProfileStep = () => {
       setProfileId(Number(editId));
     }
   }, [existingProfile]);
+
+  // Opened from a view screen's Edit with ?step=: once the profile has loaded, go on to that step (the tab that was open).
+  const navigate = useNavigate();
+  const editStep = searchParams.get("step");
+  useEffect(() => {
+    if (editId && profileId && editStep && ["contacts","documents","bank-details","notification-preferences"].includes(editStep)) {
+      navigate(`/admin/business-owners/${editStep}`, { replace: true });
+    }
+  }, [editId, profileId, editStep, navigate]);
 
   if (editId && !profileId && loadingExistingProfile) {
     return <div className="new-business__loading">Loading business profile…</div>;

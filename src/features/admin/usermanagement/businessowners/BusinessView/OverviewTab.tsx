@@ -117,7 +117,13 @@ const OverviewTab = ({ profile }: OverviewTabProps) => {
       </section>
 
       <section className="business-owner-detail__section">
-        <h2 className="business-owner-detail__section-title">Product wise brokerage charges</h2>
+        <h2 className="business-owner-detail__section-title">Brokerage Charges</h2>
+        <div className="business-owner-detail__grid">
+          <DetailField label="Buy Brokerage Charges" value={profile.buyBrokerageCharges} />
+          <DetailField label="Sell Brokerage Charges" value={profile.sellBrokerageCharges} />
+        </div>
+
+        <h3 className="business-owner-detail__subsection-title">Product wise brokerage charges</h3>
         <Table
           columns={brokerageColumns}
           data={profile.brokerageCharges}

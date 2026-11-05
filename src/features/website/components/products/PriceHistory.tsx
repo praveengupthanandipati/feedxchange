@@ -203,6 +203,11 @@ const PriceHistory = ({ seed, basePrice }: { seed: string; basePrice: number }) 
           </div>
         </div>
       </div>
+
+      {/* Wording from "Product Descriptions.docx" (Price Display). */}
+      <p className="price-history__disclaimer">
+        *Above prices are for indicative purposes only, kindly contact us for knowing the exact price for your needs and location*
+      </p>
     </section>
   );
 };

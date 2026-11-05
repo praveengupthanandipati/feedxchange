@@ -724,6 +724,14 @@
     align-items: center;
   }
 
+  &__disclaimer {
+    margin: v.$space-4 0 0;
+    color: v.fg(v.$ink-muted);
+    font-size: v.$fs-sm;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
   &__ranges {
     display: flex;
     flex-wrap: wrap;

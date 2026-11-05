@@ -452,11 +452,29 @@ const filteredRows = useMemo(() => {
   };
 
   /** The overview names a status as the API sends it (its display name); the status filter takes the status name. */
+  // The overview counts every contract, so a pick there lists all dates (Yesterday etc. would hide most of them).
+  // A month bar is itself a date filter and is kept.
+  const showAllDates = () => {
+    if (dateRangeFilter === "Custom Date Range" && monthStart !== null) return;
+    setDateRangeFilter("All");
+    setCustomFrom("");
+    setCustomTo("");
+  };
+
   const pickStatus = (status: string) => {
     const key = normalizeStatus(status);
     const match = contractStatuses.find((item) => normalizeStatus(item.displayName) === key || normalizeStatus(item.statusName) === key);
     const value = match?.statusName ?? status;
+    showAllDates();
+    // A status and a "Needs attention" item don't combine (e.g. Open + Awaiting approval is always empty): the newer pick wins.
+    setFocus(null);
     setStatusFilter((current) => (normalizeStatus(current) === normalizeStatus(value) ? "" : value));
+  };
+
+  const pickFocus = (next: Parameters<typeof setFocus>[0]) => {
+    showAllDates();
+    if (next) setStatusFilter("");
+    setFocus(next);
   };
 
   const pickMonth = (month: MonthBar) => {
@@ -475,7 +493,10 @@ const filteredRows = useMemo(() => {
     setCustomTo(isoDay(end));
   };
 
-  const pickSearch = (text: string) => setKeyword((current) => (current.toLowerCase() === text.toLowerCase() ? "" : text));
+  const pickSearch = (text: string) => {
+    showAllDates();
+    setKeyword((current) => (current.toLowerCase() === text.toLowerCase() ? "" : text));
+  };
 
   const handleExport = () => {
     const exportColumns = columns.filter((column) => column.key !== "actions");
@@ -523,7 +544,7 @@ const filteredRows = useMemo(() => {
             monthStart: dateRangeFilter === "Custom Date Range" ? monthStart : null,
           }}
           onStatus={pickStatus}
-          onFocus={setFocus}
+          onFocus={pickFocus}
           onMonth={pickMonth}
           onSearch={pickSearch}
           onClear={handleClearFilters}

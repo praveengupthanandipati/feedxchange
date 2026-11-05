@@ -1,10 +1,10 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { SearchIcon, Trash2Icon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import { fetchBankFromIfsc, isValidIfsc } from "../../../../../shared/utils/ifscLookup";
 import EmptyRowsState from "./EmptyRowsState";
-import { accountTypeOptions } from "./newTransporter.data";
+import { ALLOWED_DOCUMENT_FILE_TYPES, MAX_DOCUMENT_FILE_SIZE_MB, accountTypeOptions } from "./newTransporter.data";
 
 export interface BankEntry {
   id: string;
@@ -15,6 +15,11 @@ export interface BankEntry {
   bankName: string;
   cityBranch: string;
   ifscError: string;
+  // Bank proof (cancelled cheque / passbook). Picked here only for now: the bank account APIs have no file field yet,
+  // so it is not sent anywhere until the backend adds one.
+  proofFile?: File;
+  proofFileName?: string;
+  proofFileError?: string;
   // Present only for rows loaded from an existing profile — tells the save
   // step to call UpdateProfileBankAccount instead of bundling this row into
   // the next CreateProfileBankAccount call.
@@ -71,6 +76,26 @@ const BankDetailsSection = ({
   };
 
   const [lookingUpId, setLookingUpId] = useState<string | null>(null);
+
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const handleProofChange = (id: string, event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      updateEntry(id, { proofFile: undefined, proofFileName: "", proofFileError: "" });
+      return;
+    }
+    if (!ALLOWED_DOCUMENT_FILE_TYPES.includes(file.type)) {
+      updateEntry(id, { proofFile: undefined, proofFileName: "", proofFileError: "Unsupported file format." });
+      event.target.value = "";
+      return;
+    }
+    if (file.size > MAX_DOCUMENT_FILE_SIZE_MB * 1024 * 1024) {
+      updateEntry(id, { proofFile: undefined, proofFileName: "", proofFileError: `File must be under ${MAX_DOCUMENT_FILE_SIZE_MB}MB.` });
+      event.target.value = "";
+      return;
+    }
+    updateEntry(id, { proofFile: file, proofFileName: file.name, proofFileError: "" });
+  };
 
   const lookupIfsc = async (id: string, ifscCode: string) => {
     if (!isValidIfsc(ifscCode)) {
@@ -194,6 +219,31 @@ const BankDetailsSection = ({
                       value={entry.cityBranch}
                       onChange={(event) => updateEntry(entry.id, { cityBranch: event.target.value })}
                     />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-field__label">Upload File</label>
+                    <div className="form-field__file">
+                      <button
+                        type="button"
+                        className="form-field__file-btn"
+                        onClick={() => fileInputRefs.current[entry.id]?.click()}
+                      >
+                        Choose File
+                      </button>
+                      <span className="form-field__file-name">{entry.proofFileName || "No file chosen"}</span>
+                      <input
+                        ref={(el) => {
+                          fileInputRefs.current[entry.id] = el;
+                        }}
+                        type="file"
+                        className="form-field__file-input"
+                        accept={ALLOWED_DOCUMENT_FILE_TYPES.join(",")}
+                        onChange={(event) => handleProofChange(entry.id, event)}
+                        aria-label="Upload bank proof (cancelled cheque or passbook)"
+                      />
+                    </div>
+                    {entry.proofFileError && <p className="form-field__error">{entry.proofFileError}</p>}
                   </div>
 
                   <button

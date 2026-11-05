@@ -42,6 +42,9 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
+/** Wizard step that Edit opens for each tab (Linked Business has no step of its own, so it opens the profile). */
+const EDIT_STEP_FOR_TAB: Partial<Record<TabId, string>> = {contacts: "contacts",bank: "bank-details",notifications: "notification-preferences"};
+
 const BusinessOwnerDetail = () => {
   const { id } = useParams<{ id: string }>();
   const canSeeNotifications = usePermission("notification-preferences.view");
@@ -162,7 +165,7 @@ const BusinessOwnerDetail = () => {
               <button
                 type="button"
                 className="business-owners-btn business-owners-btn--outline"
-                onClick={() => navigate(`/admin/business-owners/profile?id=${profile.profileId}`)}
+                onClick={() => navigate(`/admin/business-owners/profile?id=${profile.profileId}${EDIT_STEP_FOR_TAB[activeTab] ? `&step=${EDIT_STEP_FOR_TAB[activeTab]}` : ""}`)}
               >
                 <PenLineIcon aria-hidden /> Edit
               </button>

@@ -5,7 +5,9 @@
   display: flex;
   flex-direction: column;
   gap: v.$spacing-1;
-  max-width: 28rem;
+  // Wide enough for "contract number — seller → buyer" in full; still the full width on small screens.
+  width: 100%;
+  max-width: 48rem;
 
   &__label {
     @include m.font-base(v.$font-weight-semibold);

@@ -129,6 +129,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
                   isOpen={openItemId === item.id}
                   onToggle={handleItemToggle}
                   onRouteActive={setOpenItemId}
+                  onRouteLeft={(id) => setOpenItemId((prev) => (prev === id ? null : prev))}
                   onNavigate={onCloseMobile}
                 />
               ))}

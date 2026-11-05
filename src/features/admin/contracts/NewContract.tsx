@@ -211,10 +211,10 @@ const NewContract = () => {
   const [contractNumber, setContractNumber] = useState("");
 
   const [contractDate, setContractDate] = useState(todayInputDate);
-  // The period the contract is valid for. Effective From follows the contract date until it is set by hand.
+  // The period the contract is valid for. Effective From starts empty; if left empty, the contract date is saved.
   const [effectiveFromInput, setEffectiveFromInput] = useState("");
   const [effectiveTo, setEffectiveTo] = useState("");
-  const effectiveFrom = effectiveFromInput || contractDate;
+  const effectiveFrom = effectiveFromInput;
   const [sellerId, setSellerId] = useState("");
   const [buyerId, setBuyerId] = useState("");
   const [productId, setProductId] = useState("");
@@ -779,7 +779,7 @@ const { data: products } = useGetProductsQuery();
         buyerId: Number(buyerId),
 
         contractDate: now,
-        effectiveFrom: toApiDate(effectiveFrom) || now,
+        effectiveFrom: toApiDate(effectiveFrom || contractDate) || now,
         effectiveTo: toApiDate(effectiveTo) || now,
         totalQuantityMT: quantity,
         productId: Number(productId),
@@ -872,7 +872,7 @@ const { data: products } = useGetProductsQuery();
         buyerId: Number(buyerId),
 
         contractDate: now,
-        effectiveFrom: toApiDate(effectiveFrom) || now,
+        effectiveFrom: toApiDate(effectiveFrom || contractDate) || now,
         effectiveTo: toApiDate(effectiveTo) || now,
 
         totalQuantityMT: quantity,
@@ -1387,26 +1387,15 @@ const { data: products } = useGetProductsQuery();
           </div>
 
           <div className="form-field">
-            <label className="form-field__label" htmlFor="effectiveFrom">
-              Effective From
-            </label>
-            <DatePickerInput
-              id="effectiveFrom"
-              value={effectiveFrom}
-              onChange={(value) => setEffectiveFromInput(value)}
-              clearable
-            />
-          </div>
-
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="effectiveTo">
-              Effective To <span className="form-field__required">*</span>
-            </label>
-            <DatePickerInput
-              id="effectiveTo"
-              value={effectiveTo}
-              onChange={(value) => setEffectiveTo(value)}
-              clearable
+            <span className="form-field__label">
+              Select Seller <span className="form-field__required">*</span>
+            </span>
+            <SearchableSelect
+              options={businessProfileOptions}
+              value={sellerId}
+              onChange={handleSellerPick}
+              placeholder="Seller"
+              ariaLabel="Select Seller"
             />
           </div>
 
@@ -1420,19 +1409,6 @@ const { data: products } = useGetProductsQuery();
               onChange={handleBuyerPick}
               placeholder="Buyer"
               ariaLabel="Select Buyer"
-            />
-          </div>
-
-          <div className="form-field">
-            <span className="form-field__label">
-              Select Seller <span className="form-field__required">*</span>
-            </span>
-            <SearchableSelect
-              options={businessProfileOptions}
-              value={sellerId}
-              onChange={handleSellerPick}
-              placeholder="Seller"
-              ariaLabel="Select Seller"
             />
           </div>
 
@@ -1583,6 +1559,30 @@ const { data: products } = useGetProductsQuery();
               value={netRate}
               disabled
               readOnly
+            />
+          </div>
+
+          <div className="form-field">
+            <label className="form-field__label" htmlFor="effectiveFrom">
+              Effective From
+            </label>
+            <DatePickerInput
+              id="effectiveFrom"
+              value={effectiveFrom}
+              onChange={(value) => setEffectiveFromInput(value)}
+              clearable
+            />
+          </div>
+
+          <div className="form-field">
+            <label className="form-field__label" htmlFor="effectiveTo">
+              Effective To <span className="form-field__required">*</span>
+            </label>
+            <DatePickerInput
+              id="effectiveTo"
+              value={effectiveTo}
+              onChange={(value) => setEffectiveTo(value)}
+              clearable
             />
           </div>
 

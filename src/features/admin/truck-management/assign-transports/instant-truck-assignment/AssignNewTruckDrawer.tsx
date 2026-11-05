@@ -535,7 +535,7 @@ const AssignNewTruckDrawer = ({
                 type="text"
                 inputMode="decimal"
                 className="assign-truck-drawer__control"
-                placeholder="Freight Charges (e.g. ₹50,000)"
+                placeholder="Freight Charges (e.g. ₹1800/MT)"
                 value={form.freight}
                 onChange={(event) => setField("freight", event.target.value)}
               />
