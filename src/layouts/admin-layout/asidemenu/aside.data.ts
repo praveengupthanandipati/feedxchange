@@ -176,11 +176,7 @@ export const asideNavSections: AsideNavSection[] = [
             id: "contract-dispatch-view-all-trucks",
             label: "View All Trucks By Contract",
             path: "/admin/truck-management/open-pending-contracts/view-trucks",
-            // Re-assign and the contract chain are both opened from a truck card here.
-            relatedPaths: [
-              "/admin/truck-management/open-pending-contracts/reassign-truck",
-              "/admin/truck-management/open-pending-contracts/truck-chain",
-            ],
+            relatedPaths: ["/admin/truck-management/open-pending-contracts/truck-chain"],
           },
         ],
       },

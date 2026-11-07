@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaRupeeSign } from "react-icons/fa";
-import { PlusIcon } from "../../../../shared/components/icon";
+import { PlusIcon, RefreshCwIcon } from "../../../../shared/components/icon";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import InfoTooltip from "../../../../shared/components/tooltip/InfoTooltip";
 import type { PendingDeliveryOrderRow } from "./pendingDeliveryOrders.data";
@@ -34,30 +34,45 @@ export const ContractRate = ({ row }: { row: PendingDeliveryOrderRow }) => (
 interface DoNumberCellProps {
   row: PendingDeliveryOrderRow;
   onAddDo: (row: PendingDeliveryOrderRow) => void;
+  onReassign: (row: PendingDeliveryOrderRow) => void;
 }
 
-export const DoNumberCell = ({ row, onAddDo }: DoNumberCellProps) =>
-  row.doNumber ? (
-    <Link to={contractPath(row)} className="pending-dos-table__do-link">
-      {row.doNumber}, {row.doDate}
-    </Link>
-  ) : (
+export const DoNumberCell = ({ row, onAddDo, onReassign }: DoNumberCellProps) => (
+  <div className="pending-dos-table__actions">
+    {row.doNumber ? (
+      <Link to={contractPath(row)} className="pending-dos-table__do-link">
+        {row.doNumber}, {row.doDate}
+      </Link>
+    ) : (
+      <button
+        type="button"
+        className="pending-dos-table__add-do"
+        onClick={() => onAddDo(row)}
+        aria-label={`Add delivery order for truck ${row.truckNumber}`}
+      >
+        <PlusIcon aria-hidden /> Add DO
+      </button>
+    )}
     <button
       type="button"
-      className="pending-dos-table__add-do"
-      onClick={() => onAddDo(row)}
-      aria-label={`Add DO or reassign truck ${row.truckNumber}`}
+      className="pending-dos-table__reassign"
+      onClick={() => onReassign(row)}
+      aria-label={`Reassign truck ${row.truckNumber} from contract ${row.contractNo}`}
+      title="Open this contract's trucks to choose one to reassign"
     >
-      <PlusIcon aria-hidden /> Add DO / Reassign
+      <RefreshCwIcon aria-hidden /> Reassign
     </button>
-  );
+  </div>
+);
 
 interface ColumnHandlers {
   onAddDo: (row: PendingDeliveryOrderRow) => void;
+  onReassign: (row: PendingDeliveryOrderRow) => void;
 }
 
 export function buildPendingDeliveryOrderColumns({
   onAddDo,
+  onReassign,
 }: ColumnHandlers): TableColumn<PendingDeliveryOrderRow>[] {
   return [
     {
@@ -76,7 +91,7 @@ export function buildPendingDeliveryOrderColumns({
       header: "Do Number",
       sortable: true,
       sortValue: (row) => row.doNumber ?? "",
-      render: (row) => <DoNumberCell row={row} onAddDo={onAddDo} />,
+      render: (row) => <DoNumberCell row={row} onAddDo={onAddDo} onReassign={onReassign} />,
       exportValue: (row) => (row.doNumber ? `${row.doNumber}, ${row.doDate}` : ""),
     },
     {

@@ -12,6 +12,7 @@ import {
 } from "../../../../../../core/store/contractsApi";
 import {
   getApiErrorMessage,
+  useGetContractTruckChainQuery,
   useGetContractTruckChainOverviewQuery,
   useReassignContractTruckMutation,
   type ContractTruckChainOverview,
@@ -154,6 +155,19 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
   // it sends the truck upstream: it loads at the target's seller and is delivered to their yard.
   const actingParty = parties.find((party) => roleOnTarget(party) !== null);
   const isDownstream = actingParty ? roleOnTarget(actingParty) === "seller" : false;
+  const requestingUserId = Number(localStorage.getItem("userId")) || 0;
+  const {
+    data: visibleChain,
+    isFetching: loadingVisibleChain,
+    isError: visibleChainError,
+  } = useGetContractTruckChainQuery(
+    {
+      contractDispatchId: contractTruckId,
+      requestingProfileId: actingParty?.id ?? 0,
+      requestingUserId,
+    },
+    { skip: !actingParty || !contractTruckId },
+  );
 
   // The end of the new leg away from the acting party's yard is picked from the other
   // party's addresses on the target contract.
@@ -173,10 +187,10 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
       <InfoPanel
         icon={TruckIcon}
         title="Truck Not Found"
-        description="This truck has no chain on the contract. Open View All Trucks and use Re-assign on one of its trucks."
+        description="This truck has no chain on the contract. Return to Pending Delivery Orders and choose another truck."
         action={{
-          label: "Go to View All Trucks",
-          to: `/admin/truck-management/open-pending-contracts/view-trucks?contract=${encodeURIComponent(contractNumber)}`,
+          label: "Go to Pending Delivery Orders",
+          to: "/admin/truck-management/pending-delivery-orders",
         }}
       />
     );
@@ -229,7 +243,7 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
       }
 
       navigate(
-        `/admin/truck-management/open-pending-contracts/view-trucks?contract=${encodeURIComponent(contractNumber)}`,
+        "/admin/truck-management/pending-delivery-orders",
       );
     } catch (error) {
       // A refusal sent with an error status carries its reason in the body.
@@ -253,6 +267,17 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
             <p className="reassign-truck__source-sub">
               {sourceLeg.contractNumber} · {sourceLeg.sellerName} → {sourceLeg.buyerName}
             </p>
+            {actingParty && (
+              <p className="reassign-truck__source-sub" role="status">
+                {loadingVisibleChain
+                  ? `Loading ${actingParty.name}'s visible truck chain…`
+                  : visibleChainError
+                    ? "Unable to load this party's visible truck chain."
+                  : `Visible chain for ${actingParty.name}: ${
+                      visibleChain?.map((leg) => leg.contractNumber).join(" → ") || "No contracts available"
+                    }`}
+              </p>
+            )}
 
             <div className="reassign-truck__source-grid">
               <div>
@@ -469,21 +494,17 @@ const ReassignTruck = () => {
       <div className="truck-chain__header">
         <h1 className="reassign-truck__heading">Re-assign truck</h1>
         <Link
-          to={
-            contractNumber
-              ? `/admin/truck-management/open-pending-contracts/view-trucks?contract=${encodeURIComponent(contractNumber)}`
-              : "/admin/truck-management/open-pending-contracts/view-trucks"
-          }
+          to="/admin/truck-management/pending-delivery-orders"
           className="reassign-truck__cancel"
         >
-          <ArrowLeftIcon aria-hidden /> View All Trucks
+          <ArrowLeftIcon aria-hidden /> Pending Delivery Orders
         </Link>
       </div>
       {!contractNumber || !contractTruckId ? (
         <InfoPanel
           icon={FileTextIcon}
           title="No Truck Selected"
-          description="Open a contract, go to View All Trucks and use Re-assign on the truck you want to move onto another contract."
+          description="Select a truck from Pending Delivery Orders to start a reassignment."
           action={{ label: "Go to Open & Pending Contracts", to: "/admin/truck-management/open-pending-contracts" }}
         />
       ) : isFetching ? (
@@ -492,10 +513,10 @@ const ReassignTruck = () => {
         <InfoPanel
           icon={TruckIcon}
           title="Chain Not Available"
-          description="The chain for this truck could not be loaded. Go back to View All Trucks and try again."
+          description="The chain for this truck could not be loaded. Return to Pending Delivery Orders and try again."
           action={{
-            label: "Go to View All Trucks",
-            to: `/admin/truck-management/open-pending-contracts/view-trucks?contract=${encodeURIComponent(contractNumber)}`,
+            label: "Go to Pending Delivery Orders",
+            to: "/admin/truck-management/pending-delivery-orders",
           }}
         />
       ) : (
