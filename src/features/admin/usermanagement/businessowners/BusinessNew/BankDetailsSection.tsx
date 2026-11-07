@@ -15,8 +15,8 @@ export interface BankEntry {
   bankName: string;
   branchName: string;
   ifscError: string;
-  // Bank proof (cancelled cheque / passbook). Picked here only for now: the bank account APIs have no file field yet,
-  // so it is not sent anywhere until the backend adds one.
+  // Cancelled cheque / bank proof. A newly picked file is uploaded on save; for a loaded account proofFileName shows the file
+  // already on record, which is kept unless a new file is picked.
   proofFile?: File;
   proofFileName?: string;
   proofFileError?: string;
@@ -225,7 +225,7 @@ const BankDetailsSection = ({
                   </div>
 
                   <div className="form-field">
-                    <label className="form-field__label">Upload File</label>
+                    <label className="form-field__label">Upload Cancelled Cheque</label>
                     <div className="form-field__file">
                       <button
                         type="button"

@@ -33,7 +33,19 @@ export interface SellerInvoiceRow {
   roundedTotal: string;
   remarks: string;
   deductions: DeductionEntry[];
+  /** The user says this truck is not assigned to the contract and entered its transporter / driver details up front (all optional). */
+  notAssigned: boolean;
+  transporterId: string;
+  driverMode: "existing" | "new";
+  driverId: string;
+  driverName: string;
+  driverMobile: string;
+  licenseNumber: string;
+  licenseExpiry: string;
 }
+
+/** The truck / driver details typed on a row, used to pre-fill the trip dialog. */
+export type TripDraft = Pick<SellerInvoiceRow, "transporterId" | "driverMode" | "driverId" | "driverName" | "driverMobile" | "licenseNumber" | "licenseExpiry">;
 
 let rowSeq = 0;
 export const nextSellerInvoiceRowId = () => `sinv-row-${Date.now()}-${rowSeq++}`;
@@ -60,6 +72,14 @@ export function createEmptySellerInvoiceRow(): SellerInvoiceRow {
     roundedTotal: "",
     remarks: "",
     deductions: [],
+    notAssigned: false,
+    transporterId: "",
+    driverMode: "existing",
+    driverId: "",
+    driverName: "",
+    driverMobile: "",
+    licenseNumber: "",
+    licenseExpiry: "",
   };
 }
 

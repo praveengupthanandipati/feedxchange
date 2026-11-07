@@ -3,6 +3,8 @@ import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ChevronLeftIcon,
+  CircleCheckBigIcon,
+  CircleXIcon,
   ChevronRightIcon,
   DownloadIcon,
   EyeIcon,
@@ -19,6 +21,7 @@ import {
   useDeleteContractMutation,
   useGetAllContractsByFiltersQuery,
     useGetAllContractStatusesQuery,
+  useUpdateContractStatusMutation,
   type PendingContractApiResponse,
 
 } from "../../../core/store/contractsApi";
@@ -157,7 +160,8 @@ const Contracts = () => {
   const statusOptions = useMemo(
   () =>
     contractStatuses
-      .filter((status) => status.isActive)
+      // Deleted is kept even when the API marks it inactive, so deleted contracts can be looked up
+      .filter((status) => status.isActive || normalizeStatus(status.statusName) === "deleted")
       .map((status) => ({
         value: status.statusName,
         label: status.displayName || status.statusName,
@@ -182,6 +186,53 @@ const Contracts = () => {
     [focus, data, now],
   );
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // ---------- bulk approve / reject of contracts pending approval ----------
+  const [updateContractStatus, { isLoading: bulkUpdating }] = useUpdateContractStatusMutation();
+  const [bulkAction, setBulkAction] = useState<"approve" | "reject" | null>(null);
+  const [bulkError, setBulkError] = useState<string | null>(null);
+
+  const findStatus = (matcher: (key: string) => boolean) =>
+    contractStatuses.find((s) => matcher(normalizeStatus(s.statusName)) || matcher(normalizeStatus(s.displayName)));
+  const approveStatus = contractStatuses.find((s) => normalizeStatus(s.statusName) === "open");
+  const rejectStatus =
+    findStatus((k) => k.startsWith("reject")) ?? findStatus((k) => k.startsWith("declin") || k.startsWith("cancel"));
+
+  const isPendingApproval = (row: Contract) => {
+    const key = normalizeStatus(row.status ?? "");
+    return key === "pendingforapproval";
+  };
+  const selectedPendingNumbers = rows
+    .filter((row) => selectedRowIds.includes(row.contractNumber) && isPendingApproval(row))
+    .map((row) => row.contractNumber);
+  const skippedCount = selectedRowIds.length - selectedPendingNumbers.length;
+
+  const confirmBulkAction = async () => {
+    const target = bulkAction === "approve" ? approveStatus : rejectStatus;
+    if (!bulkAction || !target) {
+      const available = contractStatuses.map((x) => x.displayName || x.statusName).join(", ");
+      setBulkError(
+        `No "${bulkAction === "approve" ? "Open" : "Rejected"}" status exists, so the contracts cannot be ${bulkAction === "approve" ? "approved" : "rejected"}. Available statuses: ${available || "none loaded"}.`,
+      );
+      return;
+    }
+    try {
+      await updateContractStatus({
+        contractNumber: selectedPendingNumbers,
+        contractStatusId: target.contractStatusId,
+        reviewRemarks: bulkAction === "approve" ? "Bulk approved" : "Bulk rejected",
+        actionPerformedBy: Number(localStorage.getItem("userId")) || 0,
+      }).unwrap();
+      const count = selectedPendingNumbers.length;
+      setSelectedRowIds((prev) => prev.filter((id) => !selectedPendingNumbers.includes(id)));
+      setBulkAction(null);
+      setBulkError(null);
+      showSuccessMessage(`${count} contract${count === 1 ? "" : "s"} ${bulkAction === "approve" ? "approved" : "rejected"} successfully`);
+    } catch (error) {
+      console.error("Bulk contract status update failed", error);
+      setBulkError("Failed to update contract status.");
+    }
+  };
 
   // Same toast pattern as Categories.tsx: show the message, auto-clear after 3s.
   // const showSuccessMessage = (message: string) => {
@@ -286,7 +337,8 @@ const filteredRows = useMemo(() => {
   const selectedStatus = normalizeStatus(statusFilter.trim());
 
   return rows.filter((row) => {
-    if (row.status.toLowerCase() === "deleted") return false;
+    // deleted contracts only show when the Deleted status is picked
+    if (normalizeStatus(row.status ?? "") === "deleted" && selectedStatus !== "deleted") return false;
     // a "needs attention" group picked in the overview
     if (focusIds && !focusIds.has(row.contractNumber)) return false;
 
@@ -656,6 +708,35 @@ const filteredRows = useMemo(() => {
           </div>
         )}
 
+        {selectedPendingNumbers.length > 0 && (
+          <Can any={["contracts.manage", "contract-status"]}>
+            <div className="contracts-bulk" role="region" aria-label="Bulk approval">
+              <span className="contracts-bulk__count">
+                {selectedPendingNumbers.length} pending contract{selectedPendingNumbers.length === 1 ? "" : "s"} selected
+                {skippedCount > 0 ? ` (${skippedCount} other selected will be skipped)` : ""}
+              </span>
+              <div className="contracts-bulk__actions">
+                <button
+                  type="button"
+                  className="contracts-btn contracts-btn--primary"
+                  disabled={bulkUpdating}
+                  onClick={() => { setBulkError(null); setBulkAction("approve"); }}
+                >
+                  <CircleCheckBigIcon aria-hidden /> Approve
+                </button>
+                <button
+                  type="button"
+                  className="contracts-btn contracts-btn--danger"
+                  disabled={bulkUpdating}
+                  onClick={() => { setBulkError(null); setBulkAction("reject"); }}
+                >
+                  <CircleXIcon aria-hidden /> Reject
+                </button>
+              </div>
+            </div>
+          </Can>
+        )}
+
         {isLoading || isFetching ? (
   <ContractsLoader />
 ) : (
@@ -714,6 +795,23 @@ const filteredRows = useMemo(() => {
       </div>
       
       <SuccessToast message={successMessage} />
+      <ConfirmDialog
+        open={bulkAction !== null}
+        title={bulkAction === "approve" ? "Approve selected contracts?" : "Reject selected contracts?"}
+        message={
+          bulkError ||
+          `${selectedPendingNumbers.length} contract${selectedPendingNumbers.length === 1 ? "" : "s"} will be ${
+            bulkAction === "approve" ? "approved" : "rejected"
+          }.`
+        }
+        confirmLabel={bulkAction === "approve" ? "Approve" : "Reject"}
+        confirmDisabled={bulkUpdating}
+        onConfirm={confirmBulkAction}
+        onCancel={() => {
+          setBulkAction(null);
+          setBulkError(null);
+        }}
+      />
       <ConfirmDialog
         open={pendingDeleteRow !== null}
         title="Remove this contract?"

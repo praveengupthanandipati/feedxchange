@@ -7,7 +7,8 @@ export interface Truck {
   profileId: number;
   profileLegalName: string;
   truckNumber: string;
-  registrationNumber: string;
+  /** Same as the truck number; kept only because older records and reports still carry it. */
+  registrationNumber?: string;
   truckType: string;
   make: string;
   model: string;
@@ -27,7 +28,6 @@ export interface Truck {
 export interface AddTruckDetailsPayload {
   profileId: number;
   truckNumber: string;
-  registrationNumber: string;
   truckType: string;
   make: string;
   model: string;

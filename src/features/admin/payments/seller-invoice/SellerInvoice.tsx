@@ -17,7 +17,15 @@ import {
   validateRow,
   type SellerInvoiceRow,
 } from "./sellerInvoice.data";
-import { apiErrorMessage, useLazyGetInvoiceContractDetailsQuery, useSaveInvoicesMutation } from "../../../../core/store/sellerInvoiceApi";
+import {
+  apiErrorMessage,
+  useLazyGetInvoiceContractDetailsQuery,
+  useSaveInvoicesMutation,
+  type InvoiceNotice,
+  type TripChoice,
+  type TripSelection,
+} from "../../../../core/store/sellerInvoiceApi";
+import TripSelectionDialog from "./TripSelectionDialog";
 import type { InvoiceContract } from "../../../../core/store/sellerInvoiceApi";
 import { useNotifyPrompt } from "../../../../shared/notifications/useNotifyPrompt";
 import "./SellerInvoice.scss";
@@ -32,6 +40,9 @@ const SellerInvoice = () => {
   const [selectPartiesRowId, setSelectPartiesRowId] = useState<string | null>(null);
   const [rowPendingDelete, setRowPendingDelete] = useState<SellerInvoiceRow | null>(null);
   const [saveToast, setSaveToast] = useState<string | null>(null);
+  // Trip selection (a truck with several loaded trips on the contract) and what the system did automatically while saving.
+  const [tripPrompt, setTripPrompt] = useState<TripSelection[] | null>(null);
+  const [notices, setNotices] = useState<InvoiceNotice[]>([]);
 
   const [lookupContract] = useLazyGetInvoiceContractDetailsQuery();
   const [saveInvoices, { isLoading: saving }] = useSaveInvoicesMutation();
@@ -106,8 +117,10 @@ const SellerInvoice = () => {
     setServerError("");
   };
 
-  const handleSaveInvoices = async () => {
+  /** `choices`: rowNumber (1-based) -> what the user decided in the trip dialog (an existing trip, or a new trip with its accepted steps). */
+  const handleSaveInvoices = async (choices?: Record<number, TripChoice>) => {
     setServerError("");
+    setNotices([]);
     const latest = await resolveAllContracts();
     if (latest.some((row) => hasErrors(validateRow(row)))) {
       setShowErrors(true);
@@ -115,9 +128,29 @@ const SellerInvoice = () => {
     }
 
     try {
-      const result = await saveInvoices({ invoiceDate, rows: latest.map(toRowInput) }).unwrap();
+      const result = await saveInvoices({
+        invoiceDate,
+        rows: latest.map((row, index) => {
+          const choice = choices?.[index + 1];
+          return {
+            ...toRowInput(row),
+            contractDispatchId: choice?.contractDispatchId ?? null,
+            createNewTrip: choice?.createNewTrip ?? false,
+            tripSetup: choice?.tripSetup ?? null,
+            tripSetupAccepted: choice?.accepted ?? false,
+          };
+        }),
+      }).unwrap();
+
+      // Nothing was saved: the trip is not obvious (or has to be created), so the user decides / accepts the steps first.
+      if (result.requiresTripSelection && (result.tripSelections?.length ?? 0) > 0) {
+        setTripPrompt(result.tripSelections ?? []);
+        return;
+      }
+
       setSaveToast(`${result.invoices.length} invoice${result.invoices.length === 1 ? "" : "s"} saved successfully.`);
       resetForm();
+      setNotices(result.notices ?? []);
       // The buyer is told about each invoice (the seller can be added in the dialog). One dialog per invoice, one after another; Skip or close moves on.
       notify.ask(
         result.invoices.map((invoice) => ({
@@ -188,6 +221,19 @@ const SellerInvoice = () => {
         <PlusIcon aria-hidden /> Add another invoice
       </button>
 
+      {notices.length > 0 && (
+        <div className="si-banner si-banner--info" role="status">
+          <ul>
+            {notices.map((notice, index) => (
+              <li key={`${notice.rowNumber}-${notice.code}-${index}`}>
+                {notices.length > 1 ? `Invoice ${notice.rowNumber}: ` : ""}
+                {notice.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {(serverError || problems.length > 0) && (
         <div className="si-banner si-banner--error" role="alert">
           {serverError ? (
@@ -218,6 +264,23 @@ const SellerInvoice = () => {
           </button>
         </div>
       </div>
+
+      <TripSelectionDialog
+        selections={tripPrompt}
+        prefill={Object.fromEntries(
+          rows.map((row, index) => [
+            index + 1,
+            row.notAssigned
+              ? { transporterId: row.transporterId, driverMode: row.driverMode, driverId: row.driverId, driverName: row.driverName, driverMobile: row.driverMobile, licenseNumber: row.licenseNumber, licenseExpiry: row.licenseExpiry }
+              : undefined,
+          ]),
+        )}
+        onCancel={() => setTripPrompt(null)}
+        onConfirm={(choices) => {
+          setTripPrompt(null);
+          void handleSaveInvoices(choices);
+        }}
+      />
 
       <ContractDetailsOffcanvas
         open={contractDetailsRowId !== null}

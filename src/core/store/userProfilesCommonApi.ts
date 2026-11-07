@@ -57,6 +57,11 @@ export interface BankAccountPayload {
   branchName: string;
   accountHolderName: string;
   isPrimaryAccount: boolean;
+  /** Cancelled cheque / bank proof (optional). Omit to keep the file already on record. */
+  chequeFileName?: string | null;
+  chequeFilePath?: string | null;
+  chequeFileSize?: number | null;
+  chequeContentType?: string | null;
 }
 
 export interface DocumentPayload {
@@ -64,8 +69,9 @@ export interface DocumentPayload {
   documentNumber: string;
   fileName: string;
   issuingAuthority: string;
-  issuedDate: string;
-  expiryDate?: string;
+  /** Optional: null when the document has no issue date. */
+  issuedDate: string | null;
+  expiryDate?: string | null;
 }
 
 export interface CreateProfileDocumentEntry extends DocumentPayload {
@@ -189,6 +195,25 @@ export interface DocumentFileMeta {
 export interface UploadableDocumentEntry {
   file?: File;
   meta?: DocumentFileMeta;
+}
+
+/**
+ * Uploads a newly chosen cancelled cheque and returns the fields to merge into the bank account payload.
+ * Returns {} when no new file was chosen, so an update leaves the cheque already on record untouched.
+ */
+export function useChequeFileFieldsResolver() {
+  const [uploadDocumentFile] = useUploadDocumentFileMutation();
+
+  return async (file: File | undefined): Promise<Partial<BankAccountPayload>> => {
+    if (!file) return {};
+    const uploaded = await uploadDocumentFile({ file, folderName: "Cancelled Cheque" }).unwrap();
+    return {
+      chequeFileName: file.name,
+      chequeFilePath: uploaded.filePath,
+      chequeFileSize: uploaded.fileSize,
+      chequeContentType: uploaded.contentType,
+    };
+  };
 }
 
 export function useDocumentFileFieldsResolver() {

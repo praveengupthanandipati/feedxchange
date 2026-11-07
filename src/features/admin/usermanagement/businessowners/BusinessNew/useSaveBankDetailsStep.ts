@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   useCreateProfileBankAccountMutation,
   useUpdateProfileBankAccountMutation,
+  useChequeFileFieldsResolver,
   type CreateProfileBankAccountEntry,
   type UpdateProfileBankAccountPayload,
 } from "../../../../../core/store/userProfilesCommonApi";
@@ -26,6 +27,7 @@ export const useSaveBankDetailsStep = (nextPath: string) => {
   const [updateBusinessProfile] = useUpdateBusinessProfileMutation();
   const [createProfileBankAccount] = useCreateProfileBankAccountMutation();
   const [updateProfileBankAccount] = useUpdateProfileBankAccountMutation();
+  const resolveChequeFields = useChequeFileFieldsResolver();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -46,8 +48,10 @@ export const useSaveBankDetailsStep = (nextPath: string) => {
       const newEntries: CreateProfileBankAccountEntry[] = [];
       const updates: UpdateProfileBankAccountPayload[] = [];
 
-      draft.bankAccounts.forEach((account) => {
+      for (const account of draft.bankAccounts) {
+        const chequeFields = await resolveChequeFields(account.proofFile);
         const fields = {
+          ...chequeFields,
           bankName: account.bankName,
           accountNumber: account.accountNumber,
           ifscCode: account.ifscCode,
@@ -70,7 +74,7 @@ export const useSaveBankDetailsStep = (nextPath: string) => {
         } else {
           newEntries.push({ ...fields, profileId, createdBy: currentUserId });
         }
-      });
+      }
 
       if (newEntries.length > 0) {
         await createProfileBankAccount(newEntries).unwrap();

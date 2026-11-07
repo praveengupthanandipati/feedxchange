@@ -25,7 +25,6 @@ const CURRENT_YEAR = new Date().getFullYear();
 interface FormErrors {
   transporterProfileId?: string;
   truckNumber?: string;
-  registrationNumber?: string;
   truckType?: string;
   make?: string;
   model?: string;
@@ -58,7 +57,6 @@ const TruckNew = () => {
 
   const [transporterProfileId, setTransporterProfileId] = useState("");
   const [truckNumber, setTruckNumber] = useState("");
-  const [registrationNumber, setRegistrationNumber] = useState("");
   const [truckType, setTruckType] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -76,7 +74,6 @@ const TruckNew = () => {
     if (!editingTruck) return;
     setTransporterProfileId(String(editingTruck.profileId));
     setTruckNumber(editingTruck.truckNumber);
-    setRegistrationNumber(editingTruck.registrationNumber);
     setTruckType(editingTruck.truckType);
     setMake(editingTruck.make);
     setModel(editingTruck.model);
@@ -88,9 +85,9 @@ const TruckNew = () => {
   }, [editingTruck]);
 
   const handleSave = async () => {
-    const trimmedTruckNumber = truckNumber.trim();
+    // The truck number is the vehicle registration number: spaces are dropped and it is stored upper-case.
+    const trimmedTruckNumber = normalizeRegistrationNumber(truckNumber);
     const trimmedModel = model.trim();
-    const normalizedRegistrationNumber = normalizeRegistrationNumber(registrationNumber);
 
     const nextErrors: FormErrors = {};
 
@@ -98,10 +95,13 @@ const TruckNew = () => {
 
     if (!trimmedTruckNumber) nextErrors.truckNumber = "Truck Number is required.";
     else if (trimmedTruckNumber.length < 2) nextErrors.truckNumber = "Truck Number must be at least 2 characters.";
-
-    if (!registrationNumber.trim()) nextErrors.registrationNumber = "Registration Number is required.";
-    else if (!REGISTRATION_NUMBER_REGEX.test(normalizedRegistrationNumber))
-      nextErrors.registrationNumber = "Enter a valid registration number (e.g. AP09TC1234).";
+    // The registration-number format check now applies to the truck number. A saved number is not re-checked unless it is changed,
+    // so trucks entered earlier in another format can still be edited.
+    else if (
+      !REGISTRATION_NUMBER_REGEX.test(trimmedTruckNumber) &&
+      !(isEditMode && editingTruck && normalizeRegistrationNumber(editingTruck.truckNumber) === trimmedTruckNumber)
+    )
+      nextErrors.truckNumber = "Enter a valid truck number (e.g. AP09TC1234).";
 
     if (!truckType) nextErrors.truckType = "Truck Type is required.";
 
@@ -128,7 +128,6 @@ const TruckNew = () => {
     const truckDetails = {
       profileId: Number(transporterProfileId),
       truckNumber: trimmedTruckNumber,
-      registrationNumber: normalizedRegistrationNumber,
       truckType,
       make,
       model: trimmedModel,
@@ -201,26 +200,11 @@ const TruckNew = () => {
               id="truckNumber"
               type="text"
               className="form-field__control"
-              placeholder="Enter Truck Number"
+              placeholder="e.g. AP09 TC 1234"
               value={truckNumber}
-              onChange={(event) => setTruckNumber(event.target.value)}
+              onChange={(event) => setTruckNumber(event.target.value.toUpperCase())}
             />
             {errors.truckNumber && <p className="form-field__error">{errors.truckNumber}</p>}
-          </div>
-
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="registrationNumber">
-              Registration Number <span className="form-field__required">*</span>
-            </label>
-            <input
-              id="registrationNumber"
-              type="text"
-              className="form-field__control"
-              placeholder="e.g. AP09 TC 1234"
-              value={registrationNumber}
-              onChange={(event) => setRegistrationNumber(event.target.value.toUpperCase())}
-            />
-            {errors.registrationNumber && <p className="form-field__error">{errors.registrationNumber}</p>}
           </div>
 
           <div className="form-field">

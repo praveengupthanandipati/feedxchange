@@ -78,7 +78,6 @@ const TruckView = () => {
             <h2 className="business-owner-detail__section-title">Truck Identification</h2>
             <div className="business-owner-detail__grid">
               <DetailField label="Truck Number" value={truck.truckNumber} />
-              <DetailField label="Registration Number" value={truck.registrationNumber} />
               <DetailField label="Truck Type" value={truck.truckType} />
               <DetailField label="Transporter" value={truck.profileLegalName} />
               <DetailField label="Status" value={truck.status} />

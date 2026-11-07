@@ -66,7 +66,7 @@ const TruckNewTrip = () => {
   const { data: trucks = [] } = useGetAllActiveTruckDetailsQuery();
   const truckOptions = trucks.map((truck) => ({
     value: String(truck.truckId),
-    label: `${truck.truckNumber} (${truck.registrationNumber})`,
+    label: truck.truckNumber,
   }));
 
   const { data: drivers = [] } = useGetAllActiveDriversQuery();

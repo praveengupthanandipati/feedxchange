@@ -158,6 +158,64 @@
   }
 
   // ============================================================
+  // Product features (quality specifications) per side
+  // ============================================================
+  &__features {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+  }
+
+  &__feature-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: v.$spacing-2;
+    align-items: center;
+
+    @include m.respond-below(md) {
+      grid-template-columns: 1fr 1fr;
+
+      .new-contract__feature-name {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+
+  &__feature-head {
+    font-size: v.$font-size-sm;
+    color: v.fg(v.$color-text-muted);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__feature-name {
+    font-size: v.$font-size-sm;
+    color: v.fg(v.$color-primary);
+    overflow-wrap: anywhere;
+  }
+
+  &__travel {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
+
+    input {
+      min-width: 0;
+      flex: 1 1 0;
+    }
+
+    span {
+      font-size: v.$font-size-sm;
+      color: v.fg(v.$color-text-muted);
+    }
+  }
+
+  &__feature-empty {
+    font-size: v.$font-size-sm;
+    color: v.fg(v.$color-text-muted);
+    margin: 0;
+  }
+
+  // ============================================================
   // Settings table
   // ============================================================
   &__settings-table {

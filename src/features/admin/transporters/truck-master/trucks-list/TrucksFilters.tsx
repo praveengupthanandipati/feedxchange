@@ -8,8 +8,6 @@ interface FilterOption {
 interface TrucksFiltersProps {
   truckNumber: string;
   onTruckNumberChange: (value: string) => void;
-  registrationNumber: string;
-  onRegistrationNumberChange: (value: string) => void;
   truckType: string;
   onTruckTypeChange: (value: string) => void;
   truckTypeOptions: FilterOption[];
@@ -33,8 +31,6 @@ interface TrucksFiltersProps {
 const TrucksFilters = ({
   truckNumber,
   onTruckNumberChange,
-  registrationNumber,
-  onRegistrationNumberChange,
   truckType,
   onTruckTypeChange,
   truckTypeOptions,
@@ -63,15 +59,6 @@ const TrucksFilters = ({
         onChange={(event) => onTruckNumberChange(event.target.value)}
         placeholder="Truck Number"
         aria-label="Filter by Truck Number"
-      />
-
-      <input
-        type="text"
-        className="trucks-filters__input"
-        value={registrationNumber}
-        onChange={(event) => onRegistrationNumberChange(event.target.value)}
-        placeholder="Reg. No"
-        aria-label="Filter by Registration Number"
       />
 
       <SearchableSelect

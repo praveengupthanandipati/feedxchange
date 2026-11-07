@@ -88,6 +88,7 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
     branchName: account.branchName,
     ifscError: "",
     isPrimaryAccount: account.isPrimaryAccount,
+    proofFileName: account.chequeFileName ?? "",
     meta: account.bankAccountId
       ? { bankAccountId: account.bankAccountId, createdBy: account.createdBy, createdOn: account.createdOn }
       : undefined,
@@ -186,6 +187,7 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
       bankName: row.bankName,
       branchName: row.branchName,
       ifscError: row.ifscError,
+      proofFileName: row.proofFileName,
       meta: row.meta,
     })),
     primaryBankId: primaryBank ? primaryBank.id : (bankRows[0]?.id ?? null),
@@ -194,7 +196,7 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
       documentTypeId: String(document.documentTypeId),
       documentNumber: document.documentNumber,
       issuingAuthority: document.issuingAuthority,
-      issuedDate: document.issuedDate.slice(0, 10),
+      issuedDate: document.issuedDate ? document.issuedDate.slice(0, 10) : "",
       expiryDate: document.expiryDate ? document.expiryDate.slice(0, 10) : "",
       fileName: document.fileName,
       fileError: "",

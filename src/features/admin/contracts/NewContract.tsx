@@ -27,7 +27,7 @@ import { usePermission } from "../../../core/auth/AuthContext";
 import NotifyModal from "../../../shared/notifications/NotifyModal";
 import NotifyChoicePicker from "../../../shared/notifications/NotifyChoicePicker";
 import type { NotifyChoices } from "../../../shared/notifications/notifyChoices";
-import { useGetProductsQuery } from "../../../core/store/productsApi";
+import { parseProductFeatures, useGetProductsQuery } from "../../../core/store/productsApi";
 import {
   useGetBusinessProfileSummaryQuery,
 } from "../../../core/store/businessProfilesApi";
@@ -88,6 +88,59 @@ const toUpdateQualitySpecifications = (
         Number.isInteger(specification.parameterId) &&
         specification.parameterId > 0,
     );
+
+/** One product feature shown under Seller / Buyer Conditions: the name is fixed, the min / max are editable. */
+interface FeatureSpec {
+  parameter: string;
+  min: string;
+  max: string;
+}
+
+/** "12", "12.5" or "12%" -> number; blank or unreadable -> null. */
+const parseFeatureNumber = (value: string): number | null => {
+  const cleaned = value.trim().replace(/%$/, "").trim();
+  if (!cleaned) return null;
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+/** Returns a message for the first invalid spec, or "" when all are fine. */
+const validateFeatureSpecs = (side: string, specs: FeatureSpec[]) => {
+  for (const spec of specs) {
+    const min = parseFeatureNumber(spec.min);
+    const max = parseFeatureNumber(spec.max);
+    if ((spec.min.trim() && min === null) || (spec.max.trim() && max === null)) {
+      return `${side} ${spec.parameter}: Min and Max must be numbers.`;
+    }
+    if ((min !== null && min < 0) || (max !== null && max < 0)) {
+      return `${side} ${spec.parameter}: values cannot be negative.`;
+    }
+    if (min !== null && max !== null && min > max) {
+      return `${side} ${spec.parameter}: Min cannot be greater than Max.`;
+    }
+  }
+  return "";
+};
+
+const toSavePayload = (profileId: number, specs: FeatureSpec[]) =>
+  specs
+    .map((spec) => ({
+      profileId,
+      parameterId: 0,
+      parameter: spec.parameter,
+      minValue: parseFeatureNumber(spec.min),
+      maxValue: parseFeatureNumber(spec.max),
+      unit: "",
+    }))
+    .filter((spec) => spec.minValue !== null || spec.maxValue !== null);
+
+/** Blank -> null (optional); otherwise a whole number inside [min, max], or NaN when invalid. */
+const parseOptionalWhole = (value: string, min: number, max: number): number | null => {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed);
+  return Number.isInteger(parsed) && parsed >= min && parsed <= max ? parsed : Number.NaN;
+};
 
 const optionKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -222,6 +275,9 @@ const NewContract = () => {
   const [qty, setQty] = useState("");
   const [poTolerance, setPoTolerance] = useState("");
   const [deliveryType, setDeliveryType] = useState("");
+  // Optional approximate travel time loading -> delivery address, typed by hand.
+  const [travelDays, setTravelDays] = useState("");
+  const [travelHours, setTravelHours] = useState("");
   const [contractRate, setContractRate] = useState("");
   const [gstPercent, setGstPercent] = useState("5");
   const [gstDetails, setGstDetails] = useState("");
@@ -281,6 +337,8 @@ const NewContract = () => {
       qty: `${basicDetails.quantity ?? source.totalQuantityMT ?? fallback.qtyValue} ${basicDetails.quantityMeasure ?? fallback.quantityMeasure}`,
       poTolerance: String(basicDetails.poTolerancePercentage ?? source.tolerancePercentage ?? fallback.poTolerance),
       deliveryType: String(basicDetails.deliveryType ?? source.deliveryType ?? fallback.deliveryType),
+      approxTravelDays: asNumber(basicDetails.approxTravelDays ?? source.approxTravelDays, fallback.approxTravelDays ?? undefined) ?? null,
+      approxTravelHours: asNumber(basicDetails.approxTravelHours ?? source.approxTravelHours, fallback.approxTravelHours ?? undefined) ?? null,
       cRateValue: asNumber(basicDetails.contractRate ?? source.pricePerMT, fallback.cRateValue) ?? 0,
       gst:
         basicDetails.gstPercentage ?? source.gstPercentage ?? source.gstPercent
@@ -474,6 +532,76 @@ const { data: products } = useGetProductsQuery();
         })),
       [products],
     );
+    // Product features -> editable quality specs for the seller and the buyer (new contracts only; an edit keeps its saved specs untouched).
+    const isEditMode = !!navState?.isEdit;
+    const defaultFeatures = useMemo<FeatureSpec[]>(() => {
+      const product = (products ?? []).find((item) => String(item.id) === productId);
+      return (parseProductFeatures(product?.productFeatures ?? null).nutritionalSpecifications ?? [])
+        .filter((spec) => spec.parameter?.trim())
+        .map((spec) => ({
+          parameter: spec.parameter.trim(),
+          min: spec.min == null ? "" : String(spec.min),
+          max: spec.max == null ? "" : String(spec.max),
+        }));
+    }, [products, productId]);
+    const defaultFeaturesKey = JSON.stringify(defaultFeatures);
+    const [sellerSpecs, setSellerSpecs] = useState<FeatureSpec[]>([]);
+    const [buyerSpecs, setBuyerSpecs] = useState<FeatureSpec[]>([]);
+
+    // Reload both lists whenever the selected product (or its features) changes; a refetch with identical data keeps the user's edits.
+    useEffect(() => {
+      if (isEditMode) return;
+      setSellerSpecs(defaultFeatures.map((spec) => ({ ...spec })));
+      setBuyerSpecs(defaultFeatures.map((spec) => ({ ...spec })));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [defaultFeaturesKey, isEditMode]);
+
+    const patchSpec =
+      (setter: typeof setSellerSpecs) => (index: number, patch: Partial<Pick<FeatureSpec, "min" | "max">>) =>
+        setter((prev) => prev.map((spec, i) => (i === index ? { ...spec, ...patch } : spec)));
+
+    const renderFeatureSpecs = (side: "Seller" | "Buyer", specs: FeatureSpec[], setter: typeof setSellerSpecs) => (
+      <div className="form-field new-contract__grid--full">
+        <span className="form-field__label">Quality Specifications</span>
+        {!productId ? (
+          <p className="new-contract__feature-empty">Select a product to load its quality specifications.</p>
+        ) : specs.length === 0 ? (
+          <p className="new-contract__feature-empty">No quality features are defined for this product.</p>
+        ) : (
+          <div className="new-contract__features">
+            <div className="new-contract__feature-row new-contract__feature-head" aria-hidden>
+              <span>Parameter</span>
+              <span>Min</span>
+              <span>Max</span>
+            </div>
+            {specs.map((spec, index) => (
+              <div className="new-contract__feature-row" key={spec.parameter}>
+                <span className="new-contract__feature-name">{spec.parameter}</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  className="form-field__control"
+                  value={spec.min}
+                  placeholder="Min"
+                  aria-label={`${side} ${spec.parameter} minimum`}
+                  onChange={(event) => patchSpec(setter)(index, { min: event.target.value })}
+                />
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  className="form-field__control"
+                  value={spec.max}
+                  placeholder="Max"
+                  aria-label={`${side} ${spec.parameter} maximum`}
+                  onChange={(event) => patchSpec(setter)(index, { max: event.target.value })}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+
     const { data: businessProfiles } = useGetBusinessProfileSummaryQuery(undefined, {
       refetchOnMountOrArgChange: true,
     });
@@ -595,7 +723,8 @@ const { data: products } = useGetProductsQuery();
         sellerConditions.deliverySchedule === "forward-contract" ? sellerConditions.toDate : "skip",
       sellerSpecificDays:
         sellerConditions.deliverySchedule === "specific-days" ? sellerConditions.specificDays : "skip",
-      sellerQualitySpecSource: sellerConditions.qualitySpecSource,
+      // New contracts record the product's features instead of a spec source, so the source is only required when editing.
+      sellerQualitySpecSource: isEditMode ? sellerConditions.qualitySpecSource : "skip",
       sellerAddress: sellerConditions.address,
       buyerCommission: buyerConditions.commission,
       buyerDeliverySchedule: buyerConditions.deliverySchedule,
@@ -605,7 +734,7 @@ const { data: products } = useGetProductsQuery();
         buyerConditions.deliverySchedule === "forward-contract" ? buyerConditions.toDate : "skip",
       buyerSpecificDays:
         buyerConditions.deliverySchedule === "specific-days" ? buyerConditions.specificDays : "skip",
-      buyerQualitySpecSource: buyerConditions.qualitySpecSource,
+      buyerQualitySpecSource: isEditMode ? buyerConditions.qualitySpecSource : "skip",
       buyerAddress: buyerConditions.address,
       paymentTerms,
       paymentBeforeDate: paymentTerms === "100-advance" ? paymentBeforeDate : "skip",
@@ -631,6 +760,7 @@ const { data: products } = useGetProductsQuery();
       gstDetails,
       sellerConditions,
       buyerConditions,
+      isEditMode,
       paymentTerms,
       paymentBeforeDate,
       immediateAdvancePercent,
@@ -703,6 +833,24 @@ const { data: products } = useGetProductsQuery();
   if (!navState?.isEdit && isPastDate && !pastDateConfirmed) {
     setPastDateConfirmOpen(true);
     return;
+  }
+
+  if (Number.isNaN(parseOptionalWhole(travelDays, 0, 365))) {
+    setFormError("Approx. travel time: days must be a whole number from 0 to 365.");
+    return;
+  }
+  if (Number.isNaN(parseOptionalWhole(travelHours, 0, 23))) {
+    setFormError("Approx. travel time: hours must be a whole number from 0 to 23.");
+    return;
+  }
+
+  if (!isEditMode) {
+    const specError =
+      validateFeatureSpecs("Seller", sellerSpecs) || validateFeatureSpecs("Buyer", buyerSpecs);
+    if (specError) {
+      setFormError(specError);
+      return;
+    }
   }
 
   setFormError("");
@@ -794,6 +942,8 @@ const { data: products } = useGetProductsQuery();
         gstPercentage: Number(gstPercent) || 0,
         gstDetails: gstDetailsLabel,
         deliveryType: deliveryTypeLabel,
+        approxTravelDays: parseOptionalWhole(travelDays, 0, 365),
+        approxTravelHours: parseOptionalWhole(travelHours, 0, 23),
         currencyId: existingContract?.currencyId ?? 1,
         contractStatusId: existingContract?.contractStatusId ?? (status ? 2 : 1),
         sellerCommission: Number(sellerConditions.commission) || 0,
@@ -892,6 +1042,9 @@ const { data: products } = useGetProductsQuery();
         gstDetails: gstDetailsLabel,
         deliveryType: deliveryTypeLabel,
 
+        approxTravelDays: parseOptionalWhole(travelDays, 0, 365),
+        approxTravelHours: parseOptionalWhole(travelHours, 0, 23),
+
         currencyId: 1,
 
         contractStatusId: status ? 2 : 1,
@@ -933,7 +1086,7 @@ const { data: products } = useGetProductsQuery();
         //     unit: "",
         //   },
         // ],
-        sellerQualitySpecifications: [],
+        sellerQualitySpecifications: toSavePayload(Number(sellerId), sellerSpecs),
 
         buyerCommission:
           Number(buyerConditions.commission) || 0,
@@ -972,7 +1125,7 @@ const { data: products } = useGetProductsQuery();
         //     unit: "",
         //   },
         // ],
-        buyerQualitySpecifications: [],
+        buyerQualitySpecifications: toSavePayload(Number(buyerId), buyerSpecs),
 
         remarks: paymentRemarks || "",
 
@@ -1128,6 +1281,8 @@ const { data: products } = useGetProductsQuery();
       contract.deliveryType
     )
   );
+  setTravelDays(contract.approxTravelDays != null ? String(contract.approxTravelDays) : "");
+  setTravelHours(contract.approxTravelHours != null ? String(contract.approxTravelHours) : "");
 
   const savedGstDetails = /includ/i.test(contract.gstDetails ?? "") ? "including" : contract.gstDetails ? "excluding" : "";
   const savedGstPercent = contract.gst ? Number(String(contract.gst).replace("%", "")) || 0 : 5;
@@ -1439,6 +1594,40 @@ const { data: products } = useGetProductsQuery();
           </div>
 
           <div className="form-field">
+            <span className="form-field__label">Approx. Travel Time (Loading to Delivery)</span>
+            <div className="new-contract__travel">
+              <input
+                id="travelDays"
+                type="number"
+                min="0"
+                max="365"
+                step="1"
+                inputMode="numeric"
+                className="form-field__control"
+                placeholder="Days"
+                aria-label="Approximate travel time, days"
+                value={travelDays}
+                onChange={(event) => setTravelDays(event.target.value)}
+              />
+              <span>days</span>
+              <input
+                id="travelHours"
+                type="number"
+                min="0"
+                max="23"
+                step="1"
+                inputMode="numeric"
+                className="form-field__control"
+                placeholder="Hours"
+                aria-label="Approximate travel time, hours"
+                value={travelHours}
+                onChange={(event) => setTravelHours(event.target.value)}
+              />
+              <span>hrs</span>
+            </div>
+          </div>
+
+          <div className="form-field">
             <span className="form-field__label">
               Quantity Measure <span className="form-field__required">*</span>
             </span>
@@ -1696,6 +1885,7 @@ const { data: products } = useGetProductsQuery();
                 </div>
               )}
 
+              {isEditMode ? (
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">
                   Quality Spec Source <span className="form-field__required">*</span>
@@ -1708,6 +1898,9 @@ const { data: products } = useGetProductsQuery();
                   ariaLabel="Seller quality spec source"
                 />
               </div>
+              ) : (
+                renderFeatureSpecs("Seller", sellerSpecs, setSellerSpecs)
+              )}
 
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">
@@ -1816,6 +2009,7 @@ const { data: products } = useGetProductsQuery();
                 </div>
               )}
 
+              {isEditMode ? (
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">
                   Quality Spec Source <span className="form-field__required">*</span>
@@ -1828,6 +2022,9 @@ const { data: products } = useGetProductsQuery();
                   ariaLabel="Buyer quality spec source"
                 />
               </div>
+              ) : (
+                renderFeatureSpecs("Buyer", buyerSpecs, setBuyerSpecs)
+              )}
 
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">

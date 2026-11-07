@@ -454,6 +454,191 @@
     background: v.alpha(v.$color-danger, 0.1);
     color: v.shade(v.fg(v.$color-danger), 12%);
   }
+
+  // what the system did automatically while saving (trip marked Loaded, truck added to the contract)
+  &--info {
+    background: v.alpha(v.$color-info, 0.12);
+    color: v.fg(v.$color-primary);
+
+    ul {
+      margin: 0;
+    }
+  }
+}
+
+// ---------- trip selection dialog ----------
+.si-trips__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-4;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.si-trips {
+  width: min(62rem, 100%);
+  max-height: calc(100vh - #{v.$spacing-6});
+  display: flex;
+  flex-direction: column;
+  padding: v.$spacing-5;
+  border-radius: v.$radius-lg;
+  background: v.$color-white;
+  box-shadow: v.$shadow-lg;
+
+  &__title {
+    margin: 0;
+    font-size: v.$font-size-lg;
+    color: v.fg(v.$color-primary);
+  }
+
+  &__message {
+    margin: v.$spacing-2 0 v.$spacing-4;
+    font-size: v.$font-size-sm;
+    color: v.fg(v.$color-text-muted);
+  }
+
+  &__body {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+  }
+
+  &__group h3 {
+    margin: 0 0 v.$spacing-2;
+    font-size: v.$font-size-sm;
+    color: v.fg(v.$color-text);
+  }
+
+  &__note {
+    margin: 0 0 v.$spacing-2;
+    font-size: v.$font-size-sm;
+    color: v.fg(v.$color-text-muted);
+  }
+
+  // "create a new trip" choice, its set-up form and the steps to accept
+  &__new {
+    display: flex;
+    align-items: flex-start;
+    gap: v.$spacing-3;
+    margin-top: v.$spacing-3;
+    padding: v.$spacing-3;
+    border: 1px dashed v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    cursor: pointer;
+
+    span {
+      display: flex;
+      flex-direction: column;
+      font-size: v.$font-size-sm;
+    }
+
+    &.is-selected {
+      border-style: solid;
+      background: v.alpha(v.$color-info, 0.12);
+    }
+  }
+
+  &__setup {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+    margin-top: v.$spacing-3;
+    padding: v.$spacing-3;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+  }
+
+  &__fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: v.$spacing-3;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    min-width: 0;
+
+    label {
+      font-size: v.$font-size-sm;
+      color: v.fg(v.$color-text-muted);
+    }
+  }
+
+  &__modes {
+    display: flex;
+    gap: v.$spacing-4;
+    margin-bottom: v.$spacing-2;
+    font-size: v.$font-size-sm;
+  }
+
+  &__steps {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    font-size: v.$font-size-sm;
+
+    label {
+      display: flex;
+      align-items: flex-start;
+      gap: v.$spacing-2;
+      cursor: pointer;
+    }
+  }
+
+  &__table-wrap {
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: v.$font-size-sm;
+
+    th,
+    td {
+      padding: v.$spacing-2 v.$spacing-3;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid v.line(v.$color-border);
+    }
+
+    th {
+      background: v.$color-bg-muted;
+      color: v.fg(v.$color-text-muted);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      cursor: pointer;
+
+      &:hover td {
+        background: v.$color-bg-muted;
+      }
+
+      &.is-selected td {
+        background: v.alpha(v.$color-info, 0.12);
+      }
+
+      // a trip that already has an invoice: shown, not selectable
+      &.is-disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: v.$spacing-2;
+    margin-top: v.$spacing-4;
+  }
 }
 
 // sticky bar: the running total and Save are always in reach
@@ -520,4 +705,60 @@
   color: v.fg(v.$color-text-muted);
   font-size: max(11px, 0.75rem);
   white-space: nowrap;
+}
+
+// ---------- truck & driver details on an invoice row (truck not assigned to the contract) ----------
+.si-truck-details {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  padding: v.$spacing-3;
+  border: 1px dashed v.line(v.$color-border);
+  border-radius: v.$radius-md;
+
+  &__toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: v.$spacing-2;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    span {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: v.$spacing-3;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    min-width: 0;
+  }
+
+  &__modes {
+    display: flex;
+    gap: v.$spacing-4;
+    font-size: v.$font-size-sm;
+  }
+}
+
+// red asterisk for a mandatory field
+.si-req {
+  margin-left: 2px;
+  color: v.$color-danger;
+  font-weight: 700;
 }

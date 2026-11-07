@@ -102,7 +102,7 @@ export function hydrateDraftFromPromoterProfile(profile: PromoterProfileDetail):
       documentType: String(document.documentTypeId),
       documentNumber: document.documentNumber,
       issuingAuthorityName: document.issuingAuthority,
-      dateOfIssue: document.issuedDate.slice(0, 10),
+      dateOfIssue: document.issuedDate ? document.issuedDate.slice(0, 10) : "",
       fileName: document.fileName,
       fileError: "",
       meta: document.documentId

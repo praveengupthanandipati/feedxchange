@@ -44,6 +44,14 @@ export interface InvoiceRowInput {
   contractNumber: string;
   invoiceNumber: string;
   truckNumber: string;
+  /** The trip (dispatch) the invoice is for. Left out = the server works it out; sent after the user picks one in the trip dialog. */
+  contractDispatchId?: number | null;
+  /** The user chose "create a new trip for this invoice" (the truck is added to the contract as a Loaded trip). */
+  createNewTrip?: boolean;
+  /** Transporter (new trucks only) and driver for the new trip. */
+  tripSetup?: TripSetupInput | null;
+  /** The user accepted every step listed for the new trip. */
+  tripSetupAccepted?: boolean;
   numberOfBags?: number | null;
   invoiceQty: number;
   totalMTs?: number | null;
@@ -56,6 +64,79 @@ export interface InvoiceRowInput {
   roundOff?: number | null;
   remarks?: string;
   deductions: DeductionInput[];
+}
+
+export interface NewDriverInput {
+  driverName: string;
+  mobileNumber: string;
+  licenseNumber: string;
+  licenseExpiryDate?: string | null;
+}
+
+export interface TripSetupInput {
+  transporterProfileId?: number | null;
+  driverId?: number | null;
+  newDriver?: NewDriverInput | null;
+}
+
+/** What the user decided in the trip dialog for one invoice row. */
+export interface TripChoice {
+  /** Raise the invoice against this existing trip. */
+  contractDispatchId?: number;
+  /** ... or create a new trip (the steps were accepted). */
+  createNewTrip?: boolean;
+  accepted?: boolean;
+  tripSetup?: TripSetupInput;
+}
+
+export interface TripOption {
+  contractDispatchId: number;
+  tripNumber: string;
+  lrNumber: string | null;
+  tripDate: string;
+  source: string | null;
+  destination: string | null;
+  truckNumber: string;
+  dispatchStatus: string;
+  invoiceStatus: string;
+  quantityMT: number;
+  /** False for a trip that already has an invoice (shown for information only). */
+  selectable: boolean;
+  /** An Assigned trip: choosing it changes its status to Loaded. */
+  willBeMarkedLoaded: boolean;
+}
+
+/** An invoice row whose truck has several Loaded, not-yet-invoiced trips on the contract: the user must pick one. */
+export interface TripSelection {
+  rowNumber: number;
+  /** SelectLoadedTrip | ChooseTripOrNew | NewTrip */
+  kind: string;
+  contractNumber: string;
+  truckNumber: string;
+  message: string;
+  invoiceQtyMT: number;
+  allowCreateNew: boolean;
+  truckInMaster: boolean;
+  transporterProfileId?: number | null;
+  transporterName?: string | null;
+  /** The truck's regular driver, when it has one. */
+  mappedDriver?: { driverId: number; driverName: string; mobileNumber: string } | null;
+  trips: TripOption[];
+}
+
+/** Something the system did on the user's behalf while saving (trip marked Loaded, truck added to the contract, ...). */
+export interface InvoiceNotice {
+  rowNumber: number;
+  code: string;
+  message: string;
+}
+
+export interface SaveInvoicesResult {
+  invoices: Invoice[];
+  /** True when nothing was saved because at least one row needs a trip chosen (see tripSelections). */
+  requiresTripSelection?: boolean;
+  tripSelections?: TripSelection[];
+  notices?: InvoiceNotice[];
 }
 
 export interface SaveInvoicesPayload {
@@ -166,7 +247,7 @@ export const sellerInvoiceApi = createApi({
       query: (contractNumber) => `/api/SellerInvoices/GetContractDetails?contractNumber=${encodeURIComponent(contractNumber)}`,
       providesTags: ["Contracts"],
     }),
-    saveInvoices: builder.mutation<{ invoices: Invoice[] }, SaveInvoicesPayload>({
+    saveInvoices: builder.mutation<SaveInvoicesResult, SaveInvoicesPayload>({
       query: (body) => ({ url: "/api/SellerInvoices/SaveInvoices", method: "POST", body }),
       invalidatesTags: ["Invoices", "Contracts"],
     }),

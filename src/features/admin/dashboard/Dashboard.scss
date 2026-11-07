@@ -442,7 +442,7 @@
 // ============================================================
 // Home dashboard. Tinted pieces use the theme's tint tokens (--fx-tint-<hue>-*, see _themes.scss), so Light, Dark and
 // High contrast all work.
-@each $hue in (blue, teal, orange, purple, green) {
+@each $hue in ("blue", "teal", "orange", "purple", "green") {
   .home-kpi--#{$hue},
   .home-action--#{$hue} {
     --tint-bg: var(--fx-tint-#{$hue}-bg);

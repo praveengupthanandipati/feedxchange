@@ -1,5 +1,9 @@
+import { useMemo } from "react";
 import { LinkIcon, PlusIcon, SearchIcon, Trash2Icon } from "../../../../shared/components/icon";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
+import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
+import { useGetAllActiveDriversQuery } from "../../../../core/store/driversApi";
+import { useGetTransporterProfileSummaryQuery } from "../../../../core/store/transportersApi";
 import { calculateRow, createEmptyDeduction, money, validateRow, type DeductionEntry, type SellerInvoiceRow } from "./sellerInvoice.data";
 
 interface InvoiceBlockProps {
@@ -41,6 +45,12 @@ const InvoiceBlock = ({
 }: InvoiceBlockProps) => {
   const errors = validateRow(row);
   const amounts = calculateRow(row);
+
+  // truck / driver details for a truck that is not assigned yet: only loaded when the section is opened
+  const { data: transporters } = useGetTransporterProfileSummaryQuery(undefined, { skip: !row.notAssigned });
+  const { data: drivers } = useGetAllActiveDriversQuery(undefined, { skip: !row.notAssigned });
+  const transporterOptions = useMemo(() => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })), [transporters]);
+  const driverOptions = useMemo(() => (drivers ?? []).map((d) => ({ value: String(d.driverId), label: `${d.driverName} (${d.mobileNumber})` })), [drivers]);
   const contract = row.contract;
   const bad = (key: "invoiceNumber" | "truckNumber" | "invoiceQty" | "totalMts" | "roundedTotal" | "freight" | "invoiceAmount" | "gstPercent") => (showErrors && errors[key] ? " has-error" : "");
   const contractError = row.contractError || (showErrors ? errors.contractNumber : undefined) || (contract && !contract.canInvoice ? errors.contractNumber : undefined);
@@ -206,6 +216,69 @@ const InvoiceBlock = ({
           </div>,
         )}
         {field("Remarks", text("remarks", "Remarks"))}
+
+        {/* truck and driver details, for a truck that is not assigned to the contract (or not in the truck master yet) */}
+        <div className="si-truck-details">
+          <label className="si-truck-details__toggle">
+            <input type="checkbox" checked={row.notAssigned} onChange={(event) => onChange(row.id, { notAssigned: event.target.checked })} />
+            <span>
+              This truck is not assigned to the contract — enter the truck &amp; driver details
+              <small className="si-muted"> (the truck, driver and trip are only created after you confirm each step when saving)</small>
+            </span>
+          </label>
+
+          {row.notAssigned && (
+            <div className="si-truck-details__body">
+              <div className="si-truck-details__grid">
+                <div className="si-truck-details__field">
+                  <span className="si-f__label">Truck Number</span>
+                  <input className="si-input" readOnly tabIndex={-1} value={row.truckNumber} placeholder="Enter it in the Truck Number box above" aria-label="Truck number" />
+                </div>
+                <div className="si-truck-details__field">
+                  <span className="si-f__label">Transporter <span className="si-req" aria-hidden>*</span> <small className="si-muted">(for a truck not in the truck master)</small></span>
+                  <SearchableSelect options={transporterOptions} value={row.transporterId} onChange={(value) => onChange(row.id, { transporterId: value })} placeholder="Select transporter" ariaLabel={`Transporter (invoice ${index})`} />
+                </div>
+              </div>
+
+              <div className="si-truck-details__modes" role="radiogroup" aria-label={`Driver (invoice ${index})`}>
+                <label>
+                  <input type="radio" checked={row.driverMode === "existing"} onChange={() => onChange(row.id, { driverMode: "existing" })} /> Existing driver
+                </label>
+                <label>
+                  <input type="radio" checked={row.driverMode === "new"} onChange={() => onChange(row.id, { driverMode: "new" })} /> New driver
+                </label>
+              </div>
+
+              {row.driverMode === "existing" ? (
+                <div className="si-truck-details__grid">
+                  <div className="si-truck-details__field">
+                    <span className="si-f__label">Driver <span className="si-req" aria-hidden>*</span></span>
+                    <SearchableSelect options={driverOptions} value={row.driverId} onChange={(value) => onChange(row.id, { driverId: value })} placeholder="Select driver" ariaLabel={`Driver (invoice ${index})`} />
+                  </div>
+                </div>
+              ) : (
+                <div className="si-truck-details__grid">
+                  <div className="si-truck-details__field">
+                    <span className="si-f__label">Driver name <span className="si-req" aria-hidden>*</span></span>
+                    <input className="si-input" value={row.driverName} onChange={(event) => onChange(row.id, { driverName: event.target.value })} />
+                  </div>
+                  <div className="si-truck-details__field">
+                    <span className="si-f__label">Mobile number <span className="si-req" aria-hidden>*</span></span>
+                    <input className="si-input" inputMode="tel" value={row.driverMobile} onChange={(event) => onChange(row.id, { driverMobile: event.target.value })} />
+                  </div>
+                  <div className="si-truck-details__field">
+                    <span className="si-f__label">Licence number <small className="si-muted">(optional)</small></span>
+                    <input className="si-input" value={row.licenseNumber} onChange={(event) => onChange(row.id, { licenseNumber: event.target.value })} />
+                  </div>
+                  <div className="si-truck-details__field">
+                    <span className="si-f__label">Licence expiry (optional)</span>
+                    <input className="si-input" type="date" value={row.licenseExpiry} onChange={(event) => onChange(row.id, { licenseExpiry: event.target.value })} />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* the deductions: the next rows, on the same six columns */}
         {row.deductions.map((d) => {

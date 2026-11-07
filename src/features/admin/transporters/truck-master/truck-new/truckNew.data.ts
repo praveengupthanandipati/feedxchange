@@ -38,13 +38,13 @@ export const ownershipTypeOptions = [
 export const REGISTRATION_NUMBER_REGEX = /^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{4}$/;
 export const MIN_MANUFACTURE_YEAR = 1990;
 
+/** Strips spaces and upper-cases a truck (vehicle registration) number: "ap09 tc 1234" -> "AP09TC1234". */
 export function normalizeRegistrationNumber(value: string): string {
   return value.replace(/\s+/g, "").toUpperCase();
 }
 
 export interface NewTruckPayload {
   truckNumber: string;
-  registrationNumber: string;
   truckType: string;
   make: string;
   model: string;

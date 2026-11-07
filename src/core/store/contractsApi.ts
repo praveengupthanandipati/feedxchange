@@ -309,6 +309,8 @@ export interface PendingContractApiResponse {
     deliveryFromDate: string | null;
     deliveryToDate: string | null;
     calculatedStatus: string;
+    approxTravelDays?: number | null;
+    approxTravelHours?: number | null;
     gstPercentage?: number | null;
     netRate?: number | null;
     arrangedQuantity?: number | null;
@@ -316,7 +318,322 @@ export interface PendingContractApiResponse {
     pendingQuantity?: number | null;
   };
 }
+/* =========================
+   CONTRACT FULL DETAILS (GET /api/Contracts/GetContractFullDetails)
+========================= */
+
+type Nullable<T> = T | null;
+
+export interface ContractFullOverview {
+  contractId: number;
+  contractNumber: string;
+  status: Nullable<string>;
+  contractDate: string;
+  effectiveFrom: string;
+  effectiveTo: string;
+  productId: number;
+  productName: Nullable<string>;
+  productSku: Nullable<string>;
+  productDescription: Nullable<string>;
+  currencyCode: Nullable<string>;
+  currencySymbol: Nullable<string>;
+  totalQuantityMT: number;
+  minQuantityMT: number;
+  maxQuantityMT: number;
+  tolerancePercentage: number;
+  pricePerMT: number;
+  gstPercentage: Nullable<number>;
+  gstDetails: Nullable<string>;
+  gstAmountPerMT: number;
+  netRatePerMT: number;
+  deliveryType: Nullable<string>;
+  approxTravelDays: Nullable<number>;
+  approxTravelHours: Nullable<number>;
+  approvalRequired: boolean;
+  remarks: Nullable<string>;
+  createdBy: number;
+  createdByName: Nullable<string>;
+  createdOn: string;
+  modifiedBy: Nullable<number>;
+  modifiedByName: Nullable<string>;
+  modifiedOn: Nullable<string>;
+}
+
+export interface ContractFullSummary {
+  totalQuantityMT: number;
+  arrangedQuantityMT: number;
+  dispatchedQuantityMT: number;
+  pendingQuantityMT: number;
+  receivedQuantityMT: number;
+  rejectedQuantityMT: number;
+  truckCount: number;
+  trucksAssigned: number;
+  trucksLoaded: number;
+  trucksCancelled: number;
+  contractValue: number;
+  invoicedAmount: number;
+  invoicedGst: number;
+  invoiceTotal: number;
+  deductionsTotal: number;
+  paidAgainstInvoices: number;
+  receiptsTotal: number;
+  refundsTotal: number;
+  outstandingAmount: number;
+  invoiceCount: number;
+  receiptCount: number;
+}
+
+export interface ContractFullAddress {
+  addressId: number;
+  officeName: Nullable<string>;
+  landmark: Nullable<string>;
+  city: Nullable<string>;
+  district: Nullable<string>;
+  stateName: Nullable<string>;
+  pincode: Nullable<string>;
+  googleLocationUrl: Nullable<string>;
+  fullAddress: string;
+}
+
+export interface ContractFullContact {
+  contactType: Nullable<string>;
+  contactPerson: Nullable<string>;
+  designation: Nullable<string>;
+  mobileNumber: Nullable<string>;
+  emailId: Nullable<string>;
+  isUnloadingContact: boolean;
+}
+
+export interface ContractFullBankAccount {
+  bankAccountId: number;
+  bankName: Nullable<string>;
+  accountHolderName: Nullable<string>;
+  accountNumberMasked: Nullable<string>;
+  ifscCode: Nullable<string>;
+  branchName: Nullable<string>;
+  accountType: Nullable<string>;
+  isPrimary: boolean;
+}
+
+export interface ContractFullParty {
+  profileId: number;
+  legalName: Nullable<string>;
+  tradingName: Nullable<string>;
+  profileType: Nullable<string>;
+  panNumber: Nullable<string>;
+  gstNumber: Nullable<string>;
+  emailId: Nullable<string>;
+  mobileNumber: Nullable<string>;
+  alternativeContactNumber: Nullable<string>;
+  status: Nullable<string>;
+  contractAddress: Nullable<ContractFullAddress>;
+  contacts: ContractFullContact[];
+  bankAccounts: ContractFullBankAccount[];
+}
+
+export interface ContractFullQualitySpec {
+  parameter: Nullable<string>;
+  minValue: Nullable<number>;
+  maxValue: Nullable<number>;
+  unit: Nullable<string>;
+}
+
+export interface ContractFullConditions {
+  commission: number;
+  deliverySchedule: Nullable<string>;
+  specificDays: Nullable<number>;
+  fromDate: Nullable<string>;
+  toDate: Nullable<string>;
+  qualitySpecSource: Nullable<string>;
+  remarksSpecialConditions: Nullable<string>;
+  qualitySpecifications: ContractFullQualitySpec[];
+}
+
+export interface ContractFullPaymentTerms {
+  paymentTermName: Nullable<string>;
+  paymentBeforeDate: Nullable<string>;
+  sellerPaymentDueDays: Nullable<number>;
+  buyerPaymentDueDays: Nullable<number>;
+  immediateAdvancePercentage: Nullable<number>;
+  immediateAdvanceDate: Nullable<string>;
+  balanceAdvancePercentage: Nullable<number>;
+  balanceAdvanceDate: Nullable<string>;
+  remarks: Nullable<string>;
+}
+
+export interface ContractFullStatusHistory {
+  oldStatus: Nullable<string>;
+  newStatus: Nullable<string>;
+  changedByName: Nullable<string>;
+  changedOn: Nullable<string>;
+  remarks: Nullable<string>;
+}
+
+export interface ContractFullScheduleTransporter {
+  transporterName: Nullable<string>;
+  responseStatus: Nullable<string>;
+  offeredQuantityMT: Nullable<number>;
+  acceptedQuantityMT: Nullable<number>;
+  cancelledQuantityMT: Nullable<number>;
+  offeredFreightPerMT: Nullable<number>;
+  acceptedFreightPerMT: Nullable<number>;
+  negotiated: boolean;
+  responseDateTime: Nullable<string>;
+  responseRemarks: Nullable<string>;
+}
+
+export interface ContractFullSchedule {
+  dispatchScheduleId: number;
+  scheduleDateTime: string;
+  quantityMT: number;
+  remainingQuantityMT: number;
+  fromAddress: Nullable<string>;
+  toAddress: Nullable<string>;
+  status: Nullable<string>;
+  freightPerMT: Nullable<number>;
+  autoApprove: boolean;
+  remarks: Nullable<string>;
+  transporters: ContractFullScheduleTransporter[];
+}
+
+export interface ContractFullTruckReceipt {
+  receivedDate: Nullable<string>;
+  receivedQuantity: Nullable<number>;
+  rejectedQuantity: Nullable<number>;
+  acceptedQuantity: Nullable<number>;
+  warehouse: Nullable<string>;
+  remarks: Nullable<string>;
+}
+
+export interface ContractFullTruck {
+  contractDispatchId: number;
+  assignmentType: Nullable<string>;
+  transporterName: Nullable<string>;
+  truckNumber: Nullable<string>;
+  truckType: Nullable<string>;
+  truckCapacity: Nullable<number>;
+  driverName: Nullable<string>;
+  driverMobile: Nullable<string>;
+  licenseNumber: Nullable<string>;
+  assignedOn: string;
+  lrNumber: Nullable<string>;
+  quantityMT: number;
+  freightPerMT: number;
+  freightAmount: number;
+  fromAddress: Nullable<string>;
+  toAddress: Nullable<string>;
+  status: Nullable<string>;
+  chainLevel: number;
+  isReassigned: boolean;
+  busyUntil: Nullable<string>;
+  receipts: ContractFullTruckReceipt[];
+  statusEvents: { status: Nullable<string>; createdOn: string }[];
+}
+
+export interface ContractFullInvoice {
+  invoiceId: number;
+  invoiceNumber: Nullable<string>;
+  invoiceDate: Nullable<string>;
+  financialYear: Nullable<string>;
+  status: Nullable<string>;
+  truckNumber: Nullable<string>;
+  quantityMT: number;
+  pricePerMT: number;
+  invoiceAmount: number;
+  gstPercent: Nullable<number>;
+  gstAmount: number;
+  freightAmount: number;
+  roundOff: number;
+  totalAmount: number;
+  numberOfBags: Nullable<number>;
+  deductionsTotal: number;
+  paidAmount: number;
+  allocatedFromReceipts: number;
+  balanceAmount: number;
+  remarks: Nullable<string>;
+  deductions: { deductionDate: string; amount: number; isTdsTcs: boolean; remarks: Nullable<string> }[];
+  payments: {
+    amountPaid: number;
+    paymentMode: Nullable<string>;
+    paymentReference: Nullable<string>;
+    paymentStatus: Nullable<string>;
+    paidDate: Nullable<string>;
+  }[];
+}
+
+export interface ContractFullReceipt {
+  receiptId: number;
+  receiptNumber: Nullable<string>;
+  kind: Nullable<string>;
+  receiptDate: string;
+  paymentMode: Nullable<string>;
+  reference: Nullable<string>;
+  bankName: Nullable<string>;
+  amount: number;
+  towards: Nullable<string>;
+  status: Nullable<string>;
+  remarks: Nullable<string>;
+  allocatedToThisContract: number;
+  allocations: {
+    invoiceNumber: Nullable<string>;
+    allocationType: Nullable<string>;
+    amount: number;
+    status: Nullable<string>;
+    allocatedOn: string;
+  }[];
+}
+
+export interface ContractFullRefund {
+  refundId: number;
+  receiptNumber: Nullable<string>;
+  refundDate: string;
+  paymentMode: Nullable<string>;
+  reference: Nullable<string>;
+  amount: number;
+  status: Nullable<string>;
+  remarks: Nullable<string>;
+}
+
+export interface ContractFullDetails {
+  overview: ContractFullOverview;
+  summary: ContractFullSummary;
+  seller: ContractFullParty;
+  buyer: ContractFullParty;
+  sellerConditions: ContractFullConditions;
+  buyerConditions: ContractFullConditions;
+  paymentTerms: Nullable<ContractFullPaymentTerms>;
+  statusHistory: ContractFullStatusHistory[];
+  schedules: ContractFullSchedule[];
+  trucks: ContractFullTruck[];
+  invoices: ContractFullInvoice[];
+  receipts: ContractFullReceipt[];
+  refunds: ContractFullRefund[];
+  documents: {
+    documentType: Nullable<string>;
+    documentName: Nullable<string>;
+    filePath: Nullable<string>;
+    version: Nullable<number>;
+    uploadedAt: Nullable<string>;
+  }[];
+  notifications: {
+    channel: Nullable<string>;
+    status: Nullable<string>;
+    sentOn: Nullable<string>;
+    remarks: Nullable<string>;
+  }[];
+}
+
 /*save contract request interface*/
+/** One quality specification row. Send `parameterId`, or `parameterId: 0` with the feature name in `parameter` and the server resolves it. */
+export interface SaveQualitySpecification {
+  profileId: number;
+  parameterId: number;
+  parameter?: string;
+  minValue: number | null;
+  maxValue: number | null;
+  unit: string;
+}
+
 export interface SaveContractRequest {
   contractNumber: string;
   sellerId: number;
@@ -334,6 +651,9 @@ export interface SaveContractRequest {
   pricePerMT: number;
   currencyId: number;
   contractStatusId: number;
+  /** Optional approximate travel time loading -> delivery address (days 0-365, hours 0-23); null = not given. */
+  approxTravelDays?: number | null;
+  approxTravelHours?: number | null;
 
   sellerCommission: number;
   sellerDeliverySchedule: string;
@@ -343,13 +663,7 @@ export interface SaveContractRequest {
   loadingAddressId: number;
   sellerRemarksSpecialConditions: string;
 
-  sellerQualitySpecifications: {
-    profileId: number;
-    parameterId: number;
-    minValue: number;
-    maxValue: number;
-    unit: string;
-  }[];
+  sellerQualitySpecifications: SaveQualitySpecification[];
 
   buyerCommission: number;
   buyerDeliverySchedule: string;
@@ -359,13 +673,7 @@ export interface SaveContractRequest {
   deliveryAddressId: number;
   buyerRemarksSpecialConditions: string;
 
-  buyerQualitySpecifications: {
-    profileId: number;
-    parameterId: number;
-    minValue: number;
-    maxValue: number;
-    unit: string;
-  }[];
+  buyerQualitySpecifications: SaveQualitySpecification[];
 
   remarks: string;
   approvalRequired: boolean;
@@ -621,6 +929,16 @@ updateContract: builder.mutation<unknown, UpdateContractRequest>({
       transformResponse: (payload: unknown) => unwrapObject<GetContractDto>(payload) as GetContractDto,
     }),
 
+    /** Everything about one contract in a single call (parties, trucks, invoices, payments, history ...). */
+    getContractFullDetails: builder.query<ContractFullDetails, string>({
+      query: (contractNo) => ({
+        url: "/api/Contracts/GetContractFullDetails",
+        method: "GET",
+        params: { contractNo },
+      }),
+      transformResponse: (payload: unknown) => unwrapObject<ContractFullDetails>(payload) as ContractFullDetails,
+    }),
+
     getAllOpenAndPendingContracts: builder.query<OpenAndPendingContract[], void>({
       query: () => ({
         url: "/api/Contracts/GetAllOpenAndPendingContracts",
@@ -668,6 +986,7 @@ export const {
   useGetAllContractsByFiltersQuery,
   useLazyGetAllContractsByFiltersQuery,
   useGetContractByContractNumberQuery,
+  useGetContractFullDetailsQuery,
   useLazyGetContractByContractNumberQuery,
   useGetAllOpenAndPendingContractsQuery,
   useLazyGetAllOpenAndPendingContractsQuery,

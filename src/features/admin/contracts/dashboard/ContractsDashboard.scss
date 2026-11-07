@@ -25,7 +25,7 @@
 
 // Everything below is scoped to the overview: the Open & Pending Contracts page uses some of the same cd-* class names.
 .contracts-dashboard {
-  @each $hue in (blue, teal, green, orange, amber, red, purple) {
+  @each $hue in ("blue", "teal", "green", "orange", "amber", "red", "purple") {
     .cd-tint--#{$hue} {
       --tint-bg: var(--fx-tint-#{$hue}-bg);
       --tint-border: var(--fx-tint-#{$hue}-border);

@@ -42,6 +42,7 @@
     color: v.on(v.$color-white)!important;
     font-size: v.$font-size-sm;
     text-align: left;
+    vertical-align: middle;
     white-space: nowrap;
     user-select: none;
 
@@ -55,8 +56,17 @@
   }
 
   &__header-label {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    gap: v.$spacing-1;
+    min-height: 1.5rem; // same height with or without a tooltip icon, so every heading shares one baseline
+    line-height: 1;
+  }
+
+  th .info-tooltip {
+    min-width: 0;
+    min-height: 0;
+    margin-left: 0;
   }
 
   &__sort-icons {

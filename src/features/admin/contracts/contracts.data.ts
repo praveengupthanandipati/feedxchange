@@ -51,6 +51,8 @@ export interface Contract {
   rateRemarks: string;
   gstDetails?: string;
   deliveryType: string;
+  approxTravelDays?: number | null;
+  approxTravelHours?: number | null;
   paymentTerms: string;
   paymentBeforeDate: string;
   immediateAdvancePercent: string;

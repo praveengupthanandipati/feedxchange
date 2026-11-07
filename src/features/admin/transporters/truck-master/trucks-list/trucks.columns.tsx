@@ -31,11 +31,6 @@ export function buildTruckColumns({ onEdit, onView, onDelete }: ColumnHandlers):
       ),
     },
     {
-      key: "registrationNumber",
-      header: "Reg. No",
-      sortable: true,
-    },
-    {
       key: "truckType",
       header: "Truck Type",
       sortable: true,

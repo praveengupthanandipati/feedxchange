@@ -2,11 +2,11 @@
 @use "../../../../../shared/assets/styles/mixins" as m;
 
 $tones: (
-  navy: v.$color-navy,
-  blue: v.token("sky-63"),
-  green: v.token("teal-48"),
-  orange: v.token("amber-62"),
-  red: v.$color-danger,
+  "navy": v.$color-navy,
+  "blue": v.token("sky-63"),
+  "green": v.token("teal-48"),
+  "orange": v.token("amber-62"),
+  "red": v.$color-danger,
 );
 
 .update-dispatch {

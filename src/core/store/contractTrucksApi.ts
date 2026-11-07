@@ -416,6 +416,38 @@ export interface UpdateContractTruckStatusPayload {
   modifiedBy: number;
 }
 
+export interface BusyTruck {
+  truckId: number;
+  truckNumber: string | null;
+  contractDispatchId: number;
+  contractId: number;
+  contractNumber: string | null;
+  assignedOn: string;
+  approxTravelDays: number | null;
+  approxTravelHours: number | null;
+  /** AssignedOn + approx. travel time; null = busy until the dispatch is marked Loaded or Cancelled. */
+  busyUntil: string | null;
+}
+
+const normalizeTruckKey = (value: string | null | undefined) => (value ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+/** The busy-truck entry for a selected truck (an id from the list, or a typed truck number), if it is on another trip. */
+export function findBusyTruck(busyTrucks: BusyTruck[] | undefined, value: string): BusyTruck | undefined {
+  if (!value) return undefined;
+  const key = normalizeTruckKey(value);
+  return (busyTrucks ?? []).find((b) => String(b.truckId) === value || (!!key && normalizeTruckKey(b.truckNumber) === key));
+}
+
+/** "This truck is already on another trip ..." message shown when a busy truck is selected. */
+export function describeBusyTruck(busy: BusyTruck): string {
+  const trip = `contract ${busy.contractNumber ?? busy.contractId}, dispatch ${busy.contractDispatchId}`;
+  if (busy.busyUntil) {
+    const until = new Date(busy.busyUntil).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+    return `${busy.truckNumber ?? "This truck"} is already on another trip (${trip}) and is busy until about ${until}. It can be assigned again after that, or sooner once that trip is marked Loaded or Cancelled.`;
+  }
+  return `${busy.truckNumber ?? "This truck"} is already on another trip (${trip}). It can be assigned again once that trip is marked Loaded or Cancelled.`;
+}
+
 export const contractTrucksApi = createApi({
   reducerPath: "contractTrucksApi",
 
@@ -570,6 +602,16 @@ export const contractTrucksApi = createApi({
       providesTags: ["ContractTruck"],
     }),
 
+    /** Trucks that cannot take a new trip now: on an Assigned dispatch (until Loaded / Cancelled, or until the contract's approx. travel time has elapsed). */
+    getBusyTrucks: builder.query<BusyTruck[], void>({
+      query: () => ({
+        url: "/api/ContractTrucks/GetBusyTrucks",
+        method: "GET",
+      }),
+      transformResponse: unwrapArray<BusyTruck>,
+      providesTags: ["ContractTruck"],
+    }),
+
     getContractTruckDispatchStatuses: builder.query<ContractTruckDispatchStatus[], void>({
       query: () => ({
         url: "/api/ContractTrucks/GetContractTruckDispatchStatuses",
@@ -608,5 +650,6 @@ export const {
   useGetContractTruckChainOverviewQuery,
   useGetAllTrucksByContractQuery,
   useGetContractTruckDispatchStatusesQuery,
+  useGetBusyTrucksQuery,
   useGetDispatchScheduleTransportersQuery,
 } = contractTrucksApi;

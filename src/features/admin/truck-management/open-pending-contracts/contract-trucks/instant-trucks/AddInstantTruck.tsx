@@ -16,7 +16,7 @@ import {
 } from "../../../../../../core/store/contractsApi";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../../core/store/transportersApi";
 import { useAddTruckDetailsMutation, useGetAllActiveTruckDetailsQuery } from "../../../../../../core/store/trucksApi";
-import { getApiErrorMessage, useAddContractTrucksMutation } from "../../../../../../core/store/contractTrucksApi";
+import { describeBusyTruck, findBusyTruck, getApiErrorMessage, useAddContractTrucksMutation, useGetBusyTrucksQuery } from "../../../../../../core/store/contractTrucksApi";
 import "../../../assign-transports/Assigntransports.scss";
 import "../../../assign-transports/instant-truck-assignment/InstantTruckAssignment.scss";
 import "../contractDispatch.shared.scss";
@@ -110,10 +110,13 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
     () => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })),
     [transporters],
   );
+  // Every truck is listed; picking one that is still on an Assigned trip (until Loaded / Cancelled or its approx. travel time is over) shows a message and blocks saving.
+  const { data: busyTrucks } = useGetBusyTrucksQuery(undefined, { refetchOnMountOrArgChange: true });
   const truckOptions = useMemo(
     () => (trucks ?? []).map((t) => ({ value: String(t.truckId), label: t.truckNumber })),
     [trucks],
   );
+  const selectedBusyTruck = findBusyTruck(busyTrucks, form.truck);
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -142,6 +145,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
 
     if (!form.transporter) nextErrors.transporter = "Select a transporter.";
     if (!form.truck) nextErrors.truck = "Select a truck.";
+    else if (selectedBusyTruck) nextErrors.truck = describeBusyTruck(selectedBusyTruck);
     if (!form.driverName.trim()) nextErrors.driverName = "Driver name is required.";
 
     if (!form.driverPhone.trim()) {
@@ -201,7 +205,6 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
     await addTruckDetails({
       profileId: Number(form.transporter),
       truckNumber,
-      registrationNumber: truckNumber,
       truckType: "",
       make: "",
       model: "",
@@ -349,7 +352,9 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
             ariaLabel="Select Truck"
             allowCustom
           />
-          {errors.truck && <p className="assign-truck-drawer__error">{errors.truck}</p>}
+          {(errors.truck || selectedBusyTruck) && (
+            <p className="assign-truck-drawer__error">{errors.truck || (selectedBusyTruck && describeBusyTruck(selectedBusyTruck))}</p>
+          )}
         </div>
 
         <DriverSelectFields

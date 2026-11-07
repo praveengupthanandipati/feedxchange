@@ -67,6 +67,7 @@ export function hydrateDraftFromTransporterProfile(profile: TransporterProfileDe
     cityBranch: account.branchName,
     ifscError: "",
     isPrimaryAccount: account.isPrimaryAccount,
+    proofFileName: account.chequeFileName ?? "",
     meta: account.bankAccountId
       ? { bankAccountId: account.bankAccountId, createdBy: account.createdBy, createdOn: account.createdOn }
       : undefined,
@@ -136,6 +137,7 @@ export function hydrateDraftFromTransporterProfile(profile: TransporterProfileDe
       bankName: row.bankName,
       cityBranch: row.cityBranch,
       ifscError: row.ifscError,
+      proofFileName: row.proofFileName,
       meta: row.meta,
     })),
     primaryBankId: primaryBank ? primaryBank.id : (bankRows[0]?.id ?? null),
@@ -144,7 +146,7 @@ export function hydrateDraftFromTransporterProfile(profile: TransporterProfileDe
       documentType: String(document.documentTypeId),
       documentNumber: document.documentNumber,
       issuingAuthorityName: document.issuingAuthority,
-      issuedDate: document.issuedDate.slice(0, 10),
+      issuedDate: document.issuedDate ? document.issuedDate.slice(0, 10) : "",
       fileName: document.fileName,
       fileError: "",
       meta: document.documentId

@@ -56,7 +56,8 @@ export const useSaveDocumentsStep = (nextPath: string) => {
           documentNumber: document.documentNumber,
           fileName: document.fileName,
           issuingAuthority: document.issuingAuthorityName,
-          issuedDate: document.dateOfIssue,
+          // Optional: a blank date is sent as null (an empty string cannot be read as a date by the API).
+          issuedDate: document.dateOfIssue || null,
           ...fileFields,
           isVerified: false,
           verifiedBy: 0,

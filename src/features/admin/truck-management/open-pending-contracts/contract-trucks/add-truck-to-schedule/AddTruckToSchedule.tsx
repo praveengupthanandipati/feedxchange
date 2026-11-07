@@ -17,12 +17,16 @@ import {
   useGetTruckAssignmentTypesQuery,
 } from "../../../../../../core/store/contractsApi";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../../core/store/transportersApi";
-import { useGetAllActiveTruckDetailsQuery } from "../../../../../../core/store/trucksApi";
+import { useAddTruckDetailsMutation, useGetAllActiveTruckDetailsQuery } from "../../../../../../core/store/trucksApi";
 import DriverSelectFields from "../../../contract-trucks/DriverSelectFields";
 import {
   useGetScheduleTrucksDispatchDetailsQuery,
   useAddMultipleTrucksMutation,
   useGetAllTrucksByContractQuery,
+  useGetBusyTrucksQuery,
+  getApiErrorMessage,
+  findBusyTruck,
+  describeBusyTruck,
 } from "../../../../../../core/store/contractTrucksApi";
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
 import { formatApiDateTime, parseApiDateTime } from "../../../../../../shared/utils/apiDateTime";
@@ -91,7 +95,8 @@ const AddTruckToScheduleForm = ({
 
   const { data: assignmentTypes } = useGetTruckAssignmentTypesQuery();
   const { data: transporters } = useGetTransporterProfileSummaryQuery();
-  const { data: trucks } = useGetAllActiveTruckDetailsQuery();
+  const { data: trucks, refetch: refetchTrucks } = useGetAllActiveTruckDetailsQuery();
+  const [addTruckDetails, { isLoading: addingTruck }] = useAddTruckDetailsMutation();
   const [addMultipleTrucks, { isLoading: saving }] = useAddMultipleTrucksMutation();
   const notify = useNotifyPrompt();
 
@@ -105,6 +110,8 @@ const AddTruckToScheduleForm = ({
   const transporterName =
     transporters?.find((t) => t.profileId === transporterId)?.legalName ?? `Transporter #${transporterId}`;
 
+  // Every truck is listed; picking one that is still on an Assigned trip (until Loaded / Cancelled or its approx. travel time is over) shows a message and blocks saving.
+  const { data: busyTrucks } = useGetBusyTrucksQuery(undefined, { refetchOnMountOrArgChange: true });
   const truckOptions = useMemo(
     () => (trucks ?? []).map((t) => ({ value: String(t.truckId), label: t.truckNumber })),
     [trucks],
@@ -163,8 +170,11 @@ const AddTruckToScheduleForm = ({
 
       if (!row.truck) {
         rowError.truck = "Select a truck.";
-      } else if (rows.some((other) => other.id !== row.id && other.truck === row.truck)) {
+      } else if (rows.some((other) => other.id !== row.id && normalizeTruckNumber(other.truck) === normalizeTruckNumber(row.truck))) {
         rowError.truck = "This truck is already in another row.";
+      } else {
+        const busy = findBusyTruck(busyTrucks, row.truck);
+        if (busy) rowError.truck = describeBusyTruck(busy);
       }
       if (!row.driverName.trim()) rowError.driverName = "Driver name is required.";
 
@@ -196,6 +206,37 @@ const AddTruckToScheduleForm = ({
     return { rowErrors, total };
   };
 
+  const normalizeTruckNumber = (value: string) => value.replace(/[^a-z0-9]/gi, "").toUpperCase();
+
+  /**
+   * The truck's id. A number typed in (not in the truck master) is first added to the master under the schedule's transporter
+   * with only its number; the transporter fills in the remaining truck details later from their login.
+   */
+  const resolveTruckId = async (value: string, currentUserId: number): Promise<number> => {
+    if (truckOptions.some((option) => option.value === value)) return Number(value);
+    const truckNumber = value.trim().toUpperCase();
+    const existing = (trucks ?? []).find((truck) => normalizeTruckNumber(truck.truckNumber) === normalizeTruckNumber(truckNumber));
+    if (existing) return existing.truckId;
+
+    await addTruckDetails({
+      profileId: detail!.transporterProfileId,
+      truckNumber,
+      truckType: "",
+      make: "",
+      model: "",
+      manufactureYear: 0,
+      capacity: 0,
+      capacityUnit: "",
+      fuelType: "",
+      ownershipType: "",
+      actionPerformedBy: currentUserId,
+    }).unwrap();
+    const refreshed = await refetchTrucks().unwrap();
+    const created = refreshed.find((truck) => normalizeTruckNumber(truck.truckNumber) === normalizeTruckNumber(truckNumber));
+    if (!created) throw new Error(`Truck ${truckNumber} was added but could not be found in the truck list.`);
+    return created.truckId;
+  };
+
   const handleSave = async () => {
     if (!detail || !scheduleTypeId) return;
 
@@ -209,6 +250,17 @@ const AddTruckToScheduleForm = ({
     // Every truck goes out at the time the schedule request was made for.
     const assignedOn = (parseApiDateTime(detail.scheduleDateTime) ?? new Date()).toISOString();
 
+    // Trucks typed in that are not in the master are added first (under the schedule's transporter), then everything is assigned.
+    let truckIds: number[];
+    try {
+      truckIds = [];
+      for (const row of rows) truckIds.push(await resolveTruckId(row.truck, currentUserId));
+    } catch (error) {
+      const data = (error as { data?: unknown } | undefined)?.data;
+      setSubmitError(getApiErrorMessage(data) || "The new truck number could not be added. Please try again.");
+      return;
+    }
+
     try {
       const succeeded = await addMultipleTrucks({
         contractId: detail.contractId,
@@ -221,8 +273,8 @@ const AddTruckToScheduleForm = ({
         dispatchStatusId: DEFAULT_DISPATCH_STATUS_ID,
         createdBy: currentUserId,
         createdOn: new Date().toISOString(),
-        trucks: rows.map((row) => ({
-          truckId: Number(row.truck),
+        trucks: rows.map((row, index) => ({
+          truckId: truckIds[index],
           driverId: Number(row.driverName),
           assignedOn,
           lrNumber: row.lrNumber.trim(),
@@ -321,10 +373,15 @@ const AddTruckToScheduleForm = ({
                   options={truckOptions.filter((option) => !takenTrucks.includes(option.value))}
                   value={row.truck}
                   onChange={(value) => updateRow(row.id, { truck: value })}
-                  placeholder="Select Truck"
+                  placeholder="Select or type a truck number"
                   ariaLabel="Select Truck"
+                  allowCustom
                 />
-                {rowErrors.truck && <p className="assign-truck-drawer__error">{rowErrors.truck}</p>}
+                {(() => {
+                  const busy = findBusyTruck(busyTrucks, row.truck);
+                  const message = rowErrors.truck || (busy ? describeBusyTruck(busy) : "");
+                  return message ? <p className="assign-truck-drawer__error">{message}</p> : null;
+                })()}
               </div>
 
               <DriverSelectFields
@@ -403,9 +460,9 @@ const AddTruckToScheduleForm = ({
       {submitError && <p className="assign-truck-drawer__error">{submitError}</p>}
 
       <div className="assign-truck-drawer__footer">
-        <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving}>
+        <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving || addingTruck}>
           <SaveIcon aria-hidden />{" "}
-          {saving ? "Saving…" : rows.length > 1 ? "Add all trucks" : "Add truck"}
+          {saving || addingTruck ? "Saving…" : rows.length > 1 ? "Add all trucks" : "Add truck"}
         </button>
       </div>
     </div>

@@ -57,7 +57,6 @@ const TrucksList = () => {
   const rows = useMemo(() => data ?? [], [data]);
 
   const [truckNumber, setTruckNumber] = useState("");
-  const [registrationNumber, setRegistrationNumber] = useState("");
   const [truckType, setTruckType] = useState("All");
   const [make, setMake] = useState("All");
   const [model, setModel] = useState("All");
@@ -137,19 +136,13 @@ const TrucksList = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [truckNumber, registrationNumber, truckType, make, model, manufactureYear, capacity, fuelType]);
+  }, [truckNumber, truckType, make, model, manufactureYear, capacity, fuelType]);
 
   const filteredRows = useMemo(() => {
     const truckNumberQuery = truckNumber.trim().toLowerCase();
-    const registrationNumberQuery = registrationNumber.trim().toLowerCase();
 
     return rows.filter((row) => {
       if (truckNumberQuery && !row.truckNumber.toLowerCase().includes(truckNumberQuery)) return false;
-      if (
-        registrationNumberQuery &&
-        !row.registrationNumber.toLowerCase().includes(registrationNumberQuery)
-      )
-        return false;
       if (truckType !== "All" && row.truckType !== truckType) return false;
       if (make !== "All" && row.make !== make) return false;
       if (model !== "All" && row.model !== model) return false;
@@ -159,7 +152,7 @@ const TrucksList = () => {
 
       return true;
     });
-  }, [rows, truckNumber, registrationNumber, truckType, make, model, manufactureYear, capacity, fuelType]);
+  }, [rows, truckNumber, truckType, make, model, manufactureYear, capacity, fuelType]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -226,8 +219,6 @@ const TrucksList = () => {
           <TrucksFilters
             truckNumber={truckNumber}
             onTruckNumberChange={setTruckNumber}
-            registrationNumber={registrationNumber}
-            onRegistrationNumberChange={setRegistrationNumber}
             truckType={truckType}
             onTruckTypeChange={setTruckType}
             truckTypeOptions={truckTypeOptions}

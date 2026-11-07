@@ -74,8 +74,8 @@ export interface DocumentPayload {
   documentNumber: string;
   fileName: string;
   issuingAuthority: string;
-  issuedDate: string;
-  expiryDate: string;
+  issuedDate: string | null;
+  expiryDate: string | null;
 }
 
 export interface CapacityRequirementPayload {

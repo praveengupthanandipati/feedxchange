@@ -30,7 +30,7 @@ export interface BankRow {
   bankName: string;
   branchIfsc: string;
   isPrimary: boolean;
-  /** Bank proof (cancelled cheque / passbook): not in the bank account API yet, so empty until the backend adds it. */
+  /** Bank proof (cancelled cheque): the file uploaded with the bank account, if any. */
   proofFileName?: string;
   proofFileUrl?: string;
 }
@@ -132,6 +132,8 @@ export function mapTransporterProfileDetail(profile: TransporterProfileDetail): 
       bankName: account.bankName,
       branchIfsc: joinNonEmpty([account.branchName, account.ifscCode]),
       isPrimary: account.isPrimaryAccount,
+      proofFileName: account.chequeFileName ?? undefined,
+      proofFileUrl: account.chequeFilePath ? fileUrl(account.chequeFilePath) : undefined,
     })),
     documents: (profile.documents ?? []).map((document, index) => ({
       id: String(document.documentId),

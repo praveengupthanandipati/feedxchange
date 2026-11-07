@@ -12,13 +12,16 @@ import {
   type CreateBusinessBuySellChargeEntry,
   type UpdateBusinessBuySellChargePayload,
 } from "../../../../../core/store/businessProfilesApi";
+import { getApiErrorMessage } from "../../../../../core/store/contractTrucksApi";
 import { useEnableAutoNotifications } from "../../../notification-preferences/useEnableAutoNotifications";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
 import { buildBusinessProfilePayload } from "./businessOwnerWizard.utils";
 
 function getErrorMessage(err: unknown): string {
   console.error("Failed to save business profile:", err);
-  return "Failed to save business profile.";
+  // The API explains rejections it understands (e.g. a PAN number + legal name that is already registered).
+  const data = err && typeof err === "object" ? (err as { data?: unknown }).data : undefined;
+  return getApiErrorMessage(data) || "Failed to save business profile.";
 }
 
 export const useSaveBusinessProfileMainStep = (nextPath: string) => {
