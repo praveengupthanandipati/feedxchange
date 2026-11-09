@@ -649,7 +649,6 @@ export const {
   useGetContractTruckChainQuery,
   useGetContractTruckChainOverviewQuery,
   useGetAllTrucksByContractQuery,
-  useLazyGetAllTrucksByContractQuery,
   useGetContractTruckDispatchStatusesQuery,
   useGetBusyTrucksQuery,
   useGetDispatchScheduleTransportersQuery,

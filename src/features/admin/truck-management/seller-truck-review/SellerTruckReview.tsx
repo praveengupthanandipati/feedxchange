@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode, type SubmitEvent } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaRupeeSign } from "react-icons/fa";
 import {
   ArrowLeftIcon,
@@ -23,15 +23,11 @@ import DatePickerInput from "../../../../shared/components/dropdown/DatePickerIn
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import InfoTooltip from "../../../../shared/components/tooltip/InfoTooltip";
-import { useGetContractByContractNumberQuery } from "../../../../core/store/contractsApi";
-import { useGetAllTrucksByContractQuery } from "../../../../core/store/contractTrucksApi";
-import { useGetAllActiveTruckDetailsQuery } from "../../../../core/store/trucksApi";
-import { useGetAllActiveDriversQuery } from "../../../../core/store/driversApi";
 import {
+  getSellerTruckReview,
   pendingContractsForDo,
   type PendingContractForDo,
 } from "./sellerTruckReview.data";
-import type { PendingDeliveryOrderRow } from "../pending-dos/pendingDeliveryOrders.data";
 import "./SellerTruckReview.scss";
 
 const PENDING_DOS_PATH = "/admin/truck-management/pending-delivery-orders";
@@ -110,60 +106,8 @@ const Field = ({ label, icon, children, className = "" }: FieldProps) => (
 
 const SellerTruckReview = () => {
   const { id = "" } = useParams();
-  const [searchParams] = useSearchParams();
-  const contractNumber = searchParams.get("contract") ?? "";
   const navigate = useNavigate();
-  const { data: contract, isLoading: loadingContract } = useGetContractByContractNumberQuery(
-    contractNumber,
-    { skip: !contractNumber },
-  );
-  const { data: contractTrucks, isLoading: loadingContractTrucks } = useGetAllTrucksByContractQuery(
-    { contractId: contract?.id ?? 0 },
-    { skip: !contract?.id },
-  );
-  const { data: activeTrucks } = useGetAllActiveTruckDetailsQuery();
-  const { data: activeDrivers } = useGetAllActiveDriversQuery();
-  const review = useMemo(() => {
-    const assignedTruck = contractTrucks?.find((truck) => String(truck.contractDispatchId) === id);
-    if (!contract || !assignedTruck) return null;
-
-    const row: PendingDeliveryOrderRow = {
-      id,
-      contractId: contract.id,
-      contractNo: contract.contractNumber ?? contractNumber,
-      seller: contract.sellerName ?? "",
-      buyer: contract.buyerName ?? "",
-      truckNumber: assignedTruck.registrationNumber,
-      product: contract.productName ?? "",
-      contractRate: contract.basicDetails.contractRate ?? 0,
-      gstType: contract.basicDetails.gstDetails ?? "",
-      qty: assignedTruck.quantityMT,
-      qtyUnit: contract.basicDetails.quantityMeasure ?? "MT",
-      freight: assignedTruck.freightPerMT,
-      deliveryType: contract.basicDetails.deliveryType ?? "",
-      status: assignedTruck.displayName,
-    };
-    const truckDetails = activeTrucks?.find((truck) => truck.truckId === assignedTruck.truckId);
-    const driver = activeDrivers?.find((item) => item.driverId === assignedTruck.driverId);
-
-    return {
-      row,
-      contractDate: contract.contractDate,
-      transporter: assignedTruck.legalName,
-      scheduleDate: assignedTruck.assignedOn,
-      loadingAddress: assignedTruck.loadingAddress,
-      deliveryAddress: assignedTruck.deliveryAddress,
-      truckStatus: assignedTruck.displayName,
-      truck: {
-        truckNumber: assignedTruck.registrationNumber,
-        capacity: truckDetails?.capacity ?? assignedTruck.quantityMT,
-        ownerName: assignedTruck.legalName,
-        ownerContact: "",
-        driverName: assignedTruck.driverName,
-        driverContact: driver?.mobileNumber ?? "",
-      },
-    };
-  }, [id, contractNumber, contract, contractTrucks, activeTrucks, activeDrivers]);
+  const review = useMemo(() => getSellerTruckReview(id), [id]);
 
   const [doNumber, setDoNumber] = useState("");
   const [doDate, setDoDate] = useState("");
@@ -259,10 +203,6 @@ const SellerTruckReview = () => {
       render: renderQtyInput,
     },
   ];
-
-  if (loadingContract || loadingContractTrucks) {
-    return <p className="seller-truck-review__not-found" role="status">Loading truck and contract details…</p>;
-  }
 
   if (!review) {
     return (

@@ -221,7 +221,19 @@ const ChainContent = ({ contractNumber, contractDispatchId }: ChainContentProps)
         </div>
       </div>
 
-
+      {/* Only an assigned truck can be moved; loaded or cancelled, it stays put. */}
+      {truck.dispatchStatusName.trim().toLowerCase() === "assigned" && (
+        <div className="truck-chain__actions">
+          <Link
+            to={`/admin/truck-management/open-pending-contracts/reassign-truck?contract=${encodeURIComponent(
+              contractNumber,
+            )}&contractTruckId=${contractDispatchId}`}
+            className="reassign-truck__submit"
+          >
+            Re-assign this truck
+          </Link>
+        </div>
+      )}
     </>
   );
 };

@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useGetAllContractsQuery } from "../../../../core/store/contractsApi";
-import { useLazyGetAllTrucksByContractQuery } from "../../../../core/store/contractTrucksApi";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -23,6 +21,7 @@ import {
   contractPath,
 } from "./pendingDeliveryOrders.columns";
 import {
+  pendingDeliveryOrderRows,
   type PendingDeliveryOrderRow,
 } from "./pendingDeliveryOrders.data";
 import "./PendingDeliveryOrders.scss";
@@ -45,20 +44,14 @@ function escapeHtml(value: string) {
 interface MobileCardsProps {
   rows: PendingDeliveryOrderRow[];
   onAddDo: (row: PendingDeliveryOrderRow) => void;
-  onReassign: (row: PendingDeliveryOrderRow) => void;
-  loading: boolean;
 }
 
 /** Card layout used below the md breakpoint, where an 11-column table is unreadable. */
-const PendingDoCards = ({ rows, onAddDo, onReassign, loading }: MobileCardsProps) => {
+const PendingDoCards = ({ rows, onAddDo }: MobileCardsProps) => {
   if (rows.length === 0) {
     return (
       <div className="pending-dos-cards__empty" role="status">
-        {loading ? "Loading pending delivery orders…" : (
-          <>
-            <CircleAlertIcon aria-hidden /> No pending DOs match the current filters.
-          </>
-        )}
+        <CircleAlertIcon aria-hidden /> No pending DOs match the current filters.
       </div>
     );
   }
@@ -116,7 +109,7 @@ const PendingDoCards = ({ rows, onAddDo, onReassign, loading }: MobileCardsProps
           </dl>
 
           <div className="pending-dos-card__action">
-            <DoNumberCell row={row} onAddDo={onAddDo} onReassign={onReassign} />
+            <DoNumberCell row={row} onAddDo={onAddDo} />
           </div>
         </li>
       ))}
@@ -130,63 +123,7 @@ const PendingDeliveryOrders = () => {
   const [keyword, setKeyword] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rows, setRows] = useState<PendingDeliveryOrderRow[]>([]);
-  const [loadError, setLoadError] = useState("");
-  const [loadingTrucks, setLoadingTrucks] = useState(false);
-  const { data: contractsData, isLoading: loadingContracts, isError: contractsError } = useGetAllContractsQuery();
-  const [loadContractTrucks] = useLazyGetAllTrucksByContractQuery();
-
-  useEffect(() => {
-    const contracts = contractsData?.contracts ?? [];
-    if (!contractsData) return;
-
-    let active = true;
-    setLoadError("");
-    setLoadingTrucks(true);
-
-    Promise.all(
-      contracts
-        .filter((contract) => contract.isActive && contract.dispatchedQuantity > 0)
-        .map(async (contract) => {
-          const trucks = await loadContractTrucks({ contractId: contract.id }).unwrap();
-          return trucks
-            .filter((truck) => truck.displayName.trim().toLowerCase() === "assigned")
-            .map((truck): PendingDeliveryOrderRow => ({
-            id: String(truck.contractDispatchId),
-            contractId: contract.id,
-            contractNo: contract.contractNumber,
-            seller: [contract.sellerCity, contract.sellerName].filter(Boolean).join(" - "),
-            buyer: [contract.buyerCity, contract.buyerName].filter(Boolean).join(" - "),
-            truckNumber: truck.registrationNumber,
-            product: contract.productName ?? "",
-            contractRate: contract.contractRate,
-            gstType: contract.gstPercentage > 0 ? `${contract.gstPercentage}% GST` : "No GST",
-            qty: truck.quantityMT,
-            qtyUnit: "MT",
-            freight: truck.freightPerMT,
-            deliveryType: contract.deliveryType ?? "",
-            status: truck.displayName,
-            }));
-        }),
-    )
-      .then((contractRows) => {
-        if (active) {
-          setRows(contractRows.flat());
-          setLoadingTrucks(false);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setRows([]);
-          setLoadError("Unable to load pending delivery orders from the server. Please try again.");
-          setLoadingTrucks(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [contractsData, loadContractTrucks]);
+  const rows = pendingDeliveryOrderRows;
 
   const sellerOptions = useMemo(
     () => [
@@ -207,21 +144,10 @@ const PendingDeliveryOrders = () => {
   const navigate = useNavigate();
 
   const handleAddDo = (row: PendingDeliveryOrderRow) =>
-    navigate(
-      `/admin/truck-management/pending-delivery-orders/seller-truck-review/${encodeURIComponent(
-        row.id,
-      )}?contract=${encodeURIComponent(row.contractNo)}`,
-    );
-
-  const handleReassign = (row: PendingDeliveryOrderRow) =>
-    navigate(
-      `/admin/truck-management/open-pending-contracts/reassign-truck?contract=${encodeURIComponent(
-        row.contractNo,
-      )}&contractTruckId=${encodeURIComponent(row.id)}`,
-    );
+    navigate(`/admin/truck-management/pending-delivery-orders/seller-truck-review/${encodeURIComponent(row.id)}`);
 
   const columns = useMemo(
-    () => buildPendingDeliveryOrderColumns({ onAddDo: handleAddDo, onReassign: handleReassign }),
+    () => buildPendingDeliveryOrderColumns({ onAddDo: handleAddDo }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -348,35 +274,18 @@ const PendingDeliveryOrders = () => {
           </div>
         )}
 
-        {contractsError && (
-          <p className="pending-dos-cards__empty" role="alert">
-            Unable to load contracts from the server. Please try again.
-          </p>
-        )}
-        {loadError && (
-          <p className="pending-dos-cards__empty" role="alert">
-            {loadError}
-          </p>
-        )}
-
         <div className="pending-dos-table-view">
           <Table
             columns={columns}
             data={pagedRows}
             rowKey={(row) => row.id}
-            loading={loadingContracts || loadingTrucks}
             emptyMessage="No pending DOs match the current filters."
             className="pending-dos-table"
           />
         </div>
 
         <div className="pending-dos-cards-view">
-          <PendingDoCards
-            rows={pagedRows}
-            onAddDo={handleAddDo}
-            onReassign={handleReassign}
-            loading={loadingContracts || loadingTrucks}
-          />
+          <PendingDoCards rows={pagedRows} onAddDo={handleAddDo} />
         </div>
 
         <div className="pending-dos-pagination">

@@ -15,9 +15,20 @@ import "../../../assign-transports/Assigntransports.scss";
 const ViewTrucksByContractSummary = ({ contractNumber }: { contractNumber: string }) => {
   const { trucks, isLoading } = useContractTruckDetails(contractNumber, true);
   const navigate = useNavigate();
+
+  // Reassigning puts the same truck on another contract, which is a chain of contracts
+  // hanging off this dispatch rather than a new assignment of its own.
   const handleViewChain = (truck: ContractTruckDetail) => {
     navigate(
       `/admin/truck-management/open-pending-contracts/truck-chain?contract=${encodeURIComponent(
+        contractNumber,
+      )}&contractTruckId=${truck.contractTruckId}`,
+    );
+  };
+
+  const handleReassign = (truck: ContractTruckDetail) => {
+    navigate(
+      `/admin/truck-management/open-pending-contracts/reassign-truck?contract=${encodeURIComponent(
         contractNumber,
       )}&contractTruckId=${truck.contractTruckId}`,
     );
@@ -33,6 +44,7 @@ const ViewTrucksByContractSummary = ({ contractNumber }: { contractNumber: strin
           trucks={trucks}
           isLoading={isLoading}
           showShare={false}
+          onReassign={handleReassign}
           onViewChain={handleViewChain}
         />
       </div>
