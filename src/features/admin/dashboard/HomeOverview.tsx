@@ -260,15 +260,6 @@ const HomeOverview = ({ afterKpis, children }: { afterKpis?: (live: LiveFigures)
                 to="/admin/truck-management/open-pending-contracts"
                 cta="Place trucks"
               />
-              <ActionCard
-                tone="green"
-                icon={TruckIcon}
-                title="Truck approval"
-                count={null}
-                text="Freight and trucks waiting for approval"
-                to="/admin/truck-management/bulk-freight-approval"
-                cta="Approve"
-              />
             </div>
           </section>
 

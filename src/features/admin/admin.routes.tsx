@@ -94,9 +94,6 @@ const TruckTripNew = lazy(() => import("./transporters/truck-trip-management/tru
 const TruckTripView = lazy(() => import("./transporters/truck-trip-management/truck-trip-view/TruckTripView"));
 const TransporterDashboard = lazy(() => import("./transporters/transporter-dashboard/TransporterDb"));
 const PendingDeliveryOrders = lazy(() => import("./truck-management/pending-dos/PendingDeliveryOrders"));
-const Sellerdispatch = lazy(() => import("./truck-management/add-dispatch-byuser/Sellerdispatch"));
-const SellerDispatches = lazy(() => import("./truck-management/seller-dispatches-new/seller-dispatches/SellerDispatches"));
-const UpdateSellerDispatch = lazy(() => import("./truck-management/seller-dispatches-new/update-seller-dispatch/UpdateSellerDispatch"));
 const SellerTruckReview = lazy(() => import("./truck-management/seller-truck-review/SellerTruckReview"));
 const SellerInvoiceReports = lazy(() => import("./reports/seller-invoice-reports/SellerInvoiceReports"));
 const SellerBuyerAccounts = lazy(() => import("./reports/seller-buyer-accounts/SellerBuyerAccounts"));
@@ -202,9 +199,6 @@ export const adminRoutes = (
     <Route path="company-invoices/view" element={<ViewInvoices />} />
     <Route path="truck-management/pending-contracts" element={<PendingContracts />} />
     <Route path="truck-management/pending-delivery-orders" element={<PendingDeliveryOrders />} />
-    <Route path="truck-management/add-dispatch-by-user" element={<Sellerdispatch />} />
-    <Route path="truck-management/seller-dispatches-new" element={<SellerDispatches />} />
-    <Route path="truck-management/seller-dispatches-new/update/:contractNo" element={<UpdateSellerDispatch />} />
     <Route path="truck-management/pending-delivery-orders/seller-truck-review/:id" element={<SellerTruckReview />} />
     <Route path="truck-management/open-pending-contracts" element={<OpenPendingContracts />} />
     <Route path="truck-management/open-pending-contracts/instant-truck" element={<AddInstantTruck />} />

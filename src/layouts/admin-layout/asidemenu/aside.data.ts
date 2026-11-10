@@ -191,12 +191,6 @@ export const asideNavSections: AsideNavSection[] = [
         path: "/admin/truck-management/pending-delivery-orders",
       },
       {
-        id: "add-dispatch-by-user", permissions: ["dispatch-by-user.manage"],
-        label: "Add Dispatch By User",
-        icon: UserPlusIcon,
-        path: "/admin/truck-management/add-dispatch-by-user",
-      },
-      {
         id: "truck-transporters",
         label: "Transporters",
         icon: TruckIcon,
@@ -228,12 +222,6 @@ export const asideNavSections: AsideNavSection[] = [
             path: "/admin/truck-management/transporters/truck-trips",
           },
         ],
-      },
-      {
-        id: "seller-dispatches-new", permissions: ["dispatch-by-admin.view"],
-        label: "Seller Dispatches New",
-        icon: SendIcon,
-        path: "/admin/truck-management/seller-dispatches-new",
       },
     ],
   },
