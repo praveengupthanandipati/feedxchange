@@ -45,7 +45,6 @@ const ReviewAndAssignTrucks = () => {
   const [historyExpanded, setHistoryExpanded] = useState(false);
 
   const [rows, setRows] = useState<TruckDetailRow[]>(seedTruckRows);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const [addTrucksOpen, setAddTrucksOpen] = useState(false);
   const [editingTruckRow, setEditingTruckRow] = useState<TruckDetailRow | null>(null);
   const [rowPendingDelete, setRowPendingDelete] = useState<TruckDetailRow | null>(null);
@@ -92,12 +91,7 @@ const ReviewAndAssignTrucks = () => {
   const handleConfirmDelete = () => {
     if (!rowPendingDelete) return;
     setRows((prev) => prev.filter((row) => row.id !== rowPendingDelete.id));
-    setSelectedRowKeys((prev) => prev.filter((key) => key !== rowPendingDelete.id));
     setRowPendingDelete(null);
-  };
-
-  const toggleSelectRow = (key: string) => {
-    setSelectedRowKeys((prev) => (prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key]));
   };
 
   const columns = useMemo(
@@ -313,10 +307,6 @@ const ReviewAndAssignTrucks = () => {
             columns={columns}
             data={rows}
             rowKey={(row) => row.id}
-            selectable
-            selectedRowKeys={selectedRowKeys}
-            onSelectRow={toggleSelectRow}
-            onSelectAll={(checked) => setSelectedRowKeys(checked ? rows.map((row) => row.id) : [])}
             emptyMessage="No trucks added yet. Use Add Trucks to assign one."
           />
         </div>

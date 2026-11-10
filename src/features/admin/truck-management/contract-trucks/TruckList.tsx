@@ -10,6 +10,10 @@ import {
 } from "../../../../shared/components/icon";
 import type { ContractTruckDetail } from "./useContractTruckDetails";
 import ChainViewButton from "./ChainViewButton";
+// The truck cards style lives with the Pending Contracts pages; imported here so every screen showing this list has it
+// (View Trucks by Contract opened directly rendered unstyled).
+import "../pending-contracts/PendingContracts.scss";
+import "../open-pending-contracts/PendingContracts.scss";
 
 interface TruckListProps {
   trucks: ContractTruckDetail[];

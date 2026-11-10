@@ -1,28 +1,13 @@
-import { useState } from "react";
-import { ExternalLinkIcon, MailIcon } from "../../../../../shared/components/icon";
+import { ExternalLinkIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
-import ShareModal from "../../../../../shared/components/dialog/ShareModal";
-import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
 import type { AddressRow, ContactRow, TransporterProfile } from "./transporterDetail.data";
-import { toRecipientOptions } from "./transporterDetail.data";
 
 interface ContactsTabProps {
   profile: TransporterProfile;
 }
 
 const ContactsTab = ({ profile }: ContactsTabProps) => {
-  const [selectedAddressKeys, setSelectedAddressKeys] = useState<string[]>([]);
-  const [selectedContactKeys, setSelectedContactKeys] = useState<string[]>([]);
-  const [addressModalOpen, setAddressModalOpen] = useState(false);
-  const [contactModalOpen, setContactModalOpen] = useState(false);
-
-  const recipientOptions = toRecipientOptions(profile);
-
-  const toggleKey = (keys: string[], setKeys: (value: string[]) => void, key: string) => {
-    setKeys(keys.includes(key) ? keys.filter((item) => item !== key) : [...keys, key]);
-  };
-
   const addressColumns: TableColumn<AddressRow>[] = [
     { key: "officeName", header: "Office Name" },
     { key: "address", header: "Address" },
@@ -57,35 +42,16 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
     { key: "additionalPhone", header: "Additional Phone" },
   ];
 
-  const handleSendAddress = (_payload: ShareModalPayload) => {
-    setSelectedAddressKeys([]);
-  };
-
-  const handleSendContacts = (_payload: ShareModalPayload) => {
-    setSelectedContactKeys([]);
-  };
-
   return (
     <div className="business-owner-detail__tab-panel">
       <section className="business-owner-detail__section">
         <div className="business-owner-detail__section-header">
           <h2 className="business-owner-detail__section-title">Additional Addresses</h2>
-          <button
-            type="button"
-            className="transporters-btn transporters-btn--warning"
-            onClick={() => setAddressModalOpen(true)}
-          >
-            <MailIcon aria-hidden /> Send Addresses
-          </button>
         </div>
         <Table
           columns={addressColumns}
           data={profile.addresses}
           rowKey={(row) => row.id}
-          selectable
-          selectedRowKeys={selectedAddressKeys}
-          onSelectRow={(key) => toggleKey(selectedAddressKeys, setSelectedAddressKeys, key)}
-          onSelectAll={(checked) => setSelectedAddressKeys(checked ? profile.addresses.map((row) => row.id) : [])}
           emptyMessage="No additional addresses on file."
         />
       </section>
@@ -93,45 +59,14 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
       <section className="business-owner-detail__section">
         <div className="business-owner-detail__section-header">
           <h2 className="business-owner-detail__section-title">Contacts</h2>
-          <button
-            type="button"
-            className="transporters-btn transporters-btn--warning"
-            onClick={() => setContactModalOpen(true)}
-          >
-            <MailIcon aria-hidden /> Send Message
-          </button>
         </div>
         <Table
           columns={contactColumns}
           data={profile.contacts}
           rowKey={(row) => row.id}
-          selectable
-          selectedRowKeys={selectedContactKeys}
-          onSelectRow={(key) => toggleKey(selectedContactKeys, setSelectedContactKeys, key)}
-          onSelectAll={(checked) => setSelectedContactKeys(checked ? profile.contacts.map((row) => row.id) : [])}
           emptyMessage="No contacts on file."
         />
       </section>
-
-      <ShareModal
-        open={addressModalOpen}
-        title="Send Address Information"
-        onClose={() => setAddressModalOpen(false)}
-        onSend={handleSendAddress}
-        recipientOptions={recipientOptions}
-        messagePlaceholder="Enter your message about addresses"
-        confirmLabel="Send Addresses"
-      />
-
-      <ShareModal
-        open={contactModalOpen}
-        title="Send Contact Message"
-        onClose={() => setContactModalOpen(false)}
-        onSend={handleSendContacts}
-        recipientOptions={recipientOptions}
-        messagePlaceholder="Enter your message"
-        confirmLabel="Send Message"
-      />
     </div>
   );
 };

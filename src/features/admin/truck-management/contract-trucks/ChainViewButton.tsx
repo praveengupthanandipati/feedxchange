@@ -1,5 +1,9 @@
 import { LinkIcon } from "../../../../shared/components/icon";
 import { useGetContractTruckChainOverviewQuery } from "../../../../core/store/contractTrucksApi";
+// The truck cards style lives with the Pending Contracts pages; imported here so every screen showing this list has it
+// (View Trucks by Contract opened directly rendered unstyled).
+import "../pending-contracts/PendingContracts.scss";
+import "../open-pending-contracts/PendingContracts.scss";
 
 interface ChainViewButtonProps {
   contractDispatchId: number;

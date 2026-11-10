@@ -15,6 +15,7 @@ import {
   useReleaseMappingMutation,
   type DriverTruckMapping,
 } from "../../../../../core/store/driverTruckMappingApi";
+import { apiErrorMessage } from "../../../../../core/store/sellerInvoiceApi";
 import { useGetAllActiveTruckDetailsQuery } from "../../../../../core/store/trucksApi";
 import { useGetAllActiveDriversQuery } from "../../../../../core/store/driversApi";
 import type { DriverTruckMappingFormValues } from "./driverTruckMapping.types";
@@ -49,7 +50,8 @@ const DriverTruckMappingPage = () => {
   });
   const { data: trucks = [] } = useGetAllActiveTruckDetailsQuery();
   const { data: drivers = [] } = useGetAllActiveDriversQuery();
-  const [addMapping] = useAddMappingMutation();
+  const [addMapping, { isLoading: savingMapping }] = useAddMappingMutation();
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [releaseMapping] = useReleaseMappingMutation();
 
   const driverPhoneById = useMemo(
@@ -275,6 +277,8 @@ const DriverTruckMappingPage = () => {
         driverOptions={drivers}
         actionPerformedBy={Number(localStorage.getItem("userId")) || 0}
         onClose={() => setOffcanvasOpen(false)}
+        saving={savingMapping}
+        saveError={saveError}
         onSave={handleSave}
       />
 

@@ -10,14 +10,8 @@ interface ContactsTabProps {
 }
 
 const ContactsTab = ({ profile }: ContactsTabProps) => {
-  const [selectedAddressKeys, setSelectedAddressKeys] = useState<string[]>([]);
-  const [selectedContactKeys, setSelectedContactKeys] = useState<string[]>([]);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
-
-  const toggleKey = (keys: string[], setKeys: (value: string[]) => void, key: string) => {
-    setKeys(keys.includes(key) ? keys.filter((item) => item !== key) : [...keys, key]);
-  };
 
   const addressColumns: TableColumn<AddressRow>[] = [
     {
@@ -70,10 +64,6 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
           columns={addressColumns}
           data={profile.addresses}
           rowKey={(row) => row.id}
-          selectable
-          selectedRowKeys={selectedAddressKeys}
-          onSelectRow={(key) => toggleKey(selectedAddressKeys, setSelectedAddressKeys, key)}
-          onSelectAll={(checked) => setSelectedAddressKeys(checked ? profile.addresses.map((row) => row.id) : [])}
           emptyMessage="No additional addresses on file."
         />
       </section>
@@ -93,17 +83,13 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
           columns={contactColumns}
           data={profile.contacts}
           rowKey={(row) => row.id}
-          selectable
-          selectedRowKeys={selectedContactKeys}
-          onSelectRow={(key) => toggleKey(selectedContactKeys, setSelectedContactKeys, key)}
-          onSelectAll={(checked) => setSelectedContactKeys(checked ? profile.contacts.map((row) => row.id) : [])}
           emptyMessage="No additional contacts on file."
         />
       </section>
 
       <ShareInformationModal
         open={addressModalOpen}
-        onClose={() => { setAddressModalOpen(false); setSelectedAddressKeys([]); }}
+        onClose={() => { setAddressModalOpen(false); }}
         informationType="SELLER_ADDRESS"
         profileId={profile.profileId}
         title="Send address information"
@@ -111,7 +97,7 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
 
       <ShareInformationModal
         open={contactModalOpen}
-        onClose={() => { setContactModalOpen(false); setSelectedContactKeys([]); }}
+        onClose={() => { setContactModalOpen(false); }}
         informationType="CONTACT_DETAILS"
         profileId={profile.profileId}
         title="Send contact details"

@@ -1,9 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-// Bootstrap's modal behaviour (data-bs-toggle="modal") for the Send message dialog; only this screen needs it
-import "bootstrap/js/dist/modal";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftIcon, PenLineIcon, SendIcon } from "../../../../../shared/components/icon";
+import { ArrowLeftIcon, PenLineIcon } from "../../../../../shared/components/icon";
 import { useGetDriverByIdQuery } from "../../../../../core/store/driversApi";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
 import "../drivers-list/Drivers.scss";
@@ -33,22 +30,8 @@ function formatDisplayDate(value: string): string {
 const DriverView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [message, setMessage] = useState("");
-  const modalRef = useRef<HTMLDivElement>(null);
 
   const { data: driver, isLoading } = useGetDriverByIdQuery(id ?? "", { skip: !id });
-
-  useEffect(() => {
-    const el = modalRef.current;
-    if (!el) return;
-    const resetMessage = () => setMessage("");
-    el.addEventListener("hidden.bs.modal", resetMessage);
-    return () => el.removeEventListener("hidden.bs.modal", resetMessage);
-  }, []);
-
-  const handleSendMessage = () => {
-    // TODO: call the real send-message endpoint once the backend exposes one.
-  };
 
   if (!driver) {
     return (
@@ -87,14 +70,6 @@ const DriverView = () => {
                 <PenLineIcon aria-hidden /> Edit
               </button>
             </Can>
-            <button
-              type="button"
-              className="drivers-btn drivers-btn--primary"
-              data-bs-toggle="modal"
-              data-bs-target="#sendMessageModal"
-            >
-              <SendIcon aria-hidden /> Send Message
-            </button>
           </div>
         </div>
 
@@ -151,65 +126,6 @@ const DriverView = () => {
               <DetailField label="PAN Number" value={driver.panNumber} />
             </div>
           </section>
-        </div>
-      </div>
-
-      <div
-        className="modal fade"
-        id="sendMessageModal"
-        tabIndex={-1}
-        aria-labelledby="sendMessageModalLabel"
-        aria-hidden="true"
-        ref={modalRef}
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="sendMessageModalLabel">
-                Send Message to {driver.driverName}
-              </h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-            </div>
-            <div className="modal-body">
-              <div className="mb-3">
-                <label className="form-label">Send To</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={`${driver.driverName} (${driver.mobileNumber})`}
-                  disabled
-                  readOnly
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label" htmlFor="sendMessageText">
-                  Message
-                </label>
-                <textarea
-                  id="sendMessageText"
-                  className="form-control"
-                  rows={4}
-                  placeholder="Type your message..."
-                  value={message}
-                  onChange={(event) => setMessage(event.target.value)}
-                />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-outline-secondary" data-bs-dismiss="modal">
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-bs-dismiss="modal"
-                disabled={!message.trim()}
-                onClick={handleSendMessage}
-              >
-                <SendIcon aria-hidden /> Send
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

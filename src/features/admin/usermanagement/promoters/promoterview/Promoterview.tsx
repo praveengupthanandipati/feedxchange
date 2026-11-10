@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftIcon, BellIcon, DownloadIcon, MailIcon, PenLineIcon, Share2Icon, UserIcon } from "../../../../../shared/components/icon";
+import { ArrowLeftIcon, BellIcon, DownloadIcon, PenLineIcon, Share2Icon, UserIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import ShareModal from "../../../../../shared/components/dialog/ShareModal";
@@ -46,7 +46,6 @@ const Promoterview = () => {
   const canSeeNotifications = usePermission("notification-preferences.view");
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [shareProfileOpen, setShareProfileOpen] = useState(false);
-  const [messageOpen, setMessageOpen] = useState(false);
 
   const {
     data: rawProfile,
@@ -73,7 +72,6 @@ const Promoterview = () => {
     const text = [message.trim(), ...details].filter(Boolean).join("\n");
     openShare(channel, [{ phone: profile.mobileNumber, email: profile.emailId }], text, `Promoter profile - ${profile.promoterName}`);
   };
-  const handleSendMessage = (_payload: ShareModalPayload) => undefined;
 
   const regionColumns: TableColumn<RegionRow>[] = [
     { key: "stateName", header: "State" },
@@ -203,13 +201,6 @@ const Promoterview = () => {
             <section className="business-owner-detail__section">
               <div className="business-owner-detail__section-header">
                 <h2 className="business-owner-detail__section-title">Promoter Information</h2>
-                <button
-                  type="button"
-                  className="promoters-btn promoters-btn--outline"
-                  onClick={() => setMessageOpen(true)}
-                >
-                  <MailIcon aria-hidden /> Message
-                </button>
               </div>
               <div className="business-owner-detail__grid">
                 <DetailField label="Promoter Code" value={profile.promoterCode} />
@@ -278,16 +269,6 @@ const Promoterview = () => {
         recipientOptions={recipientOptions}
         messagePlaceholder="Enter a note to include with this profile"
         confirmLabel="Share Profile"
-      />
-
-      <ShareModal
-        open={messageOpen}
-        title="Send Message"
-        onClose={() => setMessageOpen(false)}
-        onSend={handleSendMessage}
-        fixedRecipientLabel={profile.promoterName}
-        messagePlaceholder="Enter your message"
-        confirmLabel="Send Message"
       />
     </div>
   );

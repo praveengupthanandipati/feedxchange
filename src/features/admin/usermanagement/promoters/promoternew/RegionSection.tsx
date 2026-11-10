@@ -43,7 +43,7 @@ const RegionSection = ({ entries, onEntriesChange }: RegionSectionProps) => {
     onEntriesChange(entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
 
   return (
-    <div>
+    <div className="new-promoter__regions">
       <h3 className="form-subheading">Geographic Regions of Operation</h3>
 
       {entries.length === 0 ? (

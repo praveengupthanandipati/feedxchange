@@ -22,6 +22,10 @@ interface DriverTruckMappingOffcanvasProps {
   actionPerformedBy: number;
   onClose: () => void;
   onSave: (values: DriverTruckMappingFormValues) => void;
+  /** While the mapping is being saved: the button shows "Saving…" and is disabled. */
+  saving?: boolean;
+  /** Why the last save failed (shown above the buttons). */
+  saveError?: string | null;
 }
 
 const DriverTruckMappingOffcanvas = ({
@@ -33,6 +37,8 @@ const DriverTruckMappingOffcanvas = ({
   actionPerformedBy,
   onClose,
   onSave,
+  saving = false,
+  saveError = null,
 }: DriverTruckMappingOffcanvasProps) => {
   const readOnly = mode === "view";
   const [truckId, setTruckId] = useState("");
@@ -123,7 +129,7 @@ const DriverTruckMappingOffcanvas = ({
         <form className="driver-truck-mapping-offcanvas__form" onSubmit={handleSubmit}>
           <div className="driver-truck-mapping-offcanvas__body">
             <div className="driver-truck-mapping-offcanvas__field">
-              <label>Truck</label>
+              <label>Truck <span className="driver-truck-mapping-offcanvas__required" aria-hidden>*</span></label>
               <SearchableSelect
                 options={truckSelectOptions}
                 value={truckId}
@@ -135,7 +141,7 @@ const DriverTruckMappingOffcanvas = ({
             </div>
 
             <div className="driver-truck-mapping-offcanvas__field">
-              <label>Driver</label>
+              <label>Driver <span className="driver-truck-mapping-offcanvas__required" aria-hidden>*</span></label>
               <SearchableSelect
                 options={driverSelectOptions}
                 value={driverId}
@@ -147,7 +153,7 @@ const DriverTruckMappingOffcanvas = ({
             </div>
 
             <div className="driver-truck-mapping-offcanvas__field">
-              <label htmlFor="dtm-assigned-from">Assigned From</label>
+              <label htmlFor="dtm-assigned-from">Assigned From <span className="driver-truck-mapping-offcanvas__required" aria-hidden>*</span></label>
               <DatePickerInput
                 id="dtm-assigned-from"
                 value={assignedFrom}
@@ -179,13 +185,19 @@ const DriverTruckMappingOffcanvas = ({
             </label>
           </div>
 
+          {saveError && !readOnly && (
+            <p className="driver-truck-mapping-offcanvas__error" role="alert">
+              {saveError}
+            </p>
+          )}
+
           <div className="driver-truck-mapping-offcanvas__actions">
             <button type="button" className="driver-truck-mapping-offcanvas__cancel" onClick={onClose}>
               {readOnly ? "Close" : "Cancel"}
             </button>
             {!readOnly && (
-              <button type="submit" className="driver-truck-mapping-offcanvas__submit" disabled={!isValid}>
-                Create Map
+              <button type="submit" className="driver-truck-mapping-offcanvas__submit" disabled={!isValid || saving}>
+                {saving ? "Saving…" : "Create Map"}
               </button>
             )}
           </div>

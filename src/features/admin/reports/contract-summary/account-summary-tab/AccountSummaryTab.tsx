@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { DownloadIcon, PrinterIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import { buildAccountSummaryColumns } from "./accountSummaryTab.columns";
@@ -30,8 +30,6 @@ interface AccountSummaryTabProps {
 }
 
 const AccountSummaryTab = ({ onRegisterExport }: AccountSummaryTabProps) => {
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
   // TODO: wire up to a real print/document API once available.
   const handlePrint = () => undefined;
   const handleDownload = () => undefined;
@@ -40,14 +38,6 @@ const AccountSummaryTab = ({ onRegisterExport }: AccountSummaryTabProps) => {
     () => buildAccountSummaryColumns({ onPrint: handlePrint, onDownload: handleDownload }),
     [],
   );
-
-  const handleSelectRow = (id: string) => {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    setSelectedIds(checked ? accountSummaryRows.map((row) => row.id) : []);
-  };
 
   const handlePrintAll = () => undefined;
   const handleDownloadAll = () => exportPartyRows(accountSummaryRows);
@@ -72,10 +62,6 @@ const AccountSummaryTab = ({ onRegisterExport }: AccountSummaryTabProps) => {
         columns={columns}
         data={accountSummaryRows}
         rowKey={(row) => row.id}
-        selectable
-        selectedRowKeys={selectedIds}
-        onSelectRow={handleSelectRow}
-        onSelectAll={handleSelectAll}
         emptyMessage="No parties found."
         minHeight
         className="account-summary-tab-table"
