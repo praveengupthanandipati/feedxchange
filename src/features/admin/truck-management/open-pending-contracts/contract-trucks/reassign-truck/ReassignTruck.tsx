@@ -253,7 +253,6 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
             <p className="reassign-truck__source-sub">
               {sourceLeg.contractNumber} · {sourceLeg.sellerName} → {sourceLeg.buyerName}
             </p>
-
             <div className="reassign-truck__source-grid">
               <div>
                 <span>Transporter</span>

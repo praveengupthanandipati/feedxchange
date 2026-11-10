@@ -19,6 +19,7 @@ import { apiErrorMessage } from "../../../../../core/store/sellerInvoiceApi";
 import { useGetAllActiveTruckDetailsQuery } from "../../../../../core/store/trucksApi";
 import { useGetAllActiveDriversQuery } from "../../../../../core/store/driversApi";
 import type { DriverTruckMappingFormValues } from "./driverTruckMapping.types";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 import "./DriverTruckMapping.scss";
 
 const PAGE_SIZE = 10;
@@ -73,9 +74,16 @@ const DriverTruckMappingPage = () => {
   const [offcanvasMode, setOffcanvasMode] = useState<"create" | "view">("create");
   const [activeRow, setActiveRow] = useState<DriverTruckMapping | null>(null);
   const { message: successMessage, showSuccessMessage } = useSuccessToast();
+  const [saveError, setSaveError] = useState("");
+
+  useEffect(() => {
+    if (!saveError) return;
+    const timeout = window.setTimeout(() => setSaveError(""), 4000);
+    return () => window.clearTimeout(timeout);
+  }, [saveError]);
 
   const handleOpenCreate = () => {
-    setSaveError(null);
+    setSaveError("");
     setOffcanvasMode("create");
     setActiveRow(null);
     setOffcanvasOpen(true);
@@ -112,7 +120,7 @@ const DriverTruckMappingPage = () => {
   };
 
   const handleSave = async (values: DriverTruckMappingFormValues) => {
-    setSaveError(null);
+    setSaveError("");
     try {
       await addMapping({
         truckId: values.truckId,
@@ -124,19 +132,8 @@ const DriverTruckMappingPage = () => {
       }).unwrap();
       setOffcanvasOpen(false);
       showSuccessMessage("Driver-truck mapping added successfully");
-    } catch (err) {
-      // Kept open with the entered values, so the user can correct and try again.
-      // AddMapping is read as text, so the server's reason arrives as a string (plain text or JSON).
-      const raw = (err as { data?: unknown })?.data;
-      let reason: unknown = raw;
-      if (typeof raw === "string") {
-        try {
-          reason = JSON.parse(raw);
-        } catch {
-          reason = raw.trim() && raw.length < 300 ? { message: raw.trim() } : null;
-        }
-      }
-      setSaveError(apiErrorMessage({ data: reason }, "Could not save the driver-truck mapping. Please try again."));
+    } catch (error) {
+      setSaveError(getErrorMessage(error, "Failed to add driver-truck mapping. Please try again."));
     }
   };
 
@@ -204,6 +201,11 @@ const DriverTruckMappingPage = () => {
   return (
     <div className="driver-truck-mapping-page">
       <SuccessToast message={successMessage} />
+      {saveError && (
+        <div className="driver-truck-mapping-error-toast" role="alert">
+          {saveError}
+        </div>
+      )}
       <div className="driver-truck-mapping-card">
         <div className="driver-truck-mapping-card__header">
           <h1>Driver-Truck Mapping</h1>

@@ -123,7 +123,6 @@ const PendingDeliveryOrders = () => {
   const [keyword, setKeyword] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-
   const rows = pendingDeliveryOrderRows;
 
   const sellerOptions = useMemo(

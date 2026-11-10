@@ -221,7 +221,6 @@ const ChainContent = ({ contractNumber, contractDispatchId }: ChainContentProps)
         </div>
       </div>
 
-
       {/* Only an assigned truck can be moved; loaded or cancelled, it stays put. */}
       {truck.dispatchStatusName.trim().toLowerCase() === "assigned" && (
         <div className="truck-chain__actions">

@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
+import SuccessToast from "../../../../../shared/components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../../shared/components/toast/useSuccessToast";
 import { buildInstantTruckColumns } from "./instantTruckAssignment.columns";
 import type { InstantTruckRow } from "./instantTruckAssignment.data";
 import AssignNewTruckDrawer from "./AssignNewTruckDrawer";
@@ -24,6 +26,7 @@ const InstantTruckAssignment = ({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<InstantTruckRow | null>(null);
   const [rowPendingDelete, setRowPendingDelete] = useState<InstantTruckRow | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleOpenNew = () => {
     setEditingRow(null);
@@ -38,6 +41,9 @@ const InstantTruckAssignment = ({
   const handleSave = (row: InstantTruckRow) => {
     setRows((prev) =>
       editingRow ? prev.map((item) => (item.id === row.id ? row : item)) : [row, ...prev],
+    );
+    showSuccessMessage(
+      editingRow ? "Truck assignment updated successfully." : "Truck assigned successfully.",
     );
   };
 
@@ -58,6 +64,7 @@ const InstantTruckAssignment = ({
 
   return (
     <div className="instant-truck-assignment">
+      <SuccessToast message={successMessage} />
       <div className="instant-truck-assignment__header">
         <h2>Instant Truck Assignment ({rows.length})</h2>
         <button

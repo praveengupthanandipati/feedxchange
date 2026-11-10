@@ -12,6 +12,7 @@ import {
   useAddContractTrucksMutation,
   useUpdateContractTrucksMutation,
 } from "../../../../../core/store/contractTrucksApi";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 import type { InstantTruckRow } from "./instantTruckAssignment.data";
 import "./InstantTruckAssignment.scss";
 import { useNotifyPrompt } from "../../../../../shared/notifications/useNotifyPrompt";
@@ -334,8 +335,8 @@ const AssignNewTruckDrawer = ({
         onSave(newRow);
         onClose();
       });
-    } catch {
-      setSubmitError("Failed to save the truck assignment. Please try again.");
+    } catch (error) {
+      setSubmitError(getErrorMessage(error, "Failed to save the truck assignment. Please try again."));
     }
   };
 
