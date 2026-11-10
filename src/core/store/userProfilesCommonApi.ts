@@ -287,7 +287,8 @@ export const userProfilesCommonApi = createApi({
       providesTags: ["UserProfile"],
     }),
     updateProfileAddress: builder.mutation<void, ProfileAddressDetail>({
-      query: (body) => ({
+      // Sent exactly as the API's schema: the display-only name fields are not part of it.
+      query: ({ createdByName: _createdByName, modifiedByName: _modifiedByName, ...body }) => ({
         url: "/api/Profile/UpdateProfileAddress",
         method: "POST",
         body,

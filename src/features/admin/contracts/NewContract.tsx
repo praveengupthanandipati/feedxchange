@@ -843,6 +843,11 @@ const { data: products } = useGetProductsQuery();
     return;
   }
 
+  if (sellerId && buyerId && sellerId === buyerId) {
+    setFormError("Seller and Buyer cannot be the same business. Please select a different buyer.");
+    return;
+  }
+
   if (effectiveFrom && effectiveTo && effectiveTo < effectiveFrom) {
     setFormError("Effective To cannot be before Effective From.");
     return;
@@ -1559,7 +1564,7 @@ const { data: products } = useGetProductsQuery();
               Select Seller <span className="form-field__required">*</span>
             </span>
             <SearchableSelect
-              options={businessProfileOptions}
+              options={businessProfileOptions.filter((option) => !buyerId || option.value !== buyerId)}
               value={sellerId}
               onChange={handleSellerPick}
               placeholder="Seller"
@@ -1572,7 +1577,7 @@ const { data: products } = useGetProductsQuery();
               Select Buyer <span className="form-field__required">*</span>
             </span>
             <SearchableSelect
-              options={businessProfileOptions}
+              options={businessProfileOptions.filter((option) => !sellerId || option.value !== sellerId)}
               value={buyerId}
               onChange={handleBuyerPick}
               placeholder="Buyer"

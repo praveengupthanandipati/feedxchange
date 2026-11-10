@@ -253,11 +253,11 @@ const EditInvoiceOffcanvas = ({ invoice, onClose, onSaved }: Props) => {
           </div>
 
           <dl className="edit-invoice-offcanvas__totals">
-            <div><dt>Invoice amount</dt><dd>{money(amount)}</dd></div>
+            {/* Freight is already part of the invoice amount (and its GST), so it is shown inside it, not added after Total */}
+            <div><dt>Invoice amount{freight > 0 ? ` (incl. freight ${money(freight)})` : ""}</dt><dd>{money(amount)}</dd></div>
             <div><dt>GST</dt><dd>{money(gst)}</dd></div>
             <div><dt>Round off</dt><dd>{money(roundOff)}</dd></div>
             <div className="is-strong"><dt>Total</dt><dd>{money(total)}</dd></div>
-            <div><dt>Freight</dt><dd>{money(freight)}</dd></div>
             <div><dt>Deductions</dt><dd>− {money(deductionsTotal)}</dd></div>
             <div className="is-strong"><dt>Payable</dt><dd>{money(payable)}</dd></div>
           </dl>

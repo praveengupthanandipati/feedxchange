@@ -250,7 +250,7 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
                     <BarChart data={monthlyData} margin={{ top: 8, right: 8, left: 4, bottom: 4 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                      <YAxis tickFormatter={(value: number) => value >= 100000 ? `₹${Math.round(value / 100000)}L` : `₹${Math.round(value / 1000)}k`} tick={{ fontSize: 11 }} />
+                      <YAxis tickFormatter={(value: number) => value === 0 ? "₹0" : value >= 100000 ? `₹${Math.round(value / 100000)}L` : `₹${Math.round(value / 1000)}k`} tick={{ fontSize: 11 }} />
                       <Tooltip formatter={(value) => money(Number(value))} />
                       <Bar dataKey="paid" name="Paid" fill="var(--fx-chart-2)" radius={[4, 4, 0, 0]} />
                       <Bar dataKey="outstanding" name="Amount due" fill="var(--fx-chart-1)" radius={[4, 4, 0, 0]} />
