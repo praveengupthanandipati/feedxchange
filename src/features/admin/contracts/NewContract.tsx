@@ -807,11 +807,6 @@ const { data: products } = useGetProductsQuery();
     };
 
   const handleSubmit = async (pastDateConfirmed = false) => {
-  console.log("navState:", navState);
-  console.log("contract:", navState?.contract);
-  console.log("contractNumber:", contractNumber);
-  console.log("isEdit:", navState?.isEdit);
-
   const missing = Object.entries(requiredValues)
     .filter(([, value]) => !value)
     .map(([key]) => REQUIRED_FIELD_LABELS[key])
@@ -988,11 +983,6 @@ const { data: products } = useGetProductsQuery();
         contractNumber: currentContractNumber,
         updateContract: updateContractData,
       };
-
-      console.log(
-        "UPDATE CONTRACT PAYLOAD:",
-        JSON.stringify(updatePayload, null, 2)
-      );
 
       await updateContract(updatePayload).unwrap();
 
@@ -1171,11 +1161,6 @@ const { data: products } = useGetProductsQuery();
         },
       };
 
-      console.log(
-        "CREATE CONTRACT PAYLOAD:",
-        JSON.stringify(createPayload, null, 2)
-      );
-
       const created = await saveContract(createPayload).unwrap();
 
       localStorage.setItem(
@@ -1223,7 +1208,6 @@ const { data: products } = useGetProductsQuery();
 
   const contract = editContract;
 
-  console.log("EDIT CONTRACT DATA:", contract);
    setContractNumber(
     contract.contractNumber || contract.id || ""
   );

@@ -266,7 +266,7 @@ const HomeOverview = ({ afterKpis, children }: { afterKpis?: (live: LiveFigures)
                 title="Truck approval"
                 count={null}
                 text="Freight and trucks waiting for approval"
-                to="/admin/truck-management/bulk-freight-approval"
+                to="/admin/truck-management/open-pending-contracts"
                 cta="Approve"
               />
             </div>

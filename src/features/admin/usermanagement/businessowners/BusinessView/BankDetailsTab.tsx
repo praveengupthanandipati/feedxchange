@@ -14,7 +14,6 @@ interface BankDetailsTabProps {
 }
 
 const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
-  const [selectedBankKeys, setSelectedBankKeys] = useState<string[]>([]);
   const [selectedDocumentKeys, setSelectedDocumentKeys] = useState<string[]>([]);
   const [bankModalOpen, setBankModalOpen] = useState(false);
   const [documentModalOpen, setDocumentModalOpen] = useState(false);
@@ -117,10 +116,6 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
           columns={bankColumns}
           data={profile.bankDetails}
           rowKey={(row) => row.id}
-          selectable
-          selectedRowKeys={selectedBankKeys}
-          onSelectRow={(key) => toggleKey(selectedBankKeys, setSelectedBankKeys, key)}
-          onSelectAll={(checked) => setSelectedBankKeys(checked ? profile.bankDetails.map((row) => row.id) : [])}
           emptyMessage="No bank details on file."
         />
       </section>
@@ -152,7 +147,7 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
       {/* Real sending: pick people, channels and a template. The message carries the bank name only - never account number or IFSC. */}
       <ShareInformationModal
         open={bankModalOpen}
-        onClose={() => { setBankModalOpen(false); setSelectedBankKeys([]); }}
+        onClose={() => { setBankModalOpen(false); }}
         informationType="BANK_DETAILS"
         profileId={profile.profileId}
         title="Send bank details"

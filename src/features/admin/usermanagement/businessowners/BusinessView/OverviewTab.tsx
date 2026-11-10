@@ -1,10 +1,6 @@
-import { useState } from "react";
 import type { ReactNode } from "react";
-import { MailIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
-import ShareModal from "../../../../../shared/components/dialog/ShareModal";
-import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
 import type { BusinessOwnerProfile, BrokerageChargeRow, CapacityRow } from "./businessOwnerDetail.data";
 
 interface OverviewTabProps {
@@ -36,22 +32,12 @@ const capacityColumns: TableColumn<CapacityRow>[] = [
 ];
 
 const OverviewTab = ({ profile }: OverviewTabProps) => {
-  const [messageOpen, setMessageOpen] = useState(false);
-
-  const handleSendMessage = (_payload: ShareModalPayload) => undefined;
 
   return (
     <div className="business-owner-detail__tab-panel">
       <section className="business-owner-detail__section">
         <div className="business-owner-detail__section-header">
           <h2 className="business-owner-detail__section-title">Profile Details</h2>
-          <button
-            type="button"
-            className="business-owners-btn business-owners-btn--outline"
-            onClick={() => setMessageOpen(true)}
-          >
-            <MailIcon aria-hidden /> Message
-          </button>
         </div>
         <div className="business-owner-detail__grid">
           <DetailField label="Business Legal Name" value={profile.businessLegalName} />
@@ -141,16 +127,6 @@ const OverviewTab = ({ profile }: OverviewTabProps) => {
           emptyMessage="No capacity requirements configured."
         />
       </section>
-
-      <ShareModal
-        open={messageOpen}
-        title="Send Message"
-        onClose={() => setMessageOpen(false)}
-        onSend={handleSendMessage}
-        fixedRecipientLabel={profile.tradingName || profile.businessLegalName}
-        messagePlaceholder="Enter your message"
-        confirmLabel="Send Message"
-      />
     </div>
   );
 };

@@ -15,6 +15,7 @@ import {
   useReleaseMappingMutation,
   type DriverTruckMapping,
 } from "../../../../../core/store/driverTruckMappingApi";
+import { apiErrorMessage } from "../../../../../core/store/sellerInvoiceApi";
 import { useGetAllActiveTruckDetailsQuery } from "../../../../../core/store/trucksApi";
 import { useGetAllActiveDriversQuery } from "../../../../../core/store/driversApi";
 import type { DriverTruckMappingFormValues } from "./driverTruckMapping.types";
@@ -48,7 +49,8 @@ const DriverTruckMappingPage = () => {
   });
   const { data: trucks = [] } = useGetAllActiveTruckDetailsQuery();
   const { data: drivers = [] } = useGetAllActiveDriversQuery();
-  const [addMapping] = useAddMappingMutation();
+  const [addMapping, { isLoading: savingMapping }] = useAddMappingMutation();
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [releaseMapping] = useReleaseMappingMutation();
 
   const driverPhoneById = useMemo(
@@ -73,6 +75,7 @@ const DriverTruckMappingPage = () => {
   const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleOpenCreate = () => {
+    setSaveError(null);
     setOffcanvasMode("create");
     setActiveRow(null);
     setOffcanvasOpen(true);
@@ -109,6 +112,7 @@ const DriverTruckMappingPage = () => {
   };
 
   const handleSave = async (values: DriverTruckMappingFormValues) => {
+    setSaveError(null);
     try {
       await addMapping({
         truckId: values.truckId,
@@ -120,8 +124,19 @@ const DriverTruckMappingPage = () => {
       }).unwrap();
       setOffcanvasOpen(false);
       showSuccessMessage("Driver-truck mapping added successfully");
-    } catch {
-      // TODO: surface a form-level error once the offcanvas supports one.
+    } catch (err) {
+      // Kept open with the entered values, so the user can correct and try again.
+      // AddMapping is read as text, so the server's reason arrives as a string (plain text or JSON).
+      const raw = (err as { data?: unknown })?.data;
+      let reason: unknown = raw;
+      if (typeof raw === "string") {
+        try {
+          reason = JSON.parse(raw);
+        } catch {
+          reason = raw.trim() && raw.length < 300 ? { message: raw.trim() } : null;
+        }
+      }
+      setSaveError(apiErrorMessage({ data: reason }, "Could not save the driver-truck mapping. Please try again."));
     }
   };
 
@@ -260,6 +275,8 @@ const DriverTruckMappingPage = () => {
         driverOptions={drivers}
         actionPerformedBy={Number(localStorage.getItem("userId")) || 0}
         onClose={() => setOffcanvasOpen(false)}
+        saving={savingMapping}
+        saveError={saveError}
         onSave={handleSave}
       />
 

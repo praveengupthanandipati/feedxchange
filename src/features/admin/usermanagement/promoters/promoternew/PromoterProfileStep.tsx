@@ -98,7 +98,7 @@ const PromoterProfileStep = () => {
               Promoter Code
               <InfoTooltip text="Auto-generated unique code used to track this promoter's referrals." />
             </span>
-            <input type="text" className="form-field__control" value={draft.promoterCode} readOnly />
+            <input type="text" className="form-field__control" value={draft.promoterCode} readOnly aria-label="Promoter Code" />
           </div>
 
           <div className="form-field">
