@@ -3,6 +3,7 @@ import { PlusIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../../shared/components/tooltip/InfoTooltip";
 import EmptyRowsState from "./EmptyRowsState";
+import ProfileGroupField from "../../ProfileGroupField";
 import {
   useGetAllBusinessLinesQuery,
   useGetBusinessTypesByLineQuery,
@@ -289,6 +290,8 @@ interface BusinessProfileProps {
   onCollectionAreaChange: (value: string) => void;
   referredBy: string;
   onReferredByChange: (value: string) => void;
+  groupName: string;
+  onGroupNameChange: (value: string) => void;
   aboutProfile: string;
   onAboutProfileChange: (value: string) => void;
   buyBrokerageCharges: string;
@@ -324,6 +327,8 @@ const BusinessProfile = ({
   onCollectionAreaChange,
   referredBy,
   onReferredByChange,
+  groupName,
+  onGroupNameChange,
   aboutProfile,
   onAboutProfileChange,
   buyBrokerageCharges,
@@ -516,6 +521,8 @@ const BusinessProfile = ({
             allowCustom
           />
         </div>
+
+        <ProfileGroupField value={groupName} onChange={onGroupNameChange} />
 
         <div className="form-field">
           <label className="form-field__label" htmlFor="referredBy">

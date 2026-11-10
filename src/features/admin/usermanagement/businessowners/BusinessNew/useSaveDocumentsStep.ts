@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
   useCreateProfileDocumentMutation,
   useUpdateProfileDocumentMutation,
+  useDeleteProfileDocumentMutation,
+  useLazyGetProfileDocumentQuery,
   useDocumentFileFieldsResolver,
   resolveDocumentFolderName,
   type CreateProfileDocumentEntry,
@@ -24,6 +26,8 @@ export const useSaveDocumentsStep = (nextPath: string) => {
   const [updateBusinessProfile] = useUpdateBusinessProfileMutation();
   const [createProfileDocument] = useCreateProfileDocumentMutation();
   const [updateProfileDocument] = useUpdateProfileDocumentMutation();
+  const [deleteProfileDocument] = useDeleteProfileDocumentMutation();
+  const [loadSavedDocuments] = useLazyGetProfileDocumentQuery();
   const resolveFileFields = useDocumentFileFieldsResolver();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -41,6 +45,14 @@ export const useSaveDocumentsStep = (nextPath: string) => {
         profileId,
         modifiedBy: currentUserId,
       }).unwrap();
+
+      // Documents removed on the screen are deleted from the database too: whatever is saved for this profile but no longer in the list.
+      const savedDocuments = await loadSavedDocuments(String(profileId), false).unwrap();
+      const keptIds = new Set(draft.documents.map((document) => document.meta?.documentId).filter((id) => id != null));
+      const removed = savedDocuments.filter((saved) => saved.documentId != null && !keptIds.has(saved.documentId));
+      for (const saved of removed) {
+        await deleteProfileDocument({ profileId, documentId: saved.documentId as number }).unwrap();
+      }
 
       const newEntries: CreateProfileDocumentEntry[] = [];
       const updates: UpdateProfileDocumentPayload[] = [];

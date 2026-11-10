@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../../shared/components/tooltip/InfoTooltip";
 import { groupOptions, establishmentYearOptions } from "./newTransporter.data";
+import ProfileGroupField from "../../ProfileGroupField";
 import { useTransporterWizard } from "./TransporterWizardContext";
 import {
   useGetTransporterProfileByIdQuery,
@@ -176,17 +177,7 @@ const TransporterProfileStep = () => {
             />
           </div>
 
-          <div className="form-field">
-            <span className="form-field__label">Group</span>
-            <SearchableSelect
-              options={groupOptions}
-              value={draft.group}
-              onChange={(value) => updateDraft({ group: value })}
-              placeholder="Select or type..."
-              ariaLabel="Group"
-              allowCustom
-            />
-          </div>
+          <ProfileGroupField value={draft.group} onChange={(value) => updateDraft({ group: value })} extraOptions={groupOptions} />
 
           <div className="form-field">
             <label className="form-field__label" htmlFor="referralCode">

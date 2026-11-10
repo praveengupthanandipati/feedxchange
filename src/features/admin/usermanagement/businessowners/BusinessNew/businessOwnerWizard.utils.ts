@@ -28,8 +28,7 @@ export function buildBusinessProfilePayload(
     mobileNumber: draft.mobileNumber,
     alternativeContactNumber: draft.alternativeContactNumber,
     websiteUrl: draft.websiteUrl,
-    // No UI field for this anymore, but the backend payload still requires it.
-    groupName: "",
+    groupName: draft.groupName,
     collectionArea: draft.collectionArea,
     area: draft.area,
     referredBy: draft.referredBy,
@@ -108,6 +107,7 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
     area: profile.area ?? "",
     collectionArea: profile.collectionArea ?? "",
     referredBy: profile.referredBy ?? "",
+    groupName: profile.groupName ?? "",
     aboutProfile: profile.aboutProfile ?? "",
     emailId: profile.emailId ?? "",
     websiteUrl: profile.websiteUrl ?? "",

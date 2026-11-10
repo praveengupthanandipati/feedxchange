@@ -70,25 +70,6 @@ const asNumber = (value: unknown, fallback?: number) => {
   return Number.isFinite(numberValue) ? numberValue : fallback;
 };
 
-const toUpdateQualitySpecifications = (
-  specifications: Contract["sellerQualitySpecifications"] | undefined,
-) =>
-  (specifications ?? [])
-    .map((specification) => ({
-      profileId: Number(specification.profileId),
-      parameterId: Number(specification.parameterId),
-      minValue: Number(specification.minValue) || 0,
-      maxValue: Number(specification.maxValue) || 0,
-      unit: specification.unit ?? "",
-    }))
-    .filter(
-      (specification) =>
-        Number.isInteger(specification.profileId) &&
-        specification.profileId > 0 &&
-        Number.isInteger(specification.parameterId) &&
-        specification.parameterId > 0,
-    );
-
 /** One product feature shown under Seller / Buyer Conditions: the name is fixed, the min / max are editable. */
 interface FeatureSpec {
   parameter: string;
@@ -133,6 +114,31 @@ const toSavePayload = (profileId: number, specs: FeatureSpec[]) =>
       unit: "",
     }))
     .filter((spec) => spec.minValue !== null || spec.maxValue !== null);
+
+/** Saved contract specifications -> editable rows (parameter name with its min / max as text). */
+const toFeatureSpecs = (specifications: Contract["sellerQualitySpecifications"] | undefined): FeatureSpec[] =>
+  (specifications ?? [])
+    .filter((spec) => spec.parameter?.trim())
+    .map((spec) => ({
+      parameter: String(spec.parameter).trim(),
+      min: spec.minValue == null ? "" : String(spec.minValue),
+      max: spec.maxValue == null ? "" : String(spec.maxValue),
+    }));
+
+/**
+ * An existing contract's saved specs laid out on the product's features: each feature shows what the contract saved (blank when it saved
+ * none for it); saved parameters the product no longer lists are kept at the end. A contract with nothing saved starts from the product.
+ */
+const mergeSavedSpecs = (features: FeatureSpec[], saved: FeatureSpec[]): FeatureSpec[] => {
+  if (saved.length === 0) return features.map((spec) => ({ ...spec }));
+  const byName = new Map(saved.map((spec) => [spec.parameter.toLowerCase(), spec]));
+  const merged = features.map((feature) => {
+    const match = byName.get(feature.parameter.toLowerCase());
+    return match ? { parameter: feature.parameter, min: match.min, max: match.max } : { parameter: feature.parameter, min: "", max: "" };
+  });
+  const listed = new Set(features.map((feature) => feature.parameter.toLowerCase()));
+  return [...merged, ...saved.filter((spec) => !listed.has(spec.parameter.toLowerCase())).map((spec) => ({ ...spec }))];
+};
 
 /** Blank -> null (optional); otherwise a whole number inside [min, max], or NaN when invalid. */
 const parseOptionalWhole = (value: string, min: number, max: number): number | null => {
@@ -532,7 +538,7 @@ const { data: products } = useGetProductsQuery();
         })),
       [products],
     );
-    // Product features -> editable quality specs for the seller and the buyer (new contracts only; an edit keeps its saved specs untouched).
+    // Product features -> editable quality specs for the seller and the buyer (a new contract starts from the product, an edit from its saved values).
     const isEditMode = !!navState?.isEdit;
     const defaultFeatures = useMemo<FeatureSpec[]>(() => {
       const product = (products ?? []).find((item) => String(item.id) === productId);
@@ -548,13 +554,26 @@ const { data: products } = useGetProductsQuery();
     const [sellerSpecs, setSellerSpecs] = useState<FeatureSpec[]>([]);
     const [buyerSpecs, setBuyerSpecs] = useState<FeatureSpec[]>([]);
 
+    // Editing: the values saved on the contract, per side, as editable rows (only while the product is still the contract's own).
+    const savedSellerSpecs = useMemo(() => toFeatureSpecs(editContract?.sellerQualitySpecifications), [editContract]);
+    const savedBuyerSpecs = useMemo(() => toFeatureSpecs(editContract?.buyerQualitySpecifications), [editContract]);
+    const savedSpecsKey = JSON.stringify([savedSellerSpecs, savedBuyerSpecs]);
+    const contractProductId = editContract?.productId != null ? String(editContract.productId) : "";
+    const keepSavedSpecs = isEditMode && !!productId && productId === contractProductId;
+
     // Reload both lists whenever the selected product (or its features) changes; a refetch with identical data keeps the user's edits.
+    // A new contract starts from the product's features; an existing one from its saved values, laid out on the product's features.
     useEffect(() => {
-      if (isEditMode) return;
-      setSellerSpecs(defaultFeatures.map((spec) => ({ ...spec })));
-      setBuyerSpecs(defaultFeatures.map((spec) => ({ ...spec })));
+      if (isEditMode && !contractDetails) return; // wait for the saved specs
+      if (keepSavedSpecs) {
+        setSellerSpecs(mergeSavedSpecs(defaultFeatures, savedSellerSpecs));
+        setBuyerSpecs(mergeSavedSpecs(defaultFeatures, savedBuyerSpecs));
+      } else {
+        setSellerSpecs(defaultFeatures.map((spec) => ({ ...spec })));
+        setBuyerSpecs(defaultFeatures.map((spec) => ({ ...spec })));
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [defaultFeaturesKey, isEditMode]);
+    }, [defaultFeaturesKey, isEditMode, keepSavedSpecs, savedSpecsKey, !!contractDetails]);
 
     const patchSpec =
       (setter: typeof setSellerSpecs) => (index: number, patch: Partial<Pick<FeatureSpec, "min" | "max">>) =>
@@ -723,8 +742,8 @@ const { data: products } = useGetProductsQuery();
         sellerConditions.deliverySchedule === "forward-contract" ? sellerConditions.toDate : "skip",
       sellerSpecificDays:
         sellerConditions.deliverySchedule === "specific-days" ? sellerConditions.specificDays : "skip",
-      // New contracts record the product's features instead of a spec source, so the source is only required when editing.
-      sellerQualitySpecSource: isEditMode ? sellerConditions.qualitySpecSource : "skip",
+      // Contracts record the product's features (editable min / max) instead of a spec source, so no source is asked for.
+      sellerQualitySpecSource: "skip",
       sellerAddress: sellerConditions.address,
       buyerCommission: buyerConditions.commission,
       buyerDeliverySchedule: buyerConditions.deliverySchedule,
@@ -734,7 +753,7 @@ const { data: products } = useGetProductsQuery();
         buyerConditions.deliverySchedule === "forward-contract" ? buyerConditions.toDate : "skip",
       buyerSpecificDays:
         buyerConditions.deliverySchedule === "specific-days" ? buyerConditions.specificDays : "skip",
-      buyerQualitySpecSource: isEditMode ? buyerConditions.qualitySpecSource : "skip",
+      buyerQualitySpecSource: "skip",
       buyerAddress: buyerConditions.address,
       paymentTerms,
       paymentBeforeDate: paymentTerms === "100-advance" ? paymentBeforeDate : "skip",
@@ -844,13 +863,11 @@ const { data: products } = useGetProductsQuery();
     return;
   }
 
-  if (!isEditMode) {
-    const specError =
-      validateFeatureSpecs("Seller", sellerSpecs) || validateFeatureSpecs("Buyer", buyerSpecs);
-    if (specError) {
-      setFormError(specError);
-      return;
-    }
+  const specError =
+    validateFeatureSpecs("Seller", sellerSpecs) || validateFeatureSpecs("Buyer", buyerSpecs);
+  if (specError) {
+    setFormError(specError);
+    return;
   }
 
   setFormError("");
@@ -954,9 +971,7 @@ const { data: products } = useGetProductsQuery();
         loadingAddressId: Number(sellerConditions.address) || 0,
         sellerQualitySpecSource: sellerConditions.qualitySpecSource || null,
         sellerRemarksSpecialConditions: sellerConditions.remarks || "",
-        sellerQualitySpecifications: toUpdateQualitySpecifications(
-          existingContract?.sellerQualitySpecifications,
-        ),
+        sellerQualitySpecifications: toSavePayload(Number(sellerId), sellerSpecs),
         buyerCommission: Number(buyerConditions.commission) || 0,
         buyerDeliverySchedule: buyerConditions.deliverySchedule || "ready-loading",
         buyerSpecificDays: Number(buyerConditions.specificDays) || 0,
@@ -965,9 +980,7 @@ const { data: products } = useGetProductsQuery();
         deliveryAddressId: Number(buyerConditions.address) || 0,
         buyerQualitySpecSource: buyerConditions.qualitySpecSource || null,
         buyerRemarksSpecialConditions: buyerConditions.remarks || "",
-        buyerQualitySpecifications: toUpdateQualitySpecifications(
-          existingContract?.buyerQualitySpecifications,
-        ),
+        buyerQualitySpecifications: toSavePayload(Number(buyerId), buyerSpecs),
         remarks: paymentRemarks || existingContract?.paymentRemarks || "",
         approvalRequired: existingContract?.approvalRequired ?? true,
         createdBy: existingContract?.createdById ?? currentUserId,
@@ -1885,22 +1898,7 @@ const { data: products } = useGetProductsQuery();
                 </div>
               )}
 
-              {isEditMode ? (
-              <div className="form-field new-contract__grid--full">
-                <span className="form-field__label">
-                  Quality Spec Source <span className="form-field__required">*</span>
-                </span>
-                <SearchableSelect
-                  options={qualitySpecSourceOptions}
-                  value={sellerConditions.qualitySpecSource}
-                  onChange={(value) => handleSellerConditionChange({ qualitySpecSource: value })}
-                  placeholder="Select Source"
-                  ariaLabel="Seller quality spec source"
-                />
-              </div>
-              ) : (
-                renderFeatureSpecs("Seller", sellerSpecs, setSellerSpecs)
-              )}
+              {renderFeatureSpecs("Seller", sellerSpecs, setSellerSpecs)}
 
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">
@@ -2009,22 +2007,7 @@ const { data: products } = useGetProductsQuery();
                 </div>
               )}
 
-              {isEditMode ? (
-              <div className="form-field new-contract__grid--full">
-                <span className="form-field__label">
-                  Quality Spec Source <span className="form-field__required">*</span>
-                </span>
-                <SearchableSelect
-                  options={qualitySpecSourceOptions}
-                  value={buyerConditions.qualitySpecSource}
-                  onChange={(value) => handleBuyerConditionChange({ qualitySpecSource: value })}
-                  placeholder="Select Source"
-                  ariaLabel="Buyer quality spec source"
-                />
-              </div>
-              ) : (
-                renderFeatureSpecs("Buyer", buyerSpecs, setBuyerSpecs)
-              )}
+              {renderFeatureSpecs("Buyer", buyerSpecs, setBuyerSpecs)}
 
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">

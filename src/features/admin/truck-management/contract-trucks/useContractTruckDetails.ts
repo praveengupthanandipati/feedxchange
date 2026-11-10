@@ -20,6 +20,7 @@ export interface ContractTruckDetail {
   driverName: string;
   driverPhone: string;
   lrNumber: string;
+  trackingUrl: string;
   maxCapacity: string;
   startDateTime: string;
   startLocation: string;
@@ -64,6 +65,7 @@ export function useContractTruckDetails(contractNumber: string, enabled: boolean
         driverName: truck.driverName,
         driverPhone: driver?.mobileNumber ?? "-",
         lrNumber: truck.lrNumber?.trim() || "-",
+        trackingUrl: truck.trackingUrl?.trim() || "",
         maxCapacity: truckDetail ? `${truckDetail.capacity} ${truckDetail.capacityUnit}` : "-",
         startDateTime: formatApiDateTime(truck.assignedOn),
         startLocation: truck.loadingAddress,

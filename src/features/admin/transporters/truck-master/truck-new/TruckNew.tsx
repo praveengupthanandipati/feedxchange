@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeftIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
@@ -7,7 +7,6 @@ import {
   useAddTruckDetailsMutation,
   useUpdateTruckDetailsMutation,
 } from "../../../../../core/store/trucksApi";
-import { useGetTransporterProfileSummaryQuery } from "../../../../../core/store/transportersApi";
 import {
   truckTypeOptions,
   makeOptions,
@@ -23,7 +22,6 @@ import "../../../contracts/NewContract.scss";
 const CURRENT_YEAR = new Date().getFullYear();
 
 interface FormErrors {
-  transporterProfileId?: string;
   truckNumber?: string;
   truckType?: string;
   make?: string;
@@ -33,6 +31,7 @@ interface FormErrors {
   capacityUnit?: string;
   fuelType?: string;
   ownershipType?: string;
+  trackingUrl?: string;
 }
 
 const TruckNew = () => {
@@ -45,17 +44,6 @@ const TruckNew = () => {
   const [addTruckDetails] = useAddTruckDetailsMutation();
   const [updateTruckDetails] = useUpdateTruckDetailsMutation();
 
-  const { data: transporters } = useGetTransporterProfileSummaryQuery();
-  const transporterOptions = useMemo(
-    () =>
-      (transporters ?? []).map((transporter) => ({
-        value: String(transporter.profileId),
-        label: transporter.legalName,
-      })),
-    [transporters],
-  );
-
-  const [transporterProfileId, setTransporterProfileId] = useState("");
   const [truckNumber, setTruckNumber] = useState("");
   const [truckType, setTruckType] = useState("");
   const [make, setMake] = useState("");
@@ -65,6 +53,7 @@ const TruckNew = () => {
   const [capacityUnit, setCapacityUnit] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [ownershipType, setOwnershipType] = useState("");
+  const [trackingUrl, setTrackingUrl] = useState("");
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -72,7 +61,6 @@ const TruckNew = () => {
 
   useEffect(() => {
     if (!editingTruck) return;
-    setTransporterProfileId(String(editingTruck.profileId));
     setTruckNumber(editingTruck.truckNumber);
     setTruckType(editingTruck.truckType);
     setMake(editingTruck.make);
@@ -82,6 +70,7 @@ const TruckNew = () => {
     setCapacityUnit(editingTruck.capacityUnit);
     setFuelType(editingTruck.fuelType);
     setOwnershipType(editingTruck.ownershipType);
+    setTrackingUrl(editingTruck.trackingUrl ?? "");
   }, [editingTruck]);
 
   const handleSave = async () => {
@@ -90,8 +79,6 @@ const TruckNew = () => {
     const trimmedModel = model.trim();
 
     const nextErrors: FormErrors = {};
-
-    if (!transporterProfileId) nextErrors.transporterProfileId = "Transporter is required.";
 
     if (!trimmedTruckNumber) nextErrors.truckNumber = "Truck Number is required.";
     else if (trimmedTruckNumber.length < 2) nextErrors.truckNumber = "Truck Number must be at least 2 characters.";
@@ -122,11 +109,14 @@ const TruckNew = () => {
 
     if (!ownershipType) nextErrors.ownershipType = "Ownership Type is required.";
 
+    if (trackingUrl.trim() && !/^https?:\/\/.+/i.test(trackingUrl.trim())) {
+      nextErrors.trackingUrl = "Enter a valid URL starting with http:// or https://";
+    }
+
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
     const truckDetails = {
-      profileId: Number(transporterProfileId),
       truckNumber: trimmedTruckNumber,
       truckType,
       make,
@@ -136,6 +126,8 @@ const TruckNew = () => {
       capacityUnit,
       fuelType,
       ownershipType,
+      // blank removes a saved link
+      trackingUrl: trackingUrl.trim(),
       actionPerformedBy: Number(localStorage.getItem("userId")) || 0,
     };
 
@@ -176,22 +168,6 @@ const TruckNew = () => {
       <section className="new-contract__section">
         <h2 className="new-contract__section-title">1. Truck Identification</h2>
         <div className="new-contract__grid">
-          <div className="form-field">
-            <span className="form-field__label">
-              Transporter <span className="form-field__required">*</span>
-            </span>
-            <SearchableSelect
-              options={transporterOptions}
-              value={transporterProfileId}
-              onChange={setTransporterProfileId}
-              placeholder="Select Transporter"
-              ariaLabel="Transporter"
-            />
-            {errors.transporterProfileId && (
-              <p className="form-field__error">{errors.transporterProfileId}</p>
-            )}
-          </div>
-
           <div className="form-field">
             <label className="form-field__label" htmlFor="truckNumber">
               Truck Number <span className="form-field__required">*</span>
@@ -315,6 +291,21 @@ const TruckNew = () => {
               ariaLabel="Fuel Type"
             />
             {errors.fuelType && <p className="form-field__error">{errors.fuelType}</p>}
+          </div>
+
+          <div className="form-field">
+            <label className="form-field__label" htmlFor="trackingUrl">
+              Truck Tracking URL
+            </label>
+            <input
+              id="trackingUrl"
+              type="text"
+              className="form-field__control"
+              placeholder="Truck Tracking URL (e.g. https://maps.google.com)"
+              value={trackingUrl}
+              onChange={(event) => setTrackingUrl(event.target.value)}
+            />
+            {errors.trackingUrl && <p className="form-field__error">{errors.trackingUrl}</p>}
           </div>
         </div>
       </section>

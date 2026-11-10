@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { MailIcon } from "../../../../../shared/components/icon";
-import ShareModal from "../../../../../shared/components/dialog/ShareModal";
-import type { ShareModalPayload } from "../../../../../shared/components/dialog/ShareModal";
+import SendMessageModal from "../../../../../shared/notifications/SendMessageModal";
+import Can from "../../../../../core/auth/Can";
 import type { TransporterProfile } from "./transporterDetail.data";
 import {
   useGetAllTransporterLinesQuery,
@@ -11,6 +11,7 @@ import {
 
 interface OverviewTabProps {
   profile: TransporterProfile;
+  profileId: number;
 }
 
 interface DetailFieldProps {
@@ -25,11 +26,9 @@ const DetailField = ({ label, value }: DetailFieldProps) => (
   </div>
 );
 
-const OverviewTab = ({ profile }: OverviewTabProps) => {
+const OverviewTab = ({ profile, profileId }: OverviewTabProps) => {
   const [messageOpen, setMessageOpen] = useState(false);
   const primaryAddress = profile.addresses[0];
-
-  const handleSendMessage = (_payload: ShareModalPayload) => undefined;
 
   const { data: transporterLines } = useGetAllTransporterLinesQuery();
   const lineOfTransporter = useMemo(
@@ -54,13 +53,15 @@ const OverviewTab = ({ profile }: OverviewTabProps) => {
       <section className="business-owner-detail__section">
         <div className="business-owner-detail__section-header">
           <h2 className="business-owner-detail__section-title">Profile Details</h2>
-          <button
-            type="button"
-            className="transporters-btn transporters-btn--outline"
-            onClick={() => setMessageOpen(true)}
-          >
-            <MailIcon aria-hidden /> Message
-          </button>
+          <Can any={["notifications.send"]}>
+            <button
+              type="button"
+              className="transporters-btn transporters-btn--outline"
+              onClick={() => setMessageOpen(true)}
+            >
+              <MailIcon aria-hidden /> Message
+            </button>
+          </Can>
         </div>
         <div className="business-owner-detail__grid">
           <DetailField label="Trading Name" value={profile.tradingName} />
@@ -139,14 +140,11 @@ const OverviewTab = ({ profile }: OverviewTabProps) => {
         </p>
       </section>
 
-      <ShareModal
+      <SendMessageModal
         open={messageOpen}
-        title="Send Message"
         onClose={() => setMessageOpen(false)}
-        onSend={handleSendMessage}
-        fixedRecipientLabel={profile.tradingName || profile.transporterLegalName}
-        messagePlaceholder="Enter your message"
-        confirmLabel="Send Message"
+        profileId={profileId}
+        title={`Send message to ${profile.tradingName || profile.transporterLegalName}`}
       />
     </div>
   );

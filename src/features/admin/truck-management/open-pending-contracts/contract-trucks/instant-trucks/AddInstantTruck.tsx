@@ -118,6 +118,12 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
   );
   const selectedBusyTruck = findBusyTruck(busyTrucks, form.truck);
 
+  // Picking a truck brings its tracking URL from the truck master; it stays editable. A number typed in (not in the master) keeps what is entered.
+  const handleTruckPick = (value: string) => {
+    const picked = (trucks ?? []).find((t) => String(t.truckId) === value);
+    setForm((prev) => ({ ...prev, truck: value, trackingUrl: picked ? (picked.trackingUrl ?? "") : prev.trackingUrl }));
+  };
+
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
@@ -203,7 +209,6 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
     if (existing) return existing.truckId;
 
     await addTruckDetails({
-      profileId: Number(form.transporter),
       truckNumber,
       truckType: "",
       make: "",
@@ -248,6 +253,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
         driverId: Number(form.driverName),
         assignedOn,
         lrNumber: form.lrNumber.trim(),
+        trackingUrl: form.trackingUrl.trim() || undefined,
         quantityMT: Number(form.qty),
         freightPerMT: Number(form.freight),
         fromAddressId: Number(form.loadingAddress),
@@ -347,7 +353,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
           <SearchableSelect
             options={truckOptions}
             value={form.truck}
-            onChange={(value) => setField("truck", value)}
+            onChange={handleTruckPick}
             placeholder="Select or type a truck number"
             ariaLabel="Select Truck"
             allowCustom

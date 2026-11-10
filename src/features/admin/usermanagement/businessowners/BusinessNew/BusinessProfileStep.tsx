@@ -74,6 +74,8 @@ const BusinessProfileStep = () => {
           onCollectionAreaChange={(value) => updateDraft({ collectionArea: value })}
           referredBy={draft.referredBy}
           onReferredByChange={(value) => updateDraft({ referredBy: value })}
+          groupName={draft.groupName}
+          onGroupNameChange={(value) => updateDraft({ groupName: value })}
           aboutProfile={draft.aboutProfile}
           onAboutProfileChange={(value) => updateDraft({ aboutProfile: value })}
           buyBrokerageCharges={draft.buyBrokerageCharges}

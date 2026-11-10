@@ -79,7 +79,6 @@ const TruckView = () => {
             <div className="business-owner-detail__grid">
               <DetailField label="Truck Number" value={truck.truckNumber} />
               <DetailField label="Truck Type" value={truck.truckType} />
-              <DetailField label="Transporter" value={truck.profileLegalName} />
               <DetailField label="Status" value={truck.status} />
             </div>
           </section>
@@ -92,6 +91,16 @@ const TruckView = () => {
               <DetailField label="Year of Manufacture" value={truck.manufactureYear} />
               <DetailField label="Capacity" value={`${truck.capacity} ${truck.capacityUnit}`} />
               <DetailField label="Fuel Type" value={truck.fuelType} />
+              <DetailField
+                label="Tracking URL"
+                value={
+                  truck.trackingUrl ? (
+                    <a href={truck.trackingUrl} target="_blank" rel="noopener noreferrer">
+                      {truck.trackingUrl}
+                    </a>
+                  ) : null
+                }
+              />
             </div>
           </section>
 

@@ -31,6 +31,7 @@ export function buildPromoterProfilePayload(
     aboutProfile: draft.aboutProfile,
     status: draft.status,
     createdBy: currentUserId,
+    productIds: draft.associatedProductIds.map(Number).filter((id) => Number.isInteger(id) && id > 0),
     promoterProfileDetails: {
       promoterCode: draft.promoterCode,
       companyName: draft.companyName,
@@ -82,7 +83,7 @@ export function hydrateDraftFromPromoterProfile(profile: PromoterProfileDetail):
     collectionArea: profile.collectionArea,
     referredBy: profile.referredBy,
     aboutProfile: profile.aboutProfile,
-    associatedProducts: "",
+    associatedProductIds: (profile.products ?? []).map((product) => String(product.productId)),
     regions: (profile.promoterRegions ?? []).map((region) => ({
       id: nextRegionId(),
       stateName: region.stateName,
