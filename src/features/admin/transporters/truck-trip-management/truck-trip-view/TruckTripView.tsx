@@ -8,6 +8,9 @@ import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.
 import "../truck-trip-list/TruckTrip.scss";
 
 import Can from "../../../../../core/auth/Can";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
+import SuccessToast from "../../../../../shared/components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../../shared/components/toast/useSuccessToast";
 
 interface DetailFieldProps {
   label: string;
@@ -43,6 +46,7 @@ const TruckTripView = () => {
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [completing, setCompleting] = useState(false);
   const [completeError, setCompleteError] = useState<string | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleCompleteTrip = async (values: CompleteTripValues) => {
     if (!trip) return;
@@ -61,8 +65,9 @@ const TruckTripView = () => {
         actionPerformedBy,
       }).unwrap();
       setCompleteModalOpen(false);
+      showSuccessMessage("Trip completed successfully.");
     } catch (err) {
-      setCompleteError(err instanceof Error ? err.message : "Failed to complete trip.");
+      setCompleteError(getErrorMessage(err, "Failed to complete trip."));
     } finally {
       setCompleting(false);
     }
@@ -71,6 +76,7 @@ const TruckTripView = () => {
   if (!trip) {
     return (
       <div className="business-owner-detail">
+        <SuccessToast message={successMessage} />
         <Link to="/admin/truck-management/transporters/truck-trips" className="business-owner-detail__back">
           <ArrowLeftIcon aria-hidden /> Back to Truck Trips List
         </Link>

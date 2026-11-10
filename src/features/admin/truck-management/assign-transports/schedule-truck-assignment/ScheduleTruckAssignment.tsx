@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
+import SuccessToast from "../../../../../shared/components/toast/SuccessToast";
+import { useSuccessToast } from "../../../../../shared/components/toast/useSuccessToast";
 import { buildScheduleTruckColumns } from "./scheduleTruckAssignment.columns";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 import ScheduleRequestDrawer from "./ScheduleRequestDrawer";
@@ -27,6 +29,7 @@ const ScheduleTruckAssignment = ({
   const [editingRow, setEditingRow] = useState<ScheduleTruckRow | null>(null);
   const [rowPendingDelete, setRowPendingDelete] = useState<ScheduleTruckRow | null>(null);
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+  const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
   const handleToggleTrucks = (row: ScheduleTruckRow) => {
     setExpandedRowId((prev) => (prev === row.id ? null : row.id));
@@ -45,6 +48,11 @@ const ScheduleTruckAssignment = ({
   const handleSave = (row: ScheduleTruckRow) => {
     setRows((prev) =>
       editingRow ? prev.map((item) => (item.id === row.id ? row : item)) : [row, ...prev],
+    );
+    showSuccessMessage(
+      editingRow
+        ? "Scheduled request updated in this view."
+        : "Scheduled request created successfully.",
     );
   };
 
@@ -67,6 +75,7 @@ const ScheduleTruckAssignment = ({
 
   return (
     <div className="schedule-truck-assignment">
+      <SuccessToast message={successMessage} />
       <div className="schedule-truck-assignment__header">
         <h2>Schedule Truck Assignment ({rows.length})</h2>
         <button

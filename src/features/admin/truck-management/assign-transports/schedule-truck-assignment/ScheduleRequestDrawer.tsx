@@ -9,6 +9,7 @@ import { useGetTransporterProfileSummaryQuery } from "../../../../../core/store/
 import AddressSelectField from "../../contract-trucks/AddressSelectField";
 import { useGetScheduleStatusesQuery } from "../../../../../core/store/contractsApi";
 import { useScheduleContractTrucksMutation } from "../../../../../core/store/contractTrucksApi";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
 import "./ScheduleTruckAssignment.scss";
 import { useNotifyPrompt } from "../../../../../shared/notifications/useNotifyPrompt";
@@ -236,8 +237,8 @@ const ScheduleRequestDrawer = ({
           onClose();
         },
       );
-    } catch {
-      setSubmitError("Failed to save the scheduled request. Please try again.");
+    } catch (error) {
+      setSubmitError(getErrorMessage(error, "Failed to save the scheduled request. Please try again."));
     }
   };
 

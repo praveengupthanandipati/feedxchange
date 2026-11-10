@@ -14,6 +14,7 @@ import {
   useUpdateContractStatusMutation,
 } from "../../../../core/store/contractsApi";
 import { usePermission } from "../../../../core/auth/AuthContext";
+import { getErrorMessage } from "../../../../core/api/getErrorMessage";
 import NotifyModal from "../../../../shared/notifications/NotifyModal";
 import NotifyChoicePicker from "../../../../shared/notifications/NotifyChoicePicker";
 import type { NotifyChoices } from "../../../../shared/notifications/notifyChoices";
@@ -430,11 +431,12 @@ const ContractchangeStatus = () => {
         setNotifyContract(record.contractNumber);
         return;
       }
-      navigate("/admin/contracts");
+      navigate("/admin/contracts", {
+        state: { successMessage: "Contract status updated successfully." },
+      });
     } catch (error) {
-      // Only a generic message is shown; the server's reason is logged.
       console.error("Failed to update contract status:", error);
-      setError("Failed to update contract status.");
+      setError(getErrorMessage(error, "Failed to update contract status."));
     }
   };
 
@@ -651,7 +653,11 @@ const ContractchangeStatus = () => {
         closeOnBackdrop={false}
         choices={notifyChoices}
         onSkip={() => undefined}
-        onClose={() => navigate("/admin/contracts")}
+        onClose={() =>
+          navigate("/admin/contracts", {
+            state: { successMessage: "Contract status updated successfully." },
+          })
+        }
       />
 
       <GetContractsDrawer

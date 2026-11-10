@@ -3,6 +3,35 @@
 
 .driver-truck-mapping-page {
   padding-bottom: v.$spacing-6;
+
+  .category-toast,
+  .driver-truck-mapping-error-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    min-width: min(320px, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .category-toast {
+    background: var(--fx-green-94);
+    border: 1px solid var(--fx-green-74-line);
+    color: var(--fx-green-34-fg);
+  }
+
+  .driver-truck-mapping-error-toast {
+    background: var(--fx-red-94);
+    border: 1px solid var(--fx-red-80-line);
+    color: var(--fx-red-45-fg);
+  }
 }
 
 .driver-truck-mapping-card {
