@@ -72,6 +72,8 @@ export interface AddPromoterProfilePayload {
   aboutProfile: string;
   status: string;
   createdBy: number;
+  /** Associated products (ids). On update: left out = unchanged, a list replaces the current ones. */
+  productIds?: number[];
   promoterProfileDetails: PromoterProfileDetailsPayload;
 }
 
@@ -160,6 +162,8 @@ export interface PromoterProfileDetail {
   documents: ProfileDocumentDetail[];
   businessMappings: PromoterBusinessMapping[];
   promoterRegions: PromoterRegionDetail[];
+  /** The products associated with the promoter. */
+  products?: { productId: number; productName: string | null }[];
 }
 
 export const promotersApi = createApi({

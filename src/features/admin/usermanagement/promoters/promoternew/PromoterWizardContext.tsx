@@ -29,7 +29,8 @@ export interface PromoterDraft {
   collectionArea: string;
   referredBy: string;
   aboutProfile: string;
-  associatedProducts: string;
+  /** Ids of the associated products. */
+  associatedProductIds: string[];
   regions: RegionEntry[];
   commissionStructure: string;
   commissionRateValue: string;
@@ -75,7 +76,7 @@ const emptyDraft = (): PromoterDraft => ({
   collectionArea: "",
   referredBy: "",
   aboutProfile: "",
-  associatedProducts: "",
+  associatedProductIds: [],
   regions: [],
   commissionStructure: "",
   commissionRateValue: "",

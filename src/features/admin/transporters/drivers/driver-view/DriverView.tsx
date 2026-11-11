@@ -1,11 +1,13 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftIcon, PenLineIcon } from "../../../../../shared/components/icon";
+import { ArrowLeftIcon, PenLineIcon, SendIcon } from "../../../../../shared/components/icon";
 import { useGetDriverByIdQuery } from "../../../../../core/store/driversApi";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
 import "../drivers-list/Drivers.scss";
 
 import Can from "../../../../../core/auth/Can";
+import SendMessageModal from "../../../../../shared/notifications/SendMessageModal";
 
 interface DetailFieldProps {
   label: string;
@@ -30,6 +32,7 @@ function formatDisplayDate(value: string): string {
 const DriverView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [messageOpen, setMessageOpen] = useState(false);
 
   const { data: driver, isLoading } = useGetDriverByIdQuery(id ?? "", { skip: !id });
 
@@ -68,6 +71,11 @@ const DriverView = () => {
                 }
               >
                 <PenLineIcon aria-hidden /> Edit
+              </button>
+            </Can>
+            <Can any={["notifications.send"]}>
+              <button type="button" className="drivers-btn drivers-btn--primary" onClick={() => setMessageOpen(true)}>
+                <SendIcon aria-hidden /> Send Message
               </button>
             </Can>
           </div>
@@ -128,6 +136,13 @@ const DriverView = () => {
           </section>
         </div>
       </div>
+
+      <SendMessageModal
+        open={messageOpen}
+        onClose={() => setMessageOpen(false)}
+        driverId={driver.driverId}
+        title={`Send message to ${driver.driverName}`}
+      />
     </div>
   );
 };

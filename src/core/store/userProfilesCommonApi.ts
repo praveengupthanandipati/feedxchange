@@ -243,6 +243,12 @@ export const userProfilesCommonApi = createApi({
   baseQuery: profilesBaseQuery(),
   tagTypes: ["UserProfile"],
   endpoints: (builder) => ({
+    /** The distinct group names already used by any profile (for the Group field's suggestions). */
+    getProfileGroupNames: builder.query<string[], void>({
+      query: () => "/api/Profile/GetGroupNames",
+      transformResponse: unwrapArray<string>,
+      providesTags: ["UserProfile"],
+    }),
     getProfileTypes: builder.query<ProfileType[], void>({
       query: () => "/api/ProfileTypes",
       transformResponse: unwrapArray<ProfileType>,
@@ -281,7 +287,8 @@ export const userProfilesCommonApi = createApi({
       providesTags: ["UserProfile"],
     }),
     updateProfileAddress: builder.mutation<void, ProfileAddressDetail>({
-      query: (body) => ({
+      // Sent exactly as the API's schema: the display-only name fields are not part of it.
+      query: ({ createdByName: _createdByName, modifiedByName: _modifiedByName, ...body }) => ({
         url: "/api/Profile/UpdateProfileAddress",
         method: "POST",
         body,
@@ -302,6 +309,15 @@ export const userProfilesCommonApi = createApi({
       query: (profileId) => `/api/Profile/GetProfileDocument/${profileId}`,
       transformResponse: unwrapArray<ProfileDocumentDetail>,
       providesTags: ["UserProfile"],
+    }),
+    deleteProfileDocument: builder.mutation<void, { profileId: number; documentId: number }>({
+      query: (body) => ({
+        url: "/api/Profile/DeleteProfileDocument",
+        method: "POST",
+        body,
+        responseHandler: "text",
+      }),
+      invalidatesTags: ["UserProfile"],
     }),
     updateProfileDocument: builder.mutation<void, UpdateProfileDocumentPayload>({
       query: (body) => ({
@@ -353,6 +369,7 @@ export const userProfilesCommonApi = createApi({
 
 export const {
   useGetProfileTypesQuery,
+  useGetProfileGroupNamesQuery,
   useCreateProfileAddressMutation,
   useCreateBusinessProfileAddressMutation,
   useGetProfileAddressQuery,
@@ -360,6 +377,8 @@ export const {
   useUpdateProfileAddressMutation,
   useCreateProfileDocumentMutation,
   useGetProfileDocumentQuery,
+  useLazyGetProfileDocumentQuery,
+  useDeleteProfileDocumentMutation,
   useUpdateProfileDocumentMutation,
   useCreateProfileBankAccountMutation,
   useGetProfileBankAccountQuery,

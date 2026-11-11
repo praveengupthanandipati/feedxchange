@@ -29,6 +29,8 @@ export interface PromoterProfile {
   emailId: string;
   completeAddress: string;
   companyName: string;
+  group: string;
+  associatedProducts: string;
   designation: string;
   commissionStructure: string;
   commissionRateValue: string;
@@ -60,6 +62,8 @@ export function mapPromoterProfileDetail(profile: PromoterProfileDetail): Promot
       primaryAddress?.pincode,
     ]),
     companyName: details?.companyName ?? "",
+    group: profile.groupName ?? "",
+    associatedProducts: (profile.products ?? []).map((product) => product.productName).filter(Boolean).join(", "),
     designation: details?.designation ?? "",
     commissionStructure: details?.commissionStructure ?? "",
     commissionRateValue: details ? String(details.commissionRate) : "",

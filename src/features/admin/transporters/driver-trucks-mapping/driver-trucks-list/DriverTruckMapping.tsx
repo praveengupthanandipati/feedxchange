@@ -15,7 +15,6 @@ import {
   useReleaseMappingMutation,
   type DriverTruckMapping,
 } from "../../../../../core/store/driverTruckMappingApi";
-import { apiErrorMessage } from "../../../../../core/store/sellerInvoiceApi";
 import { useGetAllActiveTruckDetailsQuery } from "../../../../../core/store/trucksApi";
 import { useGetAllActiveDriversQuery } from "../../../../../core/store/driversApi";
 import type { DriverTruckMappingFormValues } from "./driverTruckMapping.types";
@@ -51,7 +50,6 @@ const DriverTruckMappingPage = () => {
   const { data: trucks = [] } = useGetAllActiveTruckDetailsQuery();
   const { data: drivers = [] } = useGetAllActiveDriversQuery();
   const [addMapping, { isLoading: savingMapping }] = useAddMappingMutation();
-  const [saveError, setSaveError] = useState<string | null>(null);
   const [releaseMapping] = useReleaseMappingMutation();
 
   const driverPhoneById = useMemo(

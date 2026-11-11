@@ -143,6 +143,18 @@ const TruckList = ({
                   <span>LR Number:</span>
                   <p>{truck.lrNumber}</p>
                 </div>
+                <div>
+                  <span>Tracking URL:</span>
+                  <p>
+                    {truck.trackingUrl ? (
+                      <a href={truck.trackingUrl} target="_blank" rel="noopener noreferrer">
+                        {truck.trackingUrl}
+                      </a>
+                    ) : (
+                      "-"
+                    )}
+                  </p>
+                </div>
 
                 <div>
                   <span>Start Date &amp; Time:</span>

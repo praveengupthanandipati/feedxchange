@@ -10,6 +10,7 @@ import {
 } from "../../../../../core/store/promotersApi";
 import {
   useCreateProfileAddressMutation,
+  useLazyGetProfileAddressQuery,
   useUpdateProfileAddressMutation,
   type CreateProfileAddressEntry,
   type ProfileAddressDetail,
@@ -18,7 +19,16 @@ import { useEnableAutoNotifications } from "../../../notification-preferences/us
 import { usePromoterWizard } from "./PromoterWizardContext";
 import { buildPromoterProfilePayload } from "./promoterWizard.utils";
 
+class AddressRemovedError extends Error {
+  constructor() {
+    super(
+      "The promoter details were saved, but the server removed the promoter's address while saving them (UpdatePromoterProfile). The address was not saved. Please report this to the backend team.",
+    );
+  }
+}
+
 function getErrorMessage(err: unknown): string {
+  if (err instanceof AddressRemovedError) return err.message;
   console.error("Failed to save promoter profile:", err);
   return "Failed to save promoter profile.";
 }
@@ -34,6 +44,7 @@ export const useSavePromoterProfileStep = (nextPath: string) => {
   const [updatePromoterRegion] = useUpdatePromoterRegionMutation();
   const [createProfileAddress] = useCreateProfileAddressMutation();
   const [updateProfileAddress] = useUpdateProfileAddressMutation();
+  const [loadProfileAddresses] = useLazyGetProfileAddressQuery();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -45,8 +56,19 @@ export const useSavePromoterProfileStep = (nextPath: string) => {
       const now = new Date().toISOString();
       const payload = buildPromoterProfilePayload(draft, currentUserId);
 
+      // The profile's addresses as UpdateProfileAddress knows them; null when they couldn't be read.
+      const fetchAddresses = async (id: number): Promise<ProfileAddressDetail[] | null> => {
+        try {
+          return await loadProfileAddresses(String(id)).unwrap();
+        } catch {
+          return null;
+        }
+      };
+
       let currentProfileId = profileId;
+      let addressesBeforeUpdate: ProfileAddressDetail[] | null = null;
       if (currentProfileId) {
+        addressesBeforeUpdate = await fetchAddresses(currentProfileId);
         await updatePromoterProfile({ ...payload, profileId: currentProfileId, modifiedBy: currentUserId }).unwrap();
       } else {
         const createdId = Number(await addPromoterProfile(payload).unwrap());
@@ -75,14 +97,33 @@ export const useSavePromoterProfileStep = (nextPath: string) => {
       const newAddressEntries: CreateProfileAddressEntry[] = [];
       const updatedAddressEntries: ProfileAddressDetail[] = [];
 
-      if (draft.billingAddressMeta) {
+      // Use the address as UpdateProfileAddress knows it: the id held from GetPromoterProfileById can be one the
+      // update API doesn't find ("Profile address not found"), and a promoter created in this session has no id
+      // held at all (each later save created another address). Only when the lookup fails is the held id used.
+      const savedAddresses = await fetchAddresses(currentProfileId!);
+
+      // The address was there before the profile update and is gone after it: the server removed it. Say so
+      // instead of quietly creating a new address on every save.
+      if (addressesBeforeUpdate && addressesBeforeUpdate.length > 0 && savedAddresses && savedAddresses.length === 0) {
+        throw new AddressRemovedError();
+      }
+      const heldId = draft.billingAddressMeta?.addressId;
+      const existingAddress = savedAddresses
+        ? savedAddresses.find((address) => address.addressId === heldId) ??
+          savedAddresses.find((address) => address.isPrimary) ??
+          savedAddresses[0]
+        : draft.billingAddressMeta
+          ? { addressId: draft.billingAddressMeta.addressId, createdBy: draft.billingAddressMeta.createdBy, createdOn: draft.billingAddressMeta.createdOn }
+          : undefined;
+
+      if (existingAddress) {
         updatedAddressEntries.push({
           ...primaryAddressFields,
-          addressId: draft.billingAddressMeta.addressId,
+          addressId: existingAddress.addressId,
           profileId: currentProfileId!,
-          createdBy: draft.billingAddressMeta.createdBy,
+          createdBy: existingAddress.createdBy,
           createdByName: "",
-          createdOn: draft.billingAddressMeta.createdOn,
+          createdOn: existingAddress.createdOn,
           modifiedBy: currentUserId,
           modifiedByName: "",
           modifiedOn: now,

@@ -77,6 +77,21 @@
 
   &__table {
     overflow-x: auto;
+
+    // The table is wider than the card on laptop screens: keep the Edit / Cancel column in view while it scrolls.
+    th:last-child,
+    td:last-child:not([colspan]) {
+      position: sticky;
+      right: 0;
+      z-index: 1;
+      background-color: var(--fx-white);
+      box-shadow: -1px 0 0 var(--fx-gray-90, rgba(0, 0, 0, 0.08));
+    }
+
+    th:last-child {
+      z-index: 2;
+      background-color: var(--fx-blue-16);
+    }
   }
 
   &__status {

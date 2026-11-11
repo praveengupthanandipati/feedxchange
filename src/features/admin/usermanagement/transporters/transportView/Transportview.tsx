@@ -155,7 +155,7 @@ const Transportview = () => {
           id={`transporter-tabpanel-${activeTab}`}
           aria-labelledby={`transporter-tab-${activeTab}`}
         >
-          {activeTab === "overview" && <OverviewTab profile={profile} />}
+          {activeTab === "overview" && <OverviewTab profile={profile} profileId={Number(id)} />}
           {activeTab === "contacts" && <ContactsTab profile={profile} />}
           {activeTab === "bank" && <BankDetailsTab profile={profile} profileId={Number(id)} />}
           {/* View only: preferences are changed in the edit wizard's Notification Preferences step. */}

@@ -26,6 +26,7 @@ interface FormState {
   qty: string;
   freight: string;
   lrNumber: string;
+  trackingUrl: string;
 }
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -66,6 +67,7 @@ const EditContractTruckModal = ({
     qty: "",
     freight: "",
     lrNumber: "",
+    trackingUrl: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState("");
@@ -89,6 +91,7 @@ const EditContractTruckModal = ({
       qty: String(truck.quantityMT),
       freight: String(truck.freightPerMT),
       lrNumber: truck.lrNumber ?? "",
+      trackingUrl: truck.trackingUrl ?? "",
     });
     setErrors({});
     setSubmitError("");
@@ -117,6 +120,12 @@ const EditContractTruckModal = ({
   }, [open, onClose]);
 
   if (!open) return null;
+
+  // Picking a truck brings its tracking URL from the truck master; it stays editable. A number typed in (not in the master) keeps what is entered.
+  const handleTruckPick = (value: string) => {
+    const picked = (trucks ?? []).find((t) => String(t.truckId) === value);
+    setForm((prev) => ({ ...prev, truck: value, trackingUrl: picked ? (picked.trackingUrl ?? "") : prev.trackingUrl }));
+  };
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -148,6 +157,10 @@ const EditContractTruckModal = ({
       nextErrors.freight = "Enter a valid freight amount greater than 0.";
     }
 
+    if (form.trackingUrl.trim() && !/^https?:\/\/.+/i.test(form.trackingUrl.trim())) {
+      nextErrors.trackingUrl = "Enter a valid URL starting with http:// or https://";
+    }
+
     return nextErrors;
   };
 
@@ -175,6 +188,8 @@ const EditContractTruckModal = ({
           driverId: Number(form.driverId),
           assignedOn: new Date(`${form.date}T${form.time}`).toISOString(),
           lrNumber: form.lrNumber.trim(),
+          // blank removes the saved link
+          trackingUrl: form.trackingUrl.trim(),
           quantityMT: Number(form.qty),
           freightPerMT: Number(form.freight),
           fromAddressId: Number(form.loadingAddress),
@@ -231,7 +246,7 @@ const EditContractTruckModal = ({
                 <SearchableSelect
                   options={truckOptions}
                   value={form.truck}
-                  onChange={(value) => setField("truck", value)}
+                  onChange={handleTruckPick}
                   placeholder="Select Truck"
                   ariaLabel="Select Truck"
                 />
@@ -353,6 +368,21 @@ const EditContractTruckModal = ({
                   value={form.lrNumber}
                   onChange={(event) => setField("lrNumber", event.target.value)}
                 />
+              </div>
+
+              <div className="assign-truck-drawer__field">
+                <label className="assign-truck-drawer__label" htmlFor="edit-truck-tracking-url">
+                  Truck Tracking URL
+                </label>
+                <input
+                  id="edit-truck-tracking-url"
+                  type="text"
+                  className="assign-truck-drawer__control"
+                  placeholder="Truck Tracking URL (e.g. https://maps.google.com)"
+                  value={form.trackingUrl}
+                  onChange={(event) => setField("trackingUrl", event.target.value)}
+                />
+                {errors.trackingUrl && <p className="assign-truck-drawer__error">{errors.trackingUrl}</p>}
               </div>
             </div>
           </div>

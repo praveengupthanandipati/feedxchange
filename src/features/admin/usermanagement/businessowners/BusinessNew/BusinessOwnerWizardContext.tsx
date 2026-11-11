@@ -17,6 +17,7 @@ export interface BusinessOwnerDraft {
   collectionArea: string;
   area: string;
   referredBy: string;
+  groupName: string;
   aboutProfile: string;
   emailId: string;
   websiteUrl: string;
@@ -57,6 +58,7 @@ const emptyDraft = (): BusinessOwnerDraft => ({
   collectionArea: "",
   area: "",
   referredBy: "",
+  groupName: "",
   aboutProfile: "",
   emailId: "",
   websiteUrl: "",

@@ -75,7 +75,9 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
       Object.fromEntries(
         selections.map((s) => {
           const draft = prefill?.[s.rowNumber];
-          return [s.rowNumber, draft && s.allowCreateNew && s.kind === "NewTrip" ? { ...emptyRow(), ...draft, choice: "new" } : emptyRow()];
+          // the transporter starts as the one this truck last ran for (when the server knows it); it is chosen for each trip
+          const start = { ...emptyRow(), transporterId: s.transporterProfileId ? String(s.transporterProfileId) : "" };
+          return [s.rowNumber, draft && s.allowCreateNew && s.kind === "NewTrip" ? { ...start, ...draft, choice: "new" } : start];
         }),
       ),
     );
@@ -99,12 +101,12 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
   const stepsFor = (selection: TripSelection, state: RowState): string[] => {
     const steps: string[] = [];
     const transporterLabel = transporterOptions.find((o) => o.value === state.transporterId)?.label ?? selection.transporterName ?? "the selected transporter";
-    if (!selection.truckInMaster) steps.push(`Add truck ${selection.truckNumber} to the truck master under ${transporterLabel}.`);
+    if (!selection.truckInMaster) steps.push(`Add truck ${selection.truckNumber} to the truck master.`);
     if (!selection.mappedDriver) {
       if (state.driverMode === "new") steps.push(`Add driver ${state.driverName.trim() || "(new driver)"} to the driver master.`);
       steps.push("Map the driver to the truck.");
     }
-    steps.push(`Assign truck ${selection.truckNumber} to contract ${selection.contractNumber} as a new trip with status Loaded (${selection.invoiceQtyMT} MT).`);
+    steps.push(`Assign truck ${selection.truckNumber} to contract ${selection.contractNumber} with ${transporterLabel} as the transporter, as a new trip with status Loaded (${selection.invoiceQtyMT} MT).`);
     steps.push("Create the invoice against that trip.");
     return steps;
   };
@@ -112,7 +114,7 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
   const rowComplete = (selection: TripSelection, state: RowState): boolean => {
     if (!state.choice) return false;
     if (state.choice !== "new") return true;
-    if (!selection.truckInMaster && !state.transporterId) return false;
+    if (!state.transporterId) return false;
     if (!selection.mappedDriver) {
       if (state.driverMode === "existing" && !state.driverId) return false;
       if (state.driverMode === "new" && (!state.driverName.trim() || !state.driverMobile.trim())) return false;
@@ -132,7 +134,7 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
           createNewTrip: true,
           accepted: true,
           tripSetup: {
-            transporterProfileId: selection.truckInMaster ? null : Number(state.transporterId),
+            transporterProfileId: Number(state.transporterId),
             ...(selection.mappedDriver
               ? {}
               : state.driverMode === "existing"
@@ -241,12 +243,10 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
 
                 {state.choice === "new" && (
                   <div className="si-trips__setup">
-                    {!selection.truckInMaster && (
-                      <div className="si-trips__field">
-                        <label>Transporter (owner of truck {selection.truckNumber}) <span className="si-req" aria-hidden>*</span></label>
-                        <SearchableSelect options={transporterOptions} value={state.transporterId} onChange={(v) => patch(selection.rowNumber, { transporterId: v, accepted: [] })} placeholder="Select transporter" ariaLabel="Transporter" />
-                      </div>
-                    )}
+                    <div className="si-trips__field">
+                      <label>Transporter for this trip <span className="si-req" aria-hidden>*</span></label>
+                      <SearchableSelect options={transporterOptions} value={state.transporterId} onChange={(v) => patch(selection.rowNumber, { transporterId: v, accepted: [] })} placeholder="Select transporter" ariaLabel="Transporter" />
+                    </div>
 
                     {selection.mappedDriver ? (
                       <p className="si-muted">

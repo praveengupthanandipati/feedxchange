@@ -14,6 +14,7 @@ import {
   useDeleteDriverMutation,
   type Driver,
 } from "../../../../../core/store/driversApi";
+import { useGetAllMappingsQuery } from "../../../../../core/store/driverTruckMappingApi";
 import "./Drivers.scss";
 
 import Can from "../../../../../core/auth/Can";
@@ -49,6 +50,7 @@ const DriversList = () => {
     refetchOnMountOrArgChange: true,
   });
   const [deleteDriver] = useDeleteDriverMutation();
+  const { data: mappings = [] } = useGetAllMappingsQuery(undefined, { refetchOnMountOrArgChange: true });
   const rows = useMemo(() => data ?? [], [data]);
 
   const [keyword, setKeyword] = useState("");
@@ -72,8 +74,18 @@ const DriversList = () => {
     setPendingDeleteRow(driver);
   };
 
+  // A driver still assigned to a truck can't be deleted: the mapping has to be released first.
+  const activeMapping = pendingDeleteRow
+    ? mappings.find(
+        (mapping) =>
+          mapping.driverId === pendingDeleteRow.driverId &&
+          mapping.isActive !== false &&
+          (mapping.status ?? "").toLowerCase() !== "released",
+      )
+    : undefined;
+
   const confirmDelete = async () => {
-    if (!pendingDeleteRow) return;
+    if (!pendingDeleteRow || activeMapping) return;
 
     const actionPerformedBy = Number(localStorage.getItem("userId")) || 0;
 
@@ -214,11 +226,14 @@ const DriversList = () => {
 
       <ConfirmDialog
         open={pendingDeleteRow !== null}
-        title="Remove this driver?"
+        title={activeMapping ? "Driver is assigned to a truck" : "Remove this driver?"}
         message={
-          deleteError ||
-          `This will permanently delete "${pendingDeleteRow?.driverName}". This cannot be undone.`
+          activeMapping
+            ? `"${pendingDeleteRow?.driverName}" is assigned to truck ${activeMapping.truckNumber}. Release this mapping in Driver-Truck Mapping before deleting the driver.`
+            : deleteError ||
+              `This will permanently delete "${pendingDeleteRow?.driverName}". This cannot be undone.`
         }
+        confirmDisabled={Boolean(activeMapping)}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDeleteRow(null)}
       />

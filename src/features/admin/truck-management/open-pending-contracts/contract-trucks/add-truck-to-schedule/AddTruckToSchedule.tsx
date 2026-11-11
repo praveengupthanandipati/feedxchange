@@ -43,6 +43,7 @@ interface TruckRow {
   driverPhone: string;
   qty: string;
   lrNumber: string;
+  trackingUrl: string;
 }
 
 type TruckRowErrors = Partial<Record<Exclude<keyof TruckRow, "id">, string>>;
@@ -58,6 +59,7 @@ const newTruckRow = (qty = ""): TruckRow => ({
   driverPhone: "",
   qty,
   lrNumber: "",
+  trackingUrl: "",
 });
 
 interface AddTruckToScheduleFormProps {
@@ -192,6 +194,10 @@ const AddTruckToScheduleForm = ({
         totalQty += Number(row.qty);
       }
 
+      if (row.trackingUrl.trim() && !/^https?:\/\/.+/i.test(row.trackingUrl.trim())) {
+        rowError.trackingUrl = "Enter a valid URL starting with http:// or https://";
+      }
+
       if (Object.keys(rowError).length > 0) rowErrors[row.id] = rowError;
     });
 
@@ -219,7 +225,6 @@ const AddTruckToScheduleForm = ({
     if (existing) return existing.truckId;
 
     await addTruckDetails({
-      profileId: detail!.transporterProfileId,
       truckNumber,
       truckType: "",
       make: "",
@@ -278,6 +283,7 @@ const AddTruckToScheduleForm = ({
           driverId: Number(row.driverName),
           assignedOn,
           lrNumber: row.lrNumber.trim(),
+          trackingUrl: row.trackingUrl.trim() || undefined,
           quantityMT: Number(row.qty),
         })),
       }).unwrap();
@@ -372,7 +378,11 @@ const AddTruckToScheduleForm = ({
                 <SearchableSelect
                   options={truckOptions.filter((option) => !takenTrucks.includes(option.value))}
                   value={row.truck}
-                  onChange={(value) => updateRow(row.id, { truck: value })}
+                  onChange={(value) => {
+                    // the truck's tracking URL from the truck master comes along; it stays editable
+                    const picked = (trucks ?? []).find((t) => String(t.truckId) === value);
+                    updateRow(row.id, picked ? { truck: value, trackingUrl: picked.trackingUrl ?? "" } : { truck: value });
+                  }}
                   placeholder="Select or type a truck number"
                   ariaLabel="Select Truck"
                   allowCustom
@@ -421,6 +431,21 @@ const AddTruckToScheduleForm = ({
                   value={row.lrNumber}
                   onChange={(event) => updateRow(row.id, { lrNumber: event.target.value })}
                 />
+              </div>
+
+              <div className="assign-truck-drawer__field">
+                <label className="assign-truck-drawer__label" htmlFor={`tracking-url-${row.id}`}>
+                  Truck Tracking URL
+                </label>
+                <input
+                  id={`tracking-url-${row.id}`}
+                  type="text"
+                  className="assign-truck-drawer__control"
+                  placeholder="Truck Tracking URL (e.g. https://maps.google.com)"
+                  value={row.trackingUrl}
+                  onChange={(event) => updateRow(row.id, { trackingUrl: event.target.value })}
+                />
+                {rowErrors.trackingUrl && <p className="assign-truck-drawer__error">{rowErrors.trackingUrl}</p>}
               </div>
               </div>
 

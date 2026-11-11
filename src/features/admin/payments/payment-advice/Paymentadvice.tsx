@@ -176,7 +176,13 @@ const Paymentadvice = () => {
   };
 
   const handleKindChange = (kind: PaymentKind) => {
-    setValues((prev) => ({ ...prev, kind, contractId: "", towards: kind === "advance" && !prev.towards ? "Advance" : prev.towards }));
+    setValues((prev) => {
+      // "Advance" is only pre-filled for an advance; drop it again when switching back to a normal payment
+      let towards = prev.towards;
+      if (kind === "advance" && !towards.trim()) towards = "Advance";
+      else if (kind !== "advance" && towards === "Advance") towards = "";
+      return { ...prev, kind, contractId: "", towards };
+    });
     setErrors({});
   };
 
@@ -468,6 +474,7 @@ const Paymentadvice = () => {
                 <th>Towards</th>
                 <th className="pa-num">Amount</th>
                 <th className="pa-num">Allocated</th>
+                <th className="pa-num">Refunded</th>
                 <th className="pa-num">Unallocated</th>
                 <th>Actions</th>
               </tr>
@@ -475,7 +482,7 @@ const Paymentadvice = () => {
             <tbody>
               {openReceipts.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="pa-empty">
+                  <td colSpan={11} className="pa-empty">
                     {prompt || (receiptsLoading ? "Loading receipts…" : "No unallocated receipts for these parties. Enter a payment above.")}
                   </td>
                 </tr>
@@ -502,6 +509,7 @@ const Paymentadvice = () => {
                     <td>{dash(r.towards)}</td>
                     <td className="pa-num">{money(r.amount)}</td>
                     <td className="pa-num">{money(r.allocatedAmount)}</td>
+                    <td className="pa-num">{money(r.refundedAmount ?? 0)}</td>
                     <td className="pa-num pa-strong">{money(r.unallocatedAmount)}</td>
                     <td>
                       <div className="payment-advice-table__actions">
@@ -660,7 +668,7 @@ const Paymentadvice = () => {
         )}
 
         <div className="payment-advice-actions">
-          <button type="button" className="payment-advice-actions__cancel" onClick={() => setAlloc({})}>
+          <button type="button" className="payment-advice-actions__cancel" onClick={() => { setAlloc({}); setApplyTried(false); }}>
             <XIcon aria-hidden /> Reset
           </button>
           <button type="button" className="payment-advice-actions__save" onClick={handleApply} disabled={openInvoices.length === 0 || applying}>

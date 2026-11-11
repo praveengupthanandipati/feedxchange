@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
+import MultiSelect from "../../../../../shared/components/dropdown/MultiSelect";
 import InfoTooltip from "../../../../../shared/components/tooltip/InfoTooltip";
 import {
   cityOptions,
@@ -10,6 +11,7 @@ import {
   paymentFrequencyOptions,
 } from "./promoterNew.data";
 import RegionSection from "./RegionSection";
+import ProfileGroupField from "../../ProfileGroupField";
 import { fetchLocationFromPincode } from "../../../../../shared/utils/pincodeLookup";
 import { usePromoterWizard } from "./PromoterWizardContext";
 import { useGetPromoterProfileByIdQuery } from "../../../../../core/store/promotersApi";
@@ -128,6 +130,8 @@ const PromoterProfileStep = () => {
               onChange={(event) => updateDraft({ companyName: event.target.value })}
             />
           </div>
+
+          <ProfileGroupField value={draft.groupName} onChange={(value) => updateDraft({ groupName: value })} />
 
           <div className="form-field">
             <label className="form-field__label" htmlFor="mobileNumber">
@@ -277,13 +281,12 @@ const PromoterProfileStep = () => {
         <div className="new-contract__grid">
           <div className="form-field">
             <span className="form-field__label">Associated Products</span>
-            <SearchableSelect
+            <MultiSelect
               options={productOptions}
-              value={draft.associatedProducts}
-              onChange={(value) => updateDraft({ associatedProducts: value })}
+              value={draft.associatedProductIds}
+              onChange={(value) => updateDraft({ associatedProductIds: value })}
               placeholder="Products"
               ariaLabel="Associated Products"
-              allowCustom
             />
           </div>
         </div>

@@ -26,6 +26,8 @@ export interface AddContractTruckPayload {
   driverId: number;
   assignedOn: string;
   lrNumber: string;
+  /** Optional live-tracking link (http/https). */
+  trackingUrl?: string;
   quantityMT: number;
   freightPerMT: number;
   fromAddressId: number;
@@ -39,6 +41,8 @@ export interface AddMultipleTrucksItem {
   driverId: number;
   assignedOn: string;
   lrNumber: string;
+  /** Optional live-tracking link (http/https). */
+  trackingUrl?: string;
   quantityMT: number;
 }
 
@@ -69,6 +73,8 @@ export interface UpdateContractTruckPayload {
   driverId: number;
   assignedOn: string;
   lrNumber: string;
+  /** Optional live-tracking link. Left out = unchanged; blank = remove it. */
+  trackingUrl?: string;
   quantityMT: number;
   freightPerMT: number;
   fromAddressId: number;
@@ -220,6 +226,8 @@ export interface TruckByContract {
   driverName: string;
   assignedOn: string;
   lrNumber: string;
+  /** The tracking link saved on the trip, if any. */
+  trackingUrl: string | null;
   quantityMT: number;
   freightPerMT: number;
   fromAddressId: number;

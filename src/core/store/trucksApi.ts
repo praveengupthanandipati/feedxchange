@@ -4,8 +4,9 @@ import { unwrapArray, unwrapObject } from "./userProfilesCommonApi";
 
 export interface Truck {
   truckId: number;
-  profileId: number;
-  profileLegalName: string;
+  /** Legacy: trucks are no longer tagged to a transporter (it is chosen for each trip). */
+  profileId?: number | null;
+  profileLegalName?: string | null;
   truckNumber: string;
   /** Same as the truck number; kept only because older records and reports still carry it. */
   registrationNumber?: string;
@@ -17,6 +18,8 @@ export interface Truck {
   capacityUnit: string;
   fuelType: string;
   ownershipType: string;
+  /** The truck's live-tracking link, if any. */
+  trackingUrl?: string | null;
   status: string;
   isActive: boolean;
   createdBy: string;
@@ -26,7 +29,6 @@ export interface Truck {
 }
 
 export interface AddTruckDetailsPayload {
-  profileId: number;
   truckNumber: string;
   truckType: string;
   make: string;
@@ -36,6 +38,8 @@ export interface AddTruckDetailsPayload {
   capacityUnit: string;
   fuelType: string;
   ownershipType: string;
+  /** Optional http/https link. On update: left out = unchanged, blank = remove it. */
+  trackingUrl?: string;
   actionPerformedBy: number;
 }
 
