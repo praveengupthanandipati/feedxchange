@@ -18,6 +18,7 @@ import {
 import "../../../contracts/NewContract.scss";
 
 function toDateInputValue(isoValue: string): string {
+  if (!isoValue) return "";
   const date = new Date(isoValue);
   if (Number.isNaN(date.getTime())) return "";
   const day = String(date.getDate()).padStart(2, "0");
@@ -59,17 +60,17 @@ const NewDriver = () => {
     setDriverName(editingDriver.driverName);
     setMobileNumber(editingDriver.mobileNumber);
     setDateOfBirth(toDateInputValue(editingDriver.dateOfBirth));
-    setBloodGroup(editingDriver.bloodGroup);
-    setExperienceYears(String(editingDriver.experienceYears));
-    setAddress(editingDriver.address);
-    setLicenseType(editingDriver.licenseType);
-    setLicenseNumber(editingDriver.licenseNumber);
+    setBloodGroup(editingDriver.bloodGroup ?? "");
+    setExperienceYears(String(editingDriver.experienceYears ?? ""));
+    setAddress(editingDriver.address ?? "");
+    setLicenseType(editingDriver.licenseType ?? "");
+    setLicenseNumber(editingDriver.licenseNumber ?? "");
     setLicenseIssuedDate(toDateInputValue(editingDriver.licenseIssuedDate));
     setLicenseExpiryDate(toDateInputValue(editingDriver.licenseExpiryDate));
-    setEmergencyContactName(editingDriver.emergencyContactName);
-    setEmergencyContactNumber(editingDriver.emergencyContactNumber);
-    setAadharNumber(editingDriver.aadharNumber);
-    setPanNumber(editingDriver.panNumber);
+    setEmergencyContactName(editingDriver.emergencyContactName ?? "");
+    setEmergencyContactNumber(editingDriver.emergencyContactNumber ?? "");
+    setAadharNumber(editingDriver.aadharNumber ?? "");
+    setPanNumber(editingDriver.panNumber ?? "");
   }, [editingDriver]);
 
   const handleSave = async () => {

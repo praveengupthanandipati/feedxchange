@@ -12,6 +12,7 @@ import { buildTruckColumns } from "./trucks.columns";
 import {
   useGetAllActiveTruckDetailsQuery,
   useDeleteTruckDetailsMutation,
+  formatCapacity,
   type Truck,
 } from "../../../../../core/store/trucksApi";
 import "./Trucks.scss";
@@ -106,31 +107,31 @@ const TrucksList = () => {
   );
 
   const truckTypeOptions = useMemo(
-    () => buildStringOptions(rows.map((row) => row.truckType), "Filter by Truck Type"),
+    () => buildStringOptions(rows.map((row) => row.truckType ?? ""), "Filter by Truck Type"),
     [rows],
   );
   const makeOptions = useMemo(
-    () => buildStringOptions(rows.map((row) => row.make), "Filter by Make"),
+    () => buildStringOptions(rows.map((row) => row.make ?? ""), "Filter by Make"),
     [rows],
   );
   const modelOptions = useMemo(
-    () => buildStringOptions(rows.map((row) => row.model), "Filter by Model"),
+    () => buildStringOptions(rows.map((row) => row.model ?? ""), "Filter by Model"),
     [rows],
   );
   const manufactureYearOptions = useMemo(
-    () => buildNumericOptions(rows.map((row) => row.manufactureYear), "Filter by Year of Model"),
+    () => buildNumericOptions(rows.flatMap((row) => (row.manufactureYear ? [row.manufactureYear] : [])), "Filter by Year of Model"),
     [rows],
   );
   const capacityOptions = useMemo(
     () =>
       buildStringOptions(
-        rows.map((row) => `${row.capacity} ${row.capacityUnit}`),
+        rows.map((row) => formatCapacity(row)),
         "Filter by Capacity",
       ),
     [rows],
   );
   const fuelTypeOptions = useMemo(
-    () => buildStringOptions(rows.map((row) => row.fuelType), "Filter by Fuel Type"),
+    () => buildStringOptions(rows.map((row) => row.fuelType ?? ""), "Filter by Fuel Type"),
     [rows],
   );
 
@@ -147,7 +148,7 @@ const TrucksList = () => {
       if (make !== "All" && row.make !== make) return false;
       if (model !== "All" && row.model !== model) return false;
       if (manufactureYear !== "All" && String(row.manufactureYear) !== manufactureYear) return false;
-      if (capacity !== "All" && `${row.capacity} ${row.capacityUnit}` !== capacity) return false;
+      if (capacity !== "All" && formatCapacity(row) !== capacity) return false;
       if (fuelType !== "All" && row.fuelType !== fuelType) return false;
 
       return true;

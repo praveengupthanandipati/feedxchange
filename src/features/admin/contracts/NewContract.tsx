@@ -3,6 +3,7 @@ import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput
 import type { ChangeEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowLeftIcon, EyeIcon, EyeOffIcon } from "../../../shared/components/icon";
+import AddressSelectField from "../truck-management/contract-trucks/AddressSelectField";
 import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
 import ToggleSwitch from "../../../shared/components/toggle/ToggleSwitch";
 import ConfirmDialog from "../../../shared/components/dialog/ConfirmDialog";
@@ -382,7 +383,9 @@ const NewContract = () => {
             source.sellerQualitySpecSource ??
             fallback.sellerConditions.qualitySpecSource,
         ),
+        // The saved address comes back as an id; the free-text fields are only a fallback for older responses.
         address: String(
+          (asNumber(sellerDetails.loadingAddressId ?? source.loadingAddressId, 0) || undefined) ??
           sellerDetails.loadingAddressAt ??
             sellerDetails.loadingAddress ??
             sellerDetails.address ??
@@ -413,6 +416,7 @@ const NewContract = () => {
             fallback.buyerConditions.qualitySpecSource,
         ),
         address: String(
+          (asNumber(buyerDetails.deliveryAddressId ?? source.deliveryAddressId, 0) || undefined) ??
           buyerDetails.deliveryAddressAt ??
             buyerDetails.deliveryAddress ??
             buyerDetails.loadingAddressAt ??
@@ -651,23 +655,6 @@ const { data: products } = useGetProductsQuery();
     const { data: buyerAddresses = [] } = useGetProfileAddressQuery(buyerId, {
       skip: !isProfileId(buyerId),
     });
-    const sellerAddressOptions = useMemo(
-      () =>
-        sellerAddresses.map((address) => ({
-          value: String(address.addressId),
-          label: formatProfileAddress(address) || `Address ${address.addressId}`,
-        })),
-      [sellerAddresses],
-    );
-    const buyerAddressOptions = useMemo(
-      () =>
-        buyerAddresses.map((address) => ({
-          value: String(address.addressId),
-          label: formatProfileAddress(address) || `Address ${address.addressId}`,
-        })),
-      [buyerAddresses],
-    );
-
     // On edit the address arrives as free text, which matches no option and is sent
     // back as 0. Swap it for the matching addressId as soon as the list is available.
     useEffect(() => {
@@ -1893,12 +1880,14 @@ const { data: products } = useGetProductsQuery();
                 <span className="form-field__label">
                   Loading Address At <span className="form-field__required">*</span>
                 </span>
-                <SearchableSelect
-                  options={sellerAddressOptions}
+                {/* "+" opens the New Address popup: the address is saved against the seller through the API and its id is what the contract stores. */}
+                <AddressSelectField
+                  profileId={Number(sellerId) || 0}
                   value={sellerConditions.address}
-                  onChange={(value) => handleSellerConditionChange({ address: value })}
-                  allowCustom
+                  onChange={(addressId) => handleSellerConditionChange({ address: addressId })}
+                  placeholder="Select Loading Address"
                   ariaLabel="Seller loading address"
+                  modalTitle="New Loading Address"
                 />
               </div>
 
@@ -2002,12 +1991,14 @@ const { data: products } = useGetProductsQuery();
                 <span className="form-field__label">
                   Delivery Address At <span className="form-field__required">*</span>
                 </span>
-                <SearchableSelect
-                  options={buyerAddressOptions}
+                <AddressSelectField
+                  profileId={Number(buyerId) || 0}
                   value={buyerConditions.address}
-                  onChange={(value) => handleBuyerConditionChange({ address: value })}
-                  allowCustom
+                  onChange={(addressId) => handleBuyerConditionChange({ address: addressId })}
+                  placeholder="Select Delivery Address"
                   ariaLabel="Buyer delivery address"
+                  modalTitle="New Delivery Address"
+                  defaultUnloading
                 />
               </div>
 

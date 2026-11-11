@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { apiBaseQuery } from "../api/baseQuery";
 import { unwrapArray } from "./userProfilesCommonApi";
+import { apiFetch } from "../api/tokenRefresh";
 
 /** The ids of the dispatches just created; the notification dialog needs them to know which truck to talk about. */
 export interface AddedTrucksResult {
@@ -418,6 +419,35 @@ export function getApiErrorMessage(body: unknown): string {
   return "";
 }
 
+/** An invoice file attached to a truck dispatch (the file itself comes from downloadTruckInvoice). */
+export interface TruckInvoice {
+  contractDispatchId: number;
+  fileName: string;
+  contentType: string | null;
+  fileSize: number;
+  uploadedOn: string | null;
+}
+
+export interface UploadTruckInvoicePayload {
+  contractDispatchId: number;
+  file: File;
+  modifiedBy: number;
+}
+
+/** Downloads the invoice stored for a truck dispatch and hands it to the browser as a file. */
+export async function downloadTruckInvoice(contractDispatchId: number, fileName: string): Promise<void> {
+  const response = await apiFetch(`/api/ContractTrucks/DownloadTruckInvoice?contractDispatchId=${contractDispatchId}`);
+  if (!response.ok) throw new Error(response.status === 404 ? "The invoice file could not be found." : "Failed to download the invoice.");
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName || "invoice";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 export interface UpdateContractTruckStatusPayload {
   contractDispatchId: number;
   dispatchStatusId: number;
@@ -461,7 +491,7 @@ export const contractTrucksApi = createApi({
 
   baseQuery: apiBaseQuery,
 
-  tagTypes: ["ContractTruck"],
+  tagTypes: ["ContractTruck", "TruckInvoice"],
 
   endpoints: (builder) => ({
     addContractTrucks: builder.mutation<AddedTrucksResult, AddContractTruckPayload>({
@@ -505,6 +535,28 @@ export const contractTrucksApi = createApi({
         body,
       }),
       invalidatesTags: ["ContractTruck"],
+    }),
+
+    // Stores the invoice file against the dispatch (a new upload replaces the earlier one).
+    uploadTruckInvoice: builder.mutation<TruckInvoice, UploadTruckInvoicePayload>({
+      query: ({ contractDispatchId, file, modifiedBy }) => {
+        const body = new FormData();
+        body.append("contractDispatchId", String(contractDispatchId));
+        body.append("modifiedBy", String(modifiedBy));
+        body.append("file", file);
+        return { url: "/api/ContractTrucks/UploadTruckInvoice", method: "POST", body };
+      },
+      invalidatesTags: ["TruckInvoice"],
+    }),
+
+    getTruckInvoicesByContract: builder.query<TruckInvoice[], { contractId: number }>({
+      query: (params) => ({
+        url: "/api/ContractTrucks/GetTruckInvoicesByContract",
+        method: "GET",
+        params,
+      }),
+      transformResponse: unwrapArray<TruckInvoice>,
+      providesTags: ["TruckInvoice"],
     }),
 
     scheduleContractTrucks: builder.mutation<ScheduleCreatedResult, ScheduleContractTruckPayload>({
@@ -648,6 +700,8 @@ export const {
   useAddMultipleTrucksMutation,
   useUpdateContractTrucksMutation,
   useUpdateContractTruckStatusMutation,
+  useUploadTruckInvoiceMutation,
+  useGetTruckInvoicesByContractQuery,
   useScheduleContractTrucksMutation,
   useGetTransporterScheduleResponseStatusesQuery,
   useGetScheduleTrucksDispatchDetailsQuery,

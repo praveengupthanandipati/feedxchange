@@ -16,6 +16,7 @@ import {
 } from "../../../../../../core/store/contractsApi";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../../core/store/transportersApi";
 import { useAddTruckDetailsMutation, useGetAllActiveTruckDetailsQuery } from "../../../../../../core/store/trucksApi";
+import { useAddDriverMutation, useGetAllActiveDriversQuery, useLazyGetDriverByMobileQuery } from "../../../../../../core/store/driversApi";
 import { describeBusyTruck, findBusyTruck, getApiErrorMessage, useAddContractTrucksMutation, useGetBusyTrucksQuery } from "../../../../../../core/store/contractTrucksApi";
 import "../../../assign-transports/Assigntransports.scss";
 import "../../../assign-transports/instant-truck-assignment/InstantTruckAssignment.scss";
@@ -102,6 +103,9 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
   const { data: transporters } = useGetTransporterProfileSummaryQuery();
   const { data: trucks, refetch: refetchTrucks } = useGetAllActiveTruckDetailsQuery();
   const [addTruckDetails, { isLoading: addingTruck }] = useAddTruckDetailsMutation();
+  const { data: drivers, refetch: refetchDrivers } = useGetAllActiveDriversQuery();
+  const [addDriver, { isLoading: addingDriver }] = useAddDriverMutation();
+  const [fetchDriverByMobile] = useLazyGetDriverByMobileQuery();
 
   const [addContractTrucks, { isLoading: saving }] = useAddContractTrucksMutation();
   const notify = useNotifyPrompt();
@@ -208,22 +212,32 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
     const existing = (trucks ?? []).find((truck) => normalizeTruckNumber(truck.truckNumber) === normalizeTruckNumber(truckNumber));
     if (existing) return existing.truckId;
 
-    await addTruckDetails({
-      truckNumber,
-      truckType: "",
-      make: "",
-      model: "",
-      manufactureYear: 0,
-      capacity: 0,
-      capacityUnit: "",
-      fuelType: "",
-      ownershipType: "",
-      actionPerformedBy: currentUserId,
-    }).unwrap();
+    // Only the number is sent: every other truck detail is optional and is filled in later from Edit Truck.
+    await addTruckDetails({ truckNumber, actionPerformedBy: currentUserId }).unwrap();
     const refreshed = await refetchTrucks().unwrap();
     const created = refreshed.find((truck) => normalizeTruckNumber(truck.truckNumber) === normalizeTruckNumber(truckNumber));
     if (!created) throw new Error(`Truck ${truckNumber} was added but could not be found in the truck list.`);
     return created.truckId;
+  };
+
+  /**
+   * The driver's id. A name typed in (not in the driver master) is added to the master with only the name and mobile number;
+   * the rest can be filled in later from Edit Driver. A mobile number already in the master reuses that driver.
+   */
+  const resolveDriverId = async (currentUserId: number): Promise<number> => {
+    const picked = (drivers ?? []).find((driver) => String(driver.driverId) === form.driverName);
+    if (picked) return picked.driverId;
+
+    const mobileNumber = form.driverPhone.trim();
+    const sameMobile = (drivers ?? []).find((driver) => driver.mobileNumber === mobileNumber);
+    if (sameMobile) return sameMobile.driverId;
+
+    await addDriver({ driverName: form.driverName.trim(), mobileNumber, actionPerformedBy: currentUserId }).unwrap();
+    // AddDriver only returns a status message, so the saved record is read back to get its driverId.
+    const created = await fetchDriverByMobile(mobileNumber).unwrap();
+    if (!created) throw new Error(`Driver ${form.driverName.trim()} was added but could not be found in the driver list.`);
+    refetchDrivers();
+    return created.driverId;
   };
 
   const handleSave = async () => {
@@ -244,13 +258,22 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       return;
     }
 
+    let driverId: number;
+    try {
+      driverId = await resolveDriverId(currentUserId);
+    } catch (error) {
+      const data = error && typeof error === "object" ? (error as { data?: unknown }).data : undefined;
+      setSubmitError(getApiErrorMessage(data) || "The new driver could not be added. Please try again.");
+      return;
+    }
+
     try {
       const succeeded = await addContractTrucks({
         contractId,
         truckAssignmentTypeId,
         transporterProfileId: Number(form.transporter),
         truckId,
-        driverId: Number(form.driverName),
+        driverId,
         assignedOn,
         lrNumber: form.lrNumber.trim(),
         trackingUrl: form.trackingUrl.trim() || undefined,
@@ -370,6 +393,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
           }
           nameError={errors.driverName}
           phoneError={errors.driverPhone}
+          directEntry
         />
 
         <div className="assign-truck-drawer__field">
@@ -501,10 +525,10 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       {submitError && <p className="assign-truck-drawer__error">{submitError}</p>}
 
       <div className="assign-truck-drawer__footer">
-        <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving || addingTruck}>
-          <SaveIcon aria-hidden /> {saving || addingTruck ? "Saving…" : "Save & Send"}
+        <button type="button" className="assign-truck-drawer__save" onClick={handleSave} disabled={saving || addingTruck || addingDriver}>
+          <SaveIcon aria-hidden /> {saving || addingTruck || addingDriver ? "Saving…" : "Save & Send"}
         </button>
-        <button type="button" className="assign-truck-drawer__cancel" onClick={handleReset} disabled={saving || addingTruck}>
+        <button type="button" className="assign-truck-drawer__cancel" onClick={handleReset} disabled={saving || addingTruck || addingDriver}>
           <XIcon aria-hidden /> Reset
         </button>
       </div>

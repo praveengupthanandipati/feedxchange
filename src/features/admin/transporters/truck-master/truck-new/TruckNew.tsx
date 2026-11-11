@@ -62,14 +62,14 @@ const TruckNew = () => {
   useEffect(() => {
     if (!editingTruck) return;
     setTruckNumber(editingTruck.truckNumber);
-    setTruckType(editingTruck.truckType);
-    setMake(editingTruck.make);
-    setModel(editingTruck.model);
-    setManufactureYear(String(editingTruck.manufactureYear));
-    setCapacity(String(editingTruck.capacity));
-    setCapacityUnit(editingTruck.capacityUnit);
-    setFuelType(editingTruck.fuelType);
-    setOwnershipType(editingTruck.ownershipType);
+    setTruckType(editingTruck.truckType ?? "");
+    setMake(editingTruck.make ?? "");
+    setModel(editingTruck.model ?? "");
+    setManufactureYear(String(editingTruck.manufactureYear ?? ""));
+    setCapacity(String(editingTruck.capacity ?? ""));
+    setCapacityUnit(editingTruck.capacityUnit ?? "");
+    setFuelType(editingTruck.fuelType ?? "");
+    setOwnershipType(editingTruck.ownershipType ?? "");
     setTrackingUrl(editingTruck.trackingUrl ?? "");
   }, [editingTruck]);
 

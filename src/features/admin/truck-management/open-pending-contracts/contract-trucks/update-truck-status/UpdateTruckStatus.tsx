@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeftIcon, FileTextIcon, PenIcon, SaveIcon, TruckIcon, UploadIcon } from "../../../../../../shared/components/icon";
+import { ArrowLeftIcon, DownloadIcon, FileTextIcon, PenIcon, SaveIcon, TruckIcon, UploadIcon } from "../../../../../../shared/components/icon";
 import InfoPanel from "../InfoPanel";
 import SearchableSelect from "../../../../../../shared/components/dropdown/SearchableSelect";
 import ContractSummaryPanel from "../../../contract-trucks/ContractSummaryPanel";
@@ -12,17 +12,20 @@ import {
   type ContractTruckDetail,
 } from "../../../contract-trucks/useContractTruckDetails";
 import {
+  downloadTruckInvoice,
+  getApiErrorMessage,
   useGetContractTruckDispatchStatusesQuery,
+  useGetTruckInvoicesByContractQuery,
   useUpdateContractTruckStatusMutation,
+  useUploadTruckInvoiceMutation,
+  type TruckInvoice,
 } from "../../../../../../core/store/contractTrucksApi";
 import { useGetContractByContractNumberQuery } from "../../../../../../core/store/contractsApi";
-import { useUploadDocumentFileMutation } from "../../../../../../core/store/userProfilesCommonApi";
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
 import "../../../assign-transports/Assigntransports.scss";
 import "./UpdateTruckStatus.scss";
 import { useNotifyPrompt } from "../../../../../../shared/notifications/useNotifyPrompt";
 
-const INVOICE_FOLDER_NAME = "ContractTruckInvoices";
 const MAX_INVOICE_FILE_SIZE_MB = 5;
 const ALLOWED_INVOICE_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
 
@@ -45,13 +48,16 @@ interface UpdateTruckStatusRowProps {
   statusOptions: { value: string; label: string }[];
   sellerId: number;
   buyerId: number;
+  /** The invoice already stored for this truck, if any. */
+  invoice?: TruckInvoice;
 }
 
-const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: UpdateTruckStatusRowProps) => {
+const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice }: UpdateTruckStatusRowProps) => {
   const [selectedStatusId, setSelectedStatusId] = useState(String(truck.dispatchStatusId));
   const [updateContractTruckStatus, { isLoading: saving }] = useUpdateContractTruckStatusMutation();
   const notify = useNotifyPrompt();
-  const [uploadDocumentFile, { isLoading: uploading }] = useUploadDocumentFileMutation();
+  const [uploadTruckInvoice, { isLoading: uploading }] = useUploadTruckInvoiceMutation();
+  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [invoiceFileName, setInvoiceFileName] = useState("");
@@ -129,10 +135,28 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: Updat
     }
 
     try {
-      await uploadDocumentFile({ file, folderName: INVOICE_FOLDER_NAME }).unwrap();
+      // Stored against this truck's dispatch, so it can be downloaded again later.
+      await uploadTruckInvoice({
+        contractDispatchId: truck.contractTruckId,
+        file,
+        modifiedBy: Number(localStorage.getItem("userId")) || 0,
+      }).unwrap();
       setInvoiceFileName(file.name);
-    } catch {
-      setInvoiceError("Failed to upload invoice. Please try again.");
+    } catch (uploadError) {
+      const data = uploadError && typeof uploadError === "object" ? (uploadError as { data?: unknown }).data : undefined;
+      setInvoiceError(getApiErrorMessage(data) || "Failed to upload invoice. Please try again.");
+    }
+  };
+
+  const handleInvoiceDownload = async () => {
+    setInvoiceError("");
+    setDownloading(true);
+    try {
+      await downloadTruckInvoice(truck.contractTruckId, invoice?.fileName ?? invoiceFileName);
+    } catch (downloadError) {
+      setInvoiceError(downloadError instanceof Error ? downloadError.message : "Failed to download the invoice.");
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -203,6 +227,18 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId }: Updat
             </>
           )}
 
+          {invoice && (
+            <button
+              type="button"
+              className="update-truck-status-card__upload"
+              onClick={handleInvoiceDownload}
+              disabled={downloading}
+              title={invoice.fileName}
+            >
+              <DownloadIcon aria-hidden /> {downloading ? "Downloading…" : "Download Invoice"}
+            </button>
+          )}
+
           {!isFinalStatus && (
             <button
               type="button"
@@ -254,6 +290,7 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
   const { trucks, isLoading } = useContractTruckDetails(contractNumber, true);
   const { data: dispatchStatuses } = useGetContractTruckDispatchStatusesQuery();
   const { data: contract } = useGetContractByContractNumberQuery(contractNumber);
+  const { data: invoices } = useGetTruckInvoicesByContractQuery({ contractId: contract?.id ?? 0 }, { skip: !contract?.id });
 
   const statusOptions = (dispatchStatuses ?? []).map((status) => ({
     value: String(status.dispatchStatusId),
@@ -281,6 +318,7 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
           key={truck.contractTruckId}
           truck={truck}
           statusOptions={statusOptions}
+          invoice={invoices?.find((item) => item.contractDispatchId === truck.contractTruckId)}
           sellerId={contract?.sellerId ?? 0}
           buyerId={contract?.buyerId ?? 0}
         />

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftIcon, PenLineIcon } from "../../../../../shared/components/icon";
-import { useGetTruckDetailsByIdQuery } from "../../../../../core/store/trucksApi";
+import { formatCapacity, useGetTruckDetailsByIdQuery } from "../../../../../core/store/trucksApi";
 import "../../../usermanagement/businessowners/BusinessView/BusinessOwnerDetail.scss";
 import "../trucks-list/Trucks.scss";
 
@@ -89,7 +89,7 @@ const TruckView = () => {
               <DetailField label="Make" value={truck.make} />
               <DetailField label="Model" value={truck.model} />
               <DetailField label="Year of Manufacture" value={truck.manufactureYear} />
-              <DetailField label="Capacity" value={`${truck.capacity} ${truck.capacityUnit}`} />
+              <DetailField label="Capacity" value={formatCapacity(truck)} />
               <DetailField label="Fuel Type" value={truck.fuelType} />
               <DetailField
                 label="Tracking URL"

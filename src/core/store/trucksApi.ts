@@ -10,14 +10,14 @@ export interface Truck {
   truckNumber: string;
   /** Same as the truck number; kept only because older records and reports still carry it. */
   registrationNumber?: string;
-  truckType: string;
-  make: string;
-  model: string;
-  manufactureYear: number;
-  capacity: number;
-  capacityUnit: string;
-  fuelType: string;
-  ownershipType: string;
+  truckType?: string | null;
+  make?: string | null;
+  model?: string | null;
+  manufactureYear?: number | null;
+  capacity?: number | null;
+  capacityUnit?: string | null;
+  fuelType?: string | null;
+  ownershipType?: string | null;
   /** The truck's live-tracking link, if any. */
   trackingUrl?: string | null;
   status: string;
@@ -28,16 +28,22 @@ export interface Truck {
   updatedOn: string;
 }
 
+/** "20 MT", or blank when the truck was added with only its number. */
+export function formatCapacity(truck: Pick<Truck, "capacity" | "capacityUnit">): string {
+  return truck.capacity ? `${truck.capacity} ${truck.capacityUnit ?? ""}`.trim() : "";
+}
+
 export interface AddTruckDetailsPayload {
+  /** Only the truck number is required; every other detail can be filled in later from Edit Truck. */
   truckNumber: string;
-  truckType: string;
-  make: string;
-  model: string;
-  manufactureYear: number;
-  capacity: number;
-  capacityUnit: string;
-  fuelType: string;
-  ownershipType: string;
+  truckType?: string;
+  make?: string;
+  model?: string;
+  manufactureYear?: number;
+  capacity?: number;
+  capacityUnit?: string;
+  fuelType?: string;
+  ownershipType?: string;
   /** Optional http/https link. On update: left out = unchanged, blank = remove it. */
   trackingUrl?: string;
   actionPerformedBy: number;

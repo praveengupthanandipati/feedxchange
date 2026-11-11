@@ -6,7 +6,7 @@ export interface Driver {
   driverId: number;
   driverName: string;
   mobileNumber: string;
-  licenseNumber: string;
+  licenseNumber: string | null;
   licenseExpiryDate: string;
   dateOfBirth: string;
   address: string;
@@ -29,18 +29,19 @@ export interface Driver {
 export interface AddDriverPayload {
   driverName: string;
   mobileNumber: string;
-  licenseNumber: string;
-  licenseExpiryDate: string;
-  dateOfBirth: string;
-  address: string;
-  licenseType: string;
-  licenseIssuedDate: string;
-  emergencyContactName: string;
-  emergencyContactNumber: string;
-  bloodGroup: string;
-  experienceYears: number;
-  aadharNumber: string;
-  panNumber: string;
+  // Only the name and mobile number are required; the rest can be filled in later from Edit Driver.
+  licenseNumber?: string;
+  licenseExpiryDate?: string;
+  dateOfBirth?: string;
+  address?: string;
+  licenseType?: string;
+  licenseIssuedDate?: string;
+  emergencyContactName?: string;
+  emergencyContactNumber?: string;
+  bloodGroup?: string;
+  experienceYears?: number;
+  aadharNumber?: string;
+  panNumber?: string;
   actionPerformedBy: number;
 }
 

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
-import type { Truck } from "../../../../../core/store/trucksApi";
+import { formatCapacity, type Truck } from "../../../../../core/store/trucksApi";
 
 interface ColumnHandlers {
   onEdit: (truck: Truck) => void;
@@ -54,9 +54,9 @@ export function buildTruckColumns({ onEdit, onView, onDelete }: ColumnHandlers):
       key: "capacity",
       header: "Capacity",
       sortable: true,
-      sortValue: (row) => row.capacity,
-      render: (row) => `${row.capacity} ${row.capacityUnit}`,
-      exportValue: (row) => `${row.capacity} ${row.capacityUnit}`,
+      sortValue: (row) => row.capacity ?? 0,
+      render: (row) => formatCapacity(row),
+      exportValue: (row) => formatCapacity(row),
     },
     {
       key: "fuelType",

@@ -20,6 +20,11 @@ interface DriverSelectFieldsProps {
   onChange: (next: DriverSelection) => void;
   nameError?: string;
   phoneError?: string;
+  /**
+   * Lets a driver be typed straight into the two fields instead of opening the New Driver form.
+   * A typed name arrives in `driverId` (it is not a known id); the screen adds the driver to the master on save.
+   */
+  directEntry?: boolean;
 }
 
 /**
@@ -27,7 +32,7 @@ interface DriverSelectFieldsProps {
  * Either field fills the other, and "+" in the search box opens the New Driver popup —
  * the driver is saved to Driver Master and filled in here so the user can carry on.
  */
-const DriverSelectFields = ({ value, onChange, nameError, phoneError }: DriverSelectFieldsProps) => {
+const DriverSelectFields = ({ value, onChange, nameError, phoneError, directEntry = false }: DriverSelectFieldsProps) => {
   const { data: drivers } = useGetAllActiveDriversQuery();
   const [fetchDriverByMobile, { isFetching: loadingDriverByMobile }] = useLazyGetDriverByMobileQuery();
 
@@ -62,6 +67,11 @@ const DriverSelectFields = ({ value, onChange, nameError, phoneError }: DriverSe
 
   const handleDriverChange = (driverId: string) => {
     const driver = (drivers ?? []).find((d) => String(d.driverId) === driverId);
+    // A typed name (direct entry) is kept as typed; a phone number already entered stays.
+    if (directEntry && driverId && !driver) {
+      onChange({ driverId, driverPhone: value.driverPhone, driverLabel: driverId });
+      return;
+    }
     onChange({
       driverId,
       driverPhone: driverId ? driver?.mobileNumber ?? value.driverPhone : "",
@@ -77,6 +87,11 @@ const DriverSelectFields = ({ value, onChange, nameError, phoneError }: DriverSe
     }
 
     const local = (drivers ?? []).find((d) => d.mobileNumber === mobileNumber);
+    if (directEntry && !local) {
+      // A number that is not in the driver master: keep what was typed; the driver is added on save.
+      onChange({ driverId: value.driverId, driverPhone: mobileNumber, driverLabel: value.driverLabel });
+      return;
+    }
     onChange({
       driverId: local ? String(local.driverId) : value.driverId,
       driverPhone: mobileNumber,
@@ -122,8 +137,9 @@ const DriverSelectFields = ({ value, onChange, nameError, phoneError }: DriverSe
           options={driverOptions}
           value={value.driverId}
           onChange={handleDriverChange}
-          onAddNew={(query) => openNewDriver(query, "")}
-          placeholder="Select Driver"
+          onAddNew={directEntry ? undefined : (query) => openNewDriver(query, "")}
+          allowCustom={directEntry}
+          placeholder={directEntry ? "Select or type a driver name" : "Select Driver"}
           ariaLabel="Select Driver"
           clearable
         />
@@ -138,8 +154,9 @@ const DriverSelectFields = ({ value, onChange, nameError, phoneError }: DriverSe
           options={driverMobileOptions}
           value={value.driverPhone}
           onChange={handleDriverPhoneChange}
-          onAddNew={(query) => openNewDriver("", query)}
-          placeholder={loadingDriverByMobile ? "Loading driver…" : "Select Driver Contact No"}
+          onAddNew={directEntry ? undefined : (query) => openNewDriver("", query)}
+          allowCustom={directEntry}
+          placeholder={loadingDriverByMobile ? "Loading driver…" : directEntry ? "Select or type a contact number" : "Select Driver Contact No"}
           ariaLabel="Select Driver Contact No"
           clearable
         />
