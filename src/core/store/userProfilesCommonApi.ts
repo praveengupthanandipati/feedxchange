@@ -266,7 +266,7 @@ export const userProfilesCommonApi = createApi({
     // Separate from createProfileAddress: these are not added to the profile's address book.
     createBusinessProfileAddress: builder.mutation<unknown, CreateProfileAddressEntry[]>({
       query: (body) => ({
-        url: "/api/BusinessProfiles/CreateProfileAddress",
+        url: "/api/BusinessProfiles/CreateContractAddress",
         method: "POST",
         body,
         // The body may be the saved address, its id, or a plain status message — keep whatever comes back.
@@ -283,6 +283,15 @@ export const userProfilesCommonApi = createApi({
     }),
     getProfileAddress: builder.query<ProfileAddressDetail[], string>({
       query: (profileId) => `/api/Profile/GetProfileAddress/${profileId}`,
+      transformResponse: unwrapArray<ProfileAddressDetail>,
+      providesTags: ["UserProfile"],
+    }),
+    // The profile's address book, plus one one-time contract address asked for by id (those are otherwise left out).
+    getProfileAddressWithSelected: builder.query<ProfileAddressDetail[], { profileId: string; includeAddressId?: number }>({
+      query: ({ profileId, includeAddressId }) => ({
+        url: `/api/Profile/GetProfileAddress/${profileId}`,
+        params: includeAddressId ? { includeAddressId } : undefined,
+      }),
       transformResponse: unwrapArray<ProfileAddressDetail>,
       providesTags: ["UserProfile"],
     }),
@@ -373,6 +382,7 @@ export const {
   useCreateProfileAddressMutation,
   useCreateBusinessProfileAddressMutation,
   useGetProfileAddressQuery,
+  useGetProfileAddressWithSelectedQuery,
   useLazyGetProfileAddressQuery,
   useUpdateProfileAddressMutation,
   useCreateProfileDocumentMutation,
