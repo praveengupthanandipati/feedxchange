@@ -202,6 +202,12 @@ const Promoterlist = () => {
             paymentFrequency={paymentFrequency}
             onPaymentFrequencyChange={setPaymentFrequency}
             paymentFrequencyOptions={paymentFrequencyOptions}
+            onClear={() => {
+              setKeyword("");
+              setStatus(DEFAULT_STATUS_FILTER);
+              setCommissionStructure("All");
+              setPaymentFrequency("All");
+            }}
           />
         )}
 

@@ -163,8 +163,8 @@ const Contracts = () => {
   const statusOptions = useMemo(
   () =>
     contractStatuses
-      // Deleted is kept even when the API marks it inactive, so deleted contracts can be looked up
-      .filter((status) => status.isActive || normalizeStatus(status.statusName) === "deleted")
+      // Deleted is not offered: deleted contracts are not listed at all
+      .filter((status) => status.isActive && normalizeStatus(status.statusName) !== "deleted")
       .map((status) => ({
         value: status.statusName,
         label: status.displayName || status.statusName,
@@ -330,8 +330,8 @@ const filteredRows = useMemo(() => {
   const selectedStatus = normalizeStatus(statusFilter.trim());
 
   return rows.filter((row) => {
-    // deleted contracts only show when the Deleted status is picked
-    if (normalizeStatus(row.status ?? "") === "deleted" && selectedStatus !== "deleted") return false;
+    // deleted contracts are not listed (there is no Deleted filter)
+    if (normalizeStatus(row.status ?? "") === "deleted") return false;
     // a "needs attention" group picked in the overview
     if (focusIds && !focusIds.has(row.contractNumber)) return false;
 

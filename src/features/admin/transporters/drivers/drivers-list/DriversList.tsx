@@ -8,7 +8,7 @@ import SuccessToast from "../../../../../shared/components/toast/SuccessToast";
 import { useSuccessToast } from "../../../../../shared/components/toast/useSuccessToast";
 import DriversFilters from "./DriversFilters";
 import Pagination from "./Pagination";
-import { buildDriverColumns } from "./drivers.columns";
+import { buildDriverColumns, realLicenseNumber } from "./drivers.columns";
 import {
   useGetAllActiveDriversQuery,
   useDeleteDriverMutation,
@@ -124,7 +124,7 @@ const DriversList = () => {
       if (experienceYears !== "All" && String(row.experienceYears) !== experienceYears) return false;
 
       if (q) {
-        const haystack = [row.driverName, row.mobileNumber, row.licenseNumber].join(" ").toLowerCase();
+        const haystack = [row.driverName, row.mobileNumber, realLicenseNumber(row.licenseNumber)].join(" ").toLowerCase();
         if (!haystack.includes(q)) return false;
       }
 
@@ -200,6 +200,10 @@ const DriversList = () => {
             experienceYears={experienceYears}
             onExperienceYearsChange={setExperienceYears}
             experienceYearsOptions={experienceYearsOptions}
+            onClear={() => {
+              setKeyword("");
+              setExperienceYears("All");
+            }}
           />
         )}
 

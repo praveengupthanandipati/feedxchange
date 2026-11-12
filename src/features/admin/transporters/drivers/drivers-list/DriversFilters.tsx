@@ -1,5 +1,6 @@
 import { SearchIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
+import ClearFiltersButton from "../../../../../shared/components/filters/ClearFiltersButton";
 
 interface FilterOption {
   value: string;
@@ -12,6 +13,8 @@ interface DriversFiltersProps {
   experienceYears: string;
   onExperienceYearsChange: (value: string) => void;
   experienceYearsOptions: FilterOption[];
+  /** Shows the ✕ that resets the filters and search. */
+  onClear?: () => void;
 }
 
 const DriversFilters = ({
@@ -20,6 +23,7 @@ const DriversFilters = ({
   experienceYears,
   onExperienceYearsChange,
   experienceYearsOptions,
+  onClear,
 }: DriversFiltersProps) => {
   return (
     <div className="drivers-filters">
@@ -40,6 +44,7 @@ const DriversFilters = ({
           placeholder="Search by name, mobile, license number"
         />
       </div>
+      {onClear && <ClearFiltersButton onClick={onClear} />}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
+import ClearFiltersButton from "../../../../../shared/components/filters/ClearFiltersButton";
 
 interface FilterOption {
   value: string;
@@ -12,6 +13,8 @@ interface DriverTruckMappingFiltersProps {
   driverName: string;
   onDriverNameChange: (value: string) => void;
   driverOptions: FilterOption[];
+  /** Shows the ✕ that resets the filters and search. */
+  onClear?: () => void;
 }
 
 const DriverTruckMappingFilters = ({
@@ -21,6 +24,7 @@ const DriverTruckMappingFilters = ({
   driverName,
   onDriverNameChange,
   driverOptions,
+  onClear,
 }: DriverTruckMappingFiltersProps) => {
   return (
     <div className="driver-truck-mapping-filters">
@@ -39,6 +43,7 @@ const DriverTruckMappingFilters = ({
         placeholder="Search by Driver"
         ariaLabel="Search by driver name"
       />
+      {onClear && <ClearFiltersButton onClick={onClear} />}
     </div>
   );
 };

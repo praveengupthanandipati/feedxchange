@@ -239,6 +239,15 @@ const TrucksList = () => {
             fuelType={fuelType}
             onFuelTypeChange={setFuelType}
             fuelTypeOptions={fuelTypeOptions}
+            onClear={() => {
+              setTruckNumber("");
+              setTruckType("All");
+              setMake("All");
+              setModel("All");
+              setManufactureYear("All");
+              setCapacity("All");
+              setFuelType("All");
+            }}
           />
         )}
 

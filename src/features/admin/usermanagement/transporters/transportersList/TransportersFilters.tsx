@@ -1,5 +1,6 @@
 import { SearchIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
+import ClearFiltersButton from "../../../../../shared/components/filters/ClearFiltersButton";
 
 interface FilterOption {
   value: string;
@@ -24,6 +25,8 @@ interface TransportersFiltersProps {
   state: string;
   onStateChange: (value: string) => void;
   stateOptions: FilterOption[];
+  /** Shows the ✕ that resets the filters and search. */
+  onClear?: () => void;
 }
 
 const TransportersFilters = ({
@@ -37,6 +40,7 @@ const TransportersFilters = ({
   state,
   onStateChange,
   stateOptions,
+  onClear,
 }: TransportersFiltersProps) => {
   return (
     <div className="transporters-filters">
@@ -73,6 +77,7 @@ const TransportersFilters = ({
           placeholder="Search by company, type, location, state, mobile"
         />
       </div>
+      {onClear && <ClearFiltersButton onClick={onClear} />}
     </div>
   );
 };
