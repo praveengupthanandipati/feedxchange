@@ -31,7 +31,7 @@ const BusinessTab = () => {
   const selected = Number(params.get("profile")) || 0;
   const [search, setSearch] = useState("");
   const query = useDebounced(search);
-  const { data: found = [], isFetching } = useFindPreferenceProfilesQuery(query, { refetchOnMountOrArgChange: true });
+  const { data: found = [], isFetching, isError: findFailed } = useFindPreferenceProfilesQuery(query, { refetchOnMountOrArgChange: true });
 
   // a business user can only reach their own profile: open it straight away
   useEffect(() => {
@@ -61,7 +61,9 @@ const BusinessTab = () => {
                 </button>
               </li>
             ))}
-            {!isFetching && found.length === 0 && <li className="pref-finder__empty">No business matches “{query}”.</li>}
+            {!isFetching && found.length === 0 && (
+              <li className="pref-finder__empty">{findFailed ? "Businesses could not be loaded. Please try again." : `No business matches “${query}”.`}</li>
+            )}
           </ul>
         </aside>
       )}
@@ -76,7 +78,7 @@ const UsersTab = () => {
   const [search, setSearch] = useState("");
   const query = useDebounced(search);
   const [userId, setUserId] = useState(0);
-  const { data: users = [], isFetching } = useFindPreferenceUsersQuery(query);
+  const { data: users = [], isFetching, isError: findUsersFailed } = useFindPreferenceUsersQuery(query);
   const { data: prefs, isError, error } = useGetUserPreferencesQuery(userId, { skip: !userId, refetchOnMountOrArgChange: true });
   const [save, { isLoading: saving }] = useSaveUserPreferencesMutation();
   const [pause, { isLoading: pausing }] = usePauseUserMutation();
@@ -98,7 +100,9 @@ const UsersTab = () => {
               </button>
             </li>
           ))}
-          {!isFetching && users.length === 0 && <li className="pref-finder__empty">No user matches “{query}”.</li>}
+          {!isFetching && users.length === 0 && (
+            <li className="pref-finder__empty">{findUsersFailed ? "Users could not be loaded. Please try again." : `No user matches “${query}”.`}</li>
+          )}
         </ul>
       </aside>
       <div className="pref-layout__main">

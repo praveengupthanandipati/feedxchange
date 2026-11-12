@@ -112,8 +112,8 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
       if (selectedIsLoaded) {
         notify.ask({ eventCode: "TRUCK_LOADED", title: "Notify the buyer that the truck is loaded", sourceEntityType: "ContractTruckDispatch", sourceEntityId: truck.contractTruckId });
       }
-    } catch {
-      setError("Failed to update truck status. Please try again.");
+    } catch (error) {
+      setError(getApiErrorMessage((error as { data?: unknown })?.data) || "Failed to update truck status. Please try again.");
     }
   };
 
@@ -287,7 +287,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
 };
 
 const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }) => {
-  const { trucks, isLoading } = useContractTruckDetails(contractNumber, true);
+  const { trucks, isLoading, isError: trucksFailed } = useContractTruckDetails(contractNumber, true);
   const { data: dispatchStatuses } = useGetContractTruckDispatchStatusesQuery();
   const { data: contract } = useGetContractByContractNumberQuery(contractNumber);
   const { data: invoices } = useGetTruckInvoicesByContractQuery({ contractId: contract?.id ?? 0 }, { skip: !contract?.id });
@@ -299,6 +299,16 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
 
   if (isLoading) {
     return <p className="update-truck-status-card__empty">Loading trucks…</p>;
+  }
+
+  if (trucks.length === 0 && trucksFailed) {
+    return (
+      <InfoPanel
+        icon={TruckIcon}
+        title="Trucks Could Not Be Loaded"
+        description="The trucks for this contract could not be loaded. Please try again."
+      />
+    );
   }
 
   if (trucks.length === 0) {

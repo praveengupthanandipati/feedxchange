@@ -40,7 +40,9 @@ const TruckTripView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { data: trip, isLoading } = useGetTripByIdQuery(id ?? "", { skip: !id });
+  const { data: trip, isLoading, isError, error: loadError } = useGetTripByIdQuery(id ?? "", { skip: !id });
+  // A real 404 means there is no such trip; any other failure is a load error.
+  const loadFailed = isError && !(loadError && "status" in loadError && loadError.status === 404);
   const [completeTrip] = useCompleteTripMutation();
 
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
@@ -81,7 +83,13 @@ const TruckTripView = () => {
           <ArrowLeftIcon aria-hidden /> Back to Truck Trips List
         </Link>
         <div className="business-owner-detail__card">
-          <p>{isLoading ? "Loading truck trip…" : `No truck trip found for id "${id}".`}</p>
+          <p>
+            {isLoading
+              ? "Loading truck trip…"
+              : loadFailed
+                ? "Could not load this truck trip. Please try again."
+                : `No truck trip found for id "${id}".`}
+          </p>
         </div>
       </div>
     );

@@ -7,10 +7,11 @@ import {
 import { useEnableAutoNotifications } from "../../../notification-preferences/useEnableAutoNotifications";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
 import { buildBusinessProfilePayload } from "./businessOwnerWizard.utils";
+import { getErrorMessage as apiErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 function getErrorMessage(err: unknown): string {
   console.error("Failed to save business profile:", err);
-  return "Failed to save business profile.";
+  return apiErrorMessage(err, "Failed to save business profile.");
 }
 
 export const useSaveBusinessProfileStep = (nextPath: string) => {

@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { apiBaseQuery } from "../api/baseQuery";
+import { getErrorMessage } from "../api/getErrorMessage";
 
 // Shapes of the /api/SellerInvoices endpoints. The server calculates amount, GST, total and the financial year; the screens only show them.
 
@@ -288,6 +289,6 @@ export const {
 
 /** Message to show for a failed call (the API puts validation messages in errors.ErrorMessage or detail). */
 export function apiErrorMessage(error: unknown, fallback = "Something went wrong."): string {
-  const e = error as { data?: { message?: string; detail?: string; title?: string; errors?: Record<string, string[]> } };
-  return e?.data?.errors?.ErrorMessage?.[0] || e?.data?.message || e?.data?.detail || e?.data?.title || fallback;
+  // The API's own sentence when it is a plain one; never raw backend data (see core/api/getErrorMessage).
+  return getErrorMessage(error, fallback);
 }

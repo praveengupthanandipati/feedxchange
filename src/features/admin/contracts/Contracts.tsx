@@ -29,12 +29,13 @@ import { buildContractColumns } from "./contracts.columns";
 import { useSuccessToast } from "../../../shared/components/toast/useSuccessToast";
 import SuccessToast from "../../../shared/components/toast/SuccessToast";
 import { DEFAULT_DATE_RANGE, DEFAULT_STATUS_FILTER, dateRangeOptions, type Contract } from "./contracts.data";
-import ContractsDashboard from "./dashboard/ContractsDashboard";
+import ContractsDashboard, { ContractsFilterBar } from "./dashboard/ContractsDashboard";
 import { ATTENTION, inAttention, type AttentionKind, type MonthBar } from "./dashboard/contractsDashboard.utils";
 import { ChartColumnIcon } from "../../../shared/components/icon";
 import "./Contracts.scss";
 
 import Can from "../../../core/auth/Can";
+import { getErrorMessage } from "../../../core/api/getErrorMessage";
 
 const PAGE_SIZE = 10;
 const DASHBOARD_KEY = "fx-contracts-dashboard"; // "shown" | "hidden"
@@ -149,7 +150,9 @@ const Contracts = () => {
   const [searchParams] = useSearchParams();
   const linkedFocus = searchParams.get("focus");
   const initialFocus = linkedFocus && linkedFocus in ATTENTION ? (linkedFocus as AttentionKind) : null;
-  const [statusFilter, setStatusFilter] = useState(initialFocus ? "" : DEFAULT_STATUS_FILTER);
+  // ?show=all (after creating / editing a contract) opens the full list: every status, all dates.
+  const showAllOnOpen = Boolean(initialFocus) || searchParams.get("show") === "all";
+  const [statusFilter, setStatusFilter] = useState(showAllOnOpen ? "" : DEFAULT_STATUS_FILTER);
   const [rows, setRows] = useState<Contract[]>([]);
   //const [successMessage, setSuccessMessage] = useState("");
   const { message: successMessage, showSuccessMessage } = useSuccessToast();
@@ -169,7 +172,7 @@ const Contracts = () => {
   [contractStatuses],
 );
   const [deleteContract] = useDeleteContractMutation();
-  const [dateRangeFilter, setDateRangeFilter] = useState(initialFocus ? "All" : DEFAULT_DATE_RANGE);
+  const [dateRangeFilter, setDateRangeFilter] = useState(showAllOnOpen ? "All" : DEFAULT_DATE_RANGE);
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -230,7 +233,7 @@ const Contracts = () => {
       showSuccessMessage(`${count} contract${count === 1 ? "" : "s"} ${bulkAction === "approve" ? "approved" : "rejected"} successfully`);
     } catch (error) {
       console.error("Bulk contract status update failed", error);
-      setBulkError("Failed to update contract status.");
+      setBulkError(getErrorMessage(error, "Failed to update contract status."));
     }
   };
 
@@ -262,17 +265,7 @@ const Contracts = () => {
     );
 }, [data]);
 
-  //   useEffect(() => {
-  //   const incomingMessage =
-  //     (location.state as { successMessage?: string } | null)?.successMessage ??
-  //     localStorage.getItem(SUCCESS_MESSAGE_STORAGE_KEY);
-
-  //   if (incomingMessage) {
-  //     localStorage.removeItem(SUCCESS_MESSAGE_STORAGE_KEY);
-  //     showSuccessMessage(incomingMessage);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [location.state]);
+  // Success messages left by the contract form / Change Status are shown by useSuccessToast above.
 
   
   const handleDelete = (contract: Contract) => {
@@ -615,6 +608,19 @@ const filteredRows = useMemo(() => {
           <strong>{totalQuantityValue.toLocaleString("en-IN")} MT</strong>
         </div>
       </div>
+      )}
+
+      {/* What the overview picked, right above the list it filters */}
+      {dashboardShown && (
+        <ContractsFilterBar
+          active={{
+            status: statusFilter,
+            focus,
+            search: keyword,
+            monthStart: dateRangeFilter === "Custom Date Range" ? monthStart : null,
+          }}
+          onClear={handleClearFilters}
+        />
       )}
 
       <div className="contracts-card">

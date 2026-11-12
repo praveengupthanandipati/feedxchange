@@ -29,6 +29,11 @@ interface AddressSelectFieldProps {
   modalTitle: string;
   /** Pre-ticks "Unloading location" in the popup, used for delivery addresses. */
   defaultUnloading?: boolean;
+  /**
+   * Text for an already-saved address (e.g. a contract being edited). Addresses added with "+" are not in the
+   * profile's address list, so without it the saved id matches no option and the field shows empty.
+   */
+  savedLabel?: string;
 }
 
 /**
@@ -45,6 +50,7 @@ const AddressSelectField = ({
   ariaLabel,
   modalTitle,
   defaultUnloading = false,
+  savedLabel,
 }: AddressSelectFieldProps) => {
   const { data: addresses } = useGetProfileAddressQuery(String(profileId), { skip: !profileId });
 
@@ -68,8 +74,15 @@ const AddressSelectField = ({
     // A just-created address wins over a profile entry with the same id, so the
     // field shows the address that was actually added.
     const added = new Set(addedOptions.map((option) => option.value));
-    return [...fromProfile.filter((option) => !added.has(option.value)), ...addedOptions];
-  }, [addresses, addedOptions]);
+    const list = [...fromProfile.filter((option) => !added.has(option.value)), ...addedOptions];
+    // A saved address that isn't in the party's list is shown only when its text is known (e.g. a contract being
+    // edited): never as a bare id, which would also keep another party's address looking valid.
+    const label = savedLabel?.trim();
+    if (label && value && /^\d+$/.test(value) && !list.some((option) => option.value === value)) {
+      list.push({ value, label });
+    }
+    return list;
+  }, [addresses, addedOptions, value, savedLabel]);
 
   const handleChange = (addressId: string) => {
     const label = options.find((option) => option.value === addressId)?.label ?? "";

@@ -152,6 +152,9 @@ export interface GetContractDto {
   id: number;
   contractNumber: string | null;
   contractDate: string;
+  /** The contract's validity period (returned by GetContractByContractNumber). */
+  effectiveFrom?: string | null;
+  effectiveTo?: string | null;
   sellerId: number | null;
   sellerName: string | null;
   buyerId: number | null;

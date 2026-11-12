@@ -18,7 +18,7 @@ import {
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
-import { approvedTruckRows as seedRows, type ApprovedTruckRow } from "./transporterAssignment.data";
+import type { ApprovedTruckRow } from "./transporterAssignment.data";
 import "./ApprovedTrucksOffcanvas.scss";
 
 const PAGE_SIZE = 5;
@@ -30,7 +30,8 @@ interface ApprovedTrucksOffcanvasProps {
 }
 
 const ApprovedTrucksOffcanvas = ({ open, scheduleRow, onClose }: ApprovedTrucksOffcanvasProps) => {
-  const [rows, setRows] = useState<ApprovedTruckRow[]>(seedRows);
+  // No approved-trucks API yet: start empty rather than showing built-in sample trucks as if real.
+  const [rows, setRows] = useState<ApprovedTruckRow[]>([]);
   const [keyword, setKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowPendingDelete, setRowPendingDelete] = useState<ApprovedTruckRow | null>(null);

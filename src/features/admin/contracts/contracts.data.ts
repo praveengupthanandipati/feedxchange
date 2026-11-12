@@ -92,6 +92,8 @@ export interface Contract {
   sellerFromDate?: string;
   sellerToDate?: string;
   loadingAddressId?: number;
+  /** The saved loading address as text (shown when its id isn't in the seller's address list). */
+  loadingAddressLabel?: string;
   sellerRemarksSpecialConditions?: string;
   sellerQualitySpecifications?: QualitySpecification[];
 
@@ -101,6 +103,8 @@ export interface Contract {
   buyerFromDate?: string;
   buyerToDate?: string;
   deliveryAddressId?: number;
+  /** The saved delivery address as text (shown when its id isn't in the buyer's address list). */
+  deliveryAddressLabel?: string;
   buyerRemarksSpecialConditions?: string;
   buyerQualitySpecifications?: QualitySpecification[];
 

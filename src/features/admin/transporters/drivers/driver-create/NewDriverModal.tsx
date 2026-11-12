@@ -19,6 +19,7 @@ import {
 } from "./driverNew.data";
 import "../../../../../shared/components/dialog/ConfirmDialog.scss";
 import "./NewDriverModal.scss";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 interface NewDriverModalProps {
   open: boolean;
@@ -92,7 +93,7 @@ const NewDriverModal = ({
       }
       onCreated(created);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to save driver.");
+      setSubmitError(getErrorMessage(err, "Failed to save driver."));
     } finally {
       setSubmitting(false);
     }

@@ -60,7 +60,7 @@ interface TruckTrackingDrawerProps {
 }
 
 const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) => {
-  const { trucks, isLoading: trucksLoading } = useContractTruckDetails(row?.id ?? "", open && Boolean(row));
+  const { trucks, isLoading: trucksLoading, isError: trucksFailed } = useContractTruckDetails(row?.id ?? "", open && Boolean(row));
 
   useEffect(() => {
     if (!open) return;
@@ -137,7 +137,7 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
                 </div>
               </div>
 
-              <TruckList trucks={trucks} isLoading={trucksLoading} />
+              <TruckList trucks={trucks} isLoading={trucksLoading} loadFailed={trucksFailed} />
             </div>
           </>
         )}
@@ -407,7 +407,9 @@ const PendingContracts = () => {
             columns={pendingContractColumns}
             data={pagedRows}
             rowKey={(row) => row.id}
-            emptyMessage="No pending contracts match the current filters."
+            emptyMessage={
+              error ? "Pending contracts could not be loaded. Please try again." : "No pending contracts match the current filters."
+            }
             minHeight
           />
         )}

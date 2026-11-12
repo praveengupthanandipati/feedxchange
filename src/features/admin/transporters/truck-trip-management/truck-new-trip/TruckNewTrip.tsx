@@ -13,7 +13,9 @@ import {
 } from "../../../../../core/store/truckTripApi";
 import { MIN_LATITUDE, MAX_LATITUDE, MIN_LONGITUDE, MAX_LONGITUDE } from "./truckNewTrip.data";
 import "../../../contracts/NewContract.scss";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
+import LookupLoadError from "../../../../../shared/components/feedback/LookupLoadError";
 function toDateTimeInputValue(isoValue: string): string {
   const date = new Date(isoValue);
   if (Number.isNaN(date.getTime())) return "";
@@ -63,24 +65,24 @@ const TruckNewTrip = () => {
   const [addTrip] = useAddTripMutation();
   const [updateTrip] = useUpdateTripMutation();
 
-  const { data: trucks = [] } = useGetAllActiveTruckDetailsQuery();
+  const { data: trucks = [], isError: trucksFailed } = useGetAllActiveTruckDetailsQuery();
   const truckOptions = trucks.map((truck) => ({
     value: String(truck.truckId),
     label: truck.truckNumber,
   }));
 
-  const { data: drivers = [] } = useGetAllActiveDriversQuery();
+  const { data: drivers = [], isError: driversFailed } = useGetAllActiveDriversQuery();
   const driverOptions = drivers.map((driver) => ({
     value: String(driver.driverId),
     label: `${driver.driverName} — ${driver.mobileNumber}`,
   }));
 
-  const { data: products = [] } = useGetProductsQuery();
+  const { data: products = [], isError: productsFailed } = useGetProductsQuery();
   const productTypeOptions = Array.from(new Set(products.map((product) => product.name).filter(Boolean))).map(
     (name) => ({ value: name as string, label: name as string }),
   );
 
-  const { data: businessProfiles = [] } = useGetBusinessProfileSummaryQuery();
+  const { data: businessProfiles = [], isError: businessProfilesFailed } = useGetBusinessProfileSummaryQuery();
   const businessProfileOptions = businessProfiles.map((profile) => ({
     value: String(profile.profileId),
     label: profile.tradingName || profile.legalName,
@@ -215,7 +217,7 @@ const TruckNewTrip = () => {
       }
       navigate("/admin/truck-management/transporters/truck-trips");
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to save truck trip.");
+      setSubmitError(getErrorMessage(err, "Failed to save truck trip."));
     } finally {
       setSubmitting(false);
     }
@@ -229,6 +231,8 @@ const TruckNewTrip = () => {
           <ArrowLeftIcon aria-hidden /> Truck Trips List
         </Link>
       </div>
+
+      <LookupLoadError failed={trucksFailed || driversFailed || productsFailed || businessProfilesFailed} className="new-contract__error" />
 
       {submitError && (
         <p className="new-contract__error" role="alert">

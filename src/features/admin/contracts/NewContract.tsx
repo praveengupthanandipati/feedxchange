@@ -29,6 +29,8 @@ import NotifyModal from "../../../shared/notifications/NotifyModal";
 import NotifyChoicePicker from "../../../shared/notifications/NotifyChoicePicker";
 import type { NotifyChoices } from "../../../shared/notifications/notifyChoices";
 import { parseProductFeatures, useGetProductsQuery } from "../../../core/store/productsApi";
+import { getErrorMessage } from "../../../core/api/getErrorMessage";
+import LookupLoadError from "../../../shared/components/feedback/LookupLoadError";
 import {
   useGetBusinessProfileSummaryQuery,
 } from "../../../core/store/businessProfilesApi";
@@ -368,6 +370,9 @@ const NewContract = () => {
       sellerFromDate: String(sellerDetails.sellerFromDate ?? sellerDetails.fromDate ?? source.sellerFromDate ?? fallback.sellerFromDate ?? ""),
       sellerToDate: String(sellerDetails.sellerToDate ?? sellerDetails.toDate ?? source.sellerToDate ?? fallback.sellerToDate ?? ""),
       loadingAddressId: asNumber(sellerDetails.loadingAddressId ?? source.loadingAddressId, fallback.loadingAddressId),
+      loadingAddressLabel: String(
+        sellerDetails.loadingAddressAt ?? sellerDetails.loadingAddress ?? source.loadingAddressAt ?? source.loadingAddress ?? fallback.loadingAddressLabel ?? "",
+      ).trim(),
       sellerRemarksSpecialConditions: String(sellerDetails.remarksSpecialConditions ?? sellerDetails.remarks ?? source.sellerRemarksSpecialConditions ?? fallback.sellerRemarksSpecialConditions ?? ""),
       sellerQualitySpecifications: (sellerDetails.qualitySpecifications ?? source.sellerQualitySpecifications ?? fallback.sellerQualitySpecifications) as Contract["sellerQualitySpecifications"],
       sellerConditions: {
@@ -400,6 +405,15 @@ const NewContract = () => {
       buyerFromDate: String(buyerDetails.buyerFromDate ?? buyerDetails.fromDate ?? source.buyerFromDate ?? fallback.buyerFromDate ?? ""),
       buyerToDate: String(buyerDetails.buyerToDate ?? buyerDetails.toDate ?? source.buyerToDate ?? fallback.buyerToDate ?? ""),
       deliveryAddressId: asNumber(buyerDetails.deliveryAddressId ?? source.deliveryAddressId, fallback.deliveryAddressId),
+      deliveryAddressLabel: String(
+        buyerDetails.deliveryAddressAt ??
+          buyerDetails.deliveryAddress ??
+          buyerDetails.loadingAddressAt ??
+          source.deliveryAddressAt ??
+          source.deliveryAddress ??
+          fallback.deliveryAddressLabel ??
+          "",
+      ).trim(),
       buyerRemarksSpecialConditions: String(buyerDetails.remarksSpecialConditions ?? buyerDetails.remarks ?? source.buyerRemarksSpecialConditions ?? fallback.buyerRemarksSpecialConditions ?? ""),
       buyerQualitySpecifications: (buyerDetails.qualitySpecifications ?? source.buyerQualitySpecifications ?? fallback.buyerQualitySpecifications) as Contract["buyerQualitySpecifications"],
       buyerConditions: {
@@ -533,7 +547,7 @@ const NewContract = () => {
 
     return "";
   };
-const { data: products } = useGetProductsQuery();
+const { data: products, isError: productsFailed } = useGetProductsQuery();
     const productOptions = useMemo(
       () =>
         (products ?? []).map((product) => ({
@@ -625,7 +639,7 @@ const { data: products } = useGetProductsQuery();
       </div>
     );
 
-    const { data: businessProfiles } = useGetBusinessProfileSummaryQuery(undefined, {
+    const { data: businessProfiles, isError: businessProfilesFailed } = useGetBusinessProfileSummaryQuery(undefined, {
       refetchOnMountOrArgChange: true,
     });
     const businessProfileOptions = useMemo(
@@ -649,12 +663,34 @@ const { data: products } = useGetProductsQuery();
     );
     // Guarded on the id shape, not just emptiness: the endpoint binds profileId as an
     // int and 400s on anything else.
-    const { data: sellerAddresses = [] } = useGetProfileAddressQuery(sellerId, {
+    // currentData, not data: after switching seller/buyer, `data` still holds the previous party's addresses until the
+    // new ones arrive, and the primary-address effect below would put the old party's address back.
+    const { currentData: sellerAddressList } = useGetProfileAddressQuery(sellerId, {
       skip: !isProfileId(sellerId),
     });
-    const { data: buyerAddresses = [] } = useGetProfileAddressQuery(buyerId, {
+    const { currentData: buyerAddressList } = useGetProfileAddressQuery(buyerId, {
       skip: !isProfileId(buyerId),
     });
+    const sellerAddresses = useMemo(() => sellerAddressList ?? [], [sellerAddressList]);
+    const buyerAddresses = useMemo(() => buyerAddressList ?? [], [buyerAddressList]);
+
+    // Edit: the contract's saved address isn't one of this party's addresses (e.g. kept from a previously chosen
+    // seller/buyer) and there's no text to show for it: clear it, so the field asks for the right address instead
+    // of silently saving the wrong one. Runs only once the party's list has loaded.
+    useEffect(() => {
+      const savedId = editContract?.loadingAddressId ? String(editContract.loadingAddressId) : "";
+      if (!sellerAddressList || !savedId || sellerConditions.address !== savedId || editContract?.loadingAddressLabel) return;
+      if (!sellerAddressList.some((address) => String(address.addressId) === savedId)) {
+        setSellerConditions((prev) => (prev.address === savedId ? { ...prev, address: "" } : prev));
+      }
+    }, [sellerAddressList, sellerConditions.address, editContract]);
+    useEffect(() => {
+      const savedId = editContract?.deliveryAddressId ? String(editContract.deliveryAddressId) : "";
+      if (!buyerAddressList || !savedId || buyerConditions.address !== savedId || editContract?.deliveryAddressLabel) return;
+      if (!buyerAddressList.some((address) => String(address.addressId) === savedId)) {
+        setBuyerConditions((prev) => (prev.address === savedId ? { ...prev, address: "" } : prev));
+      }
+    }, [buyerAddressList, buyerConditions.address, editContract]);
     // On edit the address arrives as free text, which matches no option and is sent
     // back as 0. Swap it for the matching addressId as soon as the list is available.
     useEffect(() => {
@@ -792,15 +828,27 @@ const { data: products } = useGetProductsQuery();
   // Picking a party fills its commission from its profile (seller: sell charge, buyer: buy charge); it stays editable.
   const profileCharge = (profileId: string, key: "sellCharge" | "buyCharge") =>
     businessProfiles?.find((profile) => String(profile.profileId) === profileId)?.[key];
+  // A different party has different addresses: clear the old one (the new party's primary address then fills in),
+  // otherwise the contract was saved with the previous seller's / buyer's address.
   const handleSellerPick = (value: string) => {
+    const changed = value !== sellerId;
     setSellerId(value);
     const charge = profileCharge(value, "sellCharge");
-    if (charge) setSellerConditions((prev) => ({ ...prev, commission: String(charge) }));
+    setSellerConditions((prev) => ({
+      ...prev,
+      ...(charge ? { commission: String(charge) } : {}),
+      ...(changed ? { address: "" } : {}),
+    }));
   };
   const handleBuyerPick = (value: string) => {
+    const changed = value !== buyerId;
     setBuyerId(value);
     const charge = profileCharge(value, "buyCharge");
-    if (charge) setBuyerConditions((prev) => ({ ...prev, commission: String(charge) }));
+    setBuyerConditions((prev) => ({
+      ...prev,
+      ...(charge ? { commission: String(charge) } : {}),
+      ...(changed ? { address: "" } : {}),
+    }));
   };
 
   const handleBuyerConditionChange = (patch: Partial<ConditionState>) => {
@@ -1181,7 +1229,7 @@ const { data: products } = useGetProductsQuery();
       }
     }
 
-    window.location.href = "/admin/contracts";
+    window.location.href = "/admin/contracts?show=all";
 
   } catch (error) {
     console.error(
@@ -1199,10 +1247,12 @@ const { data: products } = useGetProductsQuery();
     console.error("API Status:", err.status);
     console.error("API Response:", err.data);
 
+    // The API's own reason when it is a plain sentence (never raw backend data), else a general message.
     setFormError(
-      navState?.isEdit
-        ? "Failed to update contract. Please check the API response."
-        : "Failed to create contract. Please check the API response."
+      getErrorMessage(
+        error,
+        navState?.isEdit ? "Failed to update contract. Please try again." : "Failed to create contract. Please try again.",
+      ),
     );
   }
 };
@@ -1471,7 +1521,7 @@ const { data: products } = useGetProductsQuery();
             {summaryVisible ? "Hide Summary" : "Show Summary"}
           </button>
         </div>
-        <Link to="/admin/contracts" className="new-contract__back">
+        <Link to="/admin/contracts?show=all" className="new-contract__back">
           <ArrowLeftIcon aria-hidden /> Contract List
         </Link>
       </div>
@@ -1508,6 +1558,8 @@ const { data: products } = useGetProductsQuery();
           </div>
         </div>
       )}
+
+      <LookupLoadError failed={productsFailed || businessProfilesFailed} className="new-contract__error" />
 
       {formError && (
         <p className="new-contract__error" role="alert">
@@ -1884,6 +1936,7 @@ const { data: products } = useGetProductsQuery();
                 <AddressSelectField
                   profileId={Number(sellerId) || 0}
                   value={sellerConditions.address}
+                  savedLabel={editContract?.loadingAddressId && String(editContract.loadingAddressId) === sellerConditions.address ? editContract.loadingAddressLabel : undefined}
                   onChange={(addressId) => handleSellerConditionChange({ address: addressId })}
                   placeholder="Select Loading Address"
                   ariaLabel="Seller loading address"
@@ -1994,6 +2047,7 @@ const { data: products } = useGetProductsQuery();
                 <AddressSelectField
                   profileId={Number(buyerId) || 0}
                   value={buyerConditions.address}
+                  savedLabel={editContract?.deliveryAddressId && String(editContract.deliveryAddressId) === buyerConditions.address ? editContract.deliveryAddressLabel : undefined}
                   onChange={(addressId) => handleBuyerConditionChange({ address: addressId })}
                   placeholder="Select Delivery Address"
                   ariaLabel="Buyer delivery address"
@@ -2228,7 +2282,7 @@ const { data: products } = useGetProductsQuery();
       )}
 
       <div className="new-contract__actions">
-        <Link to="/admin/contracts" className="new-contract__cancel">
+        <Link to="/admin/contracts?show=all" className="new-contract__cancel">
           Cancel
         </Link>
         <button
@@ -2266,7 +2320,7 @@ const { data: products } = useGetProductsQuery();
         closeOnBackdrop={false}
         choices={notifyChoices}
         onSkip={() => undefined}
-        onClose={() => { window.location.href = "/admin/contracts"; }}
+        onClose={() => { window.location.href = "/admin/contracts?show=all"; }}
       />
     </div>
   );

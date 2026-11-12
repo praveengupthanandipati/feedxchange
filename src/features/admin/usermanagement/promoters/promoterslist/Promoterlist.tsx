@@ -28,6 +28,7 @@ import {
 } from "../../../../../core/store/promotersApi";
 import "./Promoters.scss";
 import Can from "../../../../../core/auth/Can";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 const PAGE_SIZE = 10;
 const DEFAULT_STATUS_FILTER: PromoterProfileStatus = "Active";
@@ -86,7 +87,7 @@ const Promoterlist = () => {
       setPendingDeleteRow(null);
       showSuccessMessage("Promoter deleted successfully");
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Failed to delete promoter.");
+      setDeleteError(getErrorMessage(err, "Failed to delete promoter."));
     }
   };
 

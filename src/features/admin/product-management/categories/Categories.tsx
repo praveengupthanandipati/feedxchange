@@ -20,6 +20,7 @@ import "./Categories.scss";
 import RowActionsMenu from "../../../../shared/components/table/RowActionsMenu";
 
 import Can from "../../../../core/auth/Can";
+import { getErrorMessage } from "../../../../core/api/getErrorMessage";
 
 const PAGE_SIZE = 10;
 const ALLOWED_CATEGORY_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -46,6 +47,7 @@ const Categories = () => {
   data: apiCategories = [],
   isLoading,
   error,
+  refetch,
 } = useGetAllActiveCategoriesQuery();
 
 // Add
@@ -78,6 +80,8 @@ const Categories = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Category | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  // A failed Add / Update: the API's own reason when it is a plain sentence, else a general message.
+  const [saveError, setSaveError] = useState("");
 
 const { message: successMessage, showSuccessMessage } = useSuccessToast();
 
@@ -91,6 +95,7 @@ const { message: successMessage, showSuccessMessage } = useSuccessToast();
     setSelectedImage(undefined)
     setImageError("");
     setErrors({});
+    setSaveError("");
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -161,9 +166,7 @@ const confirmDelete = async () => {
     setPendingDeleteRow(null);
     showSuccessMessage("Category deleted successfully.");
   } catch (err) {
-    setDeleteError(
-      err instanceof Error ? err.message : "Failed to delete category."
-    );
+    setDeleteError(getErrorMessage(err, "Failed to delete category."));
   }
 };
 
@@ -172,6 +175,7 @@ const handleSave = async () => {
     const trimmedName = categoryName.trim();
     const trimmedSeoName = seoName.trim();
 
+    setSaveError("");
     const nextErrors: FormErrors = {};
     if (!trimmedName) nextErrors.categoryName = "Category Name is required.";
     if (!trimmedSeoName) nextErrors.seoName = "SEO Name is required.";
@@ -213,6 +217,7 @@ const handleSave = async () => {
     showSuccessMessage("Category updated successfully.");
   } catch (err) {
     console.error("Failed to update category:", err);
+    setSaveError(getErrorMessage(err, "Failed to update category. Please try again."));
   }
 } else {
   try {
@@ -235,6 +240,7 @@ const handleSave = async () => {
     showSuccessMessage("Category added successfully.");
   } catch (err) {
     console.error("Failed to add category:", err);
+    setSaveError(getErrorMessage(err, "Failed to add category. Please try again."));
   }
 }
 };
@@ -310,9 +316,6 @@ const handleSave = async () => {
   return <div>Loading categories...</div>;
 }
 
-if (error) {
-  return <div>Failed to load categories.</div>;
-}
   return (
     <div className="categories-page">
       <Can any={["categories.manage"]}>
@@ -398,6 +401,12 @@ if (error) {
           />
         </div>
 
+        {saveError && (
+          <p className="form-field__error" role="alert">
+            {saveError}
+          </p>
+        )}
+
         <div className="categories-form-card__actions">
           <button type="button" className="categories-btn categories-btn--cancel" onClick={resetForm}>
             Cancel
@@ -410,11 +419,22 @@ if (error) {
       </Can>
 
       <div className="categories-table-card">
+        {/* A failed load keeps the page (form, table, paging) and says so, with a retry. */}
+        {error && (
+          <div className="categories-form-card__actions">
+            <p className="form-field__error" role="alert">
+              Could not load the categories.
+            </p>
+            <button type="button" className="categories-btn categories-btn--save" onClick={() => void refetch()}>
+              Try again
+            </button>
+          </div>
+        )}
         <Table
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}
-          emptyMessage="No categories found."
+          emptyMessage={error ? "Categories could not be loaded." : "No categories found."}
         />
 
         <div className="categories-pagination">

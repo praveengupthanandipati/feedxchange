@@ -12,10 +12,11 @@ import { useUpdateTransporterProfileMutation } from "../../../../../core/store/t
 import { useTransporterWizard } from "./TransporterWizardContext";
 import { buildTransporterProfilePayload } from "./transporterWizard.utils";
 import { documentTypeOptions } from "./newTransporter.data";
+import { getErrorMessage as apiErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 function getErrorMessage(err: unknown): string {
   console.error("Failed to save documents:", err);
-  return "Failed to save documents.";
+  return apiErrorMessage(err, "Failed to save documents.");
 }
 
 export const useSaveDocumentsStep = (nextPath: string) => {

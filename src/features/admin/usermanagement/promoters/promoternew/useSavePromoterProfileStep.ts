@@ -18,6 +18,7 @@ import {
 import { useEnableAutoNotifications } from "../../../notification-preferences/useEnableAutoNotifications";
 import { usePromoterWizard } from "./PromoterWizardContext";
 import { buildPromoterProfilePayload } from "./promoterWizard.utils";
+import { getErrorMessage as apiErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 class AddressRemovedError extends Error {
   constructor() {
@@ -30,7 +31,7 @@ class AddressRemovedError extends Error {
 function getErrorMessage(err: unknown): string {
   if (err instanceof AddressRemovedError) return err.message;
   console.error("Failed to save promoter profile:", err);
-  return "Failed to save promoter profile.";
+  return apiErrorMessage(err, "Failed to save promoter profile.");
 }
 
 

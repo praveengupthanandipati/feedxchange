@@ -17,6 +17,7 @@ import {
   type ReceiptMode,
   type Refund,
 } from "../../../../core/store/paymentAdviceApi";
+import LookupLoadError from "../../../../shared/components/feedback/LookupLoadError";
 import "./Refunds.scss";
 
 const MODES: ReceiptMode[] = ["Online", "Cheque", "Cash", "None"];
@@ -58,8 +59,8 @@ const Refunds = () => {
   const buyerNum = Number(buyerId) || 0;
   const hasPair = sellerNum > 0 && buyerNum > 0;
 
-  const { data: sellers = [] } = useGetRefundSellersQuery(undefined, { refetchOnMountOrArgChange: true });
-  const { data: buyers = [] } = useGetRefundBuyersQuery(sellerNum || undefined, { refetchOnMountOrArgChange: true });
+  const { data: sellers = [], isError: sellersFailed } = useGetRefundSellersQuery(undefined, { refetchOnMountOrArgChange: true });
+  const { data: buyers = [], isError: buyersFailed } = useGetRefundBuyersQuery(sellerNum || undefined, { refetchOnMountOrArgChange: true });
   const {
     data: receipts = [],
     isFetching: receiptsLoading,
@@ -223,6 +224,7 @@ const Refunds = () => {
         <div className="refunds-card__header">
           <h1 id="refunds-title">Credit Balance Refund</h1>
         </div>
+        <LookupLoadError failed={sellersFailed || buyersFailed} className="refunds-filters__error" />
 
         <div className="refunds-selectors">
           <SearchableSelect

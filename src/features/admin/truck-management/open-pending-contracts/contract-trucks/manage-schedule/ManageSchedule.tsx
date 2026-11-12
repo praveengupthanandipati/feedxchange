@@ -480,8 +480,10 @@ const ManageScheduleContent = ({ contractNumber }: { contractNumber: string }) =
   const contractId = contract?.id ?? 0;
 
   // First load only (see TransporterScheduleRows); also wait for the contract so "No Schedule Requests Yet" does not flash.
-  const { data: scheduleTransporters, isLoading: loadingTransporters } =
+  const { data: scheduleTransporters, isLoading: loadingTransporters, isError: transportersFailed } =
     useGetDispatchScheduleTransportersQuery({ contractId }, { skip: !contractId });
+  // The contract or its schedule could not be loaded: "no requests" would be wrong.
+  const scheduleLoadFailed = contractFailed || (transportersFailed && scheduleTransporters === undefined);
   const loadingScheduleTransporters = loadingTransporters || (!contract && !contractFailed);
 
   // Trucks added against a schedule carry its dispatchScheduleTransporterId, so their
@@ -529,6 +531,16 @@ const ManageScheduleContent = ({ contractNumber }: { contractNumber: string }) =
 
   if (loadingScheduleTransporters) {
     return <p className="review-assign-trucks-panel__hint">Loading scheduled transporters…</p>;
+  }
+
+  if (transporterEntries.length === 0 && scheduleLoadFailed) {
+    return (
+      <InfoPanel
+        icon={ClockIcon}
+        title="Schedule Requests Could Not Be Loaded"
+        description="The scheduled transporters for this contract could not be loaded. Please try again."
+      />
+    );
   }
 
   if (transporterEntries.length === 0) {

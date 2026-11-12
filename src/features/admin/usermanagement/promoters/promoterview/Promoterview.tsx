@@ -53,7 +53,10 @@ const Promoterview = () => {
     data: rawProfile,
     isFetching,
     isError,
+    error: loadError,
   } = useGetPromoterProfileByIdQuery(id ?? "", { skip: !id });
+  // A real 404 means there is no such promoter; any other failure is a load error.
+  const loadFailed = isError && !(loadError && "status" in loadError && loadError.status === 404);
 
   const profile = useMemo(() => (rawProfile ? mapPromoterProfileDetail(rawProfile) : null), [rawProfile]);
   const recipientOptions = useMemo(() => (profile ? toRecipientOptions(profile) : []), [profile]);
@@ -132,7 +135,7 @@ const Promoterview = () => {
           <ArrowLeftIcon aria-hidden /> Back to Promoters
         </Link>
         <div className="business-owner-detail__card">
-          <p>No promoter found for id "{id}".</p>
+          <p>{loadFailed ? "Could not load this promoter. Please try again." : `No promoter found for id "${id}".`}</p>
         </div>
       </div>
     );

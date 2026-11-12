@@ -18,6 +18,7 @@ import {
   normalizeRegistrationNumber,
 } from "./truckNew.data";
 import "../../../contracts/NewContract.scss";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -40,7 +41,10 @@ const TruckNew = () => {
   const editId = searchParams.get("id");
   const isEditMode = Boolean(editId);
 
-  const { data: editingTruck } = useGetTruckDetailsByIdQuery(editId ?? "", { skip: !editId });
+  const { data: editingTruck, isError: editLoadFailed } = useGetTruckDetailsByIdQuery(editId ?? "", { skip: !editId });
+  // Editing, but the truck isn't loaded (still loading, or it failed): saving now would send a blank form
+  // – or add a new truck – so Save waits for it.
+  const editNotReady = isEditMode && !editingTruck;
   const [addTruckDetails] = useAddTruckDetailsMutation();
   const [updateTruckDetails] = useUpdateTruckDetailsMutation();
 
@@ -144,7 +148,7 @@ const TruckNew = () => {
       }
       navigate("/admin/truck-management/transporters/truck-master");
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to save truck.");
+      setSubmitError(getErrorMessage(err, "Failed to save truck."));
     } finally {
       setSubmitting(false);
     }
@@ -158,6 +162,12 @@ const TruckNew = () => {
           <ArrowLeftIcon aria-hidden /> Trucks List
         </Link>
       </div>
+
+      {editLoadFailed && (
+        <p className="new-contract__error" role="alert">
+          Could not load this truck. Please go back to the Trucks list and try again.
+        </p>
+      )}
 
       {submitError && (
         <p className="new-contract__error" role="alert">
@@ -333,7 +343,7 @@ const TruckNew = () => {
         <Link to="/admin/truck-management/transporters/truck-master" className="new-contract__cancel">
           Cancel
         </Link>
-        <button type="button" className="new-contract__submit" onClick={handleSave} disabled={submitting}>
+        <button type="button" className="new-contract__submit" onClick={handleSave} disabled={submitting || editNotReady}>
           {submitting ? "Saving…" : isEditMode ? "Save Changes" : "Save Truck"}
         </button>
       </div>

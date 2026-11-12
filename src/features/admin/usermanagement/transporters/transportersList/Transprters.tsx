@@ -21,6 +21,7 @@ import { buildTransporterColumns } from "./transporters.columns";
 import { buildFilterOptions } from "../../businessowners/BusinessList/Businessowners";
 import {
   useGetTransporterProfileSummaryQuery,
+  useLazyGetTransporterProfileByIdQuery,
   useDeleteTransporterProfileMutation,
   type Transporter,
   type TransporterProfileStatus,
@@ -28,6 +29,7 @@ import {
 import "./Transporters.scss";
 
 import Can from "../../../../../core/auth/Can";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 const PAGE_SIZE = 10;
 const DEFAULT_STATUS_FILTER: TransporterProfileStatus = "Active";
@@ -54,7 +56,44 @@ const Transprters = () => {
     refetchOnMountOrArgChange: true,
   });
   const [deleteTransporterProfile] = useDeleteTransporterProfileMutation();
-  const rows = useMemo(() => data ?? [], [data]);
+
+  // The summary has no address: each transporter's location (primary address city) and state come from its
+  // profile details, loaded in the background so the list shows straight away.
+  const [loadProfile] = useLazyGetTransporterProfileByIdQuery();
+  const [profileExtras, setProfileExtras] = useState<Record<number, { location: string; stateName: string }>>({});
+  useEffect(() => {
+    const ids = (data ?? []).map((row) => row.profileId).filter((id) => id && !(id in profileExtras));
+    if (ids.length === 0) return;
+    let active = true;
+    void Promise.all(
+      ids.map(async (id) => {
+        try {
+          const profile = await loadProfile(String(id), true).unwrap();
+          const addresses = profile?.addresses ?? [];
+          const primary = addresses.find((address) => address.isPrimary) ?? addresses[0];
+          return [id, { location: primary?.city?.trim() ?? "", stateName: primary?.stateName?.trim() ?? "" }] as const;
+        } catch {
+          return [id, { location: "", stateName: "" }] as const;
+        }
+      }),
+    ).then((entries) => {
+      if (active) setProfileExtras((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, loadProfile]);
+
+  const rows = useMemo(
+    () =>
+      (data ?? []).map((row) => {
+        const extra = profileExtras[row.profileId];
+        if (!extra) return row;
+        return { ...row, location: row.location || extra.location, stateName: row.stateName || extra.stateName };
+      }),
+    [data, profileExtras],
+  );
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<string>(DEFAULT_STATUS_FILTER);
   const [transporterType, setTransporterType] = useState("All");
@@ -92,7 +131,7 @@ const Transprters = () => {
       setPendingDeleteRow(null);
       showSuccessMessage("Transporter deleted successfully");
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Failed to delete transporter.");
+      setDeleteError(getErrorMessage(err, "Failed to delete transporter."));
     }
   };
 

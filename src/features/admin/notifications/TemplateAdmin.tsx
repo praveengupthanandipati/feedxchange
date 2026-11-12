@@ -13,15 +13,14 @@ import {
 import type { RenderSampleResult, TemplateAdminItem, TemplateVersion } from "../../../core/store/notificationTemplatesApi";
 import { useGetNotificationChannelsQuery, useGetNotificationEventsQuery } from "../../../core/store/notificationsApi";
 import { formatApiDateTime } from "../../../shared/utils/apiDateTime";
+import { getErrorMessage } from "../../../core/api/getErrorMessage";
 import "../../../shared/notifications/Notifications.scss";
 
 const ROLES = ["", "BUYER", "SELLER", "TRANSPORTER", "DRIVER", "ADMIN", "SCHEDULE_INITIATOR"];
 const PROVIDER_STATUSES = ["", "Pending", "Approved", "Rejected"];
 
-const errorText = (e: unknown): string => {
-  const err = e as { data?: { message?: string; title?: string } | string };
-  return typeof err?.data === "string" ? err.data : (err?.data?.message ?? err?.data?.title ?? "Something went wrong. Please try again.");
-};
+// The API's own sentence when it is a plain one; never raw backend data.
+const errorText = (e: unknown): string => getErrorMessage(e, "Something went wrong. Please try again.");
 
 /** Sample values for the variables a template mentions, so the preview shows something readable straight away. */
 const sampleFor = (...texts: (string | null | undefined)[]): Record<string, string> => {
@@ -260,7 +259,7 @@ const TemplateAdmin = () => {
   const [channelCode, setChannelCode] = useState("");
   const [search, setSearch] = useState("");
   const query = useMemo(() => ({ eventCode, channelCode, search }), [eventCode, channelCode, search]);
-  const { data: templates = [], isFetching } = useListTemplatesQuery(query);
+  const { data: templates = [], isFetching, isError: templatesFailed } = useListTemplatesQuery(query);
   const [editing, setEditing] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
 
@@ -282,7 +281,9 @@ const TemplateAdmin = () => {
           <thead><tr><th>Template</th><th>Event</th><th>Role</th><th>Channel</th><th>Version in use</th><th>Flags</th><th></th></tr></thead>
           <tbody>
             {isFetching && templates.length === 0 && <tr><td colSpan={7} className="text-secondary">Loading…</td></tr>}
-            {!isFetching && templates.length === 0 && <tr><td colSpan={7} className="text-secondary">No templates match.</td></tr>}
+            {!isFetching && templates.length === 0 && (
+              <tr><td colSpan={7} className="text-secondary">{templatesFailed ? "Templates could not be loaded. Please try again." : "No templates match."}</td></tr>
+            )}
             {templates.map((t) => (
               <tr key={t.templateId} className={t.isActive ? "" : "text-secondary"}>
                 <td>{t.templateName}<div className="small text-secondary">{t.templateCode}</div></td>

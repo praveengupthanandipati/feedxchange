@@ -18,6 +18,7 @@ import {
 import "./Trucks.scss";
 
 import Can from "../../../../../core/auth/Can";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 const PAGE_SIZE = 10;
 
@@ -97,7 +98,7 @@ const TrucksList = () => {
       setPendingDeleteRow(null);
       showSuccessMessage("Truck deleted successfully");
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Failed to delete truck.");
+      setDeleteError(getErrorMessage(err, "Failed to delete truck."));
     }
   };
 

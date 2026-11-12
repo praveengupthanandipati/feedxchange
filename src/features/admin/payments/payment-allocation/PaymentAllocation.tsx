@@ -29,6 +29,7 @@ import {
   type PendingInvoiceRow,
 } from "./paymentAllocation.data";
 import ReceiptDetailsOffcanvas from "./ReceiptDetailsOffcanvas";
+import InfoPanel from "../../truck-management/open-pending-contracts/contract-trucks/InfoPanel";
 import "./PaymentAllocation.scss";
 
 const PAGE_SIZE = 8;
@@ -307,4 +308,22 @@ const PaymentAllocation = () => {
   );
 };
 
-export default PaymentAllocation;
+/**
+ * There is no Payment Allocation API yet and the screen above runs on built-in sample parties and contracts, so it
+ * is not shown: users get a "not available yet" note instead (allocation is done from Payment Advice). Kept for
+ * when the API exists – switch the default export back to it then.
+ */
+export { PaymentAllocation as PaymentAllocationScreen };
+
+const PaymentAllocationUnavailable = () => (
+  <div className="payment-allocation-page">
+    <InfoPanel
+      icon={LayersIcon}
+      title="Payment Allocation Is Not Available Yet"
+      description="Allocate receipts to invoices from Payment Advice for now. This screen will open once its data is connected."
+      action={{ label: "Go to Payment Advice", to: "/admin/payments/payment-advice" }}
+    />
+  </div>
+);
+
+export default PaymentAllocationUnavailable;

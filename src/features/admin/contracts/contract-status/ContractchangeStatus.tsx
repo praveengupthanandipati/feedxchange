@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -11,6 +11,7 @@ import { useGetBusinessProfileSummaryQuery } from "../../../../core/store/busine
 import {
   useGetAllContractsQuery,
   useGetAllContractStatusesQuery,
+  useLazyGetContractByContractNumberQuery,
   useUpdateContractStatusMutation,
 } from "../../../../core/store/contractsApi";
 import { usePermission } from "../../../../core/auth/AuthContext";
@@ -18,7 +19,7 @@ import { getErrorMessage } from "../../../../core/api/getErrorMessage";
 import NotifyModal from "../../../../shared/notifications/NotifyModal";
 import NotifyChoicePicker from "../../../../shared/notifications/NotifyChoicePicker";
 import type { NotifyChoices } from "../../../../shared/notifications/notifyChoices";
-import { financialYearOptions } from "./contractStatus.data";
+import { financialYearOf, financialYearOptionsUpTo } from "./contractStatus.data";
 import "../NewContract.scss";
 import "../ContractDetail.scss";
 import "./ContractchangeStatus.scss";
@@ -36,7 +37,11 @@ const DetailField = ({ label, value, full }: DetailFieldProps) => (
   </div>
 );
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+// Local date (not UTC, which is still "yesterday" before 05:30 IST).
+const todayISO = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+};
 
 const formatINR = (value: number) => `₹${value.toLocaleString("en-IN")}`;
 
@@ -233,9 +238,33 @@ const ContractchangeStatus = () => {
   const linkedStatus = searchParams.get("status");
   const [linkedDone, setLinkedDone] = useState(false);
 
-  const [financialYear, setFinancialYear] = useState(financialYearOptions[2]?.value ?? "");
+  // Default: the current financial year and today; both follow the contract once one is picked.
+  const [financialYear, setFinancialYear] = useState(financialYearOf());
+  const financialYearOptions = useMemo(() => financialYearOptionsUpTo(financialYear), [financialYear]);
   const [contractNumber, setContractNumber] = useState("");
   const [contractCloseDate, setContractCloseDate] = useState(todayISO());
+  const [loadContractDetails] = useLazyGetContractByContractNumberQuery();
+  // The contract whose dates are being filled in, and whether the user has since set the close date by hand:
+  // a late reply for an earlier pick, or one arriving after a manual edit, must not overwrite the field.
+  const datesFor = useRef<string | null>(null);
+  const closeDateEdited = useRef(false);
+
+  /** Financial year from the contract's date; close date from its Effective To (today when it has none). */
+  const applyContractDates = async (row: { contractNumber: string | null; contractDate: string }) => {
+    setFinancialYear(financialYearOf(row.contractDate || undefined));
+    setContractCloseDate(todayISO());
+    datesFor.current = row.contractNumber;
+    closeDateEdited.current = false;
+    if (!row.contractNumber) return;
+    try {
+      const details = await loadContractDetails(row.contractNumber, true).unwrap();
+      if (datesFor.current !== row.contractNumber || closeDateEdited.current) return;
+      const effectiveTo = details?.effectiveTo?.slice(0, 10);
+      if (effectiveTo && !effectiveTo.startsWith("0001")) setContractCloseDate(effectiveTo);
+    } catch {
+      // keep today
+    }
+  };
   const [record, setRecord] = useState<ContractStatusRow | null>(null);
   const [detailsVisible, setDetailsVisible] = useState(true);
   const [status, setStatus] = useState("");
@@ -326,6 +355,8 @@ const ContractchangeStatus = () => {
     setRecord(match);
     setDetailsVisible(true);
     setStatus(linkedStatus || statusNameOf(match.basicDetails?.calculatedStatus));
+    void applyContractDates(match);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkedDone, linkedContract, linkedStatus, contractRows]);
 
   const handleSearch = async () => {
@@ -351,6 +382,7 @@ const ContractchangeStatus = () => {
       setRecord(match);
       setDetailsVisible(true);
       setStatus(statusNameOf(match.basicDetails?.calculatedStatus));
+      void applyContractDates(match);
     } catch {
       setError("Failed to search for the contract.");
       setRecord(null);
@@ -388,6 +420,7 @@ const ContractchangeStatus = () => {
     setRecord(row);
     setDetailsVisible(true);
     setStatus(statusNameOf(row.basicDetails?.calculatedStatus));
+    void applyContractDates(row);
   };
 
   const handleChange = async () => {
@@ -431,7 +464,7 @@ const ContractchangeStatus = () => {
         setNotifyContract(record.contractNumber);
         return;
       }
-      navigate("/admin/contracts", {
+      navigate("/admin/contracts?show=all", {
         state: { successMessage: "Contract status updated successfully." },
       });
     } catch (error) {
@@ -500,7 +533,10 @@ const ContractchangeStatus = () => {
             <DatePickerInput
               id="contractCloseDate"
               value={contractCloseDate}
-              onChange={(value) => setContractCloseDate(value)}
+              onChange={(value) => {
+                closeDateEdited.current = true;
+                setContractCloseDate(value);
+              }}
               clearable
             />
           </div>
@@ -631,7 +667,7 @@ const ContractchangeStatus = () => {
       )}
 
       <div className="contract-change-status__actions">
-        <Link to="/admin/contracts" className="contract-change-status__cancel">
+        <Link to="/admin/contracts?show=all" className="contract-change-status__cancel">
           Cancel
         </Link>
         <button
@@ -654,7 +690,7 @@ const ContractchangeStatus = () => {
         choices={notifyChoices}
         onSkip={() => undefined}
         onClose={() =>
-          navigate("/admin/contracts", {
+          navigate("/admin/contracts?show=all", {
             state: { successMessage: "Contract status updated successfully." },
           })
         }

@@ -13,7 +13,7 @@ import { useSelectedContract } from "../../../../../../core/context/SelectedCont
 import "../../../assign-transports/Assigntransports.scss";
 
 const ViewTrucksByContractSummary = ({ contractNumber }: { contractNumber: string }) => {
-  const { trucks, isLoading } = useContractTruckDetails(contractNumber, true);
+  const { trucks, isLoading, isError: trucksFailed } = useContractTruckDetails(contractNumber, true);
   const navigate = useNavigate();
 
   // Reassigning puts the same truck on another contract, which is a chain of contracts
@@ -43,6 +43,7 @@ const ViewTrucksByContractSummary = ({ contractNumber }: { contractNumber: strin
         <TruckList
           trucks={trucks}
           isLoading={isLoading}
+          loadFailed={trucksFailed}
           showShare={false}
           onReassign={handleReassign}
           onViewChain={handleViewChain}

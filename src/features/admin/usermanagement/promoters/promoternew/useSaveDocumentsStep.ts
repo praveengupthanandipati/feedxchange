@@ -12,10 +12,11 @@ import { useUpdatePromoterProfileMutation } from "../../../../../core/store/prom
 import { usePromoterWizard } from "./PromoterWizardContext";
 import { buildPromoterProfilePayload } from "./promoterWizard.utils";
 import { documentTypeOptions } from "./promoterNew.data";
+import { getErrorMessage as apiErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 function getErrorMessage(err: unknown): string {
   console.error("Failed to save documents:", err);
-  return "Failed to save documents.";
+  return apiErrorMessage(err, "Failed to save documents.");
 }
 
 

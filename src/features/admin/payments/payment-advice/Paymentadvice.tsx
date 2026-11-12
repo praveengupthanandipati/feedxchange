@@ -52,6 +52,7 @@ import {
 } from "./paymentAdvice.data";
 import "./Paymentadvice.scss";
 import { useNotifyPrompt } from "../../../../shared/notifications/useNotifyPrompt";
+import LookupLoadError from "../../../../shared/components/feedback/LookupLoadError";
 
 const modeIcons: Record<PaymentMode, IconComponent> = {
   online: CreditCardIcon,
@@ -92,11 +93,12 @@ const Paymentadvice = () => {
   // ---- data from the API
   const seller = sellerId ? Number(sellerId) : 0;
   const buyer = buyerId ? Number(buyerId) : 0;
-  const hasPair = seller > 0 && buyer > 0;
+  // A business can't be its own buyer: never ask the API for that pair (it answers 400).
+  const hasPair = seller > 0 && buyer > 0 && seller !== buyer;
   const pairArgs = { sellerId: seller, buyerId: buyer };
 
-  const { data: sellers = [] } = useGetPaymentSellersQuery();
-  const { data: buyers = [] } = useGetPaymentBuyersQuery(seller || undefined);
+  const { data: sellers = [], isError: sellersFailed } = useGetPaymentSellersQuery();
+  const { data: buyers = [], isError: buyersFailed } = useGetPaymentBuyersQuery(seller || undefined);
   const { data: contracts = [] } = useGetAdvanceContractsQuery(pairArgs, { skip: !hasPair });
   const { data: openReceiptsData = NO_RECEIPTS, isFetching: receiptsLoading } = useGetReceiptsQuery(pairArgs, { skip: !hasPair });
   const { data: invoicesData = NO_INVOICES, isFetching: invoicesLoading } = useGetInvoicesToClearQuery(pairArgs, { skip: !hasPair });
@@ -107,16 +109,21 @@ const Paymentadvice = () => {
   const [applyAllocation, { isLoading: applying }] = useApplyAllocationMutation();
 
   const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: p.name })), [sellers]);
-  const buyerOptions = useMemo(() => buyers.map((p) => ({ value: String(p.id), label: p.name })), [buyers]);
+  const buyerOptions = useMemo(
+    () => buyers.filter((p) => String(p.id) !== sellerId).map((p) => ({ value: String(p.id), label: p.name })),
+    [buyers, sellerId],
+  );
 
   // start on the first seller and its first buyer, like the page used to
   useEffect(() => {
     if (!sellerId && sellers.length > 0) setSellerId(String(sellers[0].id));
   }, [sellers, sellerId]);
   useEffect(() => {
-    if (buyers.length === 0) return;
-    if (!buyerId || !buyers.some((b) => String(b.id) === buyerId)) setBuyerId(String(buyers[0].id));
-  }, [buyers, buyerId]);
+    // Until the seller's own buyer list arrives, the full list may still be showing: skip the seller itself.
+    const eligible = buyers.filter((b) => String(b.id) !== sellerId);
+    if (eligible.length === 0) return;
+    if (!buyerId || !eligible.some((b) => String(b.id) === buyerId)) setBuyerId(String(eligible[0].id));
+  }, [buyers, buyerId, sellerId]);
 
   useEffect(() => {
     if (!toast) return;
@@ -316,6 +323,7 @@ const Paymentadvice = () => {
         <h1 id="payment-advice-title" className="payment-advice-card__title">
           Payment Advice
         </h1>
+        <LookupLoadError failed={sellersFailed || buyersFailed} className="payment-advice-card__error" />
 
         <div className="payment-advice-parties">
           <div className="payment-advice-field">

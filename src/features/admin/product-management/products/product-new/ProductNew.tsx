@@ -27,7 +27,9 @@ import {
 } from "./productNew.data";
 import "../../../contracts/NewContract.scss";
 import "./ProductNew.scss";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
+import LookupLoadError from "../../../../../shared/components/feedback/LookupLoadError";
 interface FormErrors {
   category?: string;
   productName?: string;
@@ -52,7 +54,7 @@ const ProductNew = () => {
   const editId = searchParams.get("id");
   const isEditing = Boolean(editId);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { data: categories } = useGetAllActiveCategoriesQuery();
+  const { data: categories, isError: categoriesFailed } = useGetAllActiveCategoriesQuery();
   const [createProduct] = useCreateProductMutation();
   const [updateProduct] = useUpdateProductMutation();
   const {
@@ -257,7 +259,7 @@ const ProductNew = () => {
       }
       navigate("/admin/products");
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to save product.");
+      setSubmitError(getErrorMessage(err, "Failed to save product."));
     } finally {
       setSubmitting(false);
     }
@@ -610,6 +612,8 @@ const ProductNew = () => {
           </div>
         </div>
       </div>
+
+      <LookupLoadError failed={categoriesFailed} className="new-contract__error" />
 
       {submitError && (
         <p className="new-contract__error" role="alert" style={{ color: "var(--fx-red-49-fg)" }}>

@@ -10,6 +10,7 @@ import { formatApiDateTime } from "../../../shared/utils/apiDateTime";
 import NotifyModal from "../../../shared/notifications/NotifyModal";
 import StatusPill from "./StatusPill";
 import DeliveryDetailModal from "./DeliveryDetailModal";
+import { getErrorMessage } from "../../../core/api/getErrorMessage";
 import "../../../shared/notifications/Notifications.scss";
 
 const CHANNELS = [["", "All channels"], ["EMAIL", "Email"], ["WHATSAPP", "WhatsApp"], ["SMS", "SMS"], ["APP", "App"]];
@@ -20,10 +21,8 @@ const PAGE_SIZE = 25;
 const resendable = (d: NotificationHistoryItem) =>
   !d.isLegacy && !["Pending", "Queued", "Processing", "RetryScheduled"].includes(d.status);
 
-const errorText = (e: unknown): string => {
-  const err = e as { data?: { message?: string } | string };
-  return typeof err?.data === "string" ? err.data : (err?.data?.message ?? "Something went wrong. Please try again.");
-};
+// The API's own sentence when it is a plain one; never raw backend data.
+const errorText = (e: unknown): string => getErrorMessage(e, "Something went wrong. Please try again.");
 
 /**
  * Everything sent against one contract: the original deliveries and every resend, with channel, status and time. Select past

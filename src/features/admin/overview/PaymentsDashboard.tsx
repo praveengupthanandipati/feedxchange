@@ -210,7 +210,13 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
               </button>
             )}
           </div>
-          {!contractFilter ? (
+          {!contractFilter && hasError ? (
+            // The invoices (and so the Contract list) failed to load: say so instead of "No Contract Selected".
+            <div className="payments-dashboard__message" role="alert">
+              <span>Could not load invoice totals.</span>
+              <button type="button" onClick={() => setReloadKey((key) => key + 1)}>Try again</button>
+            </div>
+          ) : !contractFilter ? (
             <InfoPanel
               icon={FileTextIcon}
               title="No Contract Selected"

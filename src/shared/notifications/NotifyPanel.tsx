@@ -18,6 +18,7 @@ import type {
 import { TemplateSelect } from "./NotifyChoicePicker";
 import { CHANNEL_ORDER, templateKey } from "./notifyChoices";
 import type { NotifyChoices } from "./notifyChoices";
+import { getErrorMessage } from "../../core/api/getErrorMessage";
 import "./Notifications.scss";
 
 export interface NotifyPanelProps {
@@ -223,11 +224,8 @@ const NotifyPanel = ({
     };
   };
 
-  const errorText = (e: unknown): string => {
-    const err = e as { data?: { message?: string; title?: string } | string };
-    if (typeof err?.data === "string") return err.data;
-    return err?.data?.message ?? err?.data?.title ?? "Something went wrong. Please try again.";
-  };
+  // The API's own sentence when it is a plain one; never raw backend data.
+  const errorText = (e: unknown): string => getErrorMessage(e, "Something went wrong. Please try again.");
 
   const peopleSelected = candidates.filter((c) => Object.values(picks[keyOf(c)] ?? {}).some(Boolean)).length;
   const messageCount = candidates.reduce((n, c) => n + enabledChannels.filter((ch) => picks[keyOf(c)]?.[ch] && !unavailableReason(c, ch)).length, 0);

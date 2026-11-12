@@ -26,10 +26,12 @@ import "./Businessowners.scss";
 import Can from "../../../../../core/auth/Can";
 import {
   useGetBusinessProfileSummaryQuery,
+  useLazyGetBusinessProfileByIdQuery,
   useDeleteBusinessProfileMutation,
   type BusinessOwner,
   type BusinessOwnerStatus,
 } from "../../../../../core/store/businessProfilesApi";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 const PAGE_SIZE = 10;
 const DEFAULT_STATUS_FILTER: BusinessOwnerStatus = "Active";
@@ -256,7 +258,49 @@ const Businessowners = () => {
     refetchOnMountOrArgChange: true,
   });
   const [deleteBusinessProfile] = useDeleteBusinessProfileMutation();
-  const rows = useMemo(() => data ?? [], [data]);
+
+  // GetBusinessProfileSummary has no address or group: each owner's location (primary address city), state and
+  // group come from its profile details, loaded in the background so the list shows straight away.
+  const [loadProfile] = useLazyGetBusinessProfileByIdQuery();
+  const [profileExtras, setProfileExtras] = useState<Record<number, { location: string; stateName: string; groupName: string }>>({});
+  useEffect(() => {
+    const ids = (data ?? []).map((row) => row.profileId).filter((id) => id && !(id in profileExtras));
+    if (ids.length === 0) return;
+    let active = true;
+    void Promise.all(
+      ids.map(async (id) => {
+        try {
+          const profile = await loadProfile(String(id), true).unwrap();
+          const addresses = profile?.addresses ?? [];
+          const primary = addresses.find((address) => address.isPrimary) ?? addresses[0];
+          return [id, { location: primary?.city?.trim() ?? "", stateName: primary?.stateName?.trim() ?? "", groupName: profile?.groupName?.trim() ?? "" }] as const;
+        } catch {
+          return [id, { location: "", stateName: "", groupName: "" }] as const;
+        }
+      }),
+    ).then((entries) => {
+      if (active) setProfileExtras((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, loadProfile]);
+
+  const rows = useMemo(
+    () =>
+      (data ?? []).map((row) => {
+        const extra = profileExtras[row.profileId];
+        if (!extra) return row;
+        return {
+          ...row,
+          location: row.location || extra.location,
+          stateName: row.stateName || extra.stateName,
+          groupName: row.groupName?.trim() || extra.groupName,
+        };
+      }),
+    [data, profileExtras],
+  );
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<string>(DEFAULT_STATUS_FILTER);
   const [businessType, setBusinessType] = useState("All");
@@ -295,7 +339,7 @@ const Businessowners = () => {
       setPendingDeleteOwner(null);
       showSuccessMessage("Business owner deleted successfully");
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Failed to delete business owner.");
+      setDeleteError(getErrorMessage(err, "Failed to delete business owner."));
     }
   };
 
@@ -310,7 +354,7 @@ const Businessowners = () => {
   );
 
   const locationOptions = useMemo(
-    () => buildFilterOptions(rows.map((row) => row.location), "By State"),
+    () => buildFilterOptions(rows.map((row) => row.stateName), "By State"),
     [rows],
   );
 
@@ -329,7 +373,7 @@ const Businessowners = () => {
     return rows.filter((row) => {
       if (status !== "All" && row.status !== status) return false;
       if (businessType !== "All" && row.businessTypeName !== businessType) return false;
-      if (location !== "All" && row.location !== location) return false;
+      if (location !== "All" && row.stateName !== location) return false;
       if (group !== "All" && (row.groupName?.trim() ?? "") !== group) return false;
 
       if (q) {
