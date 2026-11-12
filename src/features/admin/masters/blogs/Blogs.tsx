@@ -91,6 +91,11 @@ const Blogs = () => {
             setStatus(value);
             setPage(1);
           }}
+          onClear={() => {
+            setSearch("");
+            setStatus("");
+            setPage(1);
+          }}
         />
       )}
 

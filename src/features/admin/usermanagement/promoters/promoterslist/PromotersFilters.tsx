@@ -1,5 +1,6 @@
 import { SearchIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
+import ClearFiltersButton from "../../../../../shared/components/filters/ClearFiltersButton";
 
 interface FilterOption {
   value: string;
@@ -24,6 +25,8 @@ interface PromotersFiltersProps {
   paymentFrequency: string;
   onPaymentFrequencyChange: (value: string) => void;
   paymentFrequencyOptions: FilterOption[];
+  /** Shows the ✕ that resets the filters and search. */
+  onClear?: () => void;
 }
 
 const PromotersFilters = ({
@@ -37,6 +40,7 @@ const PromotersFilters = ({
   paymentFrequency,
   onPaymentFrequencyChange,
   paymentFrequencyOptions,
+  onClear,
 }: PromotersFiltersProps) => {
   return (
     <div className="promoters-filters">
@@ -73,6 +77,7 @@ const PromotersFilters = ({
           placeholder="Search by name, company, phone, email"
         />
       </div>
+      {onClear && <ClearFiltersButton onClick={onClear} />}
     </div>
   );
 };

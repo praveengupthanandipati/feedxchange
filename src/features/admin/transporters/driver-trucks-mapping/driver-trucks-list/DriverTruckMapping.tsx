@@ -241,6 +241,10 @@ const DriverTruckMappingPage = () => {
             driverName={driverFilter}
             onDriverNameChange={setDriverFilter}
             driverOptions={driverFilterOptions}
+            onClear={() => {
+              setTruckFilter("All");
+              setDriverFilter("All");
+            }}
           />
         )}
 

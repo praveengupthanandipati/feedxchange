@@ -36,6 +36,7 @@ import {
 } from "../../../core/store/businessProfilesApi";
 import {
   useGetProfileAddressQuery,
+  useGetProfileAddressWithSelectedQuery,
   type ProfileAddressDetail,
 } from "../../../core/store/userProfilesCommonApi";
 
@@ -673,24 +674,36 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     });
     const sellerAddresses = useMemo(() => sellerAddressList ?? [], [sellerAddressList]);
     const buyerAddresses = useMemo(() => buyerAddressList ?? [], [buyerAddressList]);
+    // The party's list including the contract's saved address (a one-time contract address is not in the plain list).
+    const savedLoadingId = editContract?.loadingAddressId || undefined;
+    const savedDeliveryId = editContract?.deliveryAddressId || undefined;
+    const { currentData: sellerListWithSaved } = useGetProfileAddressWithSelectedQuery(
+      { profileId: sellerId, includeAddressId: savedLoadingId },
+      { skip: !isProfileId(sellerId) || !savedLoadingId },
+    );
+    const { currentData: buyerListWithSaved } = useGetProfileAddressWithSelectedQuery(
+      { profileId: buyerId, includeAddressId: savedDeliveryId },
+      { skip: !isProfileId(buyerId) || !savedDeliveryId },
+    );
 
     // Edit: the contract's saved address isn't one of this party's addresses (e.g. kept from a previously chosen
     // seller/buyer) and there's no text to show for it: clear it, so the field asks for the right address instead
-    // of silently saving the wrong one. Runs only once the party's list has loaded.
+    // of silently saving the wrong one. Checked against the list that includes the saved id, so a valid one-time contract
+    // address is kept; runs only once that list has loaded.
     useEffect(() => {
       const savedId = editContract?.loadingAddressId ? String(editContract.loadingAddressId) : "";
-      if (!sellerAddressList || !savedId || sellerConditions.address !== savedId || editContract?.loadingAddressLabel) return;
-      if (!sellerAddressList.some((address) => String(address.addressId) === savedId)) {
+      if (!sellerListWithSaved || !savedId || sellerConditions.address !== savedId || editContract?.loadingAddressLabel) return;
+      if (!sellerListWithSaved.some((address) => String(address.addressId) === savedId)) {
         setSellerConditions((prev) => (prev.address === savedId ? { ...prev, address: "" } : prev));
       }
-    }, [sellerAddressList, sellerConditions.address, editContract]);
+    }, [sellerListWithSaved, sellerConditions.address, editContract]);
     useEffect(() => {
       const savedId = editContract?.deliveryAddressId ? String(editContract.deliveryAddressId) : "";
-      if (!buyerAddressList || !savedId || buyerConditions.address !== savedId || editContract?.deliveryAddressLabel) return;
-      if (!buyerAddressList.some((address) => String(address.addressId) === savedId)) {
+      if (!buyerListWithSaved || !savedId || buyerConditions.address !== savedId || editContract?.deliveryAddressLabel) return;
+      if (!buyerListWithSaved.some((address) => String(address.addressId) === savedId)) {
         setBuyerConditions((prev) => (prev.address === savedId ? { ...prev, address: "" } : prev));
       }
-    }, [buyerAddressList, buyerConditions.address, editContract]);
+    }, [buyerListWithSaved, buyerConditions.address, editContract]);
     // On edit the address arrives as free text, which matches no option and is sent
     // back as 0. Swap it for the matching addressId as soon as the list is available.
     useEffect(() => {

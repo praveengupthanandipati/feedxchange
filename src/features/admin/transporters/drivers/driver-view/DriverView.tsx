@@ -8,6 +8,7 @@ import "../drivers-list/Drivers.scss";
 
 import Can from "../../../../../core/auth/Can";
 import SendMessageModal from "../../../../../shared/notifications/SendMessageModal";
+import { licenseIssuedDateOf, realLicenseNumber } from "../drivers-list/drivers.columns";
 
 interface DetailFieldProps {
   label: string;
@@ -21,7 +22,9 @@ const DetailField = ({ label, value }: DetailFieldProps) => (
   </div>
 );
 
-function formatDisplayDate(value: string): string {
+function formatDisplayDate(value: string | null | undefined): string {
+  // An empty date (null, or the API's 0001-01-01) is shown as empty, not as 01-01-1970.
+  if (!value || value.startsWith("0001")) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   const day = String(date.getDate()).padStart(2, "0");
@@ -114,8 +117,9 @@ const DriverView = () => {
             <h2 className="business-owner-detail__section-title">License Details</h2>
             <div className="business-owner-detail__grid">
               <DetailField label="License Type" value={driver.licenseType} />
-              <DetailField label="License Number" value={driver.licenseNumber} />
-              <DetailField label="License Issued Date" value={formatDisplayDate(driver.licenseIssuedDate)} />
+              <DetailField label="License Number" value={realLicenseNumber(driver.licenseNumber)} />
+              {/* Only with a licence on file: a driver added from Add Instant Truck has a default date here. */}
+              <DetailField label="License Issued Date" value={licenseIssuedDateOf(driver)} />
               <DetailField label="License Expiry Date" value={formatDisplayDate(driver.licenseExpiryDate)} />
             </div>
           </section>

@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import NewAddressModal, { type CreatedAddress } from "./NewAddressModal";
-import { useGetProfileAddressWithSelectedQuery } from "../../../../core/store/userProfilesCommonApi";
+import {
+  useGetProfileAddressQuery,
+  useGetProfileAddressWithSelectedQuery,
+} from "../../../../core/store/userProfilesCommonApi";
 
 type AddressOption = { value: string; label: string };
 
@@ -52,11 +55,26 @@ const AddressSelectField = ({
   defaultUnloading = false,
   savedLabel,
 }: AddressSelectFieldProps) => {
-  // The address already chosen is asked for by id: a one-time contract address is not in the profile's address list.
-  const { data: addresses } = useGetProfileAddressWithSelectedQuery(
-    { profileId: String(profileId), includeAddressId: Number(value) || undefined },
-    { skip: !profileId },
+  // The party's address list. currentData, not data: after the party changes, data still holds the previous
+  // party's addresses until the new list arrives.
+  const { currentData: profileAddresses } = useGetProfileAddressQuery(String(profileId), { skip: !profileId });
+
+  // The address this field started with for this party (e.g. a contract's saved one-time address, which is not in the
+  // profile's list). Remembered per party, so it stays pickable after choosing another address, and it is asked for
+  // only once – not on every pick – and never carried over to a different party.
+  const savedIdRef = useRef<{ profileId: number; addressId: number } | null>(null);
+  if (savedIdRef.current?.profileId !== profileId) {
+    savedIdRef.current = Number(value) > 0 ? { profileId, addressId: Number(value) } : null;
+  } else if (!savedIdRef.current && Number(value) > 0) {
+    savedIdRef.current = { profileId, addressId: Number(value) };
+  }
+  const savedId = savedIdRef.current?.addressId;
+  const needsSaved = Boolean(savedId) && !!profileAddresses && !profileAddresses.some((address) => address.addressId === savedId);
+  const { currentData: withSaved } = useGetProfileAddressWithSelectedQuery(
+    { profileId: String(profileId), includeAddressId: savedId },
+    { skip: !profileId || !needsSaved },
   );
+  const addresses = needsSaved ? (withSaved ?? profileAddresses) : profileAddresses;
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalName, setModalName] = useState("");

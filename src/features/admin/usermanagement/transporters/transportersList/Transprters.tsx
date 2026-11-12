@@ -253,6 +253,12 @@ const Transprters = () => {
             state={state}
             onStateChange={setState}
             stateOptions={stateOptions}
+            onClear={() => {
+              setKeyword("");
+              setStatus(DEFAULT_STATUS_FILTER);
+              setTransporterType("All");
+              setState("All");
+            }}
           />
         )}
 

@@ -1,4 +1,5 @@
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
+import ClearFiltersButton from "../../../../../shared/components/filters/ClearFiltersButton";
 
 interface FilterOption {
   value: string;
@@ -26,6 +27,8 @@ interface TrucksFiltersProps {
   fuelType: string;
   onFuelTypeChange: (value: string) => void;
   fuelTypeOptions: FilterOption[];
+  /** Shows the ✕ that resets the filters and search. */
+  onClear?: () => void;
 }
 
 const TrucksFilters = ({
@@ -49,6 +52,7 @@ const TrucksFilters = ({
   fuelType,
   onFuelTypeChange,
   fuelTypeOptions,
+  onClear,
 }: TrucksFiltersProps) => {
   return (
     <div className="trucks-filters">
@@ -108,6 +112,7 @@ const TrucksFilters = ({
         placeholder="Filter by Fuel Type"
         ariaLabel="Filter by Fuel Type"
       />
+      {onClear && <ClearFiltersButton onClick={onClear} />}
     </div>
   );
 };

@@ -172,6 +172,12 @@ const TruckTripPage = () => {
             tripStatus={tripStatusFilter}
             onTripStatusChange={setTripStatusFilter}
             tripStatusOptions={tripStatusFilterOptions}
+            onClear={() => {
+              setTruckFilter("All");
+              setDriverFilter("All");
+              setBusinessProfileFilter("All");
+              setTripStatusFilter("All");
+            }}
           />
         )}
 

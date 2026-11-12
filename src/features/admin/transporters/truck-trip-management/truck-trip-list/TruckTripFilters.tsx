@@ -1,4 +1,5 @@
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
+import ClearFiltersButton from "../../../../../shared/components/filters/ClearFiltersButton";
 
 interface FilterOption {
   value: string;
@@ -18,6 +19,8 @@ interface TruckTripFiltersProps {
   tripStatus: string;
   onTripStatusChange: (value: string) => void;
   tripStatusOptions: FilterOption[];
+  /** Shows the ✕ that resets the filters and search. */
+  onClear?: () => void;
 }
 
 const TruckTripFilters = ({
@@ -33,6 +36,7 @@ const TruckTripFilters = ({
   tripStatus,
   onTripStatusChange,
   tripStatusOptions,
+  onClear,
 }: TruckTripFiltersProps) => {
   return (
     <div className="truck-trip-filters">
@@ -67,6 +71,7 @@ const TruckTripFilters = ({
         placeholder="Filter by Status"
         ariaLabel="Filter by trip status"
       />
+      {onClear && <ClearFiltersButton onClick={onClear} />}
     </div>
   );
 };

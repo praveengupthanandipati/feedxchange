@@ -1,0 +1,21 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+// Same look as the Business Owners filter bar's clear button (.business-owners-filters__clear).
+.clear-filters-btn {
+  @include m.flex-center;
+  @include m.focus-ring(v.$color-orange);
+  flex-shrink: 0;
+  width: var(--fx-control-height);
+  height: var(--fx-control-height);
+  border: none;
+  border-radius: v.$radius-pill;
+  background-color: v.alpha(v.$color-danger, 0.1);
+  color: v.fg(v.$color-danger);
+  cursor: pointer;
+  transition: background-color v.$transition-fast;
+
+  &:hover {
+    background-color: v.alpha(v.$color-danger, 0.18);
+  }
+}
