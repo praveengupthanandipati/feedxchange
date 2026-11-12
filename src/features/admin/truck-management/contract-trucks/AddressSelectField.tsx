@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import NewAddressModal, { type CreatedAddress } from "./NewAddressModal";
-import { useGetProfileAddressQuery } from "../../../../core/store/userProfilesCommonApi";
+import { useGetProfileAddressWithSelectedQuery } from "../../../../core/store/userProfilesCommonApi";
 
 type AddressOption = { value: string; label: string };
 
@@ -52,7 +52,11 @@ const AddressSelectField = ({
   defaultUnloading = false,
   savedLabel,
 }: AddressSelectFieldProps) => {
-  const { data: addresses } = useGetProfileAddressQuery(String(profileId), { skip: !profileId });
+  // The address already chosen is asked for by id: a one-time contract address is not in the profile's address list.
+  const { data: addresses } = useGetProfileAddressWithSelectedQuery(
+    { profileId: String(profileId), includeAddressId: Number(value) || undefined },
+    { skip: !profileId },
+  );
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalName, setModalName] = useState("");
