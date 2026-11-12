@@ -4,7 +4,6 @@ import Table from "../../../../../shared/components/table/Table";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import { buildTransporterAssignmentColumns } from "./transporterAssignment.columns";
 import {
-  approvedTruckRows,
   createEmptyTransporterRow,
   getMissingTransporterFields,
   getSeedTransporterRows,
@@ -353,7 +352,8 @@ const TransporterAssignmentPanel = ({ scheduleRow, summary, contractId }: Transp
           className="transporter-assignment-panel__approved-link"
           onClick={() => setApprovedTrucksOpen(true)}
         >
-          <CircleCheckBigIcon aria-hidden /> View All Approved Trucks: {approvedTruckRows.length}
+          {/* No approved-trucks API yet, so there are none to count (the sample list is no longer shown). */}
+          <CircleCheckBigIcon aria-hidden /> View All Approved Trucks: 0
         </button>
       </div>
 

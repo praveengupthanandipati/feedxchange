@@ -22,6 +22,7 @@ import "../../../assign-transports/Assigntransports.scss";
 import "../../../assign-transports/instant-truck-assignment/InstantTruckAssignment.scss";
 import "../contractDispatch.shared.scss";
 import { useNotifyPrompt } from "../../../../../../shared/notifications/useNotifyPrompt";
+import LookupLoadError from "../../../../../../shared/components/feedback/LookupLoadError";
 
 type BillChangeOption = "direct" | "changeToBeDone";
 
@@ -100,10 +101,10 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
   const [submitError, setSubmitError] = useState("");
   const [saved, setSaved] = useState(false);
 
-  const { data: transporters } = useGetTransporterProfileSummaryQuery();
-  const { data: trucks, refetch: refetchTrucks } = useGetAllActiveTruckDetailsQuery();
+  const { data: transporters, isError: transportersFailed } = useGetTransporterProfileSummaryQuery();
+  const { data: trucks, refetch: refetchTrucks, isError: trucksFailed } = useGetAllActiveTruckDetailsQuery();
   const [addTruckDetails, { isLoading: addingTruck }] = useAddTruckDetailsMutation();
-  const { data: drivers, refetch: refetchDrivers } = useGetAllActiveDriversQuery();
+  const { data: drivers, refetch: refetchDrivers, isError: driversFailed } = useGetAllActiveDriversQuery();
   const [addDriver, { isLoading: addingDriver }] = useAddDriverMutation();
   const [fetchDriverByMobile] = useLazyGetDriverByMobileQuery();
 
@@ -522,6 +523,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       <p className="assign-truck-drawer__notice">
         Click on &quot;Save &amp; Send.&quot; The truck details will then be shared with the seller for loading.
       </p>
+      <LookupLoadError failed={transportersFailed || trucksFailed || driversFailed} className="assign-truck-drawer__error" />
       {submitError && <p className="assign-truck-drawer__error">{submitError}</p>}
 
       <div className="assign-truck-drawer__footer">

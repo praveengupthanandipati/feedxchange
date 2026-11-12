@@ -37,7 +37,7 @@ export function useContractTruckDetails(contractNumber: string, enabled: boolean
 
   const contractId = contract?.id ?? 0;
 
-  const { data: trucksByContract, isFetching: loadingTrucks } = useGetAllTrucksByContractQuery(
+  const { data: trucksByContract, isFetching: loadingTrucks, isError: trucksFailed } = useGetAllTrucksByContractQuery(
     { contractId },
     { skip: !shouldFetch || !contractId },
   );
@@ -80,5 +80,8 @@ export function useContractTruckDetails(contractNumber: string, enabled: boolean
   const waitingForContract = !contract && !contractFailed;
   const isLoading = shouldFetch && (waitingForContract || (loadingTrucks && trucksByContract === undefined));
 
-  return { trucks: items, isLoading };
+  // The contract or its trucks could not be loaded: an empty list here means "unknown", not "no trucks".
+  const isError = shouldFetch && (contractFailed || (trucksFailed && trucksByContract === undefined));
+
+  return { trucks: items, isLoading, isError };
 }

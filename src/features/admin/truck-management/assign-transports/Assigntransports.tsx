@@ -44,7 +44,26 @@ const Assigntransports = () => {
   );
 
   const summary: ContractSummary = useMemo(() => {
-    if (!contract) return { ...defaultContractSummary, contractNumber: contractNumber || defaultContractSummary.contractNumber };
+    // Not loaded (yet, or it failed): blank values – never the built-in sample contract.
+    if (!contract) {
+      return {
+        ...defaultContractSummary,
+        contractNumber: contractNumber || "—",
+        contractQty: "—",
+        dispatchedQty: "—",
+        vehicleArrangedQty: "—",
+        pendingQty: "—",
+        totalTrucksAssigned: 0,
+        sellerName: "—",
+        buyerName: "—",
+        contractDate: "—",
+        productName: "—",
+        contractRate: "—",
+        indicativeFreight: "—",
+        loadingAddress: "—",
+        deliveryAddress: "—",
+      };
+    }
 
     const basic = contract.basicDetails;
     const quantityLabel =

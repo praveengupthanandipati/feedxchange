@@ -18,6 +18,7 @@ import { useGetAllMappingsQuery } from "../../../../../core/store/driverTruckMap
 import "./Drivers.scss";
 
 import Can from "../../../../../core/auth/Can";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 const PAGE_SIZE = 10;
 
@@ -27,7 +28,8 @@ interface FilterOption {
 }
 
 function buildExperienceOptions(values: number[], allLabel: string): FilterOption[] {
-  const unique = Array.from(new Set(values)).sort((a, b) => a - b);
+  // Drivers with no experience recorded don't add a "null yrs" option.
+  const unique = Array.from(new Set(values.filter((value) => value != null))).sort((a, b) => a - b);
   return [
     { value: "All", label: allLabel },
     ...unique.map((value) => ({ value: String(value), label: `${value} yrs` })),
@@ -97,7 +99,7 @@ const DriversList = () => {
       setPendingDeleteRow(null);
       showSuccessMessage("Driver deleted successfully");
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Failed to delete driver.");
+      setDeleteError(getErrorMessage(err, "Failed to delete driver."));
     }
   };
 

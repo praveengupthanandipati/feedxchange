@@ -9,10 +9,11 @@ import {
 } from "../../../../../core/store/userProfilesCommonApi";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
 import { buildBusinessProfilePayload } from "./businessOwnerWizard.utils";
+import { getErrorMessage as apiErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 function getErrorMessage(err: unknown): string {
   console.error("Failed to save contacts & addresses:", err);
-  return "Failed to save contacts & addresses.";
+  return apiErrorMessage(err, "Failed to save contacts & addresses.");
 }
 
 export const useSaveContactsAddressesStep = (nextPath: string) => {

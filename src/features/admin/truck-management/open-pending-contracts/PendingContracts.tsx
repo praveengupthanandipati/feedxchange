@@ -86,7 +86,7 @@ interface TruckTrackingDrawerProps {
 }
 
 const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) => {
-  const { trucks, isLoading: trucksLoading } = useContractTruckDetails(row?.id ?? "", open && Boolean(row));
+  const { trucks, isLoading: trucksLoading, isError: trucksFailed } = useContractTruckDetails(row?.id ?? "", open && Boolean(row));
 
   useEffect(() => {
     if (!open) return;
@@ -177,7 +177,7 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
                 </div>
               </div>
 
-              <TruckList trucks={trucks} isLoading={trucksLoading} />
+              <TruckList trucks={trucks} isLoading={trucksLoading} loadFailed={trucksFailed} />
             </div>
           </>
         )}
@@ -212,7 +212,7 @@ const PendingContracts = () => {
   const [truckDrawerRow, setTruckDrawerRow] = useState<PendingContractRow | null>(null);
   const { setSelectedContract } = useSelectedContract();
 
-  const { data: openAndPendingContracts, isLoading: listLoading, isFetching } = useGetAllOpenAndPendingContractsQuery();
+  const { data: openAndPendingContracts, isLoading: listLoading, isFetching, isError: listFailed } = useGetAllOpenAndPendingContractsQuery();
 
   // The list endpoint also returns contracts still pending approval, which cannot take trucks.
   // Only Open and Partially Dispatched contracts are shown; the real status comes from GetAllContracts.
@@ -308,7 +308,9 @@ const PendingContracts = () => {
   const emptyMessage =
     isLoading || isFetching
       ? "Loading open & pending contracts…"
-      : "No open or pending contracts match the current filters.";
+      : listFailed
+        ? "Open & pending contracts could not be loaded. Please try again."
+        : "No open or pending contracts match the current filters.";
 
   const handleClearFilters = () => {
     setSellerFilter("All");

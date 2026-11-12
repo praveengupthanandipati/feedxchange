@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { RotateCcwIcon, XIcon } from "../../../../../shared/components/icon";
-import { transporterRequestHistory } from "./transporterAssignment.data";
+import type { TransporterRequestHistoryEntry } from "./transporterAssignment.data";
+
+const requestHistory: TransporterRequestHistoryEntry[] = [];
 import "./RequestHistoryModal.scss";
 
 interface RequestHistoryModalProps {
@@ -56,7 +58,13 @@ const RequestHistoryModal = ({ open, transporterName, onClose }: RequestHistoryM
                 </tr>
               </thead>
               <tbody>
-                {transporterRequestHistory.map((entry) => (
+                {/* No request-history API yet: say so instead of listing built-in sample requests. */}
+                {requestHistory.length === 0 && (
+                  <tr>
+                    <td colSpan={5}>No requests yet.</td>
+                  </tr>
+                )}
+                {requestHistory.map((entry) => (
                   <tr key={entry.id}>
                     <td>{entry.dateOfRequest}</td>
                     <td className="request-history-modal__amount">{entry.baseFreight}</td>

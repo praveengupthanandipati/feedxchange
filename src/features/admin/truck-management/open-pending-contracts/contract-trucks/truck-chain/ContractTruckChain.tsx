@@ -24,20 +24,10 @@ function formatFreight(value: number | null | undefined): string {
   return `₹${value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / MT`;
 }
 
-function positionBadge(leg: ContractTruckChainLeg): { badge: string; caption: string; tone: string } {
-  if (leg.chainPosition < 0) return { badge: String(leg.chainPosition), caption: "up", tone: "up" };
-  if (leg.chainPosition > 0) return { badge: `+${leg.chainPosition}`, caption: "down", tone: "down" };
-  return { badge: "0", caption: leg.positionLabel || "head", tone: "head" };
-}
-
+// The chain position (−1 up / 0 head / +1 down) is not shown: legs are listed in chain order already.
 const ChainLegCard = ({ leg, isCurrent }: { leg: ContractTruckChainLeg; isCurrent: boolean }) => {
-  const { badge, caption, tone } = positionBadge(leg);
   return (
     <div className={`reassign-truck__leg ${isCurrent ? "is-head" : ""}`}>
-      <div className={`reassign-truck__position reassign-truck__position--${tone}`}>
-        <strong>{badge}</strong>
-        <span>{caption}</span>
-      </div>
       <div className="reassign-truck__leg-body">
         <div className="reassign-truck__leg-head">
           <strong>{leg.contractNumber}</strong>
@@ -54,12 +44,10 @@ const ChainLegCard = ({ leg, isCurrent }: { leg: ContractTruckChainLeg; isCurren
           {leg.loadingAddress} ({leg.loadingCity}) → {leg.deliveryAddress} ({leg.deliveryCity})
         </p>
         <p className="reassign-truck__meta">
+          {/* Who re-assigned the truck (and whether this is the original arrangement) is internal: not shown, since
+              every party in the chain can open this screen. */}
           {leg.lrNumber || "no LR"} · {formatQty(leg.quantityMT)} @ {formatFreight(leg.freightPerMT)} ·{" "}
-          {formatApiDateTime(leg.assignedOn)} ·{" "}
-          {leg.isOriginalArrangement
-            ? "the original arrangement"
-            : // reassignmentDirectionName already reads "Re-assigned upstream".
-              `${leg.reassignmentDirectionName ?? "Re-assigned"} by ${leg.reassignedByName ?? "-"}`}
+          {formatApiDateTime(leg.assignedOn)}
         </p>
       </div>
     </div>

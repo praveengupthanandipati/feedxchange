@@ -56,7 +56,10 @@ const BusinessOwnerDetail = () => {
     data: rawProfile,
     isFetching,
     isError,
+    error: loadError,
   } = useGetBusinessProfileByIdQuery(id ?? "", { skip: !id });
+  // A real 404 means there is no such business owner; any other failure is a load error.
+  const loadFailed = isError && !(loadError && "status" in loadError && loadError.status === 404);
 
   const details = rawProfile?.businessProfileDetails;
   const businessLineId = details ? String(details.businessLineId) : "";
@@ -138,7 +141,7 @@ const BusinessOwnerDetail = () => {
           <ArrowLeftIcon aria-hidden /> Back to Business Owners
         </Link>
         <div className="business-owner-detail__card">
-          <p>No business owner found for id "{id}".</p>
+          <p>{loadFailed ? "Could not load this business owner. Please try again." : `No business owner found for id "${id}".`}</p>
         </div>
       </div>
     );

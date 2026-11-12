@@ -10,10 +10,11 @@ import {
 import { useUpdateBusinessProfileMutation } from "../../../../../core/store/businessProfilesApi";
 import { useBusinessOwnerWizard } from "./BusinessOwnerWizardContext";
 import { buildBusinessProfilePayload } from "./businessOwnerWizard.utils";
+import { getErrorMessage as apiErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 function getErrorMessage(err: unknown): string {
   console.error("Failed to save bank details:", err);
-  return "Failed to save bank details.";
+  return apiErrorMessage(err, "Failed to save bank details.");
 }
 
 // Rows with a `meta` (loaded from an existing profile) go through

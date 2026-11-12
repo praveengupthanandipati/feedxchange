@@ -7,10 +7,11 @@ import {
 import { useEnableAutoNotifications } from "../../../notification-preferences/useEnableAutoNotifications";
 import { useTransporterWizard } from "./TransporterWizardContext";
 import { buildTransporterProfilePayload } from "./transporterWizard.utils";
+import { getErrorMessage as apiErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 function getErrorMessage(err: unknown): string {
   console.error("Failed to save transporter profile:", err);
-  return "Failed to save transporter profile.";
+  return apiErrorMessage(err, "Failed to save transporter profile.");
 }
 
 // Shared by every wizard step so they all persist the same way: create the

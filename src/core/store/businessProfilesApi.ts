@@ -478,6 +478,7 @@ export const businessProfilesApi = createApi({
 export const {
   useGetBusinessProfileSummaryQuery,
   useGetBusinessProfileByIdQuery,
+  useLazyGetBusinessProfileByIdQuery,
   useGetBusinessCollectionAreaQuery,
   useCreateBusinessCollectionAreaMutation,
   useUpdateBusinessCollectionAreaMutation,

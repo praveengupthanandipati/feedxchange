@@ -13,6 +13,7 @@ import { useGetProductsQuery, useDeleteProductMutation, type Product } from "../
 import "./Products.scss";
 
 import Can from "../../../../../core/auth/Can";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 const PAGE_SIZE = 10;
 const DEFAULT_STATUS_FILTER = "Active";
@@ -78,7 +79,7 @@ const Products = () => {
       setPendingDeleteProduct(null);
       showSuccessMessage("Product deleted successfully");
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Failed to delete product.");
+      setDeleteError(getErrorMessage(err, "Failed to delete product."));
     }
   };
 

@@ -34,7 +34,9 @@ const DriverView = () => {
   const navigate = useNavigate();
   const [messageOpen, setMessageOpen] = useState(false);
 
-  const { data: driver, isLoading } = useGetDriverByIdQuery(id ?? "", { skip: !id });
+  const { data: driver, isLoading, isError, error: loadError } = useGetDriverByIdQuery(id ?? "", { skip: !id });
+  // A real 404 means there is no such driver; any other failure is a load error.
+  const loadFailed = isError && !(loadError && "status" in loadError && loadError.status === 404);
 
   if (!driver) {
     return (
@@ -43,7 +45,13 @@ const DriverView = () => {
           <ArrowLeftIcon aria-hidden /> Back to Drivers List
         </Link>
         <div className="business-owner-detail__card">
-          <p>{isLoading ? "Loading driver…" : `No driver found for id "${id}".`}</p>
+          <p>
+            {isLoading
+              ? "Loading driver…"
+              : loadFailed
+                ? "Could not load this driver. Please try again."
+                : `No driver found for id "${id}".`}
+          </p>
         </div>
       </div>
     );
@@ -96,7 +104,7 @@ const DriverView = () => {
               />
               <DetailField label="Date of Birth" value={formatDisplayDate(driver.dateOfBirth)} />
               <DetailField label="Blood Group" value={driver.bloodGroup} />
-              <DetailField label="Experience" value={`${driver.experienceYears} yrs`} />
+              <DetailField label="Experience" value={driver.experienceYears != null ? `${driver.experienceYears} yrs` : ""} />
               <DetailField label="Status" value={driver.status} />
               <DetailField label="Address" value={driver.address} />
             </div>

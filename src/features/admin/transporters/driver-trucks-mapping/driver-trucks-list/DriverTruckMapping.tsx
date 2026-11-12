@@ -113,7 +113,7 @@ const DriverTruckMappingPage = () => {
       setPendingReleaseRow(null);
       showSuccessMessage("Driver-truck mapping released successfully");
     } catch (err) {
-      setReleaseError(err instanceof Error ? err.message : "Failed to release mapping.");
+      setReleaseError(getErrorMessage(err, "Failed to release mapping."));
     }
   };
 

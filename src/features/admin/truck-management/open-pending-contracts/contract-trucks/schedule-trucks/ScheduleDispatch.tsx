@@ -17,10 +17,12 @@ import {
 } from "../../../../../../core/store/contractsApi";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../../core/store/transportersApi";
 import { useScheduleContractTrucksMutation } from "../../../../../../core/store/contractTrucksApi";
+import { getErrorMessage } from "../../../../../../core/api/getErrorMessage";
 import "../../../assign-transports/Assigntransports.scss";
 import "../../../assign-transports/schedule-truck-assignment/ScheduleTruckAssignment.scss";
 import "../contractDispatch.shared.scss";
 import { useNotifyPrompt } from "../../../../../../shared/notifications/useNotifyPrompt";
+import LookupLoadError from "../../../../../../shared/components/feedback/LookupLoadError";
 
 type BillChangeOption = "direct" | "changeToBeDone";
 
@@ -73,7 +75,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
   const [submitError, setSubmitError] = useState("");
   const [saved, setSaved] = useState(false);
 
-  const { data: transporters } = useGetTransporterProfileSummaryQuery();
+  const { data: transporters, isError: transportersFailed } = useGetTransporterProfileSummaryQuery();
   const [scheduleContractTrucks, { isLoading: saving }] = useScheduleContractTrucksMutation();
   const notify = useNotifyPrompt();
 
@@ -184,8 +186,8 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
       handleReset();
       // Tell the transporters it was sent to: the user picks recipients, channels and templates.
       notify.ask({ eventCode: "DISPATCH_SCHEDULED", title: "Notify the transporters about this truck request", contractId, sourceEntityType: "DispatchSchedule", sourceEntityId: created.dispatchScheduleId });
-    } catch {
-      setSubmitError("Failed to save the scheduled request. Please try again.");
+    } catch (error) {
+      setSubmitError(getErrorMessage(error, "Failed to save the scheduled request. Please try again."));
     }
   };
 
@@ -393,6 +395,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
           )}
         </div>
       </div>
+      <LookupLoadError failed={transportersFailed} className="schedule-request-drawer__error" />
       {submitError && <p className="schedule-request-drawer__error">{submitError}</p>}
 
       <div className="schedule-request-drawer__footer">

@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { apiBaseQuery } from "../api/baseQuery";
 import { unwrapArray } from "./userProfilesCommonApi";
 import { apiFetch } from "../api/tokenRefresh";
+import { getErrorMessage } from "../api/getErrorMessage";
 
 /** The ids of the dispatches just created; the notification dialog needs them to know which truck to talk about. */
 export interface AddedTrucksResult {
@@ -393,30 +394,22 @@ export interface ReassignContractTruckResult {
   errorMessage: string;
 }
 
-function toMessages(raw: unknown): string[] {
-  const messages = Array.isArray(raw) ? raw : [raw];
-  return messages.filter((message): message is string => typeof message === "string" && message.trim() !== "");
-}
-
 /**
  * Reads the server's error text from a response body. It arrives either at the top level,
  * as in { "ErrorMessage": ["…"] }, or inside a validation problem, as in
  * { "title": "One or more validation errors occurred.", "errors": { "ErrorMessage": ["…"] } }.
  */
-export function getApiErrorMessage(body: unknown): string {
+/** A refusal stated explicitly in a body ({ ErrorMessage } or { errors: {…} }); "" for anything else. */
+function explicitErrorMessage(body: unknown): string {
   if (!body || typeof body !== "object") return "";
   const record = body as Record<string, unknown>;
+  if (!record.ErrorMessage && !record.errorMessage && !(record.errors && typeof record.errors === "object")) return "";
+  return getErrorMessage({ data: { ErrorMessage: record.ErrorMessage ?? record.errorMessage, errors: record.errors } }, "The request was refused.");
+}
 
-  const topLevel = toMessages(record.ErrorMessage ?? record.errorMessage);
-  if (topLevel.length > 0) return topLevel.join(" ");
-
-  // Validation problems key each message by field; every field's messages are shown.
-  if (record.errors && typeof record.errors === "object") {
-    const nested = Object.values(record.errors as Record<string, unknown>).flatMap(toMessages);
-    if (nested.length > 0) return nested.join(" ");
-  }
-
-  return "";
+export function getApiErrorMessage(body: unknown): string {
+  // Same reading as everywhere else (ErrorMessage, errors{…}, message, detail …), and never raw backend data.
+  return getErrorMessage({ data: body }, "");
 }
 
 /** An invoice file attached to a truck dispatch (the file itself comes from downloadTruckInvoice). */
@@ -634,7 +627,9 @@ export const contractTrucksApi = createApi({
       // The endpoint documents no response body, so anything but an explicit false or an
       // ErrorMessage counts as done — a 2xx with no body must not read as a rejection.
       transformResponse: (payload: unknown): ReassignContractTruckResult => {
-        const errorMessage = getApiErrorMessage(payload);
+        // Only an explicit ErrorMessage / errors{} is a refusal: a success body may carry a plain
+        // { message: "Reassigned…" } or text, which must not read as a failure.
+        const errorMessage = explicitErrorMessage(payload);
         return { succeeded: payload !== false && !errorMessage, errorMessage };
       },
       // Only a done re-assignment refreshes the trucks. A plain tag list is invalidated on

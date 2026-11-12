@@ -103,7 +103,6 @@ const RankedList = ({ title, items, unit, active, onPick }: { title: string; ite
 
 const ContractsDashboard = ({ contracts, loading, error, active, onStatus, onFocus, onMonth, onSearch, onClear, now }: ContractsDashboardProps) => {
   const metrics = useMemo(() => (contracts ? buildMetrics(contracts, now) : null), [contracts, now]);
-  const filtered = Boolean(active.status || active.focus || active.search || active.monthStart);
 
   if (error) {
     return (
@@ -149,28 +148,7 @@ const ContractsDashboard = ({ contracts, loading, error, active, onStatus, onFoc
 
   return (
     <section className="contracts-dashboard" aria-label="Contracts overview">
-      {filtered && (
-        <div className="cd-filterbar" role="status">
-          <span>
-            Showing{" "}
-            <strong>
-              {[
-                active.status,
-                active.focus ? ATTENTION[active.focus].label : "",
-                active.search,
-                active.monthStart ? new Date(active.monthStart).toLocaleDateString("en-IN", { month: "long", year: "numeric" }) : "",
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            </strong>{" "}
-            in the list below
-          </span>
-          <button type="button" className="cd-filterbar__clear" onClick={onClear}>
-            <XIcon aria-hidden /> Clear
-          </button>
-        </div>
-      )}
-
+      {/* The "Showing … in the list below" bar sits right above the list: see ContractsFilterBar. */}
       {/* ---------------- headline numbers ---------------- */}
       <div className="cd-cards">
         <SummaryCard
@@ -328,6 +306,38 @@ const ContractsDashboard = ({ contracts, loading, error, active, onStatus, onFoc
         </div>
       </div>
     </section>
+  );
+};
+
+/**
+ * "Showing <what the overview picked> in the list below" with a Clear button, placed right above the contracts list.
+ * Wrapped in .contracts-dashboard so it keeps the overview's styling (the cd-* classes are scoped to it).
+ */
+export const ContractsFilterBar = ({ active, onClear }: { active: DashboardFilters; onClear: () => void }) => {
+  const filtered = Boolean(active.status || active.focus || active.search || active.monthStart);
+  if (!filtered) return null;
+  return (
+    <div className="contracts-dashboard">
+      <div className="cd-filterbar" role="status">
+        <span>
+          Showing{" "}
+          <strong>
+            {[
+              active.status,
+              active.focus ? ATTENTION[active.focus].label : "",
+              active.search,
+              active.monthStart ? new Date(active.monthStart).toLocaleDateString("en-IN", { month: "long", year: "numeric" }) : "",
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </strong>{" "}
+          in the list below
+        </span>
+        <button type="button" className="cd-filterbar__clear" onClick={onClear}>
+          <XIcon aria-hidden /> Clear
+        </button>
+      </div>
+    </div>
   );
 };
 

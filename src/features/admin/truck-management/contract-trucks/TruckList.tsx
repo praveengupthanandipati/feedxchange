@@ -18,6 +18,8 @@ import "../open-pending-contracts/PendingContracts.scss";
 interface TruckListProps {
   trucks: ContractTruckDetail[];
   isLoading: boolean;
+  /** The trucks could not be loaded: say so instead of "No trucks arranged yet". */
+  loadFailed?: boolean;
   /** The share shortcut is only offered where the list is a quick look-up, not on its own screen. */
   showShare?: boolean;
   /** When given, each truck offers a Reassign button that hands the truck back to the caller. */
@@ -29,6 +31,7 @@ interface TruckListProps {
 const TruckList = ({
   trucks,
   isLoading,
+  loadFailed = false,
   showShare = true,
   onReassign,
   onViewChain,
@@ -62,7 +65,11 @@ const TruckList = ({
   }
 
   if (trucks.length === 0) {
-    return <p className="truck-tracking-drawer__empty">No trucks arranged yet for this contract.</p>;
+    return (
+      <p className="truck-tracking-drawer__empty">
+        {loadFailed ? "Truck details could not be loaded. Please try again." : "No trucks arranged yet for this contract."}
+      </p>
+    );
   }
 
   return (

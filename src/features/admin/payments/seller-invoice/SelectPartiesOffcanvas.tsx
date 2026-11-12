@@ -9,6 +9,7 @@ import {
   useLazyGetInvoiceContractsQuery,
   type InvoiceContract,
 } from "../../../../core/store/sellerInvoiceApi";
+import LookupLoadError from "../../../../shared/components/feedback/LookupLoadError";
 import "./SelectPartiesOffcanvas.scss";
 
 function formatDate(iso: string): string {
@@ -34,8 +35,8 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
   const [failed, setFailed] = useState(false);
 
   // parties come from the contracts that can be invoiced (the caller's own contracts for business users)
-  const { data: sellers = [] } = useGetInvoiceSellersQuery(undefined, { skip: !open, refetchOnMountOrArgChange: true });
-  const { data: buyers = [] } = useGetInvoiceBuyersQuery(undefined, { skip: !open, refetchOnMountOrArgChange: true });
+  const { data: sellers = [], isError: sellersFailed } = useGetInvoiceSellersQuery(undefined, { skip: !open, refetchOnMountOrArgChange: true });
+  const { data: buyers = [], isError: buyersFailed } = useGetInvoiceBuyersQuery(undefined, { skip: !open, refetchOnMountOrArgChange: true });
   const sellerPartyOptions = sellers.map((p) => ({ value: String(p.id), label: p.name }));
   const buyerPartyOptions = buyers.map((p) => ({ value: String(p.id), label: p.name }));
   const [searchContracts, { isFetching }] = useLazyGetInvoiceContractsQuery();
@@ -91,6 +92,8 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
         </div>
 
         <div className="select-parties-offcanvas__body">
+          {/* Same error banner as the Seller Invoices page this panel opens from. */}
+          <LookupLoadError failed={sellersFailed || buyersFailed} className="si-banner si-banner--error" />
           <div className="select-parties-offcanvas__filters">
             <div className="select-parties-offcanvas__field">
               <span className="select-parties-offcanvas__label">Select Seller</span>

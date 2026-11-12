@@ -21,7 +21,7 @@ const TransporterProfileStep = () => {
     "/admin/transporters/contacts",
   );
 
-  const { data: transporterLines } = useGetAllTransporterLinesQuery();
+  const { data: transporterLines, isError: transporterLinesFailed } = useGetAllTransporterLinesQuery();
   const transporterLineOptions = useMemo(
     () =>
       (transporterLines ?? []).map((line) => ({
@@ -31,7 +31,7 @@ const TransporterProfileStep = () => {
     [transporterLines],
   );
 
-  const { data: transporterTypes } = useGetTransporterTypesByLineQuery(draft.transporterLineId, {
+  const { data: transporterTypes, isError: transporterTypesFailed } = useGetTransporterTypesByLineQuery(draft.transporterLineId, {
     skip: !draft.transporterLineId,
   });
   const typeOfTransporterOptions = useMemo(
@@ -211,6 +211,12 @@ const TransporterProfileStep = () => {
       {existingProfileLoadError && (
         <p className="new-contract__error" role="alert" style={{ color: "var(--fx-red-49-fg)" }}>
           Failed to load transporter profile.
+        </p>
+      )}
+
+      {(transporterLinesFailed || transporterTypesFailed) && (
+        <p className="new-contract__error" role="alert" style={{ color: "var(--fx-red-49-fg)" }}>
+          Some options could not be loaded, so a dropdown may be empty. Please refresh the page and try again.
         </p>
       )}
 

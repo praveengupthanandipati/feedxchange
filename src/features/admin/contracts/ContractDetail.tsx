@@ -65,7 +65,7 @@ const ContractDetail = () => {
   };
 
   const back = (
-    <Link to="/admin/contracts" className="contract-detail__back">
+    <Link to="/admin/contracts?show=all" className="contract-detail__back">
       Back to Contracts
     </Link>
   );

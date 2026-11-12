@@ -16,6 +16,7 @@ import {
 } from "../../../../../core/store/productsApi";
 import { getProductStatus } from "../products-list/products.columns";
 import "./Productview.scss";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 const dateFormatter = new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short" });
 const dateTimeFormatter = new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -55,7 +56,9 @@ const specColumns: TableColumn<ProductNutritionalSpec>[] = [
 const Productview = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: product, isLoading, isError } = useGetProductByIdQuery(id ?? "", { skip: !id });
+  const { data: product, isLoading, isError, error: loadError } = useGetProductByIdQuery(id ?? "", { skip: !id });
+  // A real 404 means there is no such product; any other failure is a load error.
+  const loadFailed = isError && !(loadError && "status" in loadError && loadError.status === 404);
   const [deleteProduct] = useDeleteProductMutation();
   const [pendingDelete, setPendingDelete] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -93,7 +96,7 @@ const Productview = () => {
           <ArrowLeftIcon aria-hidden /> Products
         </Link>
         <div className="product-view-card">
-          <p>No product found for id "{id}".</p>
+          <p>{loadFailed ? "Could not load this product. Please try again." : `No product found for id "${id}".`}</p>
         </div>
       </div>
     );
@@ -318,7 +321,7 @@ const Productview = () => {
             localStorage.setItem("successMessage", "Product deleted successfully");
             navigate("/admin/products");
           } catch (err) {
-            setDeleteError(err instanceof Error ? err.message : "Failed to delete product.");
+            setDeleteError(getErrorMessage(err, "Failed to delete product."));
           }
         }}
         onCancel={() => setPendingDelete(false)}

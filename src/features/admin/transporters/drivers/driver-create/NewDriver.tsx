@@ -16,6 +16,7 @@ import {
   type DriverFormErrors,
 } from "./driverNew.data";
 import "../../../contracts/NewContract.scss";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 function toDateInputValue(isoValue: string): string {
   if (!isoValue) return "";
@@ -32,7 +33,10 @@ const NewDriver = () => {
   const editId = searchParams.get("id");
   const isEditMode = Boolean(editId);
 
-  const { data: editingDriver } = useGetDriverByIdQuery(editId ?? "", { skip: !editId });
+  const { data: editingDriver, isError: editLoadFailed } = useGetDriverByIdQuery(editId ?? "", { skip: !editId });
+  // Editing, but the driver isn't loaded (still loading, or it failed): saving now would send a blank form
+  // – or add a new driver – so Save waits for it.
+  const editNotReady = isEditMode && !editingDriver;
   const [addDriver] = useAddDriverMutation();
   const [updateDriver] = useUpdateDriverMutation();
 
@@ -110,7 +114,7 @@ const NewDriver = () => {
       }
       navigate("/admin/truck-management/transporters/driver-master");
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to save driver.");
+      setSubmitError(getErrorMessage(err, "Failed to save driver."));
     } finally {
       setSubmitting(false);
     }
@@ -124,6 +128,12 @@ const NewDriver = () => {
           <ArrowLeftIcon aria-hidden /> Drivers List
         </Link>
       </div>
+
+      {editLoadFailed && (
+        <p className="new-contract__error" role="alert">
+          Could not load this driver. Please go back to the Drivers list and try again.
+        </p>
+      )}
 
       {submitError && (
         <p className="new-contract__error" role="alert">
@@ -371,7 +381,7 @@ const NewDriver = () => {
         <Link to="/admin/truck-management/transporters/driver-master" className="new-contract__cancel">
           Cancel
         </Link>
-        <button type="button" className="new-contract__submit" onClick={handleSave} disabled={submitting}>
+        <button type="button" className="new-contract__submit" onClick={handleSave} disabled={submitting || editNotReady}>
           {submitting ? "Saving…" : isEditMode ? "Save Changes" : "Save Driver"}
         </button>
       </div>

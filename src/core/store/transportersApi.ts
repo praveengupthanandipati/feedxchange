@@ -188,6 +188,7 @@ export const transportersApi = createApi({
 export const {
   useGetTransporterProfileSummaryQuery,
   useGetTransporterProfileByIdQuery,
+  useLazyGetTransporterProfileByIdQuery,
   useAddTransporterProfileMutation,
   useUpdateTransporterProfileMutation,
   useDeleteTransporterProfileMutation,

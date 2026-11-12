@@ -26,10 +26,8 @@ const TruckView = () => {
   const { data: truck, isLoading, error } = useGetTruckDetailsByIdQuery(id ?? "", { skip: !id });
 
   if (!truck) {
-    const errorDetail =
-      error && "status" in error
-        ? `${error.status} ${typeof error.data === "string" ? error.data : JSON.stringify(error.data)}`
-        : null;
+    // A real 404 means the truck doesn't exist; any other failure is a load error (no raw backend data shown).
+    const notFound = !error || ("status" in error && error.status === 404);
 
     return (
       <div className="business-owner-detail">
@@ -40,9 +38,9 @@ const TruckView = () => {
           <p>
             {isLoading
               ? "Loading truck…"
-              : errorDetail
-                ? `Failed to load truck "${id}": ${errorDetail}`
-                : `No truck found for id "${id}".`}
+              : notFound
+                ? `No truck found for id "${id}".`
+                : "Could not load this truck. Please try again."}
           </p>
         </div>
       </div>

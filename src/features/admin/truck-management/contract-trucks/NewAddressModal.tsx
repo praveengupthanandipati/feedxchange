@@ -8,6 +8,7 @@ import {
 import { fetchLocationFromPincode } from "../../../../shared/utils/pincodeLookup";
 import "../../../../shared/components/dialog/ConfirmDialog.scss";
 import "./NewAddressModal.scss";
+import { getErrorMessage } from "../../../../core/api/getErrorMessage";
 
 interface AddressFormValues {
   officeName: string;
@@ -231,18 +232,15 @@ const NewAddressModal = ({
       }
 
       if (!addressId) {
-        const raw = typeof response === "string" ? response : JSON.stringify(response);
-        setSubmitError(
-          `Address was saved, but no address id came back, so it could not be filled in here. Server replied: ${
-            raw?.slice(0, 120) || "(empty)"
-          }`,
-        );
+        // No raw server reply on screen (it stays in the console for support).
+        console.error("Address saved but no address id in the reply:", response);
+        setSubmitError("The address was saved, but it could not be filled in here. Please pick it from the list.");
         return;
       }
 
       onCreated({ addressId, ...savedAddress });
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to save address.");
+      setSubmitError(getErrorMessage(err, "Failed to save address."));
     } finally {
       setSubmitting(false);
     }

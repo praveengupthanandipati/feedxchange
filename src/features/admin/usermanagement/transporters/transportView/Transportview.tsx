@@ -40,7 +40,10 @@ const Transportview = () => {
     data: rawProfile,
     isFetching,
     isError,
+    error: loadError,
   } = useGetTransporterProfileByIdQuery(id ?? "", { skip: !id });
+  // A real 404 means there is no such transporter; any other failure is a load error.
+  const loadFailed = isError && !(loadError && "status" in loadError && loadError.status === 404);
 
   const profile = useMemo(() => (rawProfile ? mapTransporterProfileDetail(rawProfile) : null), [rawProfile]);
   const recipientOptions = useMemo(() => (profile ? toRecipientOptions(profile) : []), [profile]);
@@ -85,7 +88,7 @@ const Transportview = () => {
           <ArrowLeftIcon aria-hidden /> Back to Transporters
         </Link>
         <div className="business-owner-detail__card">
-          <p>No transporter found for id "{id}".</p>
+          <p>{loadFailed ? "Could not load this transporter. Please try again." : `No transporter found for id "${id}".`}</p>
         </div>
       </div>
     );
