@@ -123,7 +123,7 @@ const NewDriver = () => {
   return (
     <div className="new-contract">
       <div className="new-contract__topbar">
-        <h1>{isEditMode ? "Edit Driver" : "New Driver"}</h1>
+        <h1>{isEditMode ? "Update Driver" : "New Driver"}</h1>
         <Link to="/admin/truck-management/transporters/driver-master" className="new-contract__back">
           <ArrowLeftIcon aria-hidden /> Drivers List
         </Link>
