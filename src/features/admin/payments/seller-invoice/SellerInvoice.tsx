@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
-import { CheckIcon, CircleCheckBigIcon, PlusIcon, XIcon } from "../../../../shared/components/icon";
+import { ArrowLeftIcon, CheckIcon, CircleCheckBigIcon, PlusIcon, XIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
 import ContractDetailsOffcanvas from "./ContractDetailsOffcanvas";
+import ContractPicker from "./ContractPicker";
 import SelectPartiesOffcanvas from "./SelectPartiesOffcanvas";
 import InvoiceBlock from "./InvoiceBlock";
 import {
   calculateRow,
   createEmptySellerInvoiceRow,
-  financialYearOf,
   formatTodayInput,
   hasErrors,
+  linkedDispatchId,
   money,
   problemMessages,
   toRowInput,
@@ -27,6 +28,7 @@ import {
   type TripSelection,
 } from "../../../../core/store/sellerInvoiceApi";
 import TripSelectionDialog from "./TripSelectionDialog";
+import { financialYearOf as fyOf, financialYearOptionsUpTo } from "../../contracts/contract-status/contractStatus.data";
 import type { InvoiceContract } from "../../../../core/store/sellerInvoiceApi";
 import { useNotifyPrompt } from "../../../../shared/notifications/useNotifyPrompt";
 import "./SellerInvoice.scss";
@@ -69,18 +71,18 @@ const SellerInvoice = () => {
   const [saveInvoices, { isLoading: saving }] = useSaveInvoicesMutation();
   const notify = useNotifyPrompt();
 
-  // opened from Update Truck Status: look the contract up once, so the rate and GST are there to calculate the invoice
-  const prefilled = useRef(false);
-  useEffect(() => {
-    if (!fromTruckStatus || prefilled.current) return;
-    prefilled.current = true;
-    const row = rows[0];
-    void resolveContract(row);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // The financial year is not chosen: it follows from the invoice date.
-  const financialYear = financialYearOf(invoiceDate);
+  // The financial year is picked from a dropdown and the invoice date stays inside it (the server works the year out
+  // from the invoice date, so the two always agree): picking a year moves the date into it, changing the date moves
+  // the year.
+  const financialYear = invoiceDate ? fyOf(invoiceDate) : fyOf();
+  const financialYearOptions = useMemo(() => financialYearOptionsUpTo(financialYear).reverse(), [financialYear]);
+  const handleFinancialYearChange = (year: string) => {
+    if (!year || year === financialYear) return;
+    const start = Number(year.slice(0, 4));
+    const current = fyOf();
+    // The current year: today. An earlier year: its last day (31 March). A later one: its first day (1 April).
+    setInvoiceDate(year === current ? formatTodayInput() : year < current ? `${start + 1}-03-31` : `${start}-04-01`);
+  };
 
   useEffect(() => {
     if (!saveToast) return;
@@ -90,19 +92,21 @@ const SellerInvoice = () => {
 
   const patchRow = (id: string, patch: Partial<SellerInvoiceRow>) => setRows((prev) => prev.map((row) => (row.id === id ? { ...row, ...patch } : row)));
 
-  /** Typing the invoice quantity fills Total MTs (still editable) until the user types a Total MTs of their own. */
+  /** Total MTs is no longer on the form: it is sent as the invoice quantity. */
   const handleInvoiceQtyChange = (id: string, value: string) =>
-    setRows((prev) => prev.map((row) => (row.id === id ? { ...row, invoiceQty: value, totalMts: row.totalMtsEdited ? row.totalMts : value } : row)));
+    setRows((prev) => prev.map((row) => (row.id === id ? { ...row, invoiceQty: value, totalMts: value } : row)));
 
   // a different contract number means the linked contract is no longer known until it is looked up again
   const handleContractNumberChange = (id: string, value: string) => patchRow(id, { contractNumber: value, contract: null, contractError: "" });
 
-  /** The row with a contract linked: the quantity is pre-filled with what is still to be invoiced, and Total MTs follows it. */
-  const withContract = (row: SellerInvoiceRow, contract: InvoiceContract): SellerInvoiceRow => {
-    const suggested = String(Math.min(contract.pendingQtyMT, contract.maxAllowedQtyMT));
-    const qty = row.invoiceQty || suggested;
-    return { ...row, contractNumber: contract.contractNumber, contract, contractError: "", invoiceQty: qty, totalMts: row.totalMtsEdited && row.totalMts ? row.totalMts : qty };
-  };
+  /** The row with a contract linked. The invoice quantity is not taken from the contract: it is typed from the invoice. */
+  const withContract = (row: SellerInvoiceRow, contract: InvoiceContract): SellerInvoiceRow => ({
+    ...row,
+    contractNumber: contract.contractNumber,
+    contract,
+    contractError: "",
+    totalMts: row.invoiceQty,
+  });
 
   const needsLookup = (row: SellerInvoiceRow) =>
     row.contractNumber.trim() !== "" && !(row.contract && row.contract.contractNumber.toLowerCase() === row.contractNumber.trim().toLowerCase());
@@ -135,6 +139,44 @@ const SellerInvoice = () => {
     return updated;
   };
 
+  // Opened from Update Truck Status (a truck set to Loaded): ?contract=<number>&truck=<truck number>&dispatch=<id>
+  // fills the first invoice with that contract and truck, and links it to that exact dispatch so saving the invoice
+  // loads that trip (no trip to pick). Opened from Pending Contracts: only ?contract=<number>.
+  const [searchParams] = useSearchParams();
+  const fromTruckStatus = searchParams.get("truck") ? searchParams.get("contract")?.trim() ?? "" : "";
+  const prefillDone = useRef(false);
+  useEffect(() => {
+    if (prefillDone.current) return;
+    prefillDone.current = true;
+    const contractNumber = searchParams.get("contract")?.trim() ?? "";
+    const truckNumber = searchParams.get("truck")?.trim() ?? "";
+    const dispatchId = Number(searchParams.get("dispatch"));
+    if (!contractNumber) return;
+    const first: SellerInvoiceRow = {
+      ...createEmptySellerInvoiceRow(),
+      contractNumber,
+      truckNumber,
+      linkedDispatch: truckNumber && dispatchId > 0 ? { id: dispatchId, contractNumber, truckNumber } : null,
+    };
+    setRows([first]);
+    setPickedContract(contractNumber);
+    void resolveContract(first);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // "Select contract" at the top: the picked contract (shown in the overview) goes into the first invoice without a
+  // contract, or a new invoice when every invoice already has one; the page then scrolls to that invoice.
+  const [pickedContract, setPickedContract] = useState("");
+  const [overviewDetails, setOverviewDetails] = useState<string | null>(null);
+  const handleContractPick = (contract: InvoiceContract) => {
+    setPickedContract(contract.contractNumber);
+    const target = rows.find((row) => !row.contractNumber.trim());
+    const added = target ? null : withContract(createEmptySellerInvoiceRow(), contract);
+    setRows((prev) => (target ? prev.map((row) => (row.id === target.id ? withContract(row, contract) : row)) : [...prev, added!]));
+    const id = target?.id ?? added!.id;
+    window.setTimeout(() => document.querySelector(`[data-invoice-id="${id}"]`)?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
+  };
+
   const handleSelectPartiesSelect = (contract: InvoiceContract) => {
     if (!selectPartiesRowId) return;
     setRows((prev) => prev.map((row) => (row.id === selectPartiesRowId ? withContract(row, contract) : row)));
@@ -144,6 +186,7 @@ const SellerInvoice = () => {
   const resetForm = () => {
     setInvoiceDate(formatTodayInput());
     setRows([createEmptySellerInvoiceRow()]);
+    setPickedContract("");
     setShowErrors(false);
     setServerError("");
   };
@@ -165,7 +208,8 @@ const SellerInvoice = () => {
           const choice = choices?.[index + 1];
           return {
             ...toRowInput(row),
-            contractDispatchId: choice?.contractDispatchId ?? row.contractDispatchId ?? null,
+            // The trip chosen in the dialog, else the dispatch this invoice was opened for from Update Truck Status.
+            contractDispatchId: choice?.contractDispatchId ?? linkedDispatchId(row),
             createNewTrip: choice?.createNewTrip ?? false,
             tripSetup: choice?.tripSetup ?? null,
             tripSetupAccepted: choice?.accepted ?? false,
@@ -184,17 +228,27 @@ const SellerInvoice = () => {
       resetForm();
       setNotices(result.notices ?? []);
       // The buyer is told about each invoice (the seller can be added in the dialog). One dialog per invoice, one after another; Skip or close moves on.
-      notify.ask(
-        result.invoices.map((invoice) => ({
+      // An invoice opened from Update Truck Status loads that truck, so its "truck loaded" message is offered too
+      // (it used to be offered when Loaded was picked there).
+      const loadedTrucks = latest
+        .map((row) => ({ dispatchId: linkedDispatchId(row), row }))
+        .filter((item): item is { dispatchId: number; row: SellerInvoiceRow } => item.dispatchId !== null);
+      notify.ask([
+        ...result.invoices.map((invoice) => ({
           eventCode: "INVOICE_CREATED",
           title: `Notify the buyer about invoice ${invoice.invoiceNumber}`,
           sourceEntityType: "ContractInvoice",
           sourceEntityId: invoice.invoiceId,
           contractNumber: invoice.contractNumber,
         })),
-      );
-      // the truck is Loaded now: back to the contract's trucks
-      if (returnToContract) navigate(`${UPDATE_TRUCK_STATUS_PATH}?contract=${encodeURIComponent(returnToContract)}`);
+        ...loadedTrucks.map(({ dispatchId, row }) => ({
+          eventCode: "TRUCK_LOADED",
+          title: `Notify the buyer that truck ${row.truckNumber} is loaded`,
+          sourceEntityType: "ContractTruckDispatch",
+          sourceEntityId: dispatchId,
+          contractNumber: row.contractNumber,
+        })),
+      ]);
     } catch (error) {
       setServerError(apiErrorMessage(error, "The invoices could not be saved."));
     }
@@ -217,19 +271,46 @@ const SellerInvoice = () => {
         </div>
       )}
 
+      {fromTruckStatus && (
+        <Link
+          to={`/admin/truck-management/open-pending-contracts/update-truck-status?contract=${encodeURIComponent(fromTruckStatus)}`}
+          className="si-back-link"
+        >
+          <ArrowLeftIcon aria-hidden /> Back to Update Truck Status
+        </Link>
+      )}
+
       <div className="si-page-header">
         <div>
           <h1>Seller Invoices</h1>
           <p className="si-muted">Enter the invoices raised by the seller. Amounts, GST and the financial year are worked out for you.</p>
         </div>
-        <div className="si-page-header__date">
-          <label htmlFor="seller-invoice-date">Invoice date</label>
-          <DatePickerInput id="seller-invoice-date" value={invoiceDate} onChange={(value) => setInvoiceDate(value)} />
-          <span className="si-muted" title="Worked out from the invoice date (April to March)">
-            Financial year: <strong>{financialYear || "—"}</strong>
-          </span>
+        {/* Top left: the financial year first, then the invoice date (kept inside that year). */}
+        <div className="si-page-header__controls">
+          <div className="si-page-header__date">
+            <label htmlFor="seller-invoice-fy">Financial year</label>
+            <select
+              id="seller-invoice-fy"
+              className="si-input"
+              value={financialYear}
+              onChange={(event) => handleFinancialYearChange(event.target.value)}
+              title="April to March. The invoice date is kept inside the year you pick."
+            >
+              {financialYearOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="si-page-header__date">
+            <label htmlFor="seller-invoice-date">Invoice date</label>
+            <DatePickerInput id="seller-invoice-date" value={invoiceDate} onChange={(value) => setInvoiceDate(value)} />
+          </div>
         </div>
       </div>
+
+      <ContractPicker financialYear={financialYear} value={pickedContract} onSelect={handleContractPick} onDetails={setOverviewDetails} />
 
       <div className="si-invoices">
         {rows.map((row, index) => (
@@ -317,9 +398,12 @@ const SellerInvoice = () => {
       />
 
       <ContractDetailsOffcanvas
-        open={contractDetailsRowId !== null}
-        contractNumber={rows.find((row) => row.id === contractDetailsRowId)?.contractNumber ?? ""}
-        onClose={() => setContractDetailsRowId(null)}
+        open={contractDetailsRowId !== null || overviewDetails !== null}
+        contractNumber={overviewDetails ?? rows.find((row) => row.id === contractDetailsRowId)?.contractNumber ?? ""}
+        onClose={() => {
+          setContractDetailsRowId(null);
+          setOverviewDetails(null);
+        }}
       />
 
       <SelectPartiesOffcanvas open={selectPartiesRowId !== null} onClose={() => setSelectPartiesRowId(null)} onSelect={handleSelectPartiesSelect} />

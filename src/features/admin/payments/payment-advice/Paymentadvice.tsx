@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { amountInWords } from "../../../../shared/utils/amountInWords";
+import { useProfileCities, withCity } from "../../../../shared/hooks/useProfileCities";
 import {
   type IconComponent,
   CheckIcon,
@@ -108,10 +110,12 @@ const Paymentadvice = () => {
   const [deleteReceipt] = useDeleteReceiptMutation();
   const [applyAllocation, { isLoading: applying }] = useApplyAllocationMutation();
 
-  const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: p.name })), [sellers]);
+  // Sellers and buyers are shown as "Name, City".
+  const { cityOf } = useProfileCities();
+  const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) })), [sellers, cityOf]);
   const buyerOptions = useMemo(
-    () => buyers.filter((p) => String(p.id) !== sellerId).map((p) => ({ value: String(p.id), label: p.name })),
-    [buyers, sellerId],
+    () => buyers.filter((p) => String(p.id) !== sellerId).map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) })),
+    [buyers, sellerId, cityOf],
   );
 
   // start on the first seller and its first buyer, like the page used to
@@ -447,6 +451,16 @@ const Paymentadvice = () => {
             );
           })}
         </div>
+
+        {/* The amount in words, to check what was typed: one full-width line of fixed height under the fields, so
+            the form does not grow or jump while typing. */}
+        <p className="payment-advice-words" aria-live="polite" title={amountInWords(values.amount) || undefined}>
+          {amountInWords(values.amount) && (
+            <>
+              <span className="payment-advice-words__label">Amount in words:</span> {amountInWords(values.amount)}
+            </>
+          )}
+        </p>
 
         <div className="payment-advice-actions">
           <button type="button" className="payment-advice-actions__cancel" onClick={() => resetForm()}>

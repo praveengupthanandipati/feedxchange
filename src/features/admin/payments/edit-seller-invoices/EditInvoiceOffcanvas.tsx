@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PartyName from "../../../../shared/components/party/PartyName";
 import { createPortal } from "react-dom";
 import { PlusIcon, Trash2Icon, XIcon } from "../../../../shared/components/icon";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
@@ -169,7 +170,7 @@ const EditInvoiceOffcanvas = ({ invoice, onClose, onSaved }: Props) => {
 
         <div className="edit-invoice-offcanvas__body">
           <p className="edit-invoice-offcanvas__contract">
-            Contract <strong>{invoice.contractNumber}</strong> · {invoice.productName} · {invoice.sellerName} → {invoice.buyerName}
+            Contract <strong>{invoice.contractNumber}</strong> · {invoice.productName} · <PartyName name={invoice.sellerName} id={invoice.sellerId} /> → <PartyName name={invoice.buyerName} id={invoice.buyerId} />
             <br />
             Rate {money(invoice.ratePerMT)} / MT · GST {invoice.gstPercent ?? 0}% · Status <strong>{invoice.status}</strong>
             {invoice.paidAmount > 0 && <> · Paid {money(invoice.paidAmount)}</>}

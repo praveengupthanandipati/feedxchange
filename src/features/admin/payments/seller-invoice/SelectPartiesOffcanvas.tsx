@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useProfileCities, withCity } from "../../../../shared/hooks/useProfileCities";
 import { createPortal } from "react-dom";
 import { FileTextIcon, PlusIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
@@ -37,8 +38,9 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
   // parties come from the contracts that can be invoiced (the caller's own contracts for business users)
   const { data: sellers = [], isError: sellersFailed } = useGetInvoiceSellersQuery(undefined, { skip: !open, refetchOnMountOrArgChange: true });
   const { data: buyers = [], isError: buyersFailed } = useGetInvoiceBuyersQuery(undefined, { skip: !open, refetchOnMountOrArgChange: true });
-  const sellerPartyOptions = sellers.map((p) => ({ value: String(p.id), label: p.name }));
-  const buyerPartyOptions = buyers.map((p) => ({ value: String(p.id), label: p.name }));
+  const { cityOf, label: partyLabel } = useProfileCities(open);
+  const sellerPartyOptions = sellers.map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) }));
+  const buyerPartyOptions = buyers.map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) }));
   const [searchContracts, { isFetching }] = useLazyGetInvoiceContractsQuery();
 
   useEffect(() => {
@@ -177,14 +179,14 @@ const SelectPartiesOffcanvas = ({ open, onClose, onSelect }: SelectPartiesOffcan
                       </td>
                       <td>
                         <div className="select-parties-offcanvas__party-cell">
-                          <span className="select-parties-offcanvas__party-name">{row.buyerName}</span>
-                          <InfoTooltip text={row.buyerName} />
+                          <span className="select-parties-offcanvas__party-name">{partyLabel(row.buyerName, row.buyerId)}</span>
+                          <InfoTooltip text={partyLabel(row.buyerName, row.buyerId)} />
                         </div>
                       </td>
                       <td>
                         <div className="select-parties-offcanvas__party-cell">
-                          <span className="select-parties-offcanvas__party-name">{row.sellerName}</span>
-                          <InfoTooltip text={row.sellerName} />
+                          <span className="select-parties-offcanvas__party-name">{partyLabel(row.sellerName, row.sellerId)}</span>
+                          <InfoTooltip text={partyLabel(row.sellerName, row.sellerId)} />
                         </div>
                       </td>
                       <td>{row.productName}</td>

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import PartyName from "../../../../shared/components/party/PartyName";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { PendingContractApiResponse } from "../../../../core/store/contractsApi";
 import { CircleAlertIcon, ClockIcon, FileTextIcon, PackageIcon, TriangleAlertIcon, TruckIcon, XIcon } from "../../../../shared/components/icon";
@@ -67,7 +68,7 @@ const SrTable = ({ caption, head, rows }: { caption: string; head: string[]; row
   </table>
 );
 
-const RankedList = ({ title, items, unit, active, onPick }: { title: string; items: Ranked[]; unit: "quantity"; active: string; onPick: (name: string) => void }) => {
+const RankedList = ({ title, items, unit, active, onPick, parties }: { title: string; items: Ranked[]; unit: "quantity"; active: string; onPick: (name: string) => void; parties?: boolean }) => {
   const max = Math.max(1, ...items.map((item) => item[unit]));
   return (
     <section className="cd-panel cd-panel--half" aria-label={title}>
@@ -85,7 +86,7 @@ const RankedList = ({ title, items, unit, active, onPick }: { title: string; ite
                 onClick={() => onPick(item.name)}
                 title={`Show contracts for ${item.name}`}
               >
-                <span className="cd-ranked__name">{item.name}</span>
+                <span className="cd-ranked__name">{parties ? <PartyName name={item.name} /> : item.name}</span>
                 <span className="cd-ranked__value">
                   {formatMT(item.quantity)} · {item.count}
                 </span>
@@ -301,8 +302,8 @@ const ContractsDashboard = ({ contracts, loading, error, active, onStatus, onFoc
         {/* Products, buyers and sellers side by side on wide screens. */}
         <div className="cd-rankings">
           <RankedList title="Top products by quantity" items={metrics.topProducts} unit="quantity" active={active.search} onPick={onSearch} />
-          <RankedList title="Top buyers by quantity" items={metrics.topBuyers} unit="quantity" active={active.search} onPick={onSearch} />
-          <RankedList title="Top sellers by quantity" items={metrics.topSellers} unit="quantity" active={active.search} onPick={onSearch} />
+          <RankedList title="Top buyers by quantity" items={metrics.topBuyers} unit="quantity" active={active.search} onPick={onSearch} parties />
+          <RankedList title="Top sellers by quantity" items={metrics.topSellers} unit="quantity" active={active.search} onPick={onSearch} parties />
         </div>
       </div>
     </section>

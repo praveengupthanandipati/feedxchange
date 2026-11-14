@@ -22,6 +22,7 @@ import {
 } from "../../../../../../core/store/contractTrucksApi";
 import { useGetContractByContractNumberQuery } from "../../../../../../core/store/contractsApi";
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
+import { usePermission } from "../../../../../../core/auth/AuthContext";
 import "../../../assign-transports/Assigntransports.scss";
 import "./UpdateTruckStatus.scss";
 
@@ -51,10 +52,32 @@ interface UpdateTruckStatusRowProps {
   buyerId: number;
   /** The invoice already stored for this truck, if any. */
   invoice?: TruckInvoice;
+  contractNumber: string;
 }
 
 const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, buyerId, invoice }: UpdateTruckStatusRowProps) => {
   const [selectedStatusId, setSelectedStatusId] = useState(String(truck.dispatchStatusId));
+  /**
+   * Loaded is not set by hand here: picking it opens Create Seller Invoice with this contract and truck filled in,
+   * and saving that invoice marks the truck Loaded. Any other status is picked and saved here as before.
+   */
+  const canEnterSellerInvoice = usePermission("seller-invoice.view");
+  const handleStatusPick = (value: string) => {
+    const label = statusOptions.find((option) => option.value === value)?.label.trim().toLowerCase();
+    if (label === "loaded") {
+      setError("");
+      // Without Seller Invoice access the redirect would be blocked: say who can do it instead.
+      if (!canEnterSellerInvoice) {
+        setError("A truck becomes Loaded when its seller invoice is saved. Please ask someone with Seller Invoice access to enter it.");
+        return;
+      }
+      navigate(
+        `/admin/payments/seller-invoice?contract=${encodeURIComponent(contractNumber)}&truck=${encodeURIComponent(truck.truckNumber)}&dispatch=${truck.contractTruckId}`,
+      );
+      return;
+    }
+    setSelectedStatusId(value);
+  };
   const [updateContractTruckStatus, { isLoading: saving }] = useUpdateContractTruckStatusMutation();
   const navigate = useNavigate();
   const [uploadTruckInvoice, { isLoading: uploading }] = useUploadTruckInvoiceMutation();
@@ -84,10 +107,9 @@ const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, 
   const selectedIsLoaded = selectedStatus === "loaded";
   // Neither can be moved back to Assigned, so both are the end of the road for this row.
   const isFinalStatus = isLoaded || isCancelled;
-  // The invoice is attached while Loaded is picked and before the status is saved.
-  // Once the update has gone through — or the dispatch is cancelled — the button is done.
-  const showUploadInvoice =
-    !saved && !isLoaded && !isCancelled && !selectedIsCancelled && selectedIsLoaded && hasChanged;
+  // A truck becomes Loaded by saving its seller invoice; the invoice copy (scan / PDF) can then be attached here
+  // until one is stored.
+  const showUploadInvoice = isLoaded && !invoice && !invoiceFileName;
   const isAssigned = truck.status.trim().toLowerCase() === "assigned";
   // Dispatch details stay editable only while the truck is, and stays, merely assigned.
   const showEditDetails = isAssigned && !selectedIsLoaded && !selectedIsCancelled;
@@ -121,6 +143,7 @@ const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, 
         return;
       }
       setSaved(true);
+      // (Loaded is not saved here; its "truck loaded" notification is offered after the seller invoice is saved.)
     } catch (error) {
       setError(getApiErrorMessage((error as { data?: unknown })?.data) || "Failed to update truck status. Please try again.");
     }
@@ -208,7 +231,7 @@ const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, 
             <SearchableSelect
               options={rowStatusOptions}
               value={selectedStatusId}
-              onChange={setSelectedStatusId}
+              onChange={handleStatusPick}
               placeholder="Select Status"
               ariaLabel={`Update status for ${truck.truckNumber}`}
             />
@@ -338,6 +361,7 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
           truck={truck}
           statusOptions={statusOptions}
           invoice={invoices?.find((item) => item.contractDispatchId === truck.contractTruckId)}
+          contractNumber={contractNumber}
           sellerId={contract?.sellerId ?? 0}
           buyerId={contract?.buyerId ?? 0}
         />

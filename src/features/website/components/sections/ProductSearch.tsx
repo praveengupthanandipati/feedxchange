@@ -17,7 +17,7 @@ const ProductSearch = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
   const navigate = useNavigate();
-  const { products, findBySlug } = useCatalogue();
+  const { products } = useCatalogue();
 
   const results = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -30,7 +30,21 @@ const ProductSearch = () => {
     );
   }, [products, query]);
 
-  const popular = popularSearches.filter((search) => findBySlug(search.slug));
+  // Every popular search is shown; each opens its product when the catalogue has one, otherwise it searches for it.
+  const popular = useMemo(
+    () =>
+      popularSearches.map((search) => ({
+        ...search,
+        product: products.find((product) => search.match.test(product.name) || search.match.test(product.slug)),
+      })),
+    [products],
+  );
+  const searchFor = (term: string) => {
+    setQuery(term);
+    setHighlight(0);
+    setOpen(true);
+    inputRef.current?.focus();
+  };
 
   // Close when clicking / tapping anywhere outside the search.
   useEffect(() => {
@@ -145,8 +159,12 @@ const ProductSearch = () => {
         <span>Popular Searches</span>
         <ul>
           {popular.map((search) => (
-            <li key={search.slug}>
-              <button type="button" onClick={() => go(search.slug)}>
+            <li key={search.label}>
+              <button
+                type="button"
+                onClick={() => (search.product ? go(search.product.slug) : searchFor(search.search))}
+                title={search.product ? search.product.name : `Search for ${search.search}`}
+              >
                 {search.label}
               </button>
             </li>

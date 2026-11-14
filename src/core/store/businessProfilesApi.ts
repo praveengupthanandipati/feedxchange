@@ -378,10 +378,19 @@ function unwrapObject<T>(payload: unknown): T | null {
   return (payload as T) ?? null;
 }
 
+/** POST /api/BusinessProfiles/LinkChildBusinessProfiles */
+export interface LinkChildBusinessRequest {
+  parentProfileId: number;
+  relationShipType: string | null;
+  createdBy: number;
+  createdOn: string;
+  childProfileIds: number[];
+}
+
 export const businessProfilesApi = createApi({
   reducerPath: "businessProfilesApi",
   baseQuery: apiBaseQuery,
-  tagTypes: ["BusinessProfile"],
+  tagTypes: ["BusinessProfile", "ChildBusiness"],
   endpoints: (builder) => ({
     getBusinessProfileSummary: builder.query<BusinessOwner[], void>({
       query: () => "/api/BusinessProfiles/GetBusinessProfileSummary",

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PartyName from "../../../../shared/components/party/PartyName";
 import { ChevronLeftIcon, ChevronRightIcon, CircleCheckBigIcon, CircleXIcon, EyeIcon, EyeOffIcon, PenIcon } from "../../../../shared/components/icon";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
@@ -157,8 +158,8 @@ const EditSellerInvoices = () => {
     },
     { key: "invoiceNumber", header: "Invoice #" },
     { key: "contractNumber", header: "Contract #" },
-    { key: "sellerName", header: "Seller" },
-    { key: "buyerName", header: "Buyer" },
+    { key: "sellerName", header: "Seller", render: (row) => <PartyName name={row.sellerName} id={row.sellerId} /> },
+    { key: "buyerName", header: "Buyer", render: (row) => <PartyName name={row.buyerName} id={row.buyerId} /> },
     { key: "invoiceDate", header: "Date", render: (row) => formatDate(row.invoiceDate) },
     { key: "financialYear", header: "FY" },
     { key: "truckNumber", header: "Truck", render: (row) => row.truckNumber ?? "—" },

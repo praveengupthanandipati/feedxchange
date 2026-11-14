@@ -166,6 +166,8 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
       border-radius: v.$radius-pill;
     }
 
+    &:hover,
+    &:focus-within,
     &.is-scrolling {
       scrollbar-color: v.alpha(v.$color-white, 0.35) transparent;
 

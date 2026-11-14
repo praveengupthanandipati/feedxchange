@@ -103,6 +103,7 @@ const AccountStatement = lazy(() => import("./reports/account-statement/AccountS
 const PendingPayments = lazy(() => import("./reports/pending-payments/PendingPayments"));
 const PendingSupplies = lazy(() => import("./reports/pending-supplies/PendingSupplies"));
 const MonthlyReports = lazy(() => import("./reports/monthly-reports/MonthlyReports"));
+const PaymentsPendingContracts = lazy(() => import("./payments/pending-contracts/PaymentsPendingContracts"));
 const Sellerinvoice = lazy(() => import("./payments/seller-invoice/SellerInvoice"));
 const EditSellerInvoices = lazy(() => import("./payments/edit-seller-invoices/EditSellerInvoices"));
 const Paymentadvice = lazy(() => import("./payments/payment-advice/Paymentadvice"));
@@ -232,6 +233,7 @@ export const adminRoutes = (
     <Route path="reports/pending-payments" element={<PendingPayments />} />
     <Route path="reports/pending-supplies" element={<PendingSupplies />} />
     <Route path="reports/monthly-reports" element={<MonthlyReports />} />
+    <Route path="payments/pending-contracts" element={<PaymentsPendingContracts />} />
     <Route path="payments/seller-invoice" element={<Sellerinvoice />} />
     <Route path="payments/seller-invoice-edit" element={<EditSellerInvoices />} />
     <Route path="payments/payment-advice" element={<Paymentadvice />} />

@@ -1,10 +1,12 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { useProfileCities } from "../../../../shared/hooks/useProfileCities";
 import { LinkIcon, PlusIcon, SearchIcon, Trash2Icon } from "../../../../shared/components/icon";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import { useGetAllActiveDriversQuery } from "../../../../core/store/driversApi";
 import { useGetTransporterProfileSummaryQuery } from "../../../../core/store/transportersApi";
-import { calculateRow, createEmptyDeduction, money, validateRow, type DeductionEntry, type SellerInvoiceRow } from "./sellerInvoice.data";
+import { useGetAllTrucksByContractQuery } from "../../../../core/store/contractTrucksApi";
+import { calculateRow, createEmptyDeduction, money, normalizeTruckNumber, validateRow, type DeductionEntry, type SellerInvoiceRow } from "./sellerInvoice.data";
 
 interface InvoiceBlockProps {
   index: number;
@@ -24,7 +26,7 @@ interface InvoiceBlockProps {
 
 /**
  * One invoice on a grid of six EQUAL columns, so the invoice details and the deductions line up:
- *   row 1  Contract | Invoice No | Truck No | Bags | Invoice Qty | Total MTs
+ *   row 1  Contract (2 columns) | Invoice No | Truck No | Bags | Invoice Qty
  *   row 2  Freight  | Amount     | GST %    | Total | Round Off Total | Remarks
  *   then one row per deduction: Date | Amount | TDS/TCS | Remarks (2 columns) | remove
  * Invoice amount and GST are calculated but can be overwritten; everything else is typed.
@@ -52,7 +54,35 @@ const InvoiceBlock = ({
   const transporterOptions = useMemo(() => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })), [transporters]);
   const driverOptions = useMemo(() => (drivers ?? []).map((d) => ({ value: String(d.driverId), label: `${d.driverName} (${d.mobileNumber})` })), [drivers]);
   const contract = row.contract;
-  const bad = (key: "invoiceNumber" | "truckNumber" | "invoiceQty" | "totalMts" | "roundedTotal" | "freight" | "invoiceAmount" | "gstPercent") => (showErrors && errors[key] ? " has-error" : "");
+  const { label: partyLabel } = useProfileCities();
+
+  // The trucks assigned to the contract (not cancelled): offered in the Truck Number box, and used to tick
+  // "not assigned" automatically when the typed truck is not one of them.
+  // currentData, not data: while another contract's trucks load it is undefined (nothing is decided on stale trucks).
+  const { currentData: contractTrucks } = useGetAllTrucksByContractQuery(
+    { contractId: contract?.contractId ?? 0 },
+    { skip: !contract?.contractId },
+  );
+  const assignedTrucks = useMemo(
+    () => (contractTrucks ?? []).filter((t) => t.registrationNumber && !/cancel/i.test(t.displayName ?? "")),
+    [contractTrucks],
+  );
+  const truckListId = `si-trucks-${row.id}`;
+  const typedTruck = normalizeTruckNumber(row.truckNumber);
+  // The box is set automatically once per contract + truck number (when that contract's trucks have arrived), so a
+  // later reload of the truck list does not undo a tick the user changed by hand.
+  const autoTickedFor = useRef("");
+  useEffect(() => {
+    if (!typedTruck || !contract || contractTrucks === undefined) return;
+    const key = `${contract.contractId}|${typedTruck}`;
+    if (autoTickedFor.current === key) return;
+    autoTickedFor.current = key;
+    const isAssigned = assignedTrucks.some((t) => normalizeTruckNumber(t.registrationNumber) === typedTruck);
+    if (row.notAssigned !== !isAssigned) onChange(row.id, { notAssigned: !isAssigned });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typedTruck, contractTrucks, assignedTrucks, contract?.contractId]);
+
+  const bad =(key: "invoiceNumber" | "truckNumber" | "invoiceQty" | "totalMts" | "roundedTotal" | "freight" | "invoiceAmount" | "gstPercent") => (showErrors && errors[key] ? " has-error" : "");
   const contractError = row.contractError || (showErrors ? errors.contractNumber : undefined) || (contract && !contract.canInvoice ? errors.contractNumber : undefined);
 
   /** A labelled cell of the grid (every cell is one equal column wide unless it asks for more). */
@@ -83,7 +113,7 @@ const InvoiceBlock = ({
   const addDeduction = () => onChange(row.id, { deductions: [...row.deductions, createEmptyDeduction(invoiceDate)] });
 
   return (
-    <section className="si-invoice" aria-label={`Invoice ${index}`}>
+    <section className="si-invoice" aria-label={`Invoice ${index}`} data-invoice-id={row.id}>
       <header className="si-invoice__head">
         <span className="si-index" aria-hidden>
           {index}
@@ -92,8 +122,8 @@ const InvoiceBlock = ({
         {contractError ? (
           <small className="si-error-text si-one-line">{contractError}</small>
         ) : contract ? (
-          <small className="si-contract-note si-one-line" title={`${contract.sellerName} → ${contract.buyerName} · ${contract.productName}`}>
-            {contract.sellerName} → {contract.buyerName} · {contract.productName} · {money(contract.ratePerMT)}/MT + {contract.gstPercent}% GST · {contract.pendingQtyMT} MT pending
+          <small className="si-contract-note si-one-line" title={`${partyLabel(contract.sellerName, contract.sellerId)} → ${partyLabel(contract.buyerName, contract.buyerId)} · ${contract.productName}`}>
+            {partyLabel(contract.sellerName, contract.sellerId)} → {partyLabel(contract.buyerName, contract.buyerId)} · {contract.productName} · {money(contract.ratePerMT)}/MT + {contract.gstPercent}% GST · {contract.pendingQtyMT} MT pending
           </small>
         ) : (
           <small className="si-contract-note si-one-line">Choose the contract first: the rate, GST and pending quantity come from it.</small>
@@ -135,9 +165,33 @@ const InvoiceBlock = ({
               <SearchIcon aria-hidden />
             </button>
           </div>,
+          2,
         )}
         {field("Invoice Number", text("invoiceNumber", "Invoice #", { error: bad("invoiceNumber"), placeholder: "Invoice #" }))}
-        {field("Truck Number", text("truckNumber", "Truck #", { error: bad("truckNumber"), placeholder: "Truck #" }))}
+        {field(
+          "Truck Number",
+          <>
+            {/* The trucks already assigned to the contract can be picked from the list (or any number typed). */}
+            <input
+              type="text"
+              className={`si-input${bad("truckNumber")}`}
+              aria-label={`Truck # (invoice ${index})`}
+              placeholder={assignedTrucks.length ? "Type or pick a truck" : "Truck #"}
+              list={assignedTrucks.length ? truckListId : undefined}
+              value={row.truckNumber}
+              onChange={(event) => onChange(row.id, { truckNumber: event.target.value })}
+            />
+            {assignedTrucks.length > 0 && (
+              <datalist id={truckListId}>
+                {assignedTrucks.map((truck) => (
+                  <option key={truck.contractDispatchId} value={truck.registrationNumber}>
+                    {[truck.legalName, truck.driverName].filter(Boolean).join(" · ")}
+                  </option>
+                ))}
+              </datalist>
+            )}
+          </>,
+        )}
         {field("No. of Bags", text("bags", "Bags", { mode: "numeric" }))}
         {field(
           "Invoice Qty (MT)",
@@ -149,18 +203,6 @@ const InvoiceBlock = ({
             title={contract ? `Up to ${contract.maxAllowedQtyMT} MT more can be invoiced on this contract` : undefined}
             value={row.invoiceQty}
             onChange={(event) => onInvoiceQtyChange(row.id, event.target.value)}
-          />,
-        )}
-        {field(
-          "Total MTs",
-          <input
-            type="text"
-            inputMode="decimal"
-            className={`si-input${bad("totalMts")}`}
-            aria-label={`Total loaded on truck (invoice ${index})`}
-            title="Total loaded on the truck. Follows the invoice quantity; change it if more was loaded."
-            value={row.totalMts}
-            onChange={(event) => onChange(row.id, { totalMts: event.target.value, totalMtsEdited: true })}
           />,
         )}
 

@@ -45,6 +45,48 @@ html[data-app="admin"] {
   }
 }
 
+// Large screens (full HD, 2K, 3K / 4K at 100% scaling): the root size grows with the width so text, controls and
+// spacing scale up together instead of everything staying small with wide empty margins.
+@media (min-width: 1920px) {
+  html {
+    font-size: 100%;
+  }
+
+  html[data-app="admin"] {
+    font-size: 87.5%;
+  }
+}
+
+@media (min-width: 2560px) {
+  html {
+    font-size: 112.5%;
+  }
+
+  html[data-app="admin"] {
+    font-size: 100%;
+  }
+}
+
+@media (min-width: 2880px) {
+  html {
+    font-size: 125%;
+  }
+
+  html[data-app="admin"] {
+    font-size: 112.5%;
+  }
+}
+
+@media (min-width: 3800px) {
+  html {
+    font-size: 150%;
+  }
+
+  html[data-app="admin"] {
+    font-size: 137.5%;
+  }
+}
+
 // WCAG 2.2 target size: anything you can press is at least 24px high (buttons also 24px wide). :where() has no
 // specificity, so this only lifts controls that would otherwise be smaller; a link inside a sentence (inline) is exempt.
 :where(button, [role="button"]) {

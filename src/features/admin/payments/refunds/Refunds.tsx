@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useProfileCities, withCity } from "../../../../shared/hooks/useProfileCities";
 import { CircleAlertIcon, CircleCheckBigIcon, RotateCcwIcon } from "../../../../shared/components/icon";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
@@ -86,8 +87,9 @@ const Refunds = () => {
   const totalUnallocated = round2(receipts.reduce((sum, r) => sum + r.unallocatedAmount, 0));
   const refundTotal = round2(receipts.reduce((sum, r) => sum + (Number(amounts[r.receiptId]) || 0), 0));
 
-  const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: p.name })), [sellers]);
-  const buyerOptions = useMemo(() => buyers.map((p) => ({ value: String(p.id), label: p.name })), [buyers]);
+  const { cityOf } = useProfileCities();
+  const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) })), [sellers, cityOf]);
+  const buyerOptions = useMemo(() => buyers.map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) })), [buyers, cityOf]);
 
   const setAmount = (receipt: Receipt, raw: string) => {
     const cleaned = raw.replace(/[^0-9.]/g, "");

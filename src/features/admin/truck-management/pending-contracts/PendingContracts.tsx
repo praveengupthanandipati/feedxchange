@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import PartyName from "../../../../shared/components/party/PartyName";
+import { useProfileCities, withCity } from "../../../../shared/hooks/useProfileCities";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
@@ -99,10 +101,10 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
             <div className="truck-tracking-drawer__body">
               <div className="truck-tracking-drawer__parties">
                 <p>
-                  <HouseIcon aria-hidden /> Seller: <strong>{row.seller}</strong>
+                  <HouseIcon aria-hidden /> Seller: <strong><PartyName name={row.seller} /></strong>
                 </p>
                 <p>
-                  <UserIcon aria-hidden /> Buyer: <strong>{row.buyer}</strong>
+                  <UserIcon aria-hidden /> Buyer: <strong><PartyName name={row.buyer} /></strong>
                 </p>
               </div>
 
@@ -216,14 +218,16 @@ const PendingContracts = () => {
     [pendingContractApiRows, allContracts, activeContractIds],
   );
 
+  // Seller / buyer filters read "Name, City"; the value stays the name the rows are matched on.
+  const { cityOfName } = useProfileCities();
   const sellerOptions = useMemo(
-    () => [{ value: "All", label: "All Sellers" }, ...Array.from(new Set(apiRows.map((row) => row.seller).filter(Boolean))).map((value) => ({ value, label: value }))],
-    [apiRows],
+    () => [{ value: "All", label: "All Sellers" }, ...Array.from(new Set(apiRows.map((row) => row.seller).filter(Boolean))).map((value) => ({ value, label: withCity(value, cityOfName(value)) }))],
+    [apiRows, cityOfName],
   );
 
   const buyerOptions = useMemo(
-    () => [{ value: "All", label: "All Buyers" }, ...Array.from(new Set(apiRows.map((row) => row.buyer).filter(Boolean))).map((value) => ({ value, label: value }))],
-    [apiRows],
+    () => [{ value: "All", label: "All Buyers" }, ...Array.from(new Set(apiRows.map((row) => row.buyer).filter(Boolean))).map((value) => ({ value, label: withCity(value, cityOfName(value)) }))],
+    [apiRows, cityOfName],
   );
 
   useEffect(() => {

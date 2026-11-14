@@ -74,13 +74,22 @@ export const hero = {
   text: "Your trusted partner for procurement of Premium Animal Feed Raw Material Ingredients in India.",
 };
 
-/** "Popular Searches" under the home search: chip label and the product (SEO name) it opens; hidden if that product is missing. */
-export const popularSearches = [
-  { label: "Soya DOC", slug: "soya-doc" },
-  { label: "GN DOC", slug: "groundnut-doc" },
-  { label: "DORB", slug: "de-oiled-rice-bran-dorb" },
-  { label: "Rapeseed DOC", slug: "mustard-doc" },
-  { label: "Rice DDGS", slug: "rice-ddgs" },
+export interface PopularSearch {
+  /** The chip text (always shown). */
+  label: string;
+  /** The product it opens: matched on the product's name or SEO name, so spelling variants in the catalogue work. */
+  match: RegExp;
+  /** What is searched for when no product matches (the chip then fills the search box instead). */
+  search: string;
+}
+
+/** "Popular Searches" under the home search, as given by the client. */
+export const popularSearches: PopularSearch[] = [
+  { label: "Soya DOC", match: /soya.*(doc|de-?oiled|cake|meal)/i, search: "Soya" },
+  { label: "GN DOC", match: /(groundnut|\bgn\b).*(doc|de-?oiled|cake)/i, search: "Groundnut" },
+  { label: "DORB", match: /\bdorb\b|de-?oiled[\s-]*rice[\s-]*bran/i, search: "Rice Bran" },
+  { label: "Rapeseed DOC", match: /(rapeseed|mustard).*(doc|de-?oiled|cake|meal)/i, search: "Rapeseed" },
+  { label: "Rice DDGS", match: /rice.*ddgs|\bddgs\b/i, search: "DDGS" },
 ];
 
 export interface Stat {

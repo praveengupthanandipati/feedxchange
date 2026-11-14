@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import PartyName from "../../../../../../shared/components/party/PartyName";
+import { useProfileCities } from "../../../../../../shared/hooks/useProfileCities";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeftIcon, FileTextIcon, TruckIcon } from "../../../../../../shared/components/icon";
 import InfoPanel from "../InfoPanel";
@@ -108,6 +110,8 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
   const driverPhone = drivers?.find((d) => d.driverId === truck.driverId)?.mobileNumber ?? "";
 
   const [targetContractNumber, setTargetContractNumber] = useState("");
+
+  const { label: partyLabel } = useProfileCities();
   const [loadingAddressId, setLoadingAddressId] = useState("");
   const [lrNumber, setLrNumber] = useState("");
   const [assignedOn, setAssignedOn] = useState("");
@@ -251,7 +255,7 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
               <span className="reassign-truck__status">{truck.dispatchStatusName}</span>
             </div>
             <p className="reassign-truck__source-sub">
-              {sourceLeg.contractNumber} · {sourceLeg.sellerName} → {sourceLeg.buyerName}
+              {sourceLeg.contractNumber} · <PartyName name={sourceLeg.sellerName} /> → <PartyName name={sourceLeg.buyerName} />
             </p>
             <div className="reassign-truck__source-grid">
               <div>
@@ -295,7 +299,7 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
               <SearchableSelect
                 options={targetOptions.map((row) => ({
                   value: row.contractNumber,
-                  label: `${row.contractNumber} · ${row.seller ?? "-"} → ${row.buyer ?? "-"} · ${row.productName} · ${formatQty(row.pendingQuantityMT)} pending`,
+                  label: `${row.contractNumber} · ${row.seller ? partyLabel(row.seller) : "-"} → ${row.buyer ? partyLabel(row.buyer) : "-"} · ${row.productName} · ${formatQty(row.pendingQuantityMT)} pending`,
                 }))}
                 value={targetContractNumber}
                 onChange={(value) => {
@@ -307,8 +311,8 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
               />
               {!loadingSource && targetOptions.length === 0 && (
                 <p className="reassign-truck__hint">
-                  No other open {sourceContract?.productName ?? ""} contract for {sourceLeg.sellerName} or{" "}
-                  {sourceLeg.buyerName}
+                  No other open {sourceContract?.productName ?? ""} contract for <PartyName name={sourceLeg.sellerName} /> or{" "}
+                  <PartyName name={sourceLeg.buyerName} />
                 </p>
               )}
               {errors.targetContract && <p className="reassign-truck__error">{errors.targetContract}</p>}

@@ -58,6 +58,7 @@ export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/admin/reports/overview", any: ["reports"] },
 
   // Payments
+  { path: "/admin/payments/pending-contracts", any: ["seller-invoice.view"] },
   { path: "/admin/payments/seller-invoice", any: ["seller-invoice.view"] },
   { path: "/admin/payments/seller-invoice-edit", any: ["seller-invoice.view"] },
   { path: "/admin/payments/payment-advice", any: ["payment-advice"] },

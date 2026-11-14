@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import PartyName from "../../../../shared/components/party/PartyName";
 import { Link } from "react-router-dom";
 import { CalendarIcon, CreditCardIcon, FileTextIcon, HouseIcon, TruckIcon, UserIcon } from "../../../../shared/components/icon";
 import type { PendingContractRow } from "./pendingContracts.data";
@@ -88,7 +89,7 @@ interface BarItem {
   note?: string;
 }
 
-const BarList = ({ title, subtitle, items, empty }: { title: string; subtitle: string; items: BarItem[]; empty: string }) => {
+const BarList = ({ title, subtitle, items, empty, parties }: { title: string; subtitle: string; items: BarItem[]; empty: string; parties?: boolean }) => {
   const max = Math.max(...items.map((item) => item.value), 0);
   return (
     <div className="cd-panel">
@@ -103,7 +104,7 @@ const BarList = ({ title, subtitle, items, empty }: { title: string; subtitle: s
           {items.map((item) => (
             <li key={item.label}>
               <div className="cd-bars__label">
-                <span title={item.label}>{item.label}</span>
+                <span title={item.label}>{parties ? <PartyName name={item.label} /> : item.label}</span>
                 <strong>{qty(item.value)}</strong>
               </div>
               <div className="cd-bars__track">
@@ -136,8 +137,8 @@ export const DashboardInsights = ({ rows }: { rows: PendingContractRow[] }) => {
   }, [rows]);
   return (
     <section className="cd-insights" aria-label="Pending quantity">
-      <BarList title="Pending by buyer" subtitle="Top 5" items={groups.buyers} empty="Nothing pending." />
-      <BarList title="Pending by seller" subtitle="Top 5" items={groups.sellers} empty="Nothing pending." />
+      <BarList title="Pending by buyer" subtitle="Top 5" items={groups.buyers} empty="Nothing pending." parties />
+      <BarList title="Pending by seller" subtitle="Top 5" items={groups.sellers} empty="Nothing pending." parties />
       <BarList title="Pending by delivery schedule" subtitle="All schedules" items={groups.schedules} empty="Nothing pending." />
     </section>
   );
@@ -160,8 +161,8 @@ export const ContractCards = ({ rows, onOpenTruckDetails, emptyMessage }: { rows
             </header>
             <p className="cd-card__product">{row.product}</p>
             <div className="cd-card__parties">
-              <span title={row.seller}><HouseIcon aria-hidden /> {row.seller}</span>
-              <span title={row.buyer}><UserIcon aria-hidden /> {row.buyer}</span>
+              <span title={row.seller}><HouseIcon aria-hidden /> <PartyName name={row.seller} /></span>
+              <span title={row.buyer}><UserIcon aria-hidden /> <PartyName name={row.buyer} /></span>
             </div>
 
             <div className="cd-card__qty">
@@ -178,7 +179,7 @@ export const ContractCards = ({ rows, onOpenTruckDetails, emptyMessage }: { rows
             </div>
 
             <div className="cd-card__meta">
-              <span><CalendarIcon aria-hidden /> {row.fromDate} – {row.toDate}</span>
+              {row.fromDate && row.toDate && <span><CalendarIcon aria-hidden /> {row.fromDate} – {row.toDate}</span>}
               <span><CreditCardIcon aria-hidden /> {row.paymentType}</span>
               <span className="cd-chip cd-chip--plain">{row.deliverySchedule}</span>
               <span className="cd-card__rate">{row.cRate}/MT</span>

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useProfileCities } from "../../../../shared/hooks/useProfileCities";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import { useGetAllOpenAndPendingContractsQuery } from "../../../../core/store/contractsApi";
 import "./PendingContractSelector.scss";
@@ -10,6 +11,7 @@ interface PendingContractSelectorProps {
 
 const PendingContractSelector = ({ value, onChange }: PendingContractSelectorProps) => {
   const { data: contracts, isLoading } = useGetAllOpenAndPendingContractsQuery();
+  const { label: partyLabel } = useProfileCities();
 
   const options = useMemo(
     () =>
@@ -17,9 +19,9 @@ const PendingContractSelector = ({ value, onChange }: PendingContractSelectorPro
         .filter((row) => (row.pendingQuantityMT ?? 0) > 0)
         .map((row) => ({
           value: row.contractNumber,
-          label: `${row.contractNumber} — ${row.seller ?? "-"} → ${row.buyer ?? "-"}`,
+          label: `${row.contractNumber} — ${row.seller ? partyLabel(row.seller) : "-"} → ${row.buyer ? partyLabel(row.buyer) : "-"}`,
         })),
-    [contracts],
+    [contracts, partyLabel],
   );
 
   return (

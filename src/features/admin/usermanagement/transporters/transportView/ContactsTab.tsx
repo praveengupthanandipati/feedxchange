@@ -18,9 +18,9 @@ const ContactsTab = ({ profile }: ContactsTabProps) => {
       key: "googleMapUrl",
       header: "Google Location",
       render: (row) => (
-        <a href={row.googleMapUrl} target="_blank" rel="noopener noreferrer" className="business-owners__link">
+        row.googleMapUrl?.trim() ? (<a href={row.googleMapUrl} target="_blank" rel="noopener noreferrer" className="business-owners__link">
           View on Map <ExternalLinkIcon aria-hidden />
-        </a>
+        </a>) : ""
       ),
     },
   ];

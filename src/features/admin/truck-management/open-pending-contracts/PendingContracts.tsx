@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
+import PartyName from "../../../../shared/components/party/PartyName";
+import { useProfileCities, withCity } from "../../../../shared/hooks/useProfileCities";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import {
   useGetAllContractsQuery,
   useGetAllOpenAndPendingContractsQuery,
-  type OpenAndPendingContract,
 } from "../../../../core/store/contractsApi";
 import {
   ChevronLeftIcon,
@@ -26,7 +27,7 @@ import SearchableSelect from "../../../../shared/components/dropdown/SearchableS
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import { buildPendingContractColumns } from "./pendingContracts.columns";
-import { type PendingContractRow } from "./pendingContracts.data";
+import { mapOpenAndPendingContract, type PendingContractRow } from "./pendingContracts.data";
 import { useContractTruckDetails } from "../contract-trucks/useContractTruckDetails";
 import TruckList from "../contract-trucks/TruckList";
 import { useSelectedContract } from "../../../../core/context/SelectedContractContext";
@@ -40,44 +41,6 @@ const CARD_PAGE_SIZE = 12;
 type ViewMode = "cards" | "table";
 type SortMode = "latest" | "pending" | "qty";
 const ALL_OPTION = { value: "All", label: "All" };
-
-const formatShortDate = (value: string) => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-};
-
-function mapOpenAndPendingContract(row: OpenAndPendingContract, status: PendingContractRow["status"] = "Open"): PendingContractRow {
-  const dispatched = row.dispatchedQuantityMT ?? 0;
-  const pending = row.pendingQuantityMT ?? 0;
-  const total = row.totalQuantityMT ?? 0;
-  const arranged = Math.max(total - dispatched - pending, 0);
-  const dateValue = new Date(row.contractDate).getTime();
-
-  return {
-    id: row.contractNumber,
-    status,
-    date: formatShortDate(row.contractDate),
-    dateValue: Number.isNaN(dateValue) ? 0 : dateValue,
-    seller: row.seller ?? "-",
-    buyer: row.buyer ?? "-",
-    cRate: `₹${row.pricePerMT.toLocaleString("en-IN")}`,
-    cRateValue: row.pricePerMT,
-    cQty: `${total} MT`,
-    cQtyValue: total,
-    dQty: `${dispatched} MT`,
-    dQtyValue: dispatched,
-    aQty: `${arranged} MT`,
-    aQtyValue: arranged,
-    pQty: `${pending} MT`,
-    pQtyValue: pending,
-    product: row.productName,
-    fromDate: formatShortDate(row.effectiveFrom),
-    toDate: formatShortDate(row.effectiveTo),
-    deliverySchedule: row.deliverySchedule,
-    paymentType: row.paymentTermName,
-  };
-}
 
 interface TruckTrackingDrawerProps {
   open: boolean;
@@ -125,10 +88,10 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
             <div className="truck-tracking-drawer__body">
               <div className="truck-tracking-drawer__parties">
                 <p>
-                  <HouseIcon aria-hidden /> Seller: <strong>{row.seller}</strong>
+                  <HouseIcon aria-hidden /> Seller: <strong><PartyName name={row.seller} /></strong>
                 </p>
                 <p>
-                  <UserIcon aria-hidden /> Buyer: <strong>{row.buyer}</strong>
+                  <UserIcon aria-hidden /> Buyer: <strong><PartyName name={row.buyer} /></strong>
                 </p>
               </div>
 
@@ -232,19 +195,21 @@ const PendingContracts = () => {
       .map((row) => mapOpenAndPendingContract(row, statusByNumber.get(row.contractNumber)));
   }, [openAndPendingContracts, allContracts]);
 
+  // Seller / buyer filters read "Name, City"; the value stays the name the rows are matched on.
+  const { cityOfName } = useProfileCities();
   const sellerOptions = useMemo(() => {
     const names = Array.from(new Set(pendingContracts.map((row) => row.seller))).filter(
       (name) => name && name !== "-",
     );
-    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: name }))];
-  }, [pendingContracts]);
+    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: withCity(name, cityOfName(name)) }))];
+  }, [pendingContracts, cityOfName]);
 
   const buyerOptions = useMemo(() => {
     const names = Array.from(new Set(pendingContracts.map((row) => row.buyer))).filter(
       (name) => name && name !== "-",
     );
-    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: name }))];
-  }, [pendingContracts]);
+    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: withCity(name, cityOfName(name)) }))];
+  }, [pendingContracts, cityOfName]);
 
   const deliveryScheduleOptions = useMemo(() => {
     const schedules = Array.from(new Set(pendingContracts.map((row) => row.deliverySchedule))).filter(

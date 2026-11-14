@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import PartyName from "../../../../shared/components/party/PartyName";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { FileTextIcon, XIcon } from "../../../../shared/components/icon";
@@ -77,11 +78,11 @@ const ContractDetailsOffcanvas = ({ open, contractNumber, onClose }: ContractDet
                   </tr>
                   <tr>
                     <td>Buyer Name</td>
-                    <td className="contract-details-offcanvas__accent">{contract.buyerName}</td>
+                    <td className="contract-details-offcanvas__accent"><PartyName name={contract.buyerName} id={contract.buyerId} /></td>
                   </tr>
                   <tr>
                     <td>Seller Name</td>
-                    <td className="contract-details-offcanvas__accent">{contract.sellerName}</td>
+                    <td className="contract-details-offcanvas__accent"><PartyName name={contract.sellerName} id={contract.sellerId} /></td>
                   </tr>
                   <tr>
                     <td>Product Name</td>

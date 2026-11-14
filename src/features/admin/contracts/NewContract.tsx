@@ -223,8 +223,6 @@ const findAddressByLabel = (addresses: ProfileAddressDetail[], label: string) =>
 
 const REQUIRED_FIELD_LABELS: Record<string, string> = {
   contractDate: "Date of Contract",
-  effectiveFrom: "Effective From",
-  effectiveTo: "Effective To",
   sellerId: "Select Seller",
   buyerId: "Select Buyer",
   productId: "Select Product",
@@ -663,6 +661,8 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     const { data: businessProfiles, isError: businessProfilesFailed } = useGetBusinessProfileSummaryQuery(undefined, {
       refetchOnMountOrArgChange: true,
     });
+    // Sellers and buyers are shown as "Name, City" (dropdowns and the banner above the form).
+    const { cityOf } = useProfileCities();
     const businessProfileOptions = useMemo(
       () => {
         const uniqueProfiles = new Map<number, { value: string; label: string }>();
@@ -673,13 +673,19 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
           if (!uniqueProfiles.has(profile.profileId)) {
             uniqueProfiles.set(profile.profileId, {
               value: String(profile.profileId),
-              label: profile.legalName ?? "",
+              label: withCity(profile.legalName ?? "", cityOf(profile.profileId)),
             });
           }
         }
 
         return Array.from(uniqueProfiles.values());
       },
+      [businessProfiles, cityOf],
+    );
+    // The same profiles labelled by legal name only: an older contract without seller / buyer ids is matched on the
+    // stored name (the dropdown labels above add the city).
+    const businessProfileNameOptions = useMemo(
+      () => (businessProfiles ?? []).map((profile) => ({ value: String(profile.profileId), label: profile.legalName ?? "" })),
       [businessProfiles],
     );
     // Guarded on the id shape, not just emptiness: the endpoint binds profileId as an
@@ -822,7 +828,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
   const requiredValues = useMemo(
     () => ({
       contractDate,
-      effectiveTo,
       sellerId,
       buyerId,
       productId,
@@ -865,7 +870,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     }),
     [
       contractDate,
-      effectiveTo,
       sellerId,
       buyerId,
       productId,
@@ -951,11 +955,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
 
   if (sellerId && buyerId && sellerId === buyerId) {
     setFormError("Seller and Buyer cannot be the same business. Please select a different buyer.");
-    return;
-  }
-
-  if (effectiveFrom && effectiveTo && effectiveTo < effectiveFrom) {
-    setFormError("Effective To cannot be before Effective From.");
     return;
   }
 
@@ -1055,8 +1054,9 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         buyerId: Number(buyerId),
 
         contractDate: now,
+        // Effective From / To are no longer on the form: an edit keeps the stored dates, otherwise the contract date.
         effectiveFrom: toApiDate(effectiveFrom || contractDate) || now,
-        effectiveTo: toApiDate(effectiveTo) || now,
+        effectiveTo: toApiDate(effectiveTo || contractDate) || now,
         totalQuantityMT: quantity,
         productId: Number(productId),
         tolerancePercentage: tolerance,
@@ -1137,8 +1137,9 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         buyerId: Number(buyerId),
 
         contractDate: now,
+        // Effective From / To are no longer on the form: a new contract saves the contract date for both.
         effectiveFrom: toApiDate(effectiveFrom || contractDate) || now,
-        effectiveTo: toApiDate(effectiveTo) || now,
+        effectiveTo: toApiDate(effectiveTo || contractDate) || now,
 
         totalQuantityMT: quantity,
 
@@ -1350,12 +1351,12 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
   // Do NOT find the ID from the display name.
   setSellerId(
     asOptionId(contract.sellerId) ||
-      resolveOptionId(businessProfileOptions, contract.seller)
+      resolveOptionId(businessProfileNameOptions, contract.seller)
   );
 
   setBuyerId(
     asOptionId(contract.buyerId) ||
-      resolveOptionId(businessProfileOptions, contract.buyer)
+      resolveOptionId(businessProfileNameOptions, contract.buyer)
   );
 
   setProductId(
@@ -1569,9 +1570,11 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     contract.status === "Pending"
   );
 
+// businessProfileNameOptions, not the "Name, City" options: those change when the cities arrive, and refilling the
+// form then would undo what the user has already edited.
 }, [
   editContract,
-  businessProfileOptions,
+  businessProfileNameOptions,
   productOptions,
 ]);
 
@@ -1857,30 +1860,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
               value={netRate}
               disabled
               readOnly
-            />
-          </div>
-
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="effectiveFrom">
-              Effective From
-            </label>
-            <DatePickerInput
-              id="effectiveFrom"
-              value={effectiveFrom}
-              onChange={(value) => setEffectiveFromInput(value)}
-              clearable
-            />
-          </div>
-
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="effectiveTo">
-              Effective To <span className="form-field__required">*</span>
-            </label>
-            <DatePickerInput
-              id="effectiveTo"
-              value={effectiveTo}
-              onChange={(value) => setEffectiveTo(value)}
-              clearable
             />
           </div>
 
