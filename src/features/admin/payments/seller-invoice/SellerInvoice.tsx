@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import { CheckIcon, CircleCheckBigIcon, PlusIcon, XIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
@@ -30,9 +31,29 @@ import type { InvoiceContract } from "../../../../core/store/sellerInvoiceApi";
 import { useNotifyPrompt } from "../../../../shared/notifications/useNotifyPrompt";
 import "./SellerInvoice.scss";
 
+/** Where Update Truck Status sends the user: this screen, with the contract, truck and dispatch already filled in. */
+const UPDATE_TRUCK_STATUS_PATH = "/admin/truck-management/open-pending-contracts/update-truck-status";
+
 const SellerInvoice = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const dispatchParam = Number(searchParams.get("dispatch"));
+  const fromTruckStatus = Number.isInteger(dispatchParam) && dispatchParam > 0 && !!searchParams.get("contract") && !!searchParams.get("truck");
+
   const [invoiceDate, setInvoiceDate] = useState(formatTodayInput());
-  const [rows, setRows] = useState<SellerInvoiceRow[]>([createEmptySellerInvoiceRow()]);
+  const [rows, setRows] = useState<SellerInvoiceRow[]>(() => {
+    if (!fromTruckStatus) return [createEmptySellerInvoiceRow()];
+    // opened for one truck's dispatch: the contract and truck are filled in (the quantity starts as the truck's quantity)
+    const qty = searchParams.get("qty") ?? "";
+    return [{
+      ...createEmptySellerInvoiceRow(),
+      contractNumber: searchParams.get("contract") ?? "",
+      truckNumber: searchParams.get("truck") ?? "",
+      contractDispatchId: dispatchParam,
+      invoiceQty: qty,
+      totalMts: qty,
+    }];
+  });
   const [showErrors, setShowErrors] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -47,6 +68,16 @@ const SellerInvoice = () => {
   const [lookupContract] = useLazyGetInvoiceContractDetailsQuery();
   const [saveInvoices, { isLoading: saving }] = useSaveInvoicesMutation();
   const notify = useNotifyPrompt();
+
+  // opened from Update Truck Status: look the contract up once, so the rate and GST are there to calculate the invoice
+  const prefilled = useRef(false);
+  useEffect(() => {
+    if (!fromTruckStatus || prefilled.current) return;
+    prefilled.current = true;
+    const row = rows[0];
+    void resolveContract(row);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // The financial year is not chosen: it follows from the invoice date.
   const financialYear = financialYearOf(invoiceDate);
@@ -134,7 +165,7 @@ const SellerInvoice = () => {
           const choice = choices?.[index + 1];
           return {
             ...toRowInput(row),
-            contractDispatchId: choice?.contractDispatchId ?? null,
+            contractDispatchId: choice?.contractDispatchId ?? row.contractDispatchId ?? null,
             createNewTrip: choice?.createNewTrip ?? false,
             tripSetup: choice?.tripSetup ?? null,
             tripSetupAccepted: choice?.accepted ?? false,
@@ -149,6 +180,7 @@ const SellerInvoice = () => {
       }
 
       setSaveToast(`${result.invoices.length} invoice${result.invoices.length === 1 ? "" : "s"} saved successfully.`);
+      const returnToContract = fromTruckStatus ? latest[0]?.contractNumber : "";
       resetForm();
       setNotices(result.notices ?? []);
       // The buyer is told about each invoice (the seller can be added in the dialog). One dialog per invoice, one after another; Skip or close moves on.
@@ -161,6 +193,8 @@ const SellerInvoice = () => {
           contractNumber: invoice.contractNumber,
         })),
       );
+      // the truck is Loaded now: back to the contract's trucks
+      if (returnToContract) navigate(`${UPDATE_TRUCK_STATUS_PATH}?contract=${encodeURIComponent(returnToContract)}`);
     } catch (error) {
       setServerError(apiErrorMessage(error, "The invoices could not be saved."));
     }

@@ -18,6 +18,7 @@ import { usePermission } from "../../../../core/auth/AuthContext";
 import { getErrorMessage } from "../../../../core/api/getErrorMessage";
 import NotifyModal from "../../../../shared/notifications/NotifyModal";
 import NotifyChoicePicker from "../../../../shared/notifications/NotifyChoicePicker";
+import { useGetContractNotificationPlanQuery } from "../../../../core/store/notificationsApi";
 import type { NotifyChoices } from "../../../../shared/notifications/notifyChoices";
 import { financialYearOf, financialYearOptionsUpTo } from "./contractStatus.data";
 import "../NewContract.scss";
@@ -317,7 +318,11 @@ const ContractchangeStatus = () => {
   const statusIsChanging = !!record && !!status && status !== previousStatusName;
   const notifyEventCode =
     previousStatusName === "Pending" && status === "Open" ? "CONTRACT_APPROVED" : "CONTRACT_STATUS_CHANGED";
-  const notifyAfterChange = notifyOverride ?? notifyEventCode === "CONTRACT_APPROVED";
+  // A contract saved Pending keeps the channels and templates chosen when it was entered: approving it tells the buyer and seller with those,
+  // so this screen does not ask again (ticking the box still sends an extra "approved" message).
+  const { data: storedPlan } = useGetContractNotificationPlanQuery(record?.contractNumber ?? "", { skip: !canNotify || !record?.contractNumber });
+  const approvalUsesStoredPlan = notifyEventCode === "CONTRACT_APPROVED" && !!storedPlan && !storedPlan.sentOn && storedPlan.items.length > 0;
+  const notifyAfterChange = notifyOverride ?? (notifyEventCode === "CONTRACT_APPROVED" && !approvalUsesStoredPlan);
 
   const contractRows = useMemo<ContractStatusRow[]>(
     () =>
@@ -638,6 +643,11 @@ const ContractchangeStatus = () => {
       {canNotify && statusIsChanging && (
         <div className="contract-change-status__card">
           <h2 className="new-contract__section-title">Notifications</h2>
+          {approvalUsesStoredPlan && (
+            <div className="alert alert-info py-2 small" role="status">
+              The buyer and seller will be told automatically that this contract is approved, using the channels and templates chosen when the contract was entered.
+            </div>
+          )}
           <div className="form-check mb-3">
             <input
               className="form-check-input"

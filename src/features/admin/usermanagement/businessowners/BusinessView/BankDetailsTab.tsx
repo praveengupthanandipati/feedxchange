@@ -70,7 +70,9 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
       // The uploaded file itself (it used to download a text file holding only the file name). Opens in a new tab,
       // since the file is on the API server and a cross-origin "download" attribute is ignored.
       render: (row) =>
-        row.fileUrl ? (
+        !row.fileAvailable ? (
+          <span className="business-owner-detail__file-missing" title="This document's file is not on the server. Upload it again from Edit.">File not available</span>
+        ) : row.fileUrl ? (
         <a
           href={row.fileUrl}
           target="_blank"
@@ -91,7 +93,7 @@ const BankDetailsTab = ({ profile }: BankDetailsTabProps) => {
   // Sends the ticked documents (all of them when none are ticked) with their download links.
   const handleSendDocuments = ({ recipients, message, channel }: ShareModalPayload) => {
     const picked = selectedDocumentKeys.length ? profile.documents.filter((row) => selectedDocumentKeys.includes(row.id)) : profile.documents;
-    const lines = picked.map((row) => `- ${row.documentName}${row.registrationNumber ? ` (${row.registrationNumber})` : ""}${row.fileUrl ? `: ${row.fileUrl}` : ""}`);
+    const lines = picked.map((row) => `- ${row.documentName}${row.registrationNumber ? ` (${row.registrationNumber})` : ""}${row.fileUrl && row.fileAvailable ? `: ${row.fileUrl}` : ""}`);
     const text = [message.trim(), `Documents of ${profile.businessLegalName}:`, ...lines].filter(Boolean).join("\n");
     const people = profile.contacts.filter((contact) => recipients.includes(contact.id)).map((contact) => ({ phone: contact.phone, email: contact.email }));
     openShare(channel, people, text, `Documents - ${profile.businessLegalName}`);

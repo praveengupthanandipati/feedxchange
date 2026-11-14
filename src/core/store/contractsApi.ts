@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { apiBaseQuery } from "../api/baseQuery";
+import type { ContractNotificationPlan } from "./notificationsApi";
 import { unwrapArray, unwrapObject } from "./userProfilesCommonApi";
 
 /* =========================
@@ -693,6 +694,9 @@ export interface SaveContractRequest {
     balanceAdvanceDate: string;
     remarks: string;
   };
+
+  /** The channels and templates chosen on the form; kept with the contract and sent when it is approved. Left out = nothing stored. */
+  notificationPlan?: ContractNotificationPlan | null;
 }
 
 /* UpdateContract expects the existing contract number and a flat update DTO. */
@@ -735,6 +739,8 @@ export interface UpdateContractRequest {
     approvalRequired: boolean;
     createdBy: number;
     paymentTerms: SaveContractRequest["paymentTerms"];
+    /** The channels and templates chosen on the form; kept with the contract and sent when it is approved. Left out = unchanged. */
+    notificationPlan?: ContractNotificationPlan | null;
   };
 }
 

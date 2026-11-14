@@ -1,4 +1,4 @@
-import type { AddBusinessProfilePayload, BusinessProfileDetail } from "../../../../../core/store/businessProfilesApi";
+import type { AddBusinessProfilePayload, BusinessProfileDetail, ContactPayload } from "../../../../../core/store/businessProfilesApi";
 import type { BusinessOwnerDraft } from "./BusinessOwnerWizardContext";
 import { nextBrokerageRowId, nextCapacityRowId } from "./BusinessProfile";
 import { nextContactId, nextAddressId } from "./ContactsAddresses";
@@ -6,6 +6,41 @@ import { nextBankEntryId } from "./BankDetailsSection";
 import { nextDocumentId } from "./DocumentsSection";
 
 const toNumber = (value: string) => Number(value) || 0;
+
+// The primary contact (name from the Primary Contact section, number / email /
+// alternate number from the profile's own fields) is stored as a contact of
+// type "Primary"; the additional contacts follow it.
+function buildContactPayloads(draft: BusinessOwnerDraft): ContactPayload[] {
+  const primary: ContactPayload[] =
+    draft.primaryContactPerson.trim() || draft.mobileNumber.trim() || draft.emailId.trim()
+      ? [
+          {
+            contactId: draft.primaryContactId,
+            contactType: PRIMARY_CONTACT_TYPE,
+            contactPerson: draft.primaryContactPerson,
+            designation: "",
+            mobileNumber: draft.mobileNumber,
+            alternativeContactNumber: draft.alternativeContactNumber,
+            emailId: draft.emailId,
+            isUnloadingContact: false,
+          },
+        ]
+      : [];
+  const additional = draft.contacts.map((contact) => ({
+    contactId: contact.contactId,
+    contactType: contact.contactType,
+    contactPerson: contact.contactPerson,
+    designation: contact.designation,
+    mobileNumber: contact.mobileNumber,
+    alternativeContactNumber: contact.alternativeContactNumber,
+    emailId: contact.emailId,
+    isUnloadingContact: false,
+  }));
+  return [...primary, ...additional];
+}
+
+const PRIMARY_CONTACT_TYPE = "Primary";
+const isPrimaryContact = (contactType?: string | null) => (contactType ?? "").trim().toLowerCase() === "primary";
 
 // Used by the Business Profile and Contacts & Addresses steps, which still
 // save through the whole Add/Update Business Profile call (core profile
@@ -16,6 +51,7 @@ const toNumber = (value: string) => Number(value) || 0;
 export function buildBusinessProfilePayload(
   draft: BusinessOwnerDraft,
   currentUserId: number,
+  options: { includeContacts?: boolean } = {},
 ): AddBusinessProfilePayload {
   return {
     profileTypeId: 1, // Business — confirmed via GetProfileTypes
@@ -46,18 +82,11 @@ export function buildBusinessProfilePayload(
     // whole-profile save — they persist via their own dedicated endpoints in
     // userProfilesCommonApi (see useSaveContactsAddressesStep/
     // useSaveBankDetailsStep/useSaveDocumentsStep), so this payload always
-    // sends them empty. Contacts stay embedded here since no dedicated
-    // per-contact endpoint exists yet.
+    // sends them empty. Contacts (the primary one plus the additional ones)
+    // are saved by the profile save, but only when the step that edits them
+    // asks for it — the other steps leave the stored contacts untouched.
     addresses: [],
-    contacts: draft.contacts.map((contact) => ({
-      contactType: contact.contactType,
-      contactPerson: contact.contactPerson,
-      designation: contact.designation,
-      mobileNumber: contact.mobileNumber,
-      alternativeContactNumber: contact.alternativeContactNumber,
-      emailId: contact.emailId,
-      isUnloadingContact: false,
-    })),
+    contacts: options.includeContacts ? buildContactPayloads(draft) : undefined,
     bankAccounts: [],
     documents: [],
     // Capacity requirements and buy/sell charges now persist through their
@@ -76,6 +105,8 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
   const addressList = profile.addresses ?? [];
   const primaryAddress = addressList.find((address) => address.isPrimary) ?? addressList[0];
   const contactList = profile.contacts ?? [];
+  const primaryContact = contactList.find((contact) => isPrimaryContact(contact.contactType));
+  const additionalContacts = contactList.filter((contact) => contact !== primaryContact);
 
   const bankRows = (profile.bankAccounts ?? []).map((account) => ({
     id: nextBankEntryId(),
@@ -152,9 +183,11 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
     billingDistrict: primaryAddress?.district ?? "",
     billingStateName: primaryAddress?.stateName ?? "",
     billingGoogleLocationUrl: primaryAddress?.googleLocationUrl ?? "",
-    primaryContactPerson: contactList[0]?.contactPerson ?? "",
-    contacts: contactList.map((contact) => ({
+    primaryContactPerson: primaryContact?.contactPerson ?? "",
+    primaryContactId: primaryContact?.contactId,
+    contacts: additionalContacts.map((contact) => ({
       id: nextContactId(),
+      contactId: contact.contactId,
       contactType: contact.contactType,
       contactPerson: contact.contactPerson,
       designation: contact.designation,

@@ -64,6 +64,44 @@ export interface RecipientQuery {
   sourceEntityId?: number;
   profileId?: number;
   informationType?: string;
+  /** With profileId on its own (a contract not saved yet): the role those contacts have, SELLER or BUYER. */
+  role?: string;
+}
+
+/** The contract as typed on the New / Edit Contract form, before it is saved (what the message templates print). */
+export interface ContractDraft {
+  sellerId?: number | null;
+  buyerId?: number | null;
+  productId?: number | null;
+  quantityMT?: number | null;
+  ratePerMT?: number | null;
+  gstPercentage?: number | null;
+  paymentTerms?: string | null;
+  sellerPaymentDueDays?: number | null;
+  buyerPaymentDueDays?: number | null;
+  contractDate?: string | null;
+  contractNumber?: string | null;
+  sellerHasQuality?: boolean;
+  buyerHasQuality?: boolean;
+}
+
+export interface DraftPreviewRequest {
+  eventCode: string;
+  items: { role: string; channelCode: ChannelCode; templateId: number | null }[];
+  draft: ContractDraft;
+}
+
+/** One rendered message per role and channel (never per contact). */
+export interface DraftPreviewResult {
+  messages: RenderedMessage[];
+}
+
+/** The channels and template chosen on the contract form for each party; kept with the contract and sent when it is approved. */
+export interface ContractNotificationPlan {
+  eventCode?: string | null;
+  items: { recipientRole: string; channelCode: ChannelCode; templateId: number | null }[];
+  /** Read only: when it was sent. */
+  sentOn?: string | null;
 }
 
 export interface ChannelSelection {
@@ -263,6 +301,14 @@ export const notificationsApi = createApi({
     getNotificationRecipients: builder.query<RecipientCandidate[], RecipientQuery>({
       query: (q) => `/api/Notifications/recipients${qs({ ...q })}`,
     }),
+    previewDraftNotification: builder.mutation<DraftPreviewResult, DraftPreviewRequest>({
+      query: (body) => ({ url: "/api/Notifications/preview-draft", method: "POST", body }),
+    }),
+    getContractNotificationPlan: builder.query<ContractNotificationPlan | null, string>({
+      query: (contractNumber) => `/api/Notifications/contract-plan${qs({ contractNumber })}`,
+      // 204 (no plan stored) comes back as an empty body
+      transformResponse: (response: ContractNotificationPlan | null | undefined) => response ?? null,
+    }),
     previewNotification: builder.mutation<NotificationPreviewResult, ComposeNotificationRequest>({
       query: (body) => ({ url: "/api/Notifications/preview", method: "POST", body }),
     }),
@@ -320,6 +366,8 @@ export const {
   useGetNotificationTemplatesQuery,
   useGetNotificationRecipientsQuery,
   usePreviewNotificationMutation,
+  usePreviewDraftNotificationMutation,
+  useGetContractNotificationPlanQuery,
   useSendNotificationMutation,
   useGetNotificationHistoryQuery,
   useGetDeliveryDetailQuery,

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeftIcon, DownloadIcon, FileTextIcon, PenIcon, SaveIcon, TruckIcon, UploadIcon } from "../../../../../../shared/components/icon";
 import InfoPanel from "../InfoPanel";
 import SearchableSelect from "../../../../../../shared/components/dropdown/SearchableSelect";
@@ -24,7 +24,6 @@ import { useGetContractByContractNumberQuery } from "../../../../../../core/stor
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
 import "../../../assign-transports/Assigntransports.scss";
 import "./UpdateTruckStatus.scss";
-import { useNotifyPrompt } from "../../../../../../shared/notifications/useNotifyPrompt";
 
 const MAX_INVOICE_FILE_SIZE_MB = 5;
 const ALLOWED_INVOICE_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
@@ -44,6 +43,8 @@ function statusModifier(status: string): string {
 }
 
 interface UpdateTruckStatusRowProps {
+  /** The contract the trucks belong to (the seller invoice is opened for it). */
+  contractNumber: string;
   truck: ContractTruckDetail;
   statusOptions: { value: string; label: string }[];
   sellerId: number;
@@ -52,10 +53,10 @@ interface UpdateTruckStatusRowProps {
   invoice?: TruckInvoice;
 }
 
-const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice }: UpdateTruckStatusRowProps) => {
+const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, buyerId, invoice }: UpdateTruckStatusRowProps) => {
   const [selectedStatusId, setSelectedStatusId] = useState(String(truck.dispatchStatusId));
   const [updateContractTruckStatus, { isLoading: saving }] = useUpdateContractTruckStatusMutation();
-  const notify = useNotifyPrompt();
+  const navigate = useNavigate();
   const [uploadTruckInvoice, { isLoading: uploading }] = useUploadTruckInvoiceMutation();
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
@@ -96,6 +97,18 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
     setSaved(false);
     const currentUserId = Number(localStorage.getItem("userId")) || 0;
 
+    // A truck becomes Loaded when its seller invoice is saved: open Create Seller Invoice with the contract and truck filled in.
+    if (selectedIsLoaded) {
+      const query = new URLSearchParams({
+        contract: contractNumber,
+        truck: truck.truckNumber,
+        dispatch: String(truck.contractTruckId),
+        qty: String(truck.raw?.quantityMT ?? ""),
+      });
+      navigate(`/admin/payments/seller-invoice?${query.toString()}`);
+      return;
+    }
+
     try {
       const succeeded = await updateContractTruckStatus({
         contractDispatchId: truck.contractTruckId,
@@ -108,10 +121,6 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
         return;
       }
       setSaved(true);
-      // Loaded: the buyer is told, with the invoice details.
-      if (selectedIsLoaded) {
-        notify.ask({ eventCode: "TRUCK_LOADED", title: "Notify the buyer that the truck is loaded", sourceEntityType: "ContractTruckDispatch", sourceEntityId: truck.contractTruckId });
-      }
     } catch (error) {
       setError(getApiErrorMessage((error as { data?: unknown })?.data) || "Failed to update truck status. Please try again.");
     }
@@ -162,7 +171,6 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
 
   return (
     <div className="update-truck-status-card">
-      {notify.element}
       <div className="update-truck-status-card__header">
         <span className="update-truck-status-card__truck">
           <TruckIcon aria-hidden /> {truck.truckNumber}
@@ -246,7 +254,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
               onClick={handleUpdate}
               disabled={!hasChanged || saving}
             >
-              <SaveIcon aria-hidden /> {saving ? "Updating…" : "Update"}
+              <SaveIcon aria-hidden /> {saving ? "Updating…" : selectedIsLoaded ? "Create Invoice" : "Update"}
             </button>
           )}
 
@@ -326,6 +334,7 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
       {trucks.map((truck) => (
         <UpdateTruckStatusRow
           key={truck.contractTruckId}
+          contractNumber={contractNumber}
           truck={truck}
           statusOptions={statusOptions}
           invoice={invoices?.find((item) => item.contractDispatchId === truck.contractTruckId)}

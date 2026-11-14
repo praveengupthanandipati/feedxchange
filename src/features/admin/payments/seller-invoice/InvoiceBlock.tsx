@@ -63,9 +63,13 @@ const InvoiceBlock = ({
     </div>
   );
 
+  // opened for one truck's dispatch (Update Truck Status -> Loaded): the contract and truck are fixed
+  const dispatchFixed = row.contractDispatchId !== null;
   const text = (key: keyof SellerInvoiceRow, label: string, extra: { mode?: "text" | "numeric" | "decimal"; error?: string; placeholder?: string } = {}) => (
     <input
       type="text"
+      readOnly={dispatchFixed && key === "truckNumber"}
+      title={dispatchFixed && key === "truckNumber" ? "The truck chosen in Update Truck Status" : undefined}
       className={`si-input${extra.error ?? ""}`}
       inputMode={extra.mode ?? "text"}
       aria-label={`${label} (invoice ${index})`}
@@ -118,6 +122,7 @@ const InvoiceBlock = ({
               aria-label={`Contract number (invoice ${index})`}
               placeholder="Contract #"
               title={contractError}
+              readOnly={dispatchFixed}
               value={row.contractNumber}
               onChange={(event) => onContractNumberChange(row.id, event.target.value)}
               onBlur={() => onContractLeave(row)}

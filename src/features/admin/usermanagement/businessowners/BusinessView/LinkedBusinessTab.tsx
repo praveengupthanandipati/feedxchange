@@ -4,53 +4,79 @@ import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import MultiSelect from "../../../../../shared/components/dropdown/MultiSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
-import { businessOwners, type BusinessOwner } from "../BusinessList/businessOwners.data";
+import {
+  useDelinkChildBusinessProfileMutation,
+  useGetBusinessProfileSummaryQuery,
+  useGetChildBusinessProfilesQuery,
+  useLinkChildBusinessProfilesMutation,
+} from "../../../../../core/store/businessProfilesApi";
+import type { ChildBusiness } from "../../../../../core/store/businessProfilesApi";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 interface LinkedBusinessTabProps {
   ownerId: string;
 }
 
+/** The relationship type this screen links with; the server decides which types it accepts. */
+const CHILD_RELATIONSHIP = "Child";
+
+const nameOf = (row: { legalName?: string | null; tradingName?: string | null }) => row.legalName || row.tradingName || "—";
+
 const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
-  const [childIds, setChildIds] = useState<string[]>([]);
+  const parentProfileId = Number(ownerId);
   const [selectedToAdd, setSelectedToAdd] = useState<string[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null);
+  const [pendingRemove, setPendingRemove] = useState<ChildBusiness | null>(null);
+  const [error, setError] = useState("");
 
-  const availableOptions = useMemo(
-    () =>
-      businessOwners
-        .filter((row) => row.id !== ownerId && !childIds.includes(row.id))
-        .map((row) => ({ value: row.id, label: row.companyName })),
-    [ownerId, childIds],
-  );
+  const { data: allBusinesses = [] } = useGetBusinessProfileSummaryQuery();
+  const { data: children = [], isFetching, refetch } = useGetChildBusinessProfilesQuery(parentProfileId, { skip: !Number.isFinite(parentProfileId) });
+  const [linkChildren, { isLoading: linking }] = useLinkChildBusinessProfilesMutation();
+  const [delinkChild, { isLoading: delinking }] = useDelinkChildBusinessProfileMutation();
 
-  const children = useMemo(
-    () => businessOwners.filter((row) => childIds.includes(row.id)),
-    [childIds],
-  );
+  // Everything the server would accept is offered; the server still enforces the rules (own child, one parent, a parent cannot become a child).
+  const availableOptions = useMemo(() => {
+    const linked = new Set(children.map((child) => child.profileId));
+    return allBusinesses
+      .filter((row) => row.profileId !== parentProfileId && !linked.has(row.profileId) && row.status !== "Deleted")
+      .map((row) => ({ value: String(row.profileId), label: nameOf(row) }));
+  }, [allBusinesses, children, parentProfileId]);
 
-  const handleAddChildren = () => {
+  const handleAddChildren = async () => {
     if (selectedToAdd.length === 0) return;
-    setChildIds((prev) => [...prev, ...selectedToAdd]);
-    setSelectedToAdd([]);
+    setError("");
+    try {
+      await linkChildren({
+        parentProfileId,
+        relationShipType: CHILD_RELATIONSHIP,
+        createdBy: Number(localStorage.getItem("userId")) || 0,
+        createdOn: new Date().toISOString(),
+        childProfileIds: selectedToAdd.map(Number),
+      }).unwrap();
+      setSelectedToAdd([]);
+    } catch (err) {
+      // the server's message says which rule blocked the link
+      setError(getErrorMessage(err, "The businesses could not be linked. Please try again."));
+    }
   };
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    window.setTimeout(() => setRefreshing(false), 600);
+  const confirmRemoveChild = async () => {
+    const child = pendingRemove;
+    setPendingRemove(null);
+    if (!child) return;
+    setError("");
+    try {
+      await delinkChild({ parentProfileId, childProfileId: child.profileId }).unwrap();
+    } catch (err) {
+      setError(getErrorMessage(err, "The business could not be removed. Please try again."));
+    }
   };
 
-  const confirmRemoveChild = () => {
-    setChildIds((prev) => prev.filter((id) => id !== pendingRemoveId));
-    setPendingRemoveId(null);
-  };
-
-  const columns: TableColumn<BusinessOwner>[] = [
-    { key: "companyName", header: "Company Name", sortable: true },
-    { key: "businessType", header: "Business Type", sortable: true },
-    { key: "location", header: "Location", sortable: true },
-    { key: "mobile", header: "Mobile" },
-    { key: "state", header: "State", sortable: true },
+  const columns: TableColumn<ChildBusiness>[] = [
+    { key: "legalName", header: "Company Name", sortable: true, render: (row) => nameOf(row) },
+    { key: "businessTypeName", header: "Business Type", sortable: true },
+    { key: "businessSubTypeName", header: "Sub Type", sortable: true },
+    { key: "mobileNumber", header: "Mobile" },
+    { key: "status", header: "Status", sortable: true },
     {
       key: "actions",
       header: "Actions",
@@ -59,8 +85,9 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
         <button
           type="button"
           className="business-owner-detail__icon-link business-owner-detail__icon-link--danger"
-          onClick={() => setPendingRemoveId(row.id)}
-          aria-label={`Remove ${row.companyName} as a child business`}
+          onClick={() => setPendingRemove(row)}
+          disabled={delinking}
+          aria-label={`Remove ${nameOf(row)} as a child business`}
           title="Remove child business"
         >
           <Trash2Icon aria-hidden />
@@ -75,11 +102,11 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
         <button
           type="button"
           className="business-owners-btn business-owners-btn--warning"
-          onClick={handleRefresh}
-          disabled={refreshing}
+          onClick={() => void refetch()}
+          disabled={isFetching}
         >
-          <RefreshCwIcon aria-hidden className={refreshing ? "business-owner-detail__spin" : ""} />
-          {refreshing ? "Refreshing..." : "Refresh Relationships"}
+          <RefreshCwIcon aria-hidden className={isFetching ? "business-owner-detail__spin" : ""} />
+          {isFetching ? "Refreshing..." : "Refresh Relationships"}
         </button>
       </div>
 
@@ -99,16 +126,22 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
           <button
             type="button"
             className="business-owners-btn business-owners-btn--primary"
-            onClick={handleAddChildren}
-            disabled={selectedToAdd.length === 0}
+            onClick={() => void handleAddChildren()}
+            disabled={selectedToAdd.length === 0 || linking}
           >
-            <PlusIcon aria-hidden /> Add Children
+            <PlusIcon aria-hidden /> {linking ? "Adding..." : "Add Children"}
           </button>
         </div>
         <p className="business-owner-detail__hint">
-          Select multiple businesses to make them children of this business. Once you have children, this
-          business cannot become a child of another business.
+          Select multiple businesses to make them children of this business. A business cannot be its own child, a child
+          can have only one parent, and once a business has children it cannot become a child of another business. A
+          parent can see its children's contracts, invoices and payments; a child cannot see its parent's.
         </p>
+        {error && (
+          <p className="business-owner-detail__hint" role="alert" style={{ color: "var(--fx-red-49-fg)" }}>
+            {error}
+          </p>
+        )}
       </section>
 
       {children.length === 0 ? (
@@ -118,16 +151,16 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
       ) : (
         <section className="business-owner-detail__section">
           <h2 className="business-owner-detail__section-title">Linked Child Businesses</h2>
-          <Table columns={columns} data={children} rowKey={(row) => row.id} emptyMessage="No linked businesses." />
+          <Table columns={columns} data={children} rowKey={(row) => String(row.profileRelationshipId)} emptyMessage="No linked businesses." />
         </section>
       )}
 
       <ConfirmDialog
-        open={pendingRemoveId !== null}
+        open={pendingRemove !== null}
         title="Remove this linked business?"
-        message="This will remove the child relationship with this business. This cannot be undone."
-        onConfirm={confirmRemoveChild}
-        onCancel={() => setPendingRemoveId(null)}
+        message="This will remove the child relationship with this business. It can be linked again later."
+        onConfirm={() => void confirmRemoveChild()}
+        onCancel={() => setPendingRemove(null)}
       />
     </div>
   );

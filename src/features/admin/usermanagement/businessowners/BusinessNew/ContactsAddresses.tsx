@@ -14,6 +14,8 @@ import {
 
 export interface ContactEntry {
   id: string;
+  /** Stored contact id (set for a contact loaded from the server, so a save updates it in place). */
+  contactId?: number;
   contactType: string;
   contactPerson: string;
   designation: string;

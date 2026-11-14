@@ -42,6 +42,11 @@ export interface SellerInvoiceRow {
   driverMobile: string;
   licenseNumber: string;
   licenseExpiry: string;
+  /**
+   * The truck dispatch this invoice is for, when the screen was opened from Update Truck Status (Loaded). Saving the invoice marks that dispatch Loaded
+   * and links the invoice to it; the contract and truck are then fixed.
+   */
+  contractDispatchId: number | null;
 }
 
 /** The truck / driver details typed on a row, used to pre-fill the trip dialog. */
@@ -80,6 +85,7 @@ export function createEmptySellerInvoiceRow(): SellerInvoiceRow {
     driverMobile: "",
     licenseNumber: "",
     licenseExpiry: "",
+    contractDispatchId: null,
   };
 }
 

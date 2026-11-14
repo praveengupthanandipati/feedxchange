@@ -35,6 +35,34 @@ export interface BusinessOwner {
   sellCharge: number;
 }
 
+/** A business linked under a parent (GetAllChildBusinessProfiles). */
+export interface ChildBusiness {
+  profileRelationshipId: number;
+  relationshipType: string;
+  profileId: number;
+  legalName: string;
+  tradingName: string;
+  mobileNumber: string;
+  emailId: string;
+  status: string;
+  businessTypeName: string;
+  businessSubTypeName: string;
+}
+
+export interface LinkChildBusinessesPayload {
+  parentProfileId: number;
+  /** "Child" (the value this screen sends); the server also accepts "Group". */
+  relationShipType: string;
+  createdBy: number;
+  createdOn: string;
+  childProfileIds: number[];
+}
+
+export interface DelinkChildBusinessPayload {
+  parentProfileId: number;
+  childProfileId: number;
+}
+
 export interface AddressPayload {
   officeName: string;
   addressLine1: string;
@@ -50,6 +78,8 @@ export interface AddressPayload {
 }
 
 export interface ContactPayload {
+  /** Stored contact id; set for an existing contact so the save updates it instead of adding a copy. */
+  contactId?: number;
   contactType: string;
   contactPerson: string;
   designation: string;
@@ -116,7 +146,8 @@ export interface AddBusinessProfilePayload {
     sellBrokerageCharges: number;
   };
   addresses: AddressPayload[];
-  contacts: ContactPayload[];
+  /** Left out = the server keeps the stored contacts as they are; sent = the stored contacts are made to match it. */
+  contacts?: ContactPayload[];
   bankAccounts: BankAccountPayload[];
   documents: DocumentPayload[];
   capacityRequirements: CapacityRequirementPayload[];
@@ -357,6 +388,19 @@ export const businessProfilesApi = createApi({
       transformResponse: unwrapArray<BusinessOwner>,
       providesTags: ["BusinessProfile"],
     }),
+    getChildBusinessProfiles: builder.query<ChildBusiness[], number>({
+      query: (parentProfileId) => `/api/BusinessProfiles/GetAllChildBusinessProfiles/${parentProfileId}`,
+      transformResponse: unwrapArray<ChildBusiness>,
+      providesTags: ["BusinessProfile"],
+    }),
+    linkChildBusinessProfiles: builder.mutation<boolean, LinkChildBusinessesPayload>({
+      query: (body) => ({ url: "/api/BusinessProfiles/LinkChildBusinessProfiles", method: "POST", body }),
+      invalidatesTags: ["BusinessProfile"],
+    }),
+    delinkChildBusinessProfile: builder.mutation<boolean, DelinkChildBusinessPayload>({
+      query: (body) => ({ url: "/api/BusinessProfiles/DelinkChildBusinessProfile", method: "POST", body }),
+      invalidatesTags: ["BusinessProfile"],
+    }),
     getBusinessProfileById: builder.query<BusinessProfileDetail | null, string>({
       query: (profileId) => `/api/BusinessProfiles/GetBusinessProfileById/${profileId}`,
       transformResponse: unwrapObject<BusinessProfileDetail>,
@@ -477,6 +521,9 @@ export const businessProfilesApi = createApi({
 
 export const {
   useGetBusinessProfileSummaryQuery,
+  useGetChildBusinessProfilesQuery,
+  useLinkChildBusinessProfilesMutation,
+  useDelinkChildBusinessProfileMutation,
   useGetBusinessProfileByIdQuery,
   useLazyGetBusinessProfileByIdQuery,
   useGetBusinessCollectionAreaQuery,
