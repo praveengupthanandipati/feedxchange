@@ -57,29 +57,13 @@ interface UpdateTruckStatusRowProps {
 const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, buyerId, invoice }: UpdateTruckStatusRowProps) => {
   const [selectedStatusId, setSelectedStatusId] = useState(String(truck.dispatchStatusId));
   /**
-   * Loaded is not set by hand here: picking it opens Create Seller Invoice with this contract and truck filled in,
-   * and saving that invoice marks the truck Loaded. Any other status is picked and saved here as before.
+   * Loaded is not saved by hand here: picking it shows "Upload Invoice" (attach the invoice copy) and turns Update
+   * into "Create Invoice", which opens Create Seller Invoice for this truck; saving that invoice marks it Loaded.
+   * Any other status is picked and saved here as before.
    */
   const canEnterSellerInvoice = usePermission("seller-invoice.view");
   const handleStatusPick = (value: string) => {
-    const label = statusOptions.find((option) => option.value === value)?.label.trim().toLowerCase();
-    if (label === "loaded") {
-      setError("");
-      // Without Seller Invoice access the redirect would be blocked: say who can do it instead.
-      if (!canEnterSellerInvoice) {
-        setError("A truck becomes Loaded when its seller invoice is saved. Please ask someone with Seller Invoice access to enter it.");
-        return;
-      }
-      // Contract, truck, dispatch and the truck's quantity are filled in on the invoice.
-      const query = new URLSearchParams({
-        contract: contractNumber,
-        truck: truck.truckNumber,
-        dispatch: String(truck.contractTruckId),
-        qty: String(truck.raw?.quantityMT ?? ""),
-      });
-      navigate(`/admin/payments/seller-invoice?${query.toString()}`);
-      return;
-    }
+    setError("");
     setSelectedStatusId(value);
   };
   const [updateContractTruckStatus, { isLoading: saving }] = useUpdateContractTruckStatusMutation();
@@ -111,9 +95,9 @@ const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, 
   const selectedIsLoaded = selectedStatus === "loaded";
   // Neither can be moved back to Assigned, so both are the end of the road for this row.
   const isFinalStatus = isLoaded || isCancelled;
-  // A truck becomes Loaded by saving its seller invoice; the invoice copy (scan / PDF) can then be attached here
-  // until one is stored.
-  const showUploadInvoice = isLoaded && !invoice && !invoiceFileName;
+  // The invoice copy (scan / PDF) is attached while Loaded is picked, or later on a Loaded truck that has none yet.
+  const showUploadInvoice =
+    !invoice && !invoiceFileName && !isCancelled && ((selectedIsLoaded && hasChanged) || isLoaded);
   const isAssigned = truck.status.trim().toLowerCase() === "assigned";
   // Dispatch details stay editable only while the truck is, and stays, merely assigned.
   const showEditDetails = isAssigned && !selectedIsLoaded && !selectedIsCancelled;
@@ -123,7 +107,24 @@ const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, 
     setSaved(false);
     const currentUserId = Number(localStorage.getItem("userId")) || 0;
 
-    // (Loaded never reaches here: picking it opens Create Seller Invoice, see handleStatusPick.)
+    // Loaded: "Create Invoice" opens Create Seller Invoice with the contract, truck, dispatch and the truck's quantity
+    // filled in; saving that invoice marks the truck Loaded.
+    if (selectedIsLoaded) {
+      // Without Seller Invoice access the page would be blocked: say who can do it instead.
+      if (!canEnterSellerInvoice) {
+        setError("A truck becomes Loaded when its seller invoice is saved. Please ask someone with Seller Invoice access to enter it.");
+        return;
+      }
+      const query = new URLSearchParams({
+        contract: contractNumber,
+        truck: truck.truckNumber,
+        dispatch: String(truck.contractTruckId),
+        qty: String(truck.raw?.quantityMT ?? ""),
+      });
+      navigate(`/admin/payments/seller-invoice?${query.toString()}`);
+      return;
+    }
+
     try {
       const succeeded = await updateContractTruckStatus({
         contractDispatchId: truck.contractTruckId,

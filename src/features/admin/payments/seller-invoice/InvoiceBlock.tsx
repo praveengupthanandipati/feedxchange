@@ -77,7 +77,11 @@ const InvoiceBlock = ({
     const key = `${contract.contractId}|${typedTruck}`;
     if (autoTickedFor.current === key) return;
     autoTickedFor.current = key;
-    const isAssigned = assignedTrucks.some((t) => normalizeTruckNumber(t.registrationNumber) === typedTruck);
+    // Opened for one truck's dispatch from Update Truck Status: that truck is assigned to the contract by definition
+    // (its number in the truck list can be written differently), so the box is never ticked for it.
+    const isAssigned =
+      row.contractDispatchId !== null ||
+      assignedTrucks.some((t) => t.contractDispatchId === row.contractDispatchId || normalizeTruckNumber(t.registrationNumber) === typedTruck);
     if (row.notAssigned !== !isAssigned) onChange(row.id, { notAssigned: !isAssigned });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typedTruck, contractTrucks, assignedTrucks, contract?.contractId]);
