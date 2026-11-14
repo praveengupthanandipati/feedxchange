@@ -91,6 +91,8 @@ export interface ProfileDocumentDetail extends DocumentPayload {
   profileId: number;
   documentTypeName: string;
   filePath: string;
+  /** False when the record exists but the file is not on the server. */
+  fileAvailable?: boolean;
   fileSize: number;
   contentType: string;
   uploadDate: string;

@@ -35,6 +35,34 @@ export interface BusinessOwner {
   sellCharge: number;
 }
 
+/** A business linked under a parent (GetAllChildBusinessProfiles). */
+export interface ChildBusiness {
+  profileRelationshipId: number;
+  relationshipType: string;
+  profileId: number;
+  legalName: string;
+  tradingName: string;
+  mobileNumber: string;
+  emailId: string;
+  status: string;
+  businessTypeName: string;
+  businessSubTypeName: string;
+}
+
+export interface LinkChildBusinessesPayload {
+  parentProfileId: number;
+  /** "Child" (the value this screen sends); the server also accepts "Group". */
+  relationShipType: string;
+  createdBy: number;
+  createdOn: string;
+  childProfileIds: number[];
+}
+
+export interface DelinkChildBusinessPayload {
+  parentProfileId: number;
+  childProfileId: number;
+}
+
 export interface AddressPayload {
   officeName: string;
   addressLine1: string;
@@ -50,6 +78,8 @@ export interface AddressPayload {
 }
 
 export interface ContactPayload {
+  /** Stored contact id; set for an existing contact so the save updates it instead of adding a copy. */
+  contactId?: number;
   contactType: string;
   contactPerson: string;
   designation: string;
@@ -116,7 +146,8 @@ export interface AddBusinessProfilePayload {
     sellBrokerageCharges: number;
   };
   addresses: AddressPayload[];
-  contacts: ContactPayload[];
+  /** Left out = the server keeps the stored contacts as they are; sent = the stored contacts are made to match it. */
+  contacts?: ContactPayload[];
   bankAccounts: BankAccountPayload[];
   documents: DocumentPayload[];
   capacityRequirements: CapacityRequirementPayload[];
@@ -366,52 +397,18 @@ export const businessProfilesApi = createApi({
       transformResponse: unwrapArray<BusinessOwner>,
       providesTags: ["BusinessProfile"],
     }),
-    /**
-     * Each business's city (primary address, else the first), by profile id and by name (legal and trading, lower
-     * case), so sellers and buyers can be shown as "Name, City" on every screen. The summary has no address, so each
-     * profile's details are read once; the result is shared by all screens and kept for 10 minutes.
-     * TODO(backend): return the city in GetBusinessProfileSummary and drop the per-profile reads.
-     */
-    getProfileCities: builder.query<{ byId: Record<number, string>; byName: Record<string, string> }, void>({
-      async queryFn(_arg, _api, _extra, baseQuery) {
-        const summary = await baseQuery("/api/BusinessProfiles/GetBusinessProfileSummary");
-        if (summary.error) return { error: summary.error };
-        const profiles = unwrapArray<BusinessOwner>(summary.data);
-        const byId: Record<number, string> = {};
-        const byName: Record<string, string> = {};
-        await Promise.all(
-          profiles.map(async (profile) => {
-            const result = await baseQuery(`/api/BusinessProfiles/GetBusinessProfileById/${profile.profileId}`);
-            const detail = result.error ? null : unwrapObject<BusinessProfileDetail>(result.data);
-            const addresses = detail?.addresses ?? [];
-            const city = ((addresses.find((a) => a.isPrimary) ?? addresses[0])?.city ?? "").trim();
-            byId[profile.profileId] = city;
-            for (const name of [profile.legalName, profile.tradingName]) {
-              const key = name?.trim().toLowerCase();
-              if (key && city && !(key in byName)) byName[key] = city;
-            }
-          }),
-        );
-        return { data: { byId, byName } };
-      },
-      keepUnusedDataFor: 600,
+    getChildBusinessProfiles: builder.query<ChildBusiness[], number>({
+      query: (parentProfileId) => `/api/BusinessProfiles/GetAllChildBusinessProfiles/${parentProfileId}`,
+      transformResponse: unwrapArray<ChildBusiness>,
       providesTags: ["BusinessProfile"],
     }),
-    /** The businesses linked as children of a business (parent sees its children's contracts and data). */
-    getChildBusinessProfiles: builder.query<BusinessOwner[], number>({
-      query: (parentProfileId) => `/api/BusinessProfiles/GetAllChildBusinessProfiles/${parentProfileId}`,
-      transformResponse: unwrapArray<BusinessOwner>,
-      providesTags: (_result, _error, parentProfileId) => [{ type: "ChildBusiness", id: parentProfileId }],
-    }),
-    /** Links businesses as children of a parent. The API answers true / false. */
-    linkChildBusinessProfiles: builder.mutation<boolean, LinkChildBusinessRequest>({
+    linkChildBusinessProfiles: builder.mutation<boolean, LinkChildBusinessesPayload>({
       query: (body) => ({ url: "/api/BusinessProfiles/LinkChildBusinessProfiles", method: "POST", body }),
-      invalidatesTags: (_result, _error, { parentProfileId }) => [{ type: "ChildBusiness", id: parentProfileId }],
+      invalidatesTags: ["BusinessProfile"],
     }),
-    /** Removes one child from a parent. The API answers true / false. */
-    delinkChildBusinessProfile: builder.mutation<boolean, { parentProfileId: number; childProfileId: number }>({
+    delinkChildBusinessProfile: builder.mutation<boolean, DelinkChildBusinessPayload>({
       query: (body) => ({ url: "/api/BusinessProfiles/DelinkChildBusinessProfile", method: "POST", body }),
-      invalidatesTags: (_result, _error, { parentProfileId }) => [{ type: "ChildBusiness", id: parentProfileId }],
+      invalidatesTags: ["BusinessProfile"],
     }),
     getBusinessProfileById: builder.query<BusinessProfileDetail | null, string>({
       query: (profileId) => `/api/BusinessProfiles/GetBusinessProfileById/${profileId}`,
@@ -533,7 +530,6 @@ export const businessProfilesApi = createApi({
 
 export const {
   useGetBusinessProfileSummaryQuery,
-  useGetProfileCitiesQuery,
   useGetChildBusinessProfilesQuery,
   useLinkChildBusinessProfilesMutation,
   useDelinkChildBusinessProfileMutation,

@@ -33,9 +33,29 @@ import type { InvoiceContract } from "../../../../core/store/sellerInvoiceApi";
 import { useNotifyPrompt } from "../../../../shared/notifications/useNotifyPrompt";
 import "./SellerInvoice.scss";
 
+/** Where Update Truck Status sends the user: this screen, with the contract, truck and dispatch already filled in. */
+const UPDATE_TRUCK_STATUS_PATH = "/admin/truck-management/open-pending-contracts/update-truck-status";
+
 const SellerInvoice = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const dispatchParam = Number(searchParams.get("dispatch"));
+  const fromTruckStatus = Number.isInteger(dispatchParam) && dispatchParam > 0 && !!searchParams.get("contract") && !!searchParams.get("truck");
+
   const [invoiceDate, setInvoiceDate] = useState(formatTodayInput());
-  const [rows, setRows] = useState<SellerInvoiceRow[]>([createEmptySellerInvoiceRow()]);
+  const [rows, setRows] = useState<SellerInvoiceRow[]>(() => {
+    if (!fromTruckStatus) return [createEmptySellerInvoiceRow()];
+    // opened for one truck's dispatch: the contract and truck are filled in (the quantity starts as the truck's quantity)
+    const qty = searchParams.get("qty") ?? "";
+    return [{
+      ...createEmptySellerInvoiceRow(),
+      contractNumber: searchParams.get("contract") ?? "",
+      truckNumber: searchParams.get("truck") ?? "",
+      contractDispatchId: dispatchParam,
+      invoiceQty: qty,
+      totalMts: qty,
+    }];
+  });
   const [showErrors, setShowErrors] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -204,6 +224,7 @@ const SellerInvoice = () => {
       }
 
       setSaveToast(`${result.invoices.length} invoice${result.invoices.length === 1 ? "" : "s"} saved successfully.`);
+      const returnToContract = fromTruckStatus ? latest[0]?.contractNumber : "";
       resetForm();
       setNotices(result.notices ?? []);
       // The buyer is told about each invoice (the seller can be added in the dialog). One dialog per invoice, one after another; Skip or close moves on.

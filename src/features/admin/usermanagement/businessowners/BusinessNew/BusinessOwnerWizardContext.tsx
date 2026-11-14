@@ -36,6 +36,8 @@ export interface BusinessOwnerDraft {
   billingStateName: string;
   billingGoogleLocationUrl: string;
   primaryContactPerson: string;
+  /** Stored id of the primary contact (type "Primary"), when the profile already has one. */
+  primaryContactId?: number;
   contacts: ContactEntry[];
   addresses: AddressEntry[];
   bankAccounts: BankEntry[];

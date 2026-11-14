@@ -1,7 +1,5 @@
 import { lazy } from "react";
-import { Navigate, Route } from "react-router-dom";
-import { ADMIN_LOGIN } from "../../core/routes/adminPaths";
-import { isTauri } from "../../shared/notifications/desktopNotify";
+import { Route } from "react-router-dom";
 
 const Home = lazy(() => import("./home/Home"));
 const About = lazy(() => import("./about/About"));
@@ -21,8 +19,7 @@ const NotFound = lazy(() => import("./not-found/NotFound"));
  */
 export const websiteRoutes = (
   <>
-    {/* the installed desktop app (Tauri) opens at sign-in, not the public home page */}
-    <Route index element={isTauri() ? <Navigate to={ADMIN_LOGIN} replace /> : <Home />} />
+    <Route index element={<Home />} />
     <Route path="about" element={<About />} />
     <Route path="products" element={<Products />} />
     <Route path="products/:slug" element={<ProductDetail />} />

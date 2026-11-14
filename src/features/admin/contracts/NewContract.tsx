@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import { useProfileCities, withCity } from "../../../shared/hooks/useProfileCities";
+import { useEffect, useMemo, useRef, useState } from "react";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import type { ChangeEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -26,9 +25,11 @@ import {
 } from "./newContract.data";
 import "./NewContract.scss";
 import { usePermission } from "../../../core/auth/AuthContext";
-import NotifyModal from "../../../shared/notifications/NotifyModal";
 import NotifyChoicePicker from "../../../shared/notifications/NotifyChoicePicker";
 import type { NotifyChoices } from "../../../shared/notifications/notifyChoices";
+import { templateKey } from "../../../shared/notifications/notifyChoices";
+import { useGetContractNotificationPlanQuery } from "../../../core/store/notificationsApi";
+import type { ChannelCode, ContractDraft, ContractNotificationPlan } from "../../../core/store/notificationsApi";
 import { parseProductFeatures, useGetProductsQuery } from "../../../core/store/productsApi";
 import { getErrorMessage } from "../../../core/api/getErrorMessage";
 import LookupLoadError from "../../../shared/components/feedback/LookupLoadError";
@@ -467,22 +468,40 @@ const NewContract = () => {
   }, [contractDetails, navState]);
 
    const [saveContract, { isLoading: isSaving }] = useSaveContractMutation();
-  // After a contract is created the user chooses who to notify, on which channels and with which templates, before leaving the screen.
+  // The user chooses who to tell, on which channels and with which template for each party, while entering the contract (before Approval). The
+  // choices are kept with the contract: they are sent at once when it is saved Approved, or when it is approved later (Contract Status, Approve).
   const canNotify = usePermission("notifications.send");
   const notifyEventCode = navState?.isEdit ? "CONTRACT_UPDATED" : "CONTRACT_CREATED";
-  const [notifyContract, setNotifyContract] = useState<string | null>(null);
-  // Buyer and seller hear about a new contract once it is approved, so by default it notifies only when saved as Approved and
-  // not back-dated; an edit never notifies by default. Ticking or unticking the box overrides this.
+  // A new contract notifies by default (a Pending one when it is approved), unless it is back-dated; an edit never notifies by default.
+  // Ticking or unticking the box overrides this.
   const isPastDate = Boolean(contractDate) && contractDate < todayInputDate();
   const [notifyTouched, setNotifyTouched] = useState(false);
   const [notifyChoice, setNotifyChoice] = useState(false);
-  const notifyAfterSave = notifyTouched ? notifyChoice : !navState?.isEdit && status && !isPastDate;
+  const notifyAfterSave = notifyTouched ? notifyChoice : !navState?.isEdit && !isPastDate;
   const setNotifyAfterSave = (value: boolean) => {
     setNotifyTouched(true);
     setNotifyChoice(value);
   };
   const [pastDateConfirmOpen, setPastDateConfirmOpen] = useState(false);
   const [notifyChoices, setNotifyChoices] = useState<NotifyChoices | null>(null);
+  const NOTIFY_ROLES = [{ code: "BUYER", label: "Buyer" }, { code: "SELLER", label: "Seller" }];
+  // Editing a contract that already has choices stored with it: the form starts from them (and keeps them unless the user changes them).
+  const { data: storedPlan } = useGetContractNotificationPlanQuery(String(editContractNumber), { skip: !canNotify || !editContractNumber });
+  const planApplied = useRef(false);
+  useEffect(() => {
+    if (!storedPlan || storedPlan.items.length === 0 || planApplied.current) return;
+    planApplied.current = true;
+    const channels: Record<string, ChannelCode[]> = {};
+    const templates: Record<string, number | null> = {};
+    for (const item of storedPlan.items) {
+      channels[item.recipientRole] = [...(channels[item.recipientRole] ?? []), item.channelCode];
+      templates[templateKey(item.recipientRole, item.channelCode)] = item.templateId;
+    }
+    setNotifyChoices({ channels, templates });
+    setNotifyTouched(true);
+    setNotifyChoice(true);
+  }, [storedPlan]);
+  const { data: productCatalog } = useGetProductsQuery();
    const [updateContract, { isLoading: isUpdating }] =
   useUpdateContractMutation();
   const isSubmitting = isSaving || isUpdating;
@@ -762,6 +781,49 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
   const quantityMeasureLabel = quantityMeasureOptions.find(
     (option) => option.value === quantityMeasure,
   )?.label;
+
+  // The businesses the notification roles stand for, and the contract as entered so far (used for the preview, which needs no saved contract).
+  const notifyParties = {
+    SELLER: { profileId: Number(sellerId) || null, name: sellerLabel },
+    BUYER: { profileId: Number(buyerId) || null, name: buyerLabel },
+  };
+  const productHasQuality = parseProductFeatures((productCatalog ?? []).find((item) => String(item.id) === productId)?.productFeatures ?? null).nutritionalSpecifications?.some((spec) => spec.parameter?.trim()) ?? false;
+  const notifyDraft: ContractDraft = {
+    sellerId: Number(sellerId) || null,
+    buyerId: Number(buyerId) || null,
+    productId: Number(productId) || null,
+    quantityMT: Number(qty) || null,
+    ratePerMT: baseRate || null,
+    gstPercentage: gstPercent === "" ? null : Number(gstPercent),
+    paymentTerms: paymentTermsOptions.find((option) => option.value === paymentTerms)?.label || paymentTerms || null,
+    sellerPaymentDueDays: Number(sellerPaymentDueDays) || null,
+    buyerPaymentDueDays: Number(buyerPaymentDueDays) || null,
+    contractDate: contractDate || null,
+    contractNumber: String(editContractNumber || "") || null,
+    sellerHasQuality: productHasQuality,
+    buyerHasQuality: productHasQuality,
+  };
+
+  /**
+   * What is sent with the contract about notifying: the channels and one template per party. Undefined = leave what is stored as it is
+   * (an edit the user did not touch); no items = notifying was switched off, so a stored plan is removed.
+   */
+  const buildNotificationPlan = (): ContractNotificationPlan | undefined => {
+    if (!canNotify) return undefined;
+    if (!notifyTouched && navState?.isEdit) return undefined;
+    if (!notifyAfterSave) return notifyTouched ? { eventCode: notifyEventCode, items: [] } : undefined;
+    if (!notifyChoices) return undefined;
+    return {
+      eventCode: notifyEventCode,
+      items: NOTIFY_ROLES.flatMap((role) =>
+        (notifyChoices.channels[role.code] ?? []).map((channel) => ({
+          recipientRole: role.code,
+          channelCode: channel,
+          templateId: notifyChoices.templates[templateKey(role.code, channel)] ?? null,
+        })),
+      ),
+    };
+  };
 
   const requiredValues = useMemo(
     () => ({
@@ -1044,6 +1106,7 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
           balanceAdvanceDate: balanceAdvanceDate ? toApiDate(balanceAdvanceDate) : now,
           remarks: paymentRemarks || "",
         },
+        notificationPlan: buildNotificationPlan(),
       };
 
       const updatePayload = {
@@ -1058,11 +1121,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         "Contract updated successfully."
       );
 
-      // Offer to tell the buyer and seller about the change (Skip / close continues to the list).
-      if (canNotify && notifyAfterSave && currentContractNumber) {
-        setNotifyContract(String(currentContractNumber));
-        return;
-      }
     }
 
     /*
@@ -1227,21 +1285,17 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
 
           remarks: paymentRemarks || "",
         },
+
+        notificationPlan: buildNotificationPlan(),
       };
 
-      const created = await saveContract(createPayload).unwrap();
+      await saveContract(createPayload).unwrap();
 
       localStorage.setItem(
         "successMessage",
         "Contract created successfully."
       );
 
-      // The API returns the new contract number. Offer to notify the buyer and seller (Skip / close continues to the list).
-      const createdNumber = typeof created === "string" ? created.replace(/^"|"$/g, "") : "";
-      if (canNotify && notifyAfterSave && createdNumber) {
-        setNotifyContract(createdNumber);
-        return;
-      }
     }
 
     window.location.href = "/admin/contracts?show=all";
@@ -2208,7 +2262,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         </div>
       </section>
 
-      {/* Notifications come before the approval setting (UAT #29). */}
       {canNotify && (
         <section className="new-contract__section">
           <h2 className="new-contract__section-title">4. Notifications</h2>
@@ -2217,32 +2270,31 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
             <label className="form-check-label" htmlFor="notify-after-save">
               {navState?.isEdit
                 ? "Notify the buyer and seller about this change"
-                : "Notify the buyer and seller when the contract is created"}
+                : "Notify the buyer and seller about this contract"}
             </label>
-            {!navState?.isEdit && !notifyTouched && (!status || isPastDate) && (
-              <div className="form-text">
-                {isPastDate
-                  ? "The contract date is in the past, so no confirmation is sent unless you tick this."
-                  : "Saved as Pending: the buyer and seller are told when the contract is approved (Contract Status, Approve)."}
-              </div>
+            {!navState?.isEdit && !notifyTouched && isPastDate && (
+              <div className="form-text">The contract date is in the past, so no confirmation is sent unless you tick this.</div>
             )}
             <div className="form-text">
-              Choose the channels and the template for each below. After you click {navState?.isEdit ? "Update Contract" : "Create Contract"} you will see exactly who will receive what and can still change it before anything is sent.
+              Pick one template for the buyer and one for the seller on each channel; it is used for every contact listed. The messages are sent when the
+              contract is saved as Approved, or when it is approved later (Contract Status, Approve) - you will not be asked again.
             </div>
           </div>
           {notifyAfterSave && (
             <NotifyChoicePicker
               eventCode={notifyEventCode}
-              roles={[{ code: "BUYER", label: "Buyer" }, { code: "SELLER", label: "Seller" }]}
+              roles={NOTIFY_ROLES}
               value={notifyChoices}
               onChange={setNotifyChoices}
+              parties={notifyParties}
+              draft={notifyDraft}
             />
           )}
         </section>
       )}
 
       <section className="new-contract__section">
-        <h2 className="new-contract__section-title">{canNotify ? "5" : "4"}. Settings</h2>
+        <h2 className="new-contract__section-title">5. Approval</h2>
         <table className="new-contract__settings-table">
           <thead>
             <tr>
@@ -2305,17 +2357,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         onCancel={() => setPastDateConfirmOpen(false)}
       />
 
-      <NotifyModal
-        open={notifyContract !== null}
-        title={`Contract ${notifyContract ?? ""} ${navState?.isEdit ? "updated" : "created"} - notify buyer and seller`}
-        eventCode={notifyEventCode}
-        contractNumber={notifyContract ?? undefined}
-        sendLabel="Send notifications"
-        closeOnBackdrop={false}
-        choices={notifyChoices}
-        onSkip={() => undefined}
-        onClose={() => { window.location.href = "/admin/contracts?show=all"; }}
-      />
     </div>
   );
 };

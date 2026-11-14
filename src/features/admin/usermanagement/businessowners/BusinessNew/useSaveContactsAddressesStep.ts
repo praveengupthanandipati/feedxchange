@@ -34,7 +34,7 @@ export const useSaveContactsAddressesStep = (nextPath: string) => {
       const now = new Date().toISOString();
 
       await updateBusinessProfile({
-        ...buildBusinessProfilePayload(draft, currentUserId),
+        ...buildBusinessProfilePayload(draft, currentUserId, { includeContacts: true }),
         profileId,
         modifiedBy: currentUserId,
       }).unwrap();

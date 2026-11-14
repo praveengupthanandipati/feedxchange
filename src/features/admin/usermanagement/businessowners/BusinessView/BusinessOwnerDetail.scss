@@ -196,6 +196,12 @@
     white-space: nowrap;
   }
 
+  &__file-missing {
+    font-size: 0.8125rem;
+    font-style: italic;
+    opacity: 0.7;
+  }
+
   &__icon-link {
     @include m.flex-center;
     @include m.focus-ring(v.$color-orange);

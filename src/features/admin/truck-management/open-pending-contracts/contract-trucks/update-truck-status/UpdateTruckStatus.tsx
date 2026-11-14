@@ -44,6 +44,8 @@ function statusModifier(status: string): string {
 }
 
 interface UpdateTruckStatusRowProps {
+  /** The contract the trucks belong to (the seller invoice is opened for it). */
+  contractNumber: string;
   truck: ContractTruckDetail;
   statusOptions: { value: string; label: string }[];
   sellerId: number;
@@ -53,8 +55,7 @@ interface UpdateTruckStatusRowProps {
   contractNumber: string;
 }
 
-const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice, contractNumber }: UpdateTruckStatusRowProps) => {
-  const navigate = useNavigate();
+const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, buyerId, invoice }: UpdateTruckStatusRowProps) => {
   const [selectedStatusId, setSelectedStatusId] = useState(String(truck.dispatchStatusId));
   /**
    * Loaded is not set by hand here: picking it opens Create Seller Invoice with this contract and truck filled in,
@@ -78,6 +79,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
     setSelectedStatusId(value);
   };
   const [updateContractTruckStatus, { isLoading: saving }] = useUpdateContractTruckStatusMutation();
+  const navigate = useNavigate();
   const [uploadTruckInvoice, { isLoading: uploading }] = useUploadTruckInvoiceMutation();
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
@@ -116,6 +118,18 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
     setError("");
     setSaved(false);
     const currentUserId = Number(localStorage.getItem("userId")) || 0;
+
+    // A truck becomes Loaded when its seller invoice is saved: open Create Seller Invoice with the contract and truck filled in.
+    if (selectedIsLoaded) {
+      const query = new URLSearchParams({
+        contract: contractNumber,
+        truck: truck.truckNumber,
+        dispatch: String(truck.contractTruckId),
+        qty: String(truck.raw?.quantityMT ?? ""),
+      });
+      navigate(`/admin/payments/seller-invoice?${query.toString()}`);
+      return;
+    }
 
     try {
       const succeeded = await updateContractTruckStatus({
@@ -263,7 +277,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
               onClick={handleUpdate}
               disabled={!hasChanged || saving}
             >
-              <SaveIcon aria-hidden /> {saving ? "Updating…" : "Update"}
+              <SaveIcon aria-hidden /> {saving ? "Updating…" : selectedIsLoaded ? "Create Invoice" : "Update"}
             </button>
           )}
 
@@ -343,6 +357,7 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
       {trucks.map((truck) => (
         <UpdateTruckStatusRow
           key={truck.contractTruckId}
+          contractNumber={contractNumber}
           truck={truck}
           statusOptions={statusOptions}
           invoice={invoices?.find((item) => item.contractDispatchId === truck.contractTruckId)}

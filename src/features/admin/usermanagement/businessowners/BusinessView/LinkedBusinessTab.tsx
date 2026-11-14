@@ -4,84 +4,57 @@ import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import MultiSelect from "../../../../../shared/components/dropdown/MultiSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
-import Can from "../../../../../core/auth/Can";
-import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 import {
   useDelinkChildBusinessProfileMutation,
   useGetBusinessProfileSummaryQuery,
   useGetChildBusinessProfilesQuery,
   useLinkChildBusinessProfilesMutation,
-  type BusinessOwner,
 } from "../../../../../core/store/businessProfilesApi";
-import { useProfileCities } from "../../../../../shared/hooks/useProfileCities";
+import type { ChildBusiness } from "../../../../../core/store/businessProfilesApi";
+import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 interface LinkedBusinessTabProps {
   ownerId: string;
 }
 
-/** Sent as the relationship type when linking (the API takes a free text value). */
+/** The relationship type this screen links with; the server decides which types it accepts. */
 const CHILD_RELATIONSHIP = "Child";
 
-/**
- * The businesses linked as children of this one (the parent sees its children's contracts and data; a child does not
- * see the parent's). Children are listed from the API, added with LinkChildBusinessProfiles and removed with
- * DelinkChildBusinessProfile.
- */
+const nameOf = (row: { legalName?: string | null; tradingName?: string | null }) => row.legalName || row.tradingName || "—";
+
 const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
   const parentProfileId = Number(ownerId);
   const [selectedToAdd, setSelectedToAdd] = useState<string[]>([]);
-  const [pendingRemove, setPendingRemove] = useState<BusinessOwner | null>(null);
+  const [pendingRemove, setPendingRemove] = useState<ChildBusiness | null>(null);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const { label: partyLabel, cityOf } = useProfileCities();
 
-  const {
-    data: children = [],
-    isLoading,
-    isFetching,
-    isError: childrenFailed,
-    refetch,
-  } = useGetChildBusinessProfilesQuery(parentProfileId, { skip: !parentProfileId, refetchOnMountOrArgChange: true });
-  const { data: businesses, isError: businessesFailed } = useGetBusinessProfileSummaryQuery();
+  const { data: allBusinesses = [] } = useGetBusinessProfileSummaryQuery();
+  const { data: children = [], isFetching, refetch } = useGetChildBusinessProfilesQuery(parentProfileId, { skip: !Number.isFinite(parentProfileId) });
   const [linkChildren, { isLoading: linking }] = useLinkChildBusinessProfilesMutation();
   const [delinkChild, { isLoading: delinking }] = useDelinkChildBusinessProfileMutation();
 
-  // The success note goes away after a few seconds.
-  useEffect(() => {
-    if (!message) return;
-    const timer = window.setTimeout(() => setMessage(""), 4000);
-    return () => window.clearTimeout(timer);
-  }, [message]);
-
-  const childIds = useMemo(() => new Set(children.map((child) => child.profileId)), [children]);
-
-  const availableOptions = useMemo(
-    () =>
-      (businesses ?? [])
-        .filter((row) => row.profileId !== parentProfileId && !childIds.has(row.profileId) && row.status?.toLowerCase() === "active")
-        .map((row) => ({ value: String(row.profileId), label: partyLabel(row.legalName, row.profileId) })),
-    [businesses, parentProfileId, childIds, partyLabel],
-  );
+  // Everything the server would accept is offered; the server still enforces the rules (own child, one parent, a parent cannot become a child).
+  const availableOptions = useMemo(() => {
+    const linked = new Set(children.map((child) => child.profileId));
+    return allBusinesses
+      .filter((row) => row.profileId !== parentProfileId && !linked.has(row.profileId) && row.status !== "Deleted")
+      .map((row) => ({ value: String(row.profileId), label: nameOf(row) }));
+  }, [allBusinesses, children, parentProfileId]);
 
   const handleAddChildren = async () => {
     if (selectedToAdd.length === 0) return;
     setError("");
-    setMessage("");
     try {
-      const ok = await linkChildren({
+      await linkChildren({
         parentProfileId,
         relationShipType: CHILD_RELATIONSHIP,
         createdBy: Number(localStorage.getItem("userId")) || 0,
         createdOn: new Date().toISOString(),
         childProfileIds: selectedToAdd.map(Number),
       }).unwrap();
-      if (ok === false) {
-        setError("The businesses could not be linked. Please try again.");
-        return;
-      }
-      setMessage(`${selectedToAdd.length} business${selectedToAdd.length === 1 ? "" : "es"} linked as child${selectedToAdd.length === 1 ? "" : "ren"}.`);
       setSelectedToAdd([]);
     } catch (err) {
+      // the server's message says which rule blocked the link
       setError(getErrorMessage(err, "The businesses could not be linked. Please try again."));
     }
   };
@@ -91,38 +64,17 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
     setPendingRemove(null);
     if (!child) return;
     setError("");
-    setMessage("");
     try {
-      const ok = await delinkChild({ parentProfileId, childProfileId: child.profileId }).unwrap();
-      if (ok === false) {
-        setError(`${child.legalName} could not be removed. Please try again.`);
-        return;
-      }
-      setMessage(`${child.legalName} is no longer a child of this business.`);
+      await delinkChild({ parentProfileId, childProfileId: child.profileId }).unwrap();
     } catch (err) {
-      setError(getErrorMessage(err, `${child.legalName} could not be removed. Please try again.`));
+      setError(getErrorMessage(err, "The business could not be removed. Please try again."));
     }
   };
 
-  const columns: TableColumn<BusinessOwner>[] = [
-    {
-      key: "legalName",
-      header: "Company Name",
-      sortable: true,
-      render: (row) => partyLabel(row.legalName, row.profileId),
-      exportValue: (row) => row.legalName,
-    },
-    { key: "businessLineName", header: "Line of Business", sortable: true },
-    {
-      key: "businessTypeName",
-      header: "Business Type",
-      sortable: true,
-      // Same as the Business Owners list: the business type, else the unit type.
-      render: (row) => row.businessTypeName || row.businessUnitTypeName,
-      sortValue: (row) => row.businessTypeName || row.businessUnitTypeName || "",
-      exportValue: (row) => row.businessTypeName || row.businessUnitTypeName || "",
-    },
-    { key: "location", header: "City", sortable: true, render: (row) => cityOf(row.profileId), sortValue: (row) => cityOf(row.profileId) },
+  const columns: TableColumn<ChildBusiness>[] = [
+    { key: "legalName", header: "Company Name", sortable: true, render: (row) => nameOf(row) },
+    { key: "businessTypeName", header: "Business Type", sortable: true },
+    { key: "businessSubTypeName", header: "Sub Type", sortable: true },
     { key: "mobileNumber", header: "Mobile" },
     { key: "status", header: "Status", sortable: true },
     {
@@ -130,18 +82,16 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
       header: "Actions",
       align: "center",
       render: (row) => (
-        <Can any={["profiles.business.manage"]}>
-          <button
-            type="button"
-            className="business-owner-detail__icon-link business-owner-detail__icon-link--danger"
-            onClick={() => setPendingRemove(row)}
-            disabled={delinking}
-            aria-label={`Remove ${row.legalName} as a child business`}
-            title="Remove child business"
-          >
-            <Trash2Icon aria-hidden />
-          </button>
-        </Can>
+        <button
+          type="button"
+          className="business-owner-detail__icon-link business-owner-detail__icon-link--danger"
+          onClick={() => setPendingRemove(row)}
+          disabled={delinking}
+          aria-label={`Remove ${nameOf(row)} as a child business`}
+          title="Remove child business"
+        >
+          <Trash2Icon aria-hidden />
+        </button>
       ),
     },
   ];
@@ -152,10 +102,7 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
         <button
           type="button"
           className="business-owners-btn business-owners-btn--warning"
-          onClick={() => {
-            setError("");
-            void refetch();
-          }}
+          onClick={() => void refetch()}
           disabled={isFetching}
         >
           <RefreshCwIcon aria-hidden className={isFetching ? "business-owner-detail__spin" : ""} />
@@ -163,44 +110,43 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
         </button>
       </div>
 
-      <Can any={["profiles.business.manage"]}>
-        <section className="business-owner-detail__linked-card">
-          <h3>
-            <UsersIcon aria-hidden /> Add Child Businesses
-          </h3>
-          <span className="business-owner-detail__label">Select Child Businesses</span>
-          <div className="business-owner-detail__linked-controls">
-            <MultiSelect
-              options={availableOptions}
-              value={selectedToAdd}
-              onChange={setSelectedToAdd}
-              placeholder={businessesFailed ? "The businesses could not be loaded" : "Choose child businesses..."}
-              ariaLabel="Select Child Businesses"
-            />
-            <button
-              type="button"
-              className="business-owners-btn business-owners-btn--primary"
-              onClick={() => void handleAddChildren()}
-              disabled={selectedToAdd.length === 0 || linking}
-            >
-              <PlusIcon aria-hidden /> {linking ? "Adding..." : "Add Children"}
-            </button>
-          </div>
-          <p className="business-owner-detail__hint">
-            Select multiple businesses to make them children of this business. This business can see its children's
-            contracts and data; a child cannot see this business's.
-          </p>
-        </section>
-      </Can>
-
-      {error && (
-        <div className="alert alert-danger py-2 mb-0" role="alert">
-          {error}
+      <section className="business-owner-detail__linked-card">
+        <h3>
+          <UsersIcon aria-hidden /> Add Child Businesses
+        </h3>
+        <span className="business-owner-detail__label">Select Child Businesses</span>
+        <div className="business-owner-detail__linked-controls">
+          <MultiSelect
+            options={availableOptions}
+            value={selectedToAdd}
+            onChange={setSelectedToAdd}
+            placeholder="Choose child businesses..."
+            ariaLabel="Select Child Businesses"
+          />
+          <button
+            type="button"
+            className="business-owners-btn business-owners-btn--primary"
+            onClick={() => void handleAddChildren()}
+            disabled={selectedToAdd.length === 0 || linking}
+          >
+            <PlusIcon aria-hidden /> {linking ? "Adding..." : "Add Children"}
+          </button>
         </div>
-      )}
-      {message && (
-        <div className="alert alert-success py-2 mb-0" role="status">
-          {message}
+        <p className="business-owner-detail__hint">
+          Select multiple businesses to make them children of this business. A business cannot be its own child, a child
+          can have only one parent, and once a business has children it cannot become a child of another business. A
+          parent can see its children's contracts, invoices and payments; a child cannot see its parent's.
+        </p>
+        {error && (
+          <p className="business-owner-detail__hint" role="alert" style={{ color: "var(--fx-red-49-fg)" }}>
+            {error}
+          </p>
+        )}
+      </section>
+
+      {children.length === 0 ? (
+        <div className="business-owner-detail__notice">
+          No child businesses are linked to this profile yet.
         </div>
       )}
 
@@ -213,14 +159,14 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
       ) : (
         <section className="business-owner-detail__section">
           <h2 className="business-owner-detail__section-title">Linked Child Businesses</h2>
-          <Table columns={columns} data={children} rowKey={(row) => String(row.profileId)} emptyMessage="No linked businesses." />
+          <Table columns={columns} data={children} rowKey={(row) => String(row.profileRelationshipId)} emptyMessage="No linked businesses." />
         </section>
       )}
 
       <ConfirmDialog
         open={pendingRemove !== null}
         title="Remove this linked business?"
-        message={`${pendingRemove?.legalName ?? "This business"} will no longer be a child of this business.`}
+        message="This will remove the child relationship with this business. It can be linked again later."
         onConfirm={() => void confirmRemoveChild()}
         onCancel={() => setPendingRemove(null)}
       />

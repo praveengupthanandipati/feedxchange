@@ -59,6 +59,8 @@ export interface DocumentRow {
   fileName: string;
   /** Link to the uploaded file, or "" when there is none. */
   fileUrl: string;
+  /** False when the file is missing on the server: no download is offered. */
+  fileAvailable: boolean;
 }
 
 export interface BusinessOwnerProfile {
@@ -177,6 +179,7 @@ export function mapBusinessProfileDetail(profile: BusinessProfileDetail): Busine
       issueDate: document.issuedDate?.slice(0, 10) ?? "",
       fileName: document.fileName,
       fileUrl: fileUrl(document.filePath),
+      fileAvailable: document.fileAvailable !== false,
     })),
   };
 }
