@@ -177,7 +177,10 @@ const InvoiceBlock = ({
               className={`si-input${bad("truckNumber")}`}
               aria-label={`Truck # (invoice ${index})`}
               placeholder={assignedTrucks.length ? "Type or pick a truck" : "Truck #"}
-              list={assignedTrucks.length ? truckListId : undefined}
+              list={assignedTrucks.length && !dispatchFixed ? truckListId : undefined}
+              // Opened for one truck from Update Truck Status: that truck is fixed.
+              readOnly={dispatchFixed}
+              title={dispatchFixed ? "The truck chosen in Update Truck Status" : undefined}
               value={row.truckNumber}
               onChange={(event) => onChange(row.id, { truckNumber: event.target.value })}
             />

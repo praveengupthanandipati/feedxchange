@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { PlusIcon, RefreshCwIcon, Trash2Icon, UsersIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
@@ -148,14 +148,6 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
         <div className="business-owner-detail__notice">
           No child businesses are linked to this profile yet.
         </div>
-      )}
-
-      {isLoading ? (
-        <div className="business-owner-detail__notice">Loading linked businesses…</div>
-      ) : childrenFailed ? (
-        <div className="business-owner-detail__notice">The linked businesses could not be loaded. Please use Refresh Relationships to try again.</div>
-      ) : children.length === 0 ? (
-        <div className="business-owner-detail__notice">No child businesses are linked to this profile yet.</div>
       ) : (
         <section className="business-owner-detail__section">
           <h2 className="business-owner-detail__section-title">Linked Child Businesses</h2>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useProfileCities, withCity } from "../../../shared/hooks/useProfileCities";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import type { ChangeEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -1582,7 +1583,7 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     <div className="new-contract">
       <div className="new-contract__topbar">
         <div className="new-contract__topbar-left">
-          <h1>New Contract</h1>
+          <h1>{navState?.isEdit ? "Update Contract" : "New Contract"}</h1>
           <button
             type="button"
             className="new-contract__summary-toggle"

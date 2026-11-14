@@ -226,7 +226,7 @@ const TruckNewTrip = () => {
   return (
     <div className="new-contract">
       <div className="new-contract__topbar">
-        <h1>{isEditMode ? "Edit Truck Trip" : "New Truck Trip"}</h1>
+        <h1>{isEditMode ? "Update Truck Trip" : "New Truck Trip"}</h1>
         <Link to="/admin/truck-management/transporters/truck-trips" className="new-contract__back">
           <ArrowLeftIcon aria-hidden /> Truck Trips List
         </Link>

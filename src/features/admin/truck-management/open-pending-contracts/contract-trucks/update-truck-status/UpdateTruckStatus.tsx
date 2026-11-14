@@ -52,7 +52,6 @@ interface UpdateTruckStatusRowProps {
   buyerId: number;
   /** The invoice already stored for this truck, if any. */
   invoice?: TruckInvoice;
-  contractNumber: string;
 }
 
 const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, buyerId, invoice }: UpdateTruckStatusRowProps) => {
@@ -71,9 +70,14 @@ const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, 
         setError("A truck becomes Loaded when its seller invoice is saved. Please ask someone with Seller Invoice access to enter it.");
         return;
       }
-      navigate(
-        `/admin/payments/seller-invoice?contract=${encodeURIComponent(contractNumber)}&truck=${encodeURIComponent(truck.truckNumber)}&dispatch=${truck.contractTruckId}`,
-      );
+      // Contract, truck, dispatch and the truck's quantity are filled in on the invoice.
+      const query = new URLSearchParams({
+        contract: contractNumber,
+        truck: truck.truckNumber,
+        dispatch: String(truck.contractTruckId),
+        qty: String(truck.raw?.quantityMT ?? ""),
+      });
+      navigate(`/admin/payments/seller-invoice?${query.toString()}`);
       return;
     }
     setSelectedStatusId(value);
@@ -119,18 +123,7 @@ const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, 
     setSaved(false);
     const currentUserId = Number(localStorage.getItem("userId")) || 0;
 
-    // A truck becomes Loaded when its seller invoice is saved: open Create Seller Invoice with the contract and truck filled in.
-    if (selectedIsLoaded) {
-      const query = new URLSearchParams({
-        contract: contractNumber,
-        truck: truck.truckNumber,
-        dispatch: String(truck.contractTruckId),
-        qty: String(truck.raw?.quantityMT ?? ""),
-      });
-      navigate(`/admin/payments/seller-invoice?${query.toString()}`);
-      return;
-    }
-
+    // (Loaded never reaches here: picking it opens Create Seller Invoice, see handleStatusPick.)
     try {
       const succeeded = await updateContractTruckStatus({
         contractDispatchId: truck.contractTruckId,
@@ -361,7 +354,6 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
           truck={truck}
           statusOptions={statusOptions}
           invoice={invoices?.find((item) => item.contractDispatchId === truck.contractTruckId)}
-          contractNumber={contractNumber}
           sellerId={contract?.sellerId ?? 0}
           buyerId={contract?.buyerId ?? 0}
         />

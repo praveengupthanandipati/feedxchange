@@ -300,7 +300,7 @@ const ProductNew = () => {
   return (
     <div className="product-new">
       <div className="product-new__topbar">
-        <h1>{isEditing ? "Edit Product" : "New Product"}</h1>
+        <h1>{isEditing ? "Update Product" : "New Product"}</h1>
         <Link to="/admin/products" className="product-new__back">
           <ArrowLeftIcon aria-hidden /> Products List
         </Link>

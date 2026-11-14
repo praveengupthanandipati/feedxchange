@@ -58,6 +58,9 @@ export const nextSellerInvoiceRowId = () => `sinv-row-${Date.now()}-${rowSeq++}`
 let deductionSeq = 0;
 export const nextDeductionId = () => `sinv-ded-${Date.now()}-${deductionSeq++}`;
 
+/** Truck numbers compared without spaces, dashes or case ("AP 39 TB-1234" = "ap39tb1234"). */
+export const normalizeTruckNumber = (value: string | null | undefined) => (value ?? "").replace(/[\s-]/g, "").toUpperCase();
+
 export function createEmptySellerInvoiceRow(): SellerInvoiceRow {
   return {
     id: nextSellerInvoiceRowId(),

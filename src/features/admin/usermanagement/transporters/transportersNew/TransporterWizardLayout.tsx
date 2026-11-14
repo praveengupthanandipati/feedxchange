@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { usePermission } from "../../../../../core/auth/AuthContext";
 import WizardLayout from "../../../../../shared/components/wizard/WizardLayout";
 import { isShownProfileStep } from "../../profileSettingsVisibility";
@@ -16,13 +18,17 @@ const STEPS = [
 const PREFERENCES_STEP = { path: "/admin/transporters/notification-preferences", label: "Notification Preferences" };
 
 const TransporterWizardLayoutInner = () => {
+  // Opened for an existing profile (Edit: ?id=...) the heading says Update. Read once: the layout stays while the
+  // steps change, and the later steps do not carry the id.
+  const [searchParams] = useSearchParams();
+  const [isEditing] = useState(() => Boolean(searchParams.get("id")));
   const { profileId } = useTransporterWizard();
   // Same permission as the view screens' Notifications tab.
   const canSeeNotifications = usePermission("notification-preferences.view");
 
   return (
     <WizardLayout
-      title="New Transporter"
+      title={isEditing ? "Update Transporter" : "New Transporter"}
       backTo="/admin/transporters"
       backLabel="Transporters"
       steps={canSeeNotifications ? [...STEPS, PREFERENCES_STEP] : STEPS}

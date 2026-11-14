@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import { ArrowLeftIcon, CheckIcon, CircleCheckBigIcon, PlusIcon, XIcon } from "../../../../shared/components/icon";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
@@ -12,7 +12,6 @@ import {
   createEmptySellerInvoiceRow,
   formatTodayInput,
   hasErrors,
-  linkedDispatchId,
   money,
   problemMessages,
   toRowInput,
@@ -139,34 +138,28 @@ const SellerInvoice = () => {
     return updated;
   };
 
-  // Opened from Update Truck Status (a truck set to Loaded): ?contract=<number>&truck=<truck number>&dispatch=<id>
-  // fills the first invoice with that contract and truck, and links it to that exact dispatch so saving the invoice
-  // loads that trip (no trip to pick). Opened from Pending Contracts: only ?contract=<number>.
-  const [searchParams] = useSearchParams();
-  const fromTruckStatus = searchParams.get("truck") ? searchParams.get("contract")?.trim() ?? "" : "";
-  const prefillDone = useRef(false);
+  // "Select contract" at the top: the picked contract (shown in the overview) goes into the first invoice without a
+  // contract, or a new invoice when every invoice already has one; the page then scrolls to that invoice.
+  const [pickedContract, setPickedContract] = useState(() => searchParams.get("contract")?.trim() ?? "");
+
+  // Opened with a contract: from Update Truck Status (contract, truck and dispatch: the first invoice is already filled
+  // in above, for that truck's dispatch) or from Pending Contracts (?contract only). The contract is looked up once so
+  // the rate and GST are there to calculate the invoice.
+  const prefilled = useRef(false);
   useEffect(() => {
-    if (prefillDone.current) return;
-    prefillDone.current = true;
+    if (prefilled.current) return;
+    prefilled.current = true;
     const contractNumber = searchParams.get("contract")?.trim() ?? "";
-    const truckNumber = searchParams.get("truck")?.trim() ?? "";
-    const dispatchId = Number(searchParams.get("dispatch"));
     if (!contractNumber) return;
-    const first: SellerInvoiceRow = {
-      ...createEmptySellerInvoiceRow(),
-      contractNumber,
-      truckNumber,
-      linkedDispatch: truckNumber && dispatchId > 0 ? { id: dispatchId, contractNumber, truckNumber } : null,
-    };
+    if (fromTruckStatus) {
+      void resolveContract(rows[0]);
+      return;
+    }
+    const first: SellerInvoiceRow = { ...createEmptySellerInvoiceRow(), contractNumber };
     setRows([first]);
-    setPickedContract(contractNumber);
     void resolveContract(first);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // "Select contract" at the top: the picked contract (shown in the overview) goes into the first invoice without a
-  // contract, or a new invoice when every invoice already has one; the page then scrolls to that invoice.
-  const [pickedContract, setPickedContract] = useState("");
   const [overviewDetails, setOverviewDetails] = useState<string | null>(null);
   const handleContractPick = (contract: InvoiceContract) => {
     setPickedContract(contract.contractNumber);
@@ -209,7 +202,7 @@ const SellerInvoice = () => {
           return {
             ...toRowInput(row),
             // The trip chosen in the dialog, else the dispatch this invoice was opened for from Update Truck Status.
-            contractDispatchId: choice?.contractDispatchId ?? linkedDispatchId(row),
+            contractDispatchId: choice?.contractDispatchId ?? row.contractDispatchId ?? null,
             createNewTrip: choice?.createNewTrip ?? false,
             tripSetup: choice?.tripSetup ?? null,
             tripSetupAccepted: choice?.accepted ?? false,
@@ -231,8 +224,13 @@ const SellerInvoice = () => {
       // An invoice opened from Update Truck Status loads that truck, so its "truck loaded" message is offered too
       // (it used to be offered when Loaded was picked there).
       const loadedTrucks = latest
-        .map((row) => ({ dispatchId: linkedDispatchId(row), row }))
+        .map((row) => ({ dispatchId: row.contractDispatchId, row }))
         .filter((item): item is { dispatchId: number; row: SellerInvoiceRow } => item.dispatchId !== null);
+      // Opened from Update Truck Status: once the notify prompts are answered (or skipped), back to the contract's
+      // trucks, where this truck now shows Loaded. (Leaving straight away would close the prompts.)
+      const backToTrucks = () => {
+        if (returnToContract) navigate(`${UPDATE_TRUCK_STATUS_PATH}?contract=${encodeURIComponent(returnToContract)}`);
+      };
       notify.ask([
         ...result.invoices.map((invoice) => ({
           eventCode: "INVOICE_CREATED",
@@ -248,7 +246,7 @@ const SellerInvoice = () => {
           sourceEntityId: dispatchId,
           contractNumber: row.contractNumber,
         })),
-      ]);
+      ], backToTrucks);
     } catch (error) {
       setServerError(apiErrorMessage(error, "The invoices could not be saved."));
     }
@@ -273,7 +271,7 @@ const SellerInvoice = () => {
 
       {fromTruckStatus && (
         <Link
-          to={`/admin/truck-management/open-pending-contracts/update-truck-status?contract=${encodeURIComponent(fromTruckStatus)}`}
+          to={`${UPDATE_TRUCK_STATUS_PATH}?contract=${encodeURIComponent(searchParams.get("contract") ?? "")}`}
           className="si-back-link"
         >
           <ArrowLeftIcon aria-hidden /> Back to Update Truck Status
