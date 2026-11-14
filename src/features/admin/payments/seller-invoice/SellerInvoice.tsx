@@ -27,6 +27,7 @@ import {
   type TripSelection,
 } from "../../../../core/store/sellerInvoiceApi";
 import TripSelectionDialog from "./TripSelectionDialog";
+import { useGetContractTruckDispatchStatusesQuery, useUpdateContractTruckStatusMutation } from "../../../../core/store/contractTrucksApi";
 import { financialYearOf as fyOf, financialYearOptionsUpTo } from "../../contracts/contract-status/contractStatus.data";
 import type { InvoiceContract } from "../../../../core/store/sellerInvoiceApi";
 import { useNotifyPrompt } from "../../../../shared/notifications/useNotifyPrompt";
@@ -68,6 +69,11 @@ const SellerInvoice = () => {
 
   const [lookupContract] = useLazyGetInvoiceContractDetailsQuery();
   const [saveInvoices, { isLoading: saving }] = useSaveInvoicesMutation();
+  // Opened for one truck's dispatch: after the invoice is saved, that dispatch is set to Loaded (in case the server
+  // did not already do it while saving the invoice).
+  const { data: dispatchStatuses } = useGetContractTruckDispatchStatusesQuery(undefined, { skip: !fromTruckStatus });
+  const [updateTruckStatus] = useUpdateContractTruckStatusMutation();
+  const loadedStatusId = dispatchStatuses?.find((s) => [s.statusName, s.displayName].some((n) => n?.trim().toLowerCase() === "loaded"))?.dispatchStatusId;
   const notify = useNotifyPrompt();
 
   // The financial year is picked from a dropdown and the invoice date stays inside it (the server works the year out
@@ -218,6 +224,20 @@ const SellerInvoice = () => {
 
       setSaveToast(`${result.invoices.length} invoice${result.invoices.length === 1 ? "" : "s"} saved successfully.`);
       const returnToContract = fromTruckStatus ? latest[0]?.contractNumber : "";
+      // The truck this invoice was opened for is now loaded: make sure its dispatch shows Loaded. An error here (e.g. the
+      // server already set it while saving the invoice) changes nothing for the user.
+      if (loadedStatusId) {
+        const modifiedBy = Number(localStorage.getItem("userId")) || 0;
+        await Promise.all(
+          latest
+            .filter((row) => row.contractDispatchId !== null)
+            .map((row) =>
+              updateTruckStatus({ contractDispatchId: row.contractDispatchId!, dispatchStatusId: loadedStatusId, modifiedBy })
+                .unwrap()
+                .catch(() => undefined),
+            ),
+        );
+      }
       resetForm();
       setNotices(result.notices ?? []);
       // The buyer is told about each invoice (the seller can be added in the dialog). One dialog per invoice, one after another; Skip or close moves on.
