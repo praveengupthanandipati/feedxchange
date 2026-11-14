@@ -1,6 +1,7 @@
 import type { ContractFullConditions, ContractFullDetails, ContractFullParty } from "../../../../core/store/contractsApi";
 import logoUrl from "../../../../shared/assets/img/logo.png";
 import { date, dateTime, humanize, num, percent, qty, travelTime } from "./format";
+import { withCity } from "../../../../shared/hooks/useProfileCities";
 
 /**
  * Builds the complete contract summary report as a PDF and downloads it. Runs entirely in the browser from the details already
@@ -82,7 +83,7 @@ export async function downloadContractPdf(data: ContractFullDetails): Promise<vo
   doc.text(clean(`Contract ${number}`), margin, 38);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text(clean(`${data.seller.legalName ?? "Seller"}  ->  ${data.buyer.legalName ?? "Buyer"}`), margin, 56);
+  doc.text(clean(`${withCity(data.seller.legalName ?? "Seller", data.seller.contractAddress?.city)}  ->  ${withCity(data.buyer.legalName ?? "Buyer", data.buyer.contractAddress?.city)}`), margin, 56);
   doc.text(clean(`Status: ${o.status ?? "-"}   |   ${o.productName ?? ""}`), margin, 69);
   doc.setFontSize(9);
   doc.text(`Summary report - generated ${clean(dateTime(new Date().toISOString()))}`, pageWidth - margin, 69, { align: "right" });
@@ -217,8 +218,6 @@ export async function downloadContractPdf(data: ContractFullDetails): Promise<vo
     ["Status", o.status],
     ["Contract Date", d(o.contractDate)],
     ["Approval Required", o.approvalRequired ? "Yes" : "No"],
-    ["Effective From", d(o.effectiveFrom)],
-    ["Effective To", d(o.effectiveTo)],
     ["Product", o.productName],
     ["SKU", o.productSku],
     ["Total Quantity", qty(o.totalQuantityMT)],

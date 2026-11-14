@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useProfileCities } from "../../../../shared/hooks/useProfileCities";
 import { TruckIcon } from "../../../../shared/components/icon";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import InfoTooltip from "../../../../shared/components/tooltip/InfoTooltip";
@@ -10,6 +11,12 @@ const TruncatedName = ({ value }: { value: string }) => (
     <InfoTooltip text={value} />
   </span>
 );
+
+/** A seller / buyer cell: "Name, City". */
+const PartyCell = ({ name }: { name: string }) => {
+  const { label } = useProfileCities();
+  return <TruncatedName value={label(name)} />;
+};
 
 interface ColumnHandlers {
   onOpenTruckDetails: (row: PendingContractRow) => void;
@@ -69,14 +76,14 @@ export function buildPendingContractColumns({
     key: "seller",
     header: "Seller",
     sortable: true,
-    render: (row) => <TruncatedName value={row.seller} />,
+    render: (row) => <PartyCell name={row.seller} />,
     exportValue: (row) => row.seller,
   },
   {
     key: "buyer",
     header: "Buyer",
     sortable: true,
-    render: (row) => <TruncatedName value={row.buyer} />,
+    render: (row) => <PartyCell name={row.buyer} />,
     exportValue: (row) => row.buyer,
   },
   {

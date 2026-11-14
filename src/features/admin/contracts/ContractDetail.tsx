@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { withCity } from "../../../shared/hooks/useProfileCities";
 // Bootstrap's dropdown behaviour (data-bs-toggle="dropdown") for the Share information menu; only this screen needs it
 import "bootstrap/js/dist/dropdown";
 import { Link, useParams } from "react-router-dom";
@@ -100,6 +101,15 @@ const ContractDetail = () => {
   const o = data.overview;
   const s = data.summary;
   const sym = o.currencySymbol;
+  // Contract value follows the GST choice: "Including GST" shows the net rate (with GST), "Excluding GST" the contract rate.
+  const includesGst = /includ/i.test(o.gstDetails ?? "");
+  // The rate with GST: the API's net rate, else worked out from the rate and its GST (per MT amount, else the %), so an
+  // "incl. GST" label never shows the amount before GST.
+  const rateWithGst =
+    o.netRatePerMT ||
+    o.pricePerMT + (o.gstAmountPerMT || (o.pricePerMT * (o.gstPercentage ?? 0)) / 100);
+  const shownRate = includesGst ? rateWithGst : o.pricePerMT;
+  const shownValue = includesGst ? Math.round(s.totalQuantityMT * rateWithGst * 100) / 100 : s.contractValue;
   const number = o.contractNumber || contractNo;
 
   return (
@@ -115,10 +125,10 @@ const ContractDetail = () => {
             {isFetching && <span className="cd-muted">Refreshing…</span>}
           </div>
           <p className="cd-hero__parties">
-            <strong>{text(data.seller.legalName)}</strong> <span aria-hidden>→</span> <strong>{text(data.buyer.legalName)}</strong>
+            <strong>{withCity(text(data.seller.legalName), data.seller.contractAddress?.city)}</strong> <span aria-hidden>→</span> <strong>{withCity(text(data.buyer.legalName), data.buyer.contractAddress?.city)}</strong>
           </p>
           <p className="cd-hero__meta">
-            {text(o.productName)} · {qty(o.totalQuantityMT)} @ {money(o.pricePerMT, sym)}/MT · {date(o.effectiveFrom)} to {date(o.effectiveTo)}
+            {text(o.productName)} · {qty(o.totalQuantityMT)} @ {money(shownRate, sym)}/MT{o.gstDetails ? ` (${includesGst ? "incl." : "excl."} GST)` : ""} · {date(o.contractDate)}
             {o.approxTravelDays != null || o.approxTravelHours != null ? ` · Travel ~${travelTime(o.approxTravelDays, o.approxTravelHours)}` : ""}
           </p>
         </div>
@@ -180,7 +190,11 @@ const ContractDetail = () => {
 
       {/* ---------- at-a-glance ---------- */}
       <div className="cd-kpis">
-        <Kpi label="Contract Value" value={money(s.contractValue, sym)} hint={`${qty(s.totalQuantityMT)} × ${money(o.pricePerMT, sym)}`} />
+        <Kpi
+          label={o.gstDetails ? `Contract Value (${includesGst ? "incl." : "excl."} GST)` : "Contract Value"}
+          value={money(shownValue, sym)}
+          hint={`${qty(s.totalQuantityMT)} × ${money(shownRate, sym)}`}
+        />
         <Kpi label="Invoiced (incl. GST)" value={money(s.invoiceTotal, sym)} hint={`${s.invoiceCount} invoice${s.invoiceCount === 1 ? "" : "s"}`} />
         <Kpi label="Paid / Adjusted" value={money(s.paidAgainstInvoices, sym)} tone="success" hint={`Receipts ${money(s.receiptsTotal, sym)}`} />
         <Kpi
@@ -193,9 +207,9 @@ const ContractDetail = () => {
 
       <div className="cd-card cd-progress-card">
         <div className="cd-progress-grid">
+          {/* Order per UAT: Invoiced, Arranged, Pending. "Invoiced" is the quantity dispatched on seller invoices. */}
+          <Progress label="Invoiced" value={s.dispatchedQuantityMT} total={s.totalQuantityMT} valueLabel={`${qty(s.dispatchedQuantityMT)} of ${qty(s.totalQuantityMT)}`} />
           <Progress label="Arranged" value={s.arrangedQuantityMT} total={s.totalQuantityMT} valueLabel={`${qty(s.arrangedQuantityMT)} of ${qty(s.totalQuantityMT)}`} />
-          <Progress label="Dispatched" value={s.dispatchedQuantityMT} total={s.totalQuantityMT} valueLabel={`${qty(s.dispatchedQuantityMT)} of ${qty(s.totalQuantityMT)}`} />
-          <Progress label="Received" value={s.receivedQuantityMT} total={s.totalQuantityMT} valueLabel={`${qty(s.receivedQuantityMT)} of ${qty(s.totalQuantityMT)}`} />
           <Progress label="Pending" value={s.pendingQuantityMT} total={s.totalQuantityMT} valueLabel={`${qty(s.pendingQuantityMT)} of ${qty(s.totalQuantityMT)}`} />
         </div>
       </div>

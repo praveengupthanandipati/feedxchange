@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useProfileCities, withCity } from "../../../../shared/hooks/useProfileCities";
+import PartyName from "../../../../shared/components/party/PartyName";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -120,8 +122,8 @@ const GetContractsDrawer = ({
         exportValue: (row) => formatDisplayDate(row.contractDate),
       },
       { key: "contractNumber", header: "Contract #", sortable: true },
-      { key: "buyerName", header: "Buyer", sortable: true },
-      { key: "sellerName", header: "Seller", sortable: true },
+      { key: "buyerName", header: "Buyer", sortable: true, render: (row) => <PartyName name={row.buyerName} /> },
+      { key: "sellerName", header: "Seller", sortable: true, render: (row) => <PartyName name={row.sellerName} /> },
       { key: "productName", header: "Product", sortable: true },
       {
         key: "quantity",
@@ -259,8 +261,11 @@ const ContractchangeStatus = () => {
     try {
       const details = await loadContractDetails(row.contractNumber, true).unwrap();
       if (datesFor.current !== row.contractNumber || closeDateEdited.current) return;
+      // Effective To is no longer entered on the contract form (it is saved as the contract date), so it is used
+      // only when it is a real end date later than Effective From – i.e. on older contracts.
       const effectiveTo = details?.effectiveTo?.slice(0, 10);
-      if (effectiveTo && !effectiveTo.startsWith("0001")) setContractCloseDate(effectiveTo);
+      const effectiveFrom = details?.effectiveFrom?.slice(0, 10) ?? "";
+      if (effectiveTo && !effectiveTo.startsWith("0001") && effectiveTo > effectiveFrom) setContractCloseDate(effectiveTo);
     } catch {
       // keep today
     }
@@ -278,13 +283,14 @@ const ContractchangeStatus = () => {
   const [drawerRows, setDrawerRows] = useState<ContractStatusRow[] | null>(null);
 
   const { data: businessProfiles } = useGetBusinessProfileSummaryQuery();
+  const { cityOf } = useProfileCities();
   const businessProfileOptions = useMemo(
     () =>
       (businessProfiles ?? []).map((profile) => ({
         value: String(profile.profileId),
-        label: profile.legalName,
+        label: withCity(profile.legalName, cityOf(profile.profileId)),
       })),
-    [businessProfiles],
+    [businessProfiles, cityOf],
   );
 
   const { data: contractStatusOptions } = useGetAllContractStatusesQuery();
@@ -398,8 +404,9 @@ const ContractchangeStatus = () => {
 
   const handleGetContracts = async () => {
     try {
-      const sellerLabel = businessProfileOptions.find((option) => option.value === drawerSeller)?.label;
-      const buyerLabel = businessProfileOptions.find((option) => option.value === drawerBuyer)?.label;
+      // Rows carry the plain legal name (the dropdown labels add the city), so match on the profile's name.
+      const sellerLabel = (businessProfiles ?? []).find((p) => String(p.profileId) === drawerSeller)?.legalName;
+      const buyerLabel = (businessProfiles ?? []).find((p) => String(p.profileId) === drawerBuyer)?.legalName;
       setDrawerRows(
         contractRows.filter(
           (row) =>
@@ -572,8 +579,8 @@ const ContractchangeStatus = () => {
               <div className="new-contract__grid">
                 <DetailField label="Contract Number" value={record.contractNumber} />
                 <DetailField label="Contract Date" value={formatDisplayDate(record.contractDate)} />
-                <DetailField label="Seller" value={record.sellerName} />
-                <DetailField label="Buyer" value={record.buyerName} />
+                <DetailField label="Seller" value={<PartyName name={record.sellerName} fallback="—" />} />
+                <DetailField label="Buyer" value={<PartyName name={record.buyerName} fallback="—" />} />
 
                 <DetailField label="Product Name" value={record.productName} />
                 <DetailField label="Delivery Type" value={basicDetails?.deliveryType} />

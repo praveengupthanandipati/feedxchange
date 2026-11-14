@@ -5,6 +5,7 @@ import type {
 } from "../../../../core/store/contractsApi";
 import { date, dateTime, humanize, money, num, percent, qty, text, travelTime } from "./format";
 import { Card, Empty, Field, FieldGrid, Pill, StatusPill, TableWrap } from "./ui";
+import { withCity } from "../../../../shared/hooks/useProfileCities";
 
 /** One panel per tab of the contract detail page. Each takes the whole details object and reads what it needs. */
 
@@ -52,8 +53,6 @@ export const OverviewTab = ({ d }: Props) => {
         <FieldGrid>
           <Field label="Delivery Type" value={text(o.deliveryType)} />
           <Field label="Approx. Travel Time" value={travelTime(o.approxTravelDays, o.approxTravelHours)} />
-          <Field label="Effective From" value={date(o.effectiveFrom)} />
-          <Field label="Effective To" value={date(o.effectiveTo)} />
           <Field label="Contract Date" value={date(o.contractDate)} />
           <Field label="Approval Required" value={o.approvalRequired ? "Yes" : "No"} />
           <Field label="Loading Address (Seller)" value={text(d.seller.contractAddress?.fullAddress)} wide />
@@ -101,7 +100,7 @@ const PartyCard = ({ role, p, addressLabel }: { role: string; p: ContractFullPar
   <Card
     title={
       <>
-        {role}: {text(p.legalName)}
+        {role}: {withCity(text(p.legalName), p.contractAddress?.city)}
       </>
     }
     action={p.status ? <StatusPill status={p.status} /> : undefined}
@@ -228,10 +227,10 @@ const SpecTable = ({ c }: { c: ContractFullConditions }) =>
 
 export const QualityTab = ({ d }: Props) => (
   <div className="cd-two">
-    <Card title={`Seller Quality Specifications · ${text(d.seller.legalName)}`}>
+    <Card title={`Seller Quality Specifications · ${withCity(text(d.seller.legalName), d.seller.contractAddress?.city)}`}>
       <SpecTable c={d.sellerConditions} />
     </Card>
-    <Card title={`Buyer Quality Specifications · ${text(d.buyer.legalName)}`}>
+    <Card title={`Buyer Quality Specifications · ${withCity(text(d.buyer.legalName), d.buyer.contractAddress?.city)}`}>
       <SpecTable c={d.buyerConditions} />
     </Card>
   </div>

@@ -42,6 +42,23 @@ export interface SellerInvoiceRow {
   driverMobile: string;
   licenseNumber: string;
   licenseExpiry: string;
+  /**
+   * Opened from Update Truck Status: the exact truck dispatch (trip) this invoice is for, with the contract and truck it
+   * was for. Sent with the invoice only while the contract and truck number are still those.
+   */
+  linkedDispatch?: { id: number; contractNumber: string; truckNumber: string } | null;
+}
+
+/** Truck numbers compared without spaces, dashes or case ("AP 39 TB-1234" = "ap39tb1234"). */
+export const normalizeTruckNumber = (value: string | null | undefined) => (value ?? "").replace(/[\s-]/g, "").toUpperCase();
+
+/** The dispatch linked from Update Truck Status, if the invoice is still for that contract and truck. */
+export function linkedDispatchId(row: SellerInvoiceRow): number | null {
+  const link = row.linkedDispatch;
+  if (!link) return null;
+  const sameContract = row.contractNumber.trim().toLowerCase() === link.contractNumber.trim().toLowerCase();
+  const sameTruck = normalizeTruckNumber(row.truckNumber) === normalizeTruckNumber(link.truckNumber);
+  return sameContract && sameTruck ? link.id : null;
 }
 
 /** The truck / driver details typed on a row, used to pre-fill the trip dialog. */

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useProfileCities, withCity } from "../../../shared/hooks/useProfileCities";
 import { Link } from "react-router-dom";
 import {
   BellIcon,
@@ -65,11 +66,12 @@ const NotificationHistoryPanel = () => {
   const { data: contracts = [], isError: contractsFailed } = useGetHistoryContractsQuery({ sellerId: sellerNum, buyerId: buyerNum });
   const lookupFailed = sellersFailed || buyersFailed || contractsFailed;
 
-  const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: p.name })), [sellers]);
-  const buyerOptions = useMemo(() => buyers.map((p) => ({ value: String(p.id), label: p.name })), [buyers]);
+  const { cityOf, label: partyLabel } = useProfileCities();
+  const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) })), [sellers, cityOf]);
+  const buyerOptions = useMemo(() => buyers.map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) })), [buyers, cityOf]);
   const contractOptions = useMemo(
-    () => contracts.map((c) => ({ value: String(c.contractId), label: `${c.contractNumber}${c.productName ? ` · ${c.productName}` : ""}${!sellerNum && !buyerNum && c.sellerName ? ` · ${c.sellerName} → ${c.buyerName ?? ""}` : ""}` })),
-    [contracts, sellerNum, buyerNum],
+    () => contracts.map((c) => ({ value: String(c.contractId), label: `${c.contractNumber}${c.productName ? ` · ${c.productName}` : ""}${!sellerNum && !buyerNum && c.sellerName ? ` · ${partyLabel(c.sellerName)} → ${partyLabel(c.buyerName ?? "")}` : ""}` })),
+    [contracts, sellerNum, buyerNum, partyLabel],
   );
 
   const canSearch = !!(draft.contractId || draft.sellerId || draft.buyerId);
@@ -184,7 +186,7 @@ const NotificationHistoryPanel = () => {
                         <td className="nc-nowrap">{formatApiDateTime(d.createdAt)}</td>
                         <td>
                           {d.contractNumber ? <strong>{d.contractNumber}</strong> : <span className="nc-muted">—</span>}
-                          {(d.sellerName || d.buyerName) && <small>{d.sellerName ?? "?"} → {d.buyerName ?? "?"}</small>}
+                          {(d.sellerName || d.buyerName) && <small>{d.sellerName ? partyLabel(d.sellerName) : "?"} → {d.buyerName ? partyLabel(d.buyerName) : "?"}</small>}
                         </td>
                         <td>
                           {d.eventName}

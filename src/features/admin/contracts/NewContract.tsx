@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useProfileCities, withCity } from "../../../shared/hooks/useProfileCities";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import type { ChangeEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -221,8 +222,6 @@ const findAddressByLabel = (addresses: ProfileAddressDetail[], label: string) =>
 
 const REQUIRED_FIELD_LABELS: Record<string, string> = {
   contractDate: "Date of Contract",
-  effectiveFrom: "Effective From",
-  effectiveTo: "Effective To",
   sellerId: "Select Seller",
   buyerId: "Select Buyer",
   productId: "Select Product",
@@ -643,6 +642,8 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     const { data: businessProfiles, isError: businessProfilesFailed } = useGetBusinessProfileSummaryQuery(undefined, {
       refetchOnMountOrArgChange: true,
     });
+    // Sellers and buyers are shown as "Name, City" (dropdowns and the banner above the form).
+    const { cityOf } = useProfileCities();
     const businessProfileOptions = useMemo(
       () => {
         const uniqueProfiles = new Map<number, { value: string; label: string }>();
@@ -653,13 +654,19 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
           if (!uniqueProfiles.has(profile.profileId)) {
             uniqueProfiles.set(profile.profileId, {
               value: String(profile.profileId),
-              label: profile.legalName ?? "",
+              label: withCity(profile.legalName ?? "", cityOf(profile.profileId)),
             });
           }
         }
 
         return Array.from(uniqueProfiles.values());
       },
+      [businessProfiles, cityOf],
+    );
+    // The same profiles labelled by legal name only: an older contract without seller / buyer ids is matched on the
+    // stored name (the dropdown labels above add the city).
+    const businessProfileNameOptions = useMemo(
+      () => (businessProfiles ?? []).map((profile) => ({ value: String(profile.profileId), label: profile.legalName ?? "" })),
       [businessProfiles],
     );
     // Guarded on the id shape, not just emptiness: the endpoint binds profileId as an
@@ -759,7 +766,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
   const requiredValues = useMemo(
     () => ({
       contractDate,
-      effectiveTo,
       sellerId,
       buyerId,
       productId,
@@ -802,7 +808,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     }),
     [
       contractDate,
-      effectiveTo,
       sellerId,
       buyerId,
       productId,
@@ -888,11 +893,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
 
   if (sellerId && buyerId && sellerId === buyerId) {
     setFormError("Seller and Buyer cannot be the same business. Please select a different buyer.");
-    return;
-  }
-
-  if (effectiveFrom && effectiveTo && effectiveTo < effectiveFrom) {
-    setFormError("Effective To cannot be before Effective From.");
     return;
   }
 
@@ -992,8 +992,9 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         buyerId: Number(buyerId),
 
         contractDate: now,
+        // Effective From / To are no longer on the form: an edit keeps the stored dates, otherwise the contract date.
         effectiveFrom: toApiDate(effectiveFrom || contractDate) || now,
-        effectiveTo: toApiDate(effectiveTo) || now,
+        effectiveTo: toApiDate(effectiveTo || contractDate) || now,
         totalQuantityMT: quantity,
         productId: Number(productId),
         tolerancePercentage: tolerance,
@@ -1078,8 +1079,9 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         buyerId: Number(buyerId),
 
         contractDate: now,
+        // Effective From / To are no longer on the form: a new contract saves the contract date for both.
         effectiveFrom: toApiDate(effectiveFrom || contractDate) || now,
-        effectiveTo: toApiDate(effectiveTo) || now,
+        effectiveTo: toApiDate(effectiveTo || contractDate) || now,
 
         totalQuantityMT: quantity,
 
@@ -1295,12 +1297,12 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
   // Do NOT find the ID from the display name.
   setSellerId(
     asOptionId(contract.sellerId) ||
-      resolveOptionId(businessProfileOptions, contract.seller)
+      resolveOptionId(businessProfileNameOptions, contract.seller)
   );
 
   setBuyerId(
     asOptionId(contract.buyerId) ||
-      resolveOptionId(businessProfileOptions, contract.buyer)
+      resolveOptionId(businessProfileNameOptions, contract.buyer)
   );
 
   setProductId(
@@ -1514,9 +1516,11 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     contract.status === "Pending"
   );
 
+// businessProfileNameOptions, not the "Name, City" options: those change when the cities arrive, and refilling the
+// form then would undo what the user has already edited.
 }, [
   editContract,
-  businessProfileOptions,
+  businessProfileNameOptions,
   productOptions,
 ]);
 
@@ -1802,30 +1806,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
               value={netRate}
               disabled
               readOnly
-            />
-          </div>
-
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="effectiveFrom">
-              Effective From
-            </label>
-            <DatePickerInput
-              id="effectiveFrom"
-              value={effectiveFrom}
-              onChange={(value) => setEffectiveFromInput(value)}
-              clearable
-            />
-          </div>
-
-          <div className="form-field">
-            <label className="form-field__label" htmlFor="effectiveTo">
-              Effective To <span className="form-field__required">*</span>
-            </label>
-            <DatePickerInput
-              id="effectiveTo"
-              value={effectiveTo}
-              onChange={(value) => setEffectiveTo(value)}
-              clearable
             />
           </div>
 
@@ -2228,8 +2208,41 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         </div>
       </section>
 
+      {/* Notifications come before the approval setting (UAT #29). */}
+      {canNotify && (
+        <section className="new-contract__section">
+          <h2 className="new-contract__section-title">4. Notifications</h2>
+          <div className="form-check mb-3">
+            <input className="form-check-input" type="checkbox" id="notify-after-save" checked={notifyAfterSave} onChange={(e) => setNotifyAfterSave(e.target.checked)} />
+            <label className="form-check-label" htmlFor="notify-after-save">
+              {navState?.isEdit
+                ? "Notify the buyer and seller about this change"
+                : "Notify the buyer and seller when the contract is created"}
+            </label>
+            {!navState?.isEdit && !notifyTouched && (!status || isPastDate) && (
+              <div className="form-text">
+                {isPastDate
+                  ? "The contract date is in the past, so no confirmation is sent unless you tick this."
+                  : "Saved as Pending: the buyer and seller are told when the contract is approved (Contract Status, Approve)."}
+              </div>
+            )}
+            <div className="form-text">
+              Choose the channels and the template for each below. After you click {navState?.isEdit ? "Update Contract" : "Create Contract"} you will see exactly who will receive what and can still change it before anything is sent.
+            </div>
+          </div>
+          {notifyAfterSave && (
+            <NotifyChoicePicker
+              eventCode={notifyEventCode}
+              roles={[{ code: "BUYER", label: "Buyer" }, { code: "SELLER", label: "Seller" }]}
+              value={notifyChoices}
+              onChange={setNotifyChoices}
+            />
+          )}
+        </section>
+      )}
+
       <section className="new-contract__section">
-        <h2 className="new-contract__section-title">4. Settings</h2>
+        <h2 className="new-contract__section-title">{canNotify ? "5" : "4"}. Settings</h2>
         <table className="new-contract__settings-table">
           <thead>
             <tr>
@@ -2261,38 +2274,6 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
           </tbody>
         </table>
       </section>
-
-      {canNotify && (
-        <section className="new-contract__section">
-          <h2 className="new-contract__section-title">Notifications</h2>
-          <div className="form-check mb-3">
-            <input className="form-check-input" type="checkbox" id="notify-after-save" checked={notifyAfterSave} onChange={(e) => setNotifyAfterSave(e.target.checked)} />
-            <label className="form-check-label" htmlFor="notify-after-save">
-              {navState?.isEdit
-                ? "Notify the buyer and seller about this change"
-                : "Notify the buyer and seller when the contract is created"}
-            </label>
-            {!navState?.isEdit && !notifyTouched && (!status || isPastDate) && (
-              <div className="form-text">
-                {isPastDate
-                  ? "The contract date is in the past, so no confirmation is sent unless you tick this."
-                  : "Saved as Pending: the buyer and seller are told when the contract is approved (Contract Status, Approve)."}
-              </div>
-            )}
-            <div className="form-text">
-              Choose the channels and the template for each below. After you click {navState?.isEdit ? "Update Contract" : "Create Contract"} you will see exactly who will receive what and can still change it before anything is sent.
-            </div>
-          </div>
-          {notifyAfterSave && (
-            <NotifyChoicePicker
-              eventCode={notifyEventCode}
-              roles={[{ code: "BUYER", label: "Buyer" }, { code: "SELLER", label: "Seller" }]}
-              value={notifyChoices}
-              onChange={setNotifyChoices}
-            />
-          )}
-        </section>
-      )}
 
       <div className="new-contract__actions">
         <Link to="/admin/contracts?show=all" className="new-contract__cancel">

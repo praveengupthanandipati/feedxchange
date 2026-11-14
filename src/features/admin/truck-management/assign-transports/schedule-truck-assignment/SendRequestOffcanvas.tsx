@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import PartyName from "../../../../../shared/components/party/PartyName";
 import { createPortal } from "react-dom";
 import { SendIcon, TruckIcon, XIcon } from "../../../../../shared/components/icon";
 import type { ContractSummary } from "../assignTransports.data";
@@ -33,8 +34,8 @@ const SendRequestOffcanvas = ({
   }, [open, onClose]);
 
   const details = [
-    { label: "Seller", value: summary.sellerName },
-    { label: "Buyer", value: summary.buyerName },
+    { label: "Seller", value: <PartyName name={summary.sellerName} /> },
+    { label: "Buyer", value: <PartyName name={summary.buyerName} /> },
     { label: "Schedule Date & Time", value: scheduleRow?.scheduleDateTime ?? "—" },
     { label: "Loading Address", value: scheduleRow?.loadingAddress ?? summary.loadingAddress },
     { label: "Delivery Address", value: scheduleRow?.deliveryAddress ?? summary.deliveryAddress },

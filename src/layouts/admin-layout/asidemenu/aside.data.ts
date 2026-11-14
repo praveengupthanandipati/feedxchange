@@ -234,6 +234,7 @@ export const asideNavSections: AsideNavSection[] = [
         label: "Payments",
         icon: FolderIcon,
         children: [
+          { id: "payments-pending-contracts", permissions: ["seller-invoice.view"], label: "Pending Contracts", path: "/admin/payments/pending-contracts" },
           { id: "payments-seller-invoice", permissions: ["seller-invoice.view"], label: "Seller Invoice", path: "/admin/payments/seller-invoice" },
           { id: "payments-seller-invoice-edit", permissions: ["seller-invoice.view"], label: "Edit Seller Invoices", path: "/admin/payments/seller-invoice-edit" },
           { id: "payments-payment-advice", permissions: ["payment-advice"], label: "Payment Advice", path: "/admin/payments/payment-advice" },
@@ -251,29 +252,13 @@ export const asideNavSections: AsideNavSection[] = [
         id: "business-owners", permissions: ["profiles.business.view"],
         label: "Business Owners",
         icon: BriefcaseIcon,
-        path: "/admin/business-owners",
-        children: [
-          { id: "business-owners-profile", permissions: ["profiles.business.manage"], label: "Business Profile", path: "/admin/business-owners/profile" },
-          { id: "business-owners-contacts", permissions: ["profiles.business.manage"], label: "Contacts & Addresses", path: "/admin/business-owners/contacts" },
-          { id: "business-owners-documents", permissions: ["profiles.business.manage"], label: "Documents", path: "/admin/business-owners/documents" },
-          { id: "business-owners-bank-details", permissions: ["profiles.business.manage"], label: "Bank Details", path: "/admin/business-owners/bank-details" },
-          { id: "business-owners-profile-settings", permissions: ["profiles.business.manage"], label: "Profile Settings", path: "/admin/business-owners/profile-settings" },
-          { id: "business-owners-notification-preferences", permissions: ["notification-preferences.view"], label: "Notification Preferences", path: "/admin/business-owners/notification-preferences" },
-        ],
+        path: "/admin/business-owners"
       },
       {
         id: "transporters", permissions: ["profiles.transporter.view"],
         label: "Transporters",
         icon: TruckIcon,
-        path: "/admin/transporters",
-        children: [
-          { id: "transporters-profile", permissions: ["profiles.transporter.manage"], label: "Transporter Profile", path: "/admin/transporters/profile" },
-          { id: "transporters-contacts", permissions: ["profiles.transporter.manage"], label: "Contacts & Addresses", path: "/admin/transporters/contacts" },
-          { id: "transporters-documents", permissions: ["profiles.transporter.manage"], label: "Documents", path: "/admin/transporters/documents" },
-          { id: "transporters-bank-details", permissions: ["profiles.transporter.manage"], label: "Bank Details", path: "/admin/transporters/bank-details" },
-          { id: "transporters-profile-settings", permissions: ["profiles.transporter.manage"], label: "Profile Settings", path: "/admin/transporters/profile-settings" },
-          { id: "transporters-notification-preferences", permissions: ["notification-preferences.view"], label: "Notification Preferences", path: "/admin/transporters/notification-preferences" },
-        ],
+        path: "/admin/transporters"
       },
       {
         id: "promoters-dashboard", permissions: ["profiles.promoter-dashboard"],
@@ -285,13 +270,7 @@ export const asideNavSections: AsideNavSection[] = [
         id: "promoters", permissions: ["profiles.promoter.view"],
         label: "Promoters",
         icon: UsersIcon,
-        path: "/admin/promoters",
-        children: [
-          { id: "promoters-profile", permissions: ["profiles.promoter.manage"], label: "Promoter Profile", path: "/admin/promoters/profile" },
-          { id: "promoters-documents", permissions: ["profiles.promoter.manage"], label: "Documents", path: "/admin/promoters/documents" },
-          { id: "promoters-profile-settings", permissions: ["profiles.promoter.manage"], label: "Profile Settings", path: "/admin/promoters/profile-settings" },
-          { id: "promoters-notification-preferences", permissions: ["notification-preferences.view"], label: "Notification Preferences", path: "/admin/promoters/notification-preferences" },
-        ],
+        path: "/admin/promoters"
       },
       { id: "promocodes", permissions: ["promocodes.view"], label: "Promocodes", icon: TagIcon, path: "/admin/promocodes" },
       {

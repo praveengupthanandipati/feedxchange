@@ -347,15 +347,71 @@ function unwrapObject<T>(payload: unknown): T | null {
   return (payload as T) ?? null;
 }
 
+/** POST /api/BusinessProfiles/LinkChildBusinessProfiles */
+export interface LinkChildBusinessRequest {
+  parentProfileId: number;
+  relationShipType: string | null;
+  createdBy: number;
+  createdOn: string;
+  childProfileIds: number[];
+}
+
 export const businessProfilesApi = createApi({
   reducerPath: "businessProfilesApi",
   baseQuery: apiBaseQuery,
-  tagTypes: ["BusinessProfile"],
+  tagTypes: ["BusinessProfile", "ChildBusiness"],
   endpoints: (builder) => ({
     getBusinessProfileSummary: builder.query<BusinessOwner[], void>({
       query: () => "/api/BusinessProfiles/GetBusinessProfileSummary",
       transformResponse: unwrapArray<BusinessOwner>,
       providesTags: ["BusinessProfile"],
+    }),
+    /**
+     * Each business's city (primary address, else the first), by profile id and by name (legal and trading, lower
+     * case), so sellers and buyers can be shown as "Name, City" on every screen. The summary has no address, so each
+     * profile's details are read once; the result is shared by all screens and kept for 10 minutes.
+     * TODO(backend): return the city in GetBusinessProfileSummary and drop the per-profile reads.
+     */
+    getProfileCities: builder.query<{ byId: Record<number, string>; byName: Record<string, string> }, void>({
+      async queryFn(_arg, _api, _extra, baseQuery) {
+        const summary = await baseQuery("/api/BusinessProfiles/GetBusinessProfileSummary");
+        if (summary.error) return { error: summary.error };
+        const profiles = unwrapArray<BusinessOwner>(summary.data);
+        const byId: Record<number, string> = {};
+        const byName: Record<string, string> = {};
+        await Promise.all(
+          profiles.map(async (profile) => {
+            const result = await baseQuery(`/api/BusinessProfiles/GetBusinessProfileById/${profile.profileId}`);
+            const detail = result.error ? null : unwrapObject<BusinessProfileDetail>(result.data);
+            const addresses = detail?.addresses ?? [];
+            const city = ((addresses.find((a) => a.isPrimary) ?? addresses[0])?.city ?? "").trim();
+            byId[profile.profileId] = city;
+            for (const name of [profile.legalName, profile.tradingName]) {
+              const key = name?.trim().toLowerCase();
+              if (key && city && !(key in byName)) byName[key] = city;
+            }
+          }),
+        );
+        return { data: { byId, byName } };
+      },
+      keepUnusedDataFor: 600,
+      providesTags: ["BusinessProfile"],
+    }),
+    /** The businesses linked as children of a business (parent sees its children's contracts and data). */
+    getChildBusinessProfiles: builder.query<BusinessOwner[], number>({
+      query: (parentProfileId) => `/api/BusinessProfiles/GetAllChildBusinessProfiles/${parentProfileId}`,
+      transformResponse: unwrapArray<BusinessOwner>,
+      providesTags: (_result, _error, parentProfileId) => [{ type: "ChildBusiness", id: parentProfileId }],
+    }),
+    /** Links businesses as children of a parent. The API answers true / false. */
+    linkChildBusinessProfiles: builder.mutation<boolean, LinkChildBusinessRequest>({
+      query: (body) => ({ url: "/api/BusinessProfiles/LinkChildBusinessProfiles", method: "POST", body }),
+      invalidatesTags: (_result, _error, { parentProfileId }) => [{ type: "ChildBusiness", id: parentProfileId }],
+    }),
+    /** Removes one child from a parent. The API answers true / false. */
+    delinkChildBusinessProfile: builder.mutation<boolean, { parentProfileId: number; childProfileId: number }>({
+      query: (body) => ({ url: "/api/BusinessProfiles/DelinkChildBusinessProfile", method: "POST", body }),
+      invalidatesTags: (_result, _error, { parentProfileId }) => [{ type: "ChildBusiness", id: parentProfileId }],
     }),
     getBusinessProfileById: builder.query<BusinessProfileDetail | null, string>({
       query: (profileId) => `/api/BusinessProfiles/GetBusinessProfileById/${profileId}`,
@@ -477,6 +533,10 @@ export const businessProfilesApi = createApi({
 
 export const {
   useGetBusinessProfileSummaryQuery,
+  useGetProfileCitiesQuery,
+  useGetChildBusinessProfilesQuery,
+  useLinkChildBusinessProfilesMutation,
+  useDelinkChildBusinessProfileMutation,
   useGetBusinessProfileByIdQuery,
   useLazyGetBusinessProfileByIdQuery,
   useGetBusinessCollectionAreaQuery,

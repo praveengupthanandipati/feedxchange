@@ -226,6 +226,25 @@
     color: v.fg(v.$color-danger);
     font-size: max(11px, 0.8rem);
   }
+
+}
+
+// The amount in words: a single line across the form, always the same height (empty until an amount is typed).
+.payment-advice-words {
+  height: 1.5rem;
+  margin: v.$spacing-2 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.5rem;
+  color: v.fg(v.$color-primary);
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+
+  &__label {
+    color: v.fg(v.$color-text-muted);
+    font-weight: v.$font-weight-medium;
+  }
 }
 
 // ============================================================

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeftIcon, DownloadIcon, FileTextIcon, PenIcon, SaveIcon, TruckIcon, UploadIcon } from "../../../../../../shared/components/icon";
 import InfoPanel from "../InfoPanel";
 import SearchableSelect from "../../../../../../shared/components/dropdown/SearchableSelect";
@@ -22,9 +22,9 @@ import {
 } from "../../../../../../core/store/contractTrucksApi";
 import { useGetContractByContractNumberQuery } from "../../../../../../core/store/contractsApi";
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
+import { usePermission } from "../../../../../../core/auth/AuthContext";
 import "../../../assign-transports/Assigntransports.scss";
 import "./UpdateTruckStatus.scss";
-import { useNotifyPrompt } from "../../../../../../shared/notifications/useNotifyPrompt";
 
 const MAX_INVOICE_FILE_SIZE_MB = 5;
 const ALLOWED_INVOICE_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
@@ -50,12 +50,34 @@ interface UpdateTruckStatusRowProps {
   buyerId: number;
   /** The invoice already stored for this truck, if any. */
   invoice?: TruckInvoice;
+  contractNumber: string;
 }
 
-const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice }: UpdateTruckStatusRowProps) => {
+const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice, contractNumber }: UpdateTruckStatusRowProps) => {
+  const navigate = useNavigate();
   const [selectedStatusId, setSelectedStatusId] = useState(String(truck.dispatchStatusId));
+  /**
+   * Loaded is not set by hand here: picking it opens Create Seller Invoice with this contract and truck filled in,
+   * and saving that invoice marks the truck Loaded. Any other status is picked and saved here as before.
+   */
+  const canEnterSellerInvoice = usePermission("seller-invoice.view");
+  const handleStatusPick = (value: string) => {
+    const label = statusOptions.find((option) => option.value === value)?.label.trim().toLowerCase();
+    if (label === "loaded") {
+      setError("");
+      // Without Seller Invoice access the redirect would be blocked: say who can do it instead.
+      if (!canEnterSellerInvoice) {
+        setError("A truck becomes Loaded when its seller invoice is saved. Please ask someone with Seller Invoice access to enter it.");
+        return;
+      }
+      navigate(
+        `/admin/payments/seller-invoice?contract=${encodeURIComponent(contractNumber)}&truck=${encodeURIComponent(truck.truckNumber)}&dispatch=${truck.contractTruckId}`,
+      );
+      return;
+    }
+    setSelectedStatusId(value);
+  };
   const [updateContractTruckStatus, { isLoading: saving }] = useUpdateContractTruckStatusMutation();
-  const notify = useNotifyPrompt();
   const [uploadTruckInvoice, { isLoading: uploading }] = useUploadTruckInvoiceMutation();
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
@@ -83,10 +105,9 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
   const selectedIsLoaded = selectedStatus === "loaded";
   // Neither can be moved back to Assigned, so both are the end of the road for this row.
   const isFinalStatus = isLoaded || isCancelled;
-  // The invoice is attached while Loaded is picked and before the status is saved.
-  // Once the update has gone through — or the dispatch is cancelled — the button is done.
-  const showUploadInvoice =
-    !saved && !isLoaded && !isCancelled && !selectedIsCancelled && selectedIsLoaded && hasChanged;
+  // A truck becomes Loaded by saving its seller invoice; the invoice copy (scan / PDF) can then be attached here
+  // until one is stored.
+  const showUploadInvoice = isLoaded && !invoice && !invoiceFileName;
   const isAssigned = truck.status.trim().toLowerCase() === "assigned";
   // Dispatch details stay editable only while the truck is, and stays, merely assigned.
   const showEditDetails = isAssigned && !selectedIsLoaded && !selectedIsCancelled;
@@ -108,10 +129,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
         return;
       }
       setSaved(true);
-      // Loaded: the buyer is told, with the invoice details.
-      if (selectedIsLoaded) {
-        notify.ask({ eventCode: "TRUCK_LOADED", title: "Notify the buyer that the truck is loaded", sourceEntityType: "ContractTruckDispatch", sourceEntityId: truck.contractTruckId });
-      }
+      // (Loaded is not saved here; its "truck loaded" notification is offered after the seller invoice is saved.)
     } catch (error) {
       setError(getApiErrorMessage((error as { data?: unknown })?.data) || "Failed to update truck status. Please try again.");
     }
@@ -162,7 +180,6 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
 
   return (
     <div className="update-truck-status-card">
-      {notify.element}
       <div className="update-truck-status-card__header">
         <span className="update-truck-status-card__truck">
           <TruckIcon aria-hidden /> {truck.truckNumber}
@@ -200,7 +217,7 @@ const UpdateTruckStatusRow = ({ truck, statusOptions, sellerId, buyerId, invoice
             <SearchableSelect
               options={rowStatusOptions}
               value={selectedStatusId}
-              onChange={setSelectedStatusId}
+              onChange={handleStatusPick}
               placeholder="Select Status"
               ariaLabel={`Update status for ${truck.truckNumber}`}
             />
@@ -329,6 +346,7 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
           truck={truck}
           statusOptions={statusOptions}
           invoice={invoices?.find((item) => item.contractDispatchId === truck.contractTruckId)}
+          contractNumber={contractNumber}
           sellerId={contract?.sellerId ?? 0}
           buyerId={contract?.buyerId ?? 0}
         />

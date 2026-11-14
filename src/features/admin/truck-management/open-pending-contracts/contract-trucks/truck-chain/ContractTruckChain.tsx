@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import PartyName from "../../../../../../shared/components/party/PartyName";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeftIcon, FileTextIcon, TruckIcon } from "../../../../../../shared/components/icon";
 import InfoPanel from "../InfoPanel";
@@ -38,7 +39,7 @@ const ChainLegCard = ({ leg, isCurrent }: { leg: ContractTruckChainLeg; isCurren
           <span className="reassign-truck__leg-status">{leg.dispatchStatusName}</span>
         </div>
         <p className="reassign-truck__parties">
-          {leg.sellerName} → {leg.buyerName}
+          <PartyName name={leg.sellerName} /> → <PartyName name={leg.buyerName} />
         </p>
         <p className="reassign-truck__addresses">
           {leg.loadingAddress} ({leg.loadingCity}) → {leg.deliveryAddress} ({leg.deliveryCity})

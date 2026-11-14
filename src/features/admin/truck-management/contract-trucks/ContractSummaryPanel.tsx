@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import PartyName from "../../../../shared/components/party/PartyName";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -186,11 +187,11 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
         <div className="assign-transports-details__grid">
           <div className="assign-transports-details__field">
             <span>Seller Name</span>
-            <strong>{formatText(contract?.sellerName ?? matchingOpenContract?.seller)}</strong>
+            <strong><PartyName name={contract?.sellerName ?? matchingOpenContract?.seller} fallback="-" /></strong>
           </div>
           <div className="assign-transports-details__field">
             <span>Buyer Name</span>
-            <strong>{formatText(contract?.buyerName ?? matchingOpenContract?.buyer)}</strong>
+            <strong><PartyName name={contract?.buyerName ?? matchingOpenContract?.buyer} fallback="-" /></strong>
           </div>
           <div className="assign-transports-details__field">
             <span>Date of Contract</span>

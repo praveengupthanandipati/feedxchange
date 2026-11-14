@@ -7,6 +7,7 @@ import type { TableColumn } from "../../../shared/components/table/table.types";
 import InfoTooltip from "../../../shared/components/tooltip/InfoTooltip";
 import RowActionsMenu, { type RowAction } from "../../../shared/components/table/RowActionsMenu";
 import type { Contract } from "./contracts.data";
+import { useProfileCities } from "../../../shared/hooks/useProfileCities";
 
 const parseQtyOrNA = (value: string) => (value === "N/A" ? -1 : parseFloat(value));
 
@@ -48,6 +49,12 @@ const TruncatedName = ({ value }: { value: string }) => (
     <InfoTooltip text={value} />
   </span>
 );
+
+/** A seller / buyer cell: "Name, City". */
+const PartyCell = ({ name, id }: { name: string; id?: number }) => {
+  const { label } = useProfileCities();
+  return <TruncatedName value={label(name, id)} />;
+};
 
 
 
@@ -126,14 +133,14 @@ export function buildContractColumns({ onEdit, onDelete }: ColumnHandlers): Tabl
       key: "seller",
       header: "Seller",
       sortable: true,
-      render: (row) => <TruncatedName value={row.seller} />,
+      render: (row) => <PartyCell name={row.seller} id={row.sellerId} />,
       exportValue: (row) => row.seller,
     },
     {
       key: "buyer",
       header: "Buyer",
       sortable: true,
-      render: (row) => <TruncatedName value={row.buyer} />,
+      render: (row) => <PartyCell name={row.buyer} id={row.buyerId} />,
       exportValue: (row) => row.buyer,
     },
     {

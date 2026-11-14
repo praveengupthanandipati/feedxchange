@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import PartyName from "../../../../shared/components/party/PartyName";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowLeftIcon,
@@ -180,11 +181,11 @@ const Assigntransports = () => {
             <div className="assign-transports-details__grid">
               <div className="assign-transports-details__field">
                 <span>Seller Name</span>
-                <strong>{summary.sellerName}</strong>
+                <strong><PartyName name={summary.sellerName} /></strong>
               </div>
               <div className="assign-transports-details__field">
                 <span>Buyer Name</span>
-                <strong>{summary.buyerName}</strong>
+                <strong><PartyName name={summary.buyerName} /></strong>
               </div>
               <div className="assign-transports-details__field">
                 <span>Date of Contract</span>
