@@ -5,10 +5,13 @@ import Header from "./header/Header";
 import BottomNav from "./bottomnav/BottomNav";
 import PageLoader from "../../shared/components/loader/PageLoader";
 import { RequireSession, RoutePermissionGate } from "../../core/auth/RouteGuard";
+import { useCreateShortcuts } from "./useCreateShortcuts";
 
 /** Sidebar, header and bottom bar around every signed-in screen. Each screen loads on demand inside it. */
 const AdminLayout = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  // Alt + C / I / P (create contract / invoice / payment) work on every screen.
+  useCreateShortcuts();
 
   return (
     <RequireSession>

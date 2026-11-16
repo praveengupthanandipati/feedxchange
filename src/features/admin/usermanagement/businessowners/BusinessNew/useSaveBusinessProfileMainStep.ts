@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   useAddBusinessProfileMutation,
@@ -37,7 +37,12 @@ export const useSaveBusinessProfileMainStep = (nextPath: string) => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // A second click while the first save is still running is ignored: it would create the business twice (the button is
+  // only disabled after the next render).
+  const inFlight = useRef(false);
   const handleSaveAndContinue = async () => {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -145,6 +150,7 @@ export const useSaveBusinessProfileMainStep = (nextPath: string) => {
     } catch (err) {
       setSubmitError(getErrorMessage(err));
     } finally {
+      inFlight.current = false;
       setSubmitting(false);
     }
   };

@@ -11,11 +11,22 @@ import { useProfileCities } from "../../../shared/hooks/useProfileCities";
 
 const parseQtyOrNA = (value: string) => (value === "N/A" ? -1 : parseFloat(value));
 
-const ContractIdCell = ({ id }: { id: string }) => {
+/**
+ * The contract number with its copy icon. For users who can create contracts the icon opens a duplicate of this
+ * contract (New Contract filled from it, Qty / Rate / Delivery Schedule / Payment days empty); for others it copies
+ * the number.
+ */
+const ContractIdCell = ({ id, onDuplicate }: { id: string; onDuplicate?: () => void }) => {
   const [copied, setCopied] = useState(false);
+  const { can } = useAuth();
+  const canDuplicate = Boolean(onDuplicate) && can("contracts.manage");
 
   const handleCopy = (event: MouseEvent) => {
     event.stopPropagation();
+    if (canDuplicate) {
+      onDuplicate?.();
+      return;
+    }
     navigator.clipboard
       .writeText(id)
       .then(() => {
@@ -34,8 +45,8 @@ const ContractIdCell = ({ id }: { id: string }) => {
         type="button"
         className="contracts-table__copy"
         onClick={handleCopy}
-        aria-label={`Copy contract ${id}`}
-        title="Copy contract number"
+        aria-label={canDuplicate ? `Duplicate contract ${id}` : `Copy contract ${id}`}
+        title={canDuplicate ? "Duplicate contract" : "Copy contract number"}
       >
         {copied ? <CheckIcon aria-hidden /> : <CopyIcon aria-hidden />}
       </button>
@@ -98,9 +109,11 @@ const ContractRowActions = ({ row, onEdit, onDelete }: { row: Contract; onEdit: 
 interface ColumnHandlers {
   onEdit: (contract: Contract) => void;
   onDelete: (contract: Contract) => void;
+  /** Opens New Contract as a duplicate of this contract (the copy icon beside the number). */
+  onDuplicate?: (contract: Contract) => void;
 }
 
-export function buildContractColumns({ onEdit, onDelete }: ColumnHandlers): TableColumn<Contract>[] {
+export function buildContractColumns({ onEdit, onDelete, onDuplicate }: ColumnHandlers): TableColumn<Contract>[] {
   return [
     {
       key: "date",
@@ -112,7 +125,7 @@ export function buildContractColumns({ onEdit, onDelete }: ColumnHandlers): Tabl
       key: "id",
       header: "Contract",
       sortable: true,
-      render: (row) => <ContractIdCell id={row.id} />,
+      render: (row) => <ContractIdCell id={row.id} onDuplicate={onDuplicate ? () => onDuplicate(row) : undefined} />,
       exportValue: (row) => row.id,
     },
     {

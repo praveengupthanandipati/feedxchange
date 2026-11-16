@@ -156,6 +156,11 @@
     color: v.fg(v.$color-text-muted);
     font-size: v.$font-size-sm;
     margin: 0;
+
+    // An error in the same place (same red as the tab's other error line).
+    &--error {
+      color: var(--fx-red-49-fg);
+    }
   }
 
   &__label {

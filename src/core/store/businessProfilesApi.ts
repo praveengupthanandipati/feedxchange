@@ -37,7 +37,8 @@ export interface BusinessOwner {
 
 /** A business linked under a parent (GetAllChildBusinessProfiles). */
 export interface ChildBusiness {
-  profileRelationshipId: number;
+  /** Not always returned by GetAllChildBusinessProfiles: rows are keyed by profileId. */
+  profileRelationshipId?: number;
   relationshipType: string;
   profileId: number;
   legalName: string;

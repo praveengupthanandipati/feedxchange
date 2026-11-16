@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useMemo, useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../../core/auth/AuthContext";
 import { useGetBusinessProfileSummaryQuery } from "../../../core/store/businessProfilesApi";
 import { useGetAllContractsByFiltersQuery } from "../../../core/store/contractsApi";
@@ -117,7 +117,6 @@ export interface LiveFigures {
 
 /** `children` (the dashboard's other widgets) come after the overview and read its live data through HomeLiveContext. */
 const HomeOverview = ({ afterKpis, children }: { afterKpis?: (live: LiveFigures) => ReactNode; children?: ReactNode }) => {
-  const navigate = useNavigate();
   const { can } = useAuth();
   const [period, setPeriod] = useState<PeriodKey>(readPeriod);
   const [now] = useState(() => Date.now());
@@ -166,20 +165,7 @@ const HomeOverview = ({ afterKpis, children }: { afterKpis?: (live: LiveFigures)
     [allInvoices, withParties, period, now, periodLabel, invoicesFailed],
   );
 
-  // Alt + C / I / P open the shortcuts (ignored while typing in a field).
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-      const target = event.target as HTMLElement | null;
-      if (target && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))) return;
-      const shortcut = shortcuts.find((item) => item.key === event.key.toLowerCase());
-      if (!shortcut) return;
-      event.preventDefault();
-      navigate(shortcut.to);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [shortcuts, navigate]);
+  // Alt + C / I / P are handled for every screen by the admin layout (useCreateShortcuts).
 
   const maxShare = Math.max(0.0001, ...(metrics?.commodities ?? []).map((item) => item.share));
 
