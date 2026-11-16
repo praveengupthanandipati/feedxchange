@@ -5,6 +5,7 @@ export interface PincodeLocation {
 }
 
 interface PostOffice {
+  Name?: string;
   District?: string;
   Block?: string;
   State?: string;
@@ -29,9 +30,12 @@ export async function fetchLocationFromPincode(pincode: string): Promise<Pincode
 
     if (data?.[0]?.Status !== "Success" || !postOffice) return null;
 
+    // City is the town / taluk (Block; a block of "NA" is not a place, so the post office name or the district is used);
+    // District is the district.
+    const block = postOffice.Block && postOffice.Block.trim().toUpperCase() !== "NA" ? postOffice.Block : "";
     return {
-      city: postOffice.District || "",
-      district: postOffice.Block || postOffice.District || "",
+      city: block || postOffice.Name || postOffice.District || "",
+      district: postOffice.District || "",
       state: postOffice.State || "",
     };
   } catch (err) {

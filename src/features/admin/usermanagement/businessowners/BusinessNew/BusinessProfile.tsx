@@ -15,6 +15,8 @@ import { areaOptions, collectionAreaOptions, establishmentYearOptions } from "./
 export interface BrokerageRow {
   id: string;
   productId: string;
+  /** The saved product name (rows loaded from a profile), shown if the product is not in the active list. */
+  productName?: string;
   buyCharge: string;
   sellCharge: string;
   // Present only for rows loaded from an existing profile — tells the save
@@ -92,7 +94,7 @@ const BrokerageChargesCard = ({
       <div className="new-contract__grid new-contract__grid--condition">
         <div className="form-field">
           <span className="form-field__label">
-            Buy Brokerage Charges
+            Buy Brokerage Charges <span className="form-field__required">*</span>
             <InfoTooltip text="Default brokerage charged when buying from this business." />
           </span>
           <input
@@ -106,7 +108,7 @@ const BrokerageChargesCard = ({
         </div>
         <div className="form-field">
           <span className="form-field__label">
-            Sell Brokerage Charges
+            Sell Brokerage Charges <span className="form-field__required">*</span>
             <InfoTooltip text="Default brokerage charged when selling to this business." />
           </span>
           <input
@@ -134,8 +136,9 @@ const BrokerageChargesCard = ({
             const usedProducts = rows
               .filter((otherRow) => otherRow.id !== row.id)
               .map((otherRow) => otherRow.productId);
-            const availableProductOptions = productOptions.filter(
-              (option) => !usedProducts.includes(option.value),
+            const availableProductOptions = withSavedProduct(
+              productOptions.filter((option) => !usedProducts.includes(option.value)),
+              row,
             );
 
             return (
@@ -183,9 +186,20 @@ const BrokerageChargesCard = ({
   );
 };
 
+/**
+ * A saved row whose product is not in the active product list (e.g. made inactive since) still shows its name instead
+ * of a blank box.
+ */
+function withSavedProduct(options: ProductOption[], row: { productId: string; productName?: string }): ProductOption[] {
+  if (!row.productId || !row.productName?.trim() || options.some((option) => option.value === row.productId)) return options;
+  return [...options, { value: row.productId, label: row.productName.trim() }];
+}
+
 export interface CapacityRow {
   id: string;
   productId: string;
+  /** The saved product name (rows loaded from a profile), shown if the product is not in the active list. */
+  productName?: string;
   tonsPerDay: string;
   tonsPerMonth: string;
   meta?: { capacityRequirementId: number; createdBy: number; createdOn: string };
@@ -226,7 +240,7 @@ const CapacityRequirementsCard = ({ rows, onRowsChange, productOptions }: Capaci
           {rows.map((row, index) => (
             <div className="repeatable-rows__row" key={row.id}>
               <SearchableSelect
-                options={productOptions}
+                options={withSavedProduct(productOptions, row)}
                 value={row.productId}
                 onChange={(value) => updateRow(row.id, { productId: value })}
                 ariaLabel="Product"
@@ -341,12 +355,15 @@ const BusinessProfile = ({
   onCapacityRowsChange,
 }: BusinessProfileProps) => {
   const { data: products } = useGetProductsQuery();
+  // Only named products (an unnamed one showed as a blank entry in the Product dropdowns).
   const productOptions = useMemo(
     () =>
-      (products ?? []).map((product) => ({
-        value: String(product.id),
-        label: product.name ?? "",
-      })),
+      (products ?? [])
+        .filter((product) => product.name?.trim())
+        .map((product) => ({
+          value: String(product.id),
+          label: product.name!.trim(),
+        })),
     [products],
   );
 
@@ -438,7 +455,7 @@ const BusinessProfile = ({
 
         <div className="form-field">
           <label className="form-field__label" htmlFor="panNumber">
-            PAN Number
+            PAN Number <span className="form-field__required">*</span>
           </label>
           <input
             id="panNumber"

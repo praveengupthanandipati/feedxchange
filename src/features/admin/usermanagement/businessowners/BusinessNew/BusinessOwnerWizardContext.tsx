@@ -36,6 +36,8 @@ export interface BusinessOwnerDraft {
   billingStateName: string;
   billingGoogleLocationUrl: string;
   primaryContactPerson: string;
+  /** The primary contact's designation (e.g. Proprietor). */
+  primaryDesignation: string;
   /** Stored id of the primary contact (type "Primary"), when the profile already has one. */
   primaryContactId?: number;
   contacts: ContactEntry[];
@@ -79,6 +81,7 @@ const emptyDraft = (): BusinessOwnerDraft => ({
   billingStateName: "",
   billingGoogleLocationUrl: "",
   primaryContactPerson: "",
+  primaryDesignation: "",
   contacts: [],
   addresses: [],
   bankAccounts: [],

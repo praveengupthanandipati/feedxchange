@@ -289,7 +289,8 @@ const Businessowners = () => {
 
   const rows = useMemo(
     () =>
-      (data ?? []).map((row) => {
+      // One card / row per business, even if the API lists the same profile more than once.
+      (data ?? []).filter((row, index, all) => all.findIndex((other) => other.profileId === row.profileId) === index).map((row) => {
         const extra = profileExtras[row.profileId];
         if (!extra) return row;
         return {

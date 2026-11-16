@@ -18,7 +18,7 @@ function buildContactPayloads(draft: BusinessOwnerDraft): ContactPayload[] {
             contactId: draft.primaryContactId,
             contactType: PRIMARY_CONTACT_TYPE,
             contactPerson: draft.primaryContactPerson,
-            designation: "",
+            designation: draft.primaryDesignation,
             mobileNumber: draft.mobileNumber,
             alternativeContactNumber: draft.alternativeContactNumber,
             emailId: draft.emailId,
@@ -28,7 +28,7 @@ function buildContactPayloads(draft: BusinessOwnerDraft): ContactPayload[] {
       : [];
   const additional = draft.contacts.map((contact) => ({
     contactId: contact.contactId,
-    contactType: contact.contactType,
+    contactType: contact.contactType || ADDITIONAL_CONTACT_TYPE,
     contactPerson: contact.contactPerson,
     designation: contact.designation,
     mobileNumber: contact.mobileNumber,
@@ -40,6 +40,8 @@ function buildContactPayloads(draft: BusinessOwnerDraft): ContactPayload[] {
 }
 
 const PRIMARY_CONTACT_TYPE = "Primary";
+// Additional contacts no longer ask for a type (it offered the same choices as Designation).
+const ADDITIONAL_CONTACT_TYPE = "Additional";
 const isPrimaryContact = (contactType?: string | null) => (contactType ?? "").trim().toLowerCase() === "primary";
 
 // Used by the Business Profile and Contacts & Addresses steps, which still
@@ -149,6 +151,7 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
     brokerageRows: (profile.buySellCharges ?? []).map((charge) => ({
       id: nextBrokerageRowId(),
       productId: String(charge.productId),
+      productName: charge.productName ?? "",
       buyCharge: String(charge.buyCharge),
       sellCharge: String(charge.sellCharge),
       meta: charge.chargeId
@@ -165,6 +168,7 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
     capacityRows: (profile.capacityRequirements ?? []).map((req) => ({
       id: nextCapacityRowId(),
       productId: String(req.productId),
+      productName: req.productName ?? "",
       tonsPerDay: String(req.tonsPerDay),
       tonsPerMonth: String(req.tonsPerMonth),
       meta: req.capacityRequirementId
@@ -184,6 +188,7 @@ export function hydrateDraftFromProfile(profile: BusinessProfileDetail): Busines
     billingStateName: primaryAddress?.stateName ?? "",
     billingGoogleLocationUrl: primaryAddress?.googleLocationUrl ?? "",
     primaryContactPerson: primaryContact?.contactPerson ?? "",
+    primaryDesignation: primaryContact?.designation ?? "",
     primaryContactId: primaryContact?.contactId,
     contacts: additionalContacts.map((contact) => ({
       id: nextContactId(),

@@ -259,9 +259,12 @@ const REQUIRED_FIELD_LABELS: Record<string, string> = {
 
 const NewContract = () => {
   const location = useLocation();
-  const navState = (location.state as null | { contract?: Contract; isEdit?: boolean }) || null;
-  const editContractNumber = navState?.isEdit
-    ? navState.contract?.contractNumber || navState.contract?.id || ""
+  const navState = (location.state as null | { contract?: Contract; isEdit?: boolean; isDuplicate?: boolean }) || null;
+  // Duplicate (copy icon in the contracts list): the form is filled from that contract like an edit, with Qty, Rate,
+  // Delivery Schedule and Payment days left empty, and saving creates a new contract.
+  const isDuplicate = !navState?.isEdit && !!navState?.isDuplicate;
+  const editContractNumber = navState?.isEdit || isDuplicate
+    ? navState?.contract?.contractNumber || navState?.contract?.id || ""
     : "";
   const {
     data: contractDetails,
@@ -313,7 +316,7 @@ const NewContract = () => {
   const [formError, setFormError] = useState("");
 
   const editContract = useMemo<Contract | null>(() => {
-    if (!navState?.isEdit || !navState.contract) return null;
+    if (!(navState?.isEdit || isDuplicate) || !navState?.contract) return null;
     if (!contractDetails) return navState.contract;
 
     const response = asRecord(contractDetails);
@@ -577,7 +580,8 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
       [products],
     );
     // Product features -> editable quality specs for the seller and the buyer (a new contract starts from the product, an edit from its saved values).
-    const isEditMode = !!navState?.isEdit;
+    // A duplicate copies the contract's saved quality specs too.
+    const isEditMode = !!navState?.isEdit || isDuplicate;
     const defaultFeatures = useMemo<FeatureSpec[]>(() => {
       const product = (products ?? []).find((item) => String(item.id) === productId);
       return (parseProductFeatures(product?.productFeatures ?? null).nutritionalSpecifications ?? [])
@@ -1571,6 +1575,23 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     contract.status === "Pending"
   );
 
+  // --------------------------------------------------
+  // Duplicate: a new contract dated today, with these left empty to fill in.
+  // --------------------------------------------------
+  if (isDuplicate) {
+    setContractNumber("");
+    setContractDate(todayInputDate());
+    setEffectiveFromInput("");
+    setEffectiveTo("");
+    setQty("");
+    setContractRate("");
+    setSellerConditions((prev) => ({ ...prev, deliverySchedule: "", fromDate: "", toDate: "", specificDays: "" }));
+    setBuyerConditions((prev) => ({ ...prev, deliverySchedule: "", fromDate: "", toDate: "", specificDays: "" }));
+    setSellerPaymentDueDays("");
+    setBuyerPaymentDueDays("");
+    setStatus(false);
+  }
+
 // businessProfileNameOptions, not the "Name, City" options: those change when the cities arrive, and refilling the
 // form then would undo what the user has already edited.
 }, [
@@ -1583,7 +1604,7 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
     <div className="new-contract">
       <div className="new-contract__topbar">
         <div className="new-contract__topbar-left">
-          <h1>{navState?.isEdit ? "Update Contract" : "New Contract"}</h1>
+          <h1>{navState?.isEdit ? "Update Contract" : isDuplicate ? "Duplicate Contract" : "New Contract"}</h1>
           <button
             type="button"
             className="new-contract__summary-toggle"

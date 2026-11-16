@@ -429,6 +429,11 @@
         font-size: v.$font-size-sm;
         font-weight: v.$font-weight-semibold;
       }
+
+      // "Add" sits over the centred + buttons of its column.
+      span:last-child {
+        text-align: center;
+      }
     }
   }
 

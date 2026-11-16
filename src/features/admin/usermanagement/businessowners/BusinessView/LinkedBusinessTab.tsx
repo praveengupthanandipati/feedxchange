@@ -12,6 +12,7 @@ import {
 } from "../../../../../core/store/businessProfilesApi";
 import type { ChildBusiness } from "../../../../../core/store/businessProfilesApi";
 import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
+import LookupLoadError from "../../../../../shared/components/feedback/LookupLoadError";
 
 interface LinkedBusinessTabProps {
   ownerId: string;
@@ -28,8 +29,22 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
   const [pendingRemove, setPendingRemove] = useState<ChildBusiness | null>(null);
   const [error, setError] = useState("");
 
-  const { data: allBusinesses = [] } = useGetBusinessProfileSummaryQuery();
-  const { data: children = [], isFetching, refetch } = useGetChildBusinessProfilesQuery(parentProfileId, { skip: !Number.isFinite(parentProfileId) });
+  const { data: allBusinesses = [], isError: businessesFailed } = useGetBusinessProfileSummaryQuery();
+  const {
+    data: childRows = [],
+    isLoading: childrenLoading,
+    isFetching,
+    isError: childrenFailed,
+    refetch,
+  } = useGetChildBusinessProfilesQuery(parentProfileId, {
+    skip: !Number.isFinite(parentProfileId),
+    refetchOnMountOrArgChange: true,
+  });
+  // Every linked business once (each row is keyed by its profile id, so a repeat would hide the others).
+  const children = useMemo(
+    () => childRows.filter((row, index, all) => all.findIndex((other) => other.profileId === row.profileId) === index),
+    [childRows],
+  );
   const [linkChildren, { isLoading: linking }] = useLinkChildBusinessProfilesMutation();
   const [delinkChild, { isLoading: delinking }] = useDelinkChildBusinessProfileMutation();
 
@@ -45,14 +60,21 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
     if (selectedToAdd.length === 0) return;
     setError("");
     try {
-      await linkChildren({
+      const linked = await linkChildren({
         parentProfileId,
         relationShipType: CHILD_RELATIONSHIP,
         createdBy: Number(localStorage.getItem("userId")) || 0,
         createdOn: new Date().toISOString(),
         childProfileIds: selectedToAdd.map(Number),
       }).unwrap();
+      // The API answers true / false: false (no error) means nothing was linked, which used to look like nothing happened.
+      if (linked === false) {
+        setError("The businesses could not be linked. Please check they are not already linked to another business and try again.");
+        return;
+      }
       setSelectedToAdd([]);
+      // show the newly linked businesses straight away
+      void refetch();
     } catch (err) {
       // the server's message says which rule blocked the link
       setError(getErrorMessage(err, "The businesses could not be linked. Please try again."));
@@ -65,7 +87,9 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
     if (!child) return;
     setError("");
     try {
-      await delinkChild({ parentProfileId, childProfileId: child.profileId }).unwrap();
+      const removed = await delinkChild({ parentProfileId, childProfileId: child.profileId }).unwrap();
+      if (removed === false) setError("The business could not be removed. Please try again.");
+      void refetch();
     } catch (err) {
       setError(getErrorMessage(err, "The business could not be removed. Please try again."));
     }
@@ -132,6 +156,8 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
             <PlusIcon aria-hidden /> {linking ? "Adding..." : "Add Children"}
           </button>
         </div>
+        {/* The business list for the dropdown could not be loaded (so it may be empty). */}
+        <LookupLoadError failed={businessesFailed} className="business-owner-detail__hint business-owner-detail__hint--error" />
         <p className="business-owner-detail__hint">
           Select multiple businesses to make them children of this business. A business cannot be its own child, a child
           can have only one parent, and once a business has children it cannot become a child of another business. A
@@ -144,14 +170,23 @@ const LinkedBusinessTab = ({ ownerId }: LinkedBusinessTabProps) => {
         )}
       </section>
 
-      {children.length === 0 ? (
+      {childrenLoading ? (
+        <div className="business-owner-detail__notice" role="status">
+          Loading linked businesses…
+        </div>
+      ) : childrenFailed ? (
+        // The list could not be loaded: say so (not "no businesses linked", which would be wrong).
+        <div className="business-owner-detail__notice" role="alert">
+          The linked businesses could not be loaded. Please use Refresh Relationships to try again.
+        </div>
+      ) : children.length === 0 ? (
         <div className="business-owner-detail__notice">
           No child businesses are linked to this profile yet.
         </div>
       ) : (
         <section className="business-owner-detail__section">
           <h2 className="business-owner-detail__section-title">Linked Child Businesses</h2>
-          <Table columns={columns} data={children} rowKey={(row) => String(row.profileRelationshipId)} emptyMessage="No linked businesses." />
+          <Table columns={columns} data={children} rowKey={(row) => `${row.profileId}-${row.profileRelationshipId ?? ""}`} emptyMessage="No linked businesses." />
         </section>
       )}
 

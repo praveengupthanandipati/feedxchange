@@ -5,7 +5,6 @@ import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog
 import EmptyRowsState from "./EmptyRowsState";
 import { fetchLocationFromPincode } from "../../../../../shared/utils/pincodeLookup";
 import {
-  contactTypeOptions,
   designationOptions,
   cityOptions,
   districtOptions,
@@ -65,23 +64,10 @@ const AdditionalContactsSection = ({ entries, onEntriesChange }: AdditionalConta
             {entries.map((entry) => (
               <div className="repeatable-entry" key={entry.id}>
                 <div className="new-contract__grid">
-                  <div className="form-field">
-                    <span className="form-field__label">
-                      Contact Type <span className="form-field__required">*</span>
-                    </span>
-                    <SearchableSelect
-                      options={contactTypeOptions}
-                      value={entry.contactType}
-                      onChange={(value) => updateEntry(entry.id, { contactType: value })}
-                      placeholder="Select Contact Type"
-                      ariaLabel="Contact Type"
-                      allowCustom
-                    />
-                  </div>
-
+                  {/* Contact Type is not asked: it offered the same choices as Designation (saved as "Additional"). */}
                   <div className="form-field">
                     <label className="form-field__label">
-                      Contact Person Name <span className="form-field__required">*</span>
+                      Contact Person Name
                     </label>
                     <input
                       type="text"
@@ -96,7 +82,7 @@ const AdditionalContactsSection = ({ entries, onEntriesChange }: AdditionalConta
 
                   <div className="form-field">
                     <span className="form-field__label">
-                      Designation <span className="form-field__required">*</span>
+                      Designation
                     </span>
                     <SearchableSelect
                       options={designationOptions}
@@ -110,7 +96,7 @@ const AdditionalContactsSection = ({ entries, onEntriesChange }: AdditionalConta
 
                   <div className="form-field">
                     <label className="form-field__label">
-                      Mobile Number <span className="form-field__required">*</span>
+                      Mobile Number
                     </label>
                     <input
                       type="tel"
@@ -250,7 +236,7 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
                 <div className="new-contract__grid">
                   <div className="form-field">
                     <label className="form-field__label">
-                      Office Name <span className="form-field__required">*</span>
+                      Office Name
                     </label>
                     <input
                       type="text"
@@ -263,7 +249,7 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
 
                   <div className="form-field">
                     <label className="form-field__label">
-                      Address Line 1 <span className="form-field__required">*</span>
+                      Address Line 1
                     </label>
                     <input
                       type="text"
@@ -291,7 +277,7 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
 
                   <div className="form-field">
                     <label className="form-field__label">
-                      Pincode <span className="form-field__required">*</span>
+                      Pincode
                     </label>
                     <input
                       type="text"
@@ -305,7 +291,7 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
 
                   <div className="form-field">
                     <span className="form-field__label">
-                      Select City <span className="form-field__required">*</span>
+                      Select City
                     </span>
                     <SearchableSelect
                       options={cityOptions}
@@ -318,7 +304,7 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
 
                   <div className="form-field">
                     <span className="form-field__label">
-                      Select District <span className="form-field__required">*</span>
+                      Select District
                     </span>
                     <SearchableSelect
                       options={districtOptions}
@@ -331,7 +317,7 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
 
                   <div className="form-field">
                     <span className="form-field__label">
-                      Select State <span className="form-field__required">*</span>
+                      Select State
                     </span>
                     <SearchableSelect
                       options={stateOptions}
@@ -412,6 +398,8 @@ interface ContactsAddressesProps {
   onGoogleLocationUrlChange: (value: string) => void;
   contactPerson: string;
   onContactPersonChange: (value: string) => void;
+  primaryDesignation: string;
+  onPrimaryDesignationChange: (value: string) => void;
   contacts: ContactEntry[];
   onContactsChange: (entries: ContactEntry[]) => void;
   addresses: AddressEntry[];
@@ -445,6 +433,8 @@ const ContactsAddresses = ({
   onGoogleLocationUrlChange,
   contactPerson,
   onContactPersonChange,
+  primaryDesignation,
+  onPrimaryDesignationChange,
   contacts,
   onContactsChange,
   addresses,
@@ -468,7 +458,7 @@ const ContactsAddresses = ({
         <div className="new-contract__grid">
           <div className="form-field">
             <label className="form-field__label">
-              Billing Address Line 01 <span className="form-field__required">*</span>
+              Billing Address Line 01
             </label>
             <input
               type="text"
@@ -500,7 +490,7 @@ const ContactsAddresses = ({
           </div>
           <div className="form-field">
             <label className="form-field__label">
-              Pincode <span className="form-field__required">*</span>
+              Pincode
             </label>
             <input
               type="text"
@@ -526,7 +516,7 @@ const ContactsAddresses = ({
           </div>
           <div className="form-field">
             <span className="form-field__label">
-              District <span className="form-field__required">*</span>
+              District
             </span>
             <SearchableSelect
               options={districtOptions}
@@ -538,7 +528,7 @@ const ContactsAddresses = ({
           </div>
           <div className="form-field">
             <span className="form-field__label">
-              State <span className="form-field__required">*</span>
+              State
             </span>
             <SearchableSelect
               options={stateOptions}
@@ -595,6 +585,17 @@ const ContactsAddresses = ({
               placeholder="Full Name"
               value={contactPerson}
               onChange={(event) => onContactPersonChange(event.target.value)}
+            />
+          </div>
+          <div className="form-field">
+            <span className="form-field__label">Designation</span>
+            <SearchableSelect
+              options={designationOptions}
+              value={primaryDesignation}
+              onChange={onPrimaryDesignationChange}
+              placeholder="Select or type..."
+              ariaLabel="Primary contact designation"
+              allowCustom
             />
           </div>
           <div className="form-field">

@@ -43,6 +43,8 @@ const ContactsAddressesStep = () => {
           onGoogleLocationUrlChange={(value) => updateDraft({ billingGoogleLocationUrl: value })}
           contactPerson={draft.primaryContactPerson}
           onContactPersonChange={(value) => updateDraft({ primaryContactPerson: value })}
+          primaryDesignation={draft.primaryDesignation}
+          onPrimaryDesignationChange={(value) => updateDraft({ primaryDesignation: value })}
           contacts={draft.contacts}
           onContactsChange={(entries) => updateDraft({ contacts: entries })}
           addresses={draft.addresses}

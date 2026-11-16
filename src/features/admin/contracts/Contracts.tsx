@@ -251,6 +251,9 @@ const Contracts = () => {
       });
     };
 
+  // Copy icon beside the contract number: New Contract filled from this one, as a new contract.
+  const handleDuplicate = (contract: Contract) => navigate("new", { state: { contract, isDuplicate: true } });
+
   // useEffect(() => {
   //   if (!data?.contracts) return;
 
@@ -307,7 +310,7 @@ const Contracts = () => {
   };
 
   const columns = useMemo(
-    () => buildContractColumns({ onEdit: handleEdit, onDelete: handleDelete }),
+    () => buildContractColumns({ onEdit: handleEdit, onDelete: handleDelete, onDuplicate: handleDuplicate }),
     [],
   );
 
