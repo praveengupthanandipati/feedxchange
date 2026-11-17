@@ -10,6 +10,14 @@
   @include t.palette-tokens(light);
   @include t.scale-tokens;
   @include t.bootstrap-tokens;
+  --fx-white: rgba(250, 251, 252, 0.96);
+  --fx-white-rgb: 250, 251, 252;
+  --fx-header-bg: #ffffff;
+  --fx-glass-border: rgba(255, 255, 255, 0.72);
+  --fx-glass-shadow: 0 10px 32px rgba(27, 54, 100, 0.12);
+  --fx-glass-blur: 14px;
+  --bs-toast-bg: var(--fx-white);
+  --bs-toast-border-color: var(--fx-glass-border);
 }
 
 // ---------- Density ----------
@@ -142,16 +150,27 @@ html[data-app="admin"] {
 .modal {
   --bs-modal-padding: var(--fx-dialog-padding);
   --bs-modal-header-padding: 0.75rem var(--fx-dialog-padding);
+  --bs-modal-bg: var(--fx-white);
+  --bs-modal-border-color: var(--fx-glass-border);
 }
 
 .offcanvas {
   --bs-offcanvas-padding-x: var(--fx-dialog-padding);
   --bs-offcanvas-padding-y: 0.75rem;
+  --bs-offcanvas-bg: var(--fx-white);
+  --bs-offcanvas-border-color: var(--fx-glass-border);
 }
 
 .dropdown-menu {
   --bs-dropdown-item-padding-y: 0.3rem;
   --bs-dropdown-font-size: var(--fx-text-sm);
+  --bs-dropdown-bg: var(--fx-white);
+  --bs-dropdown-border-color: var(--fx-glass-border);
+}
+
+.card {
+  --bs-card-bg: var(--fx-white);
+  --bs-card-border-color: var(--fx-glass-border);
 }
 
 // Themes: data-theme on <html> is set before first paint by the script in index.html (src/shared/theme/theme.ts keeps it
@@ -159,6 +178,12 @@ html[data-app="admin"] {
 [data-theme="dark"] {
   color-scheme: dark;
   @include t.palette-tokens(dark);
+  --fx-white: rgba(39, 46, 58, 0.78);
+  --fx-white-rgb: 39, 46, 58;
+  --fx-header-bg: var(--fx-white);
+  --fx-glass-border: rgba(255, 255, 255, 0.14);
+  --fx-glass-shadow: 0 10px 32px rgba(0, 0, 0, 0.32);
+  --fx-glass-blur: 14px;
   --fx-focus-ring: var(--fx-brand-orange-on);
   // soft neutral greys a few steps above the dark field (deliberate exception, see _themes.scss): #4a4a4a 2.05:1,
   // hover #5c5c5c 2.71:1; focus #7a7a7a 4.22:1 keeps real contrast
@@ -180,6 +205,10 @@ html[data-app="admin"] {
   color-scheme: light;
   @include t.palette-tokens(high-contrast);
   @include t.tint-tokens-high-contrast;
+  --fx-header-bg: var(--fx-white);
+  --fx-glass-border: var(--fx-white-line);
+  --fx-glass-shadow: none;
+  --fx-glass-blur: 0px;
   --fx-focus-ring: var(--fx-gray-7);
   // the accessibility theme keeps strong field edges
   --fx-field-border: var(--fx-slate-58-line);
@@ -190,6 +219,25 @@ html[data-app="admin"] {
   --fx-field-focus-outline: 2px solid var(--fx-focus-ring);
   --fx-field-icon: var(--fx-gray-7);
   --fx-field-icon-hover: var(--fx-gray-7);
+}
+
+$glass-surfaces: ".card", "[class*='-card']", "[class*='__card']", "[class*='-panel']", "[class*='__panel']", "[class*='-drawer']", "[class*='__drawer']", "[role='dialog']", ".dropdown-menu", ".modal-content", ".offcanvas", ".toast";
+
+:is(#{$glass-surfaces}) {
+  backdrop-filter: blur(var(--fx-glass-blur)) saturate(145%);
+  -webkit-backdrop-filter: blur(var(--fx-glass-blur)) saturate(145%);
+}
+
+[data-theme="high-contrast"] :is(#{$glass-surfaces}) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+@media (forced-colors: active), (prefers-reduced-transparency: reduce) {
+  :is(#{$glass-surfaces}) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 // The dark brand panels: the admin sidebar, the login brand panel and dashboard banner, and the website's hero, dark

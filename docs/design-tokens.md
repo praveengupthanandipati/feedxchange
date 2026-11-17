@@ -38,6 +38,14 @@ In plain CSS the same are `var(--fx-<name>)`, `var(--fx-<name>-fg)`, `var(--fx-<
 
 Charts take `var(--fx-chart-1)` ... `var(--fx-chart-5)`, `var(--fx-chart-grid)` and `var(--fx-chart-axis)` as fill/stroke values.
 
+## Glass surfaces
+
+The shared `--fx-white` surface is translucent, near-white silver in Light and charcoal-tinted in Dark. Cards use a subtle highlight border,
+shadow and backdrop blur; Bootstrap cards, menus, modals, offcanvas panels, toasts, and named card/panel/drawer surfaces
+share the blur treatment. Text variants such as `--fx-white-on` remain unchanged. High contrast keeps opaque surfaces and
+disables blur, as do forced-colors and reduced-transparency system settings. The admin header uses `--fx-header-bg` for
+pure white in Light and the theme surface in Dark and High contrast.
+
 ## Density
 
 Every size is in `rem`, and the root size sets the density for everything at once (`tokens.scss`): 13px in the admin app

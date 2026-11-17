@@ -5,7 +5,6 @@ import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog
 import EmptyRowsState from "./EmptyRowsState";
 import { fetchLocationFromPincode } from "../../../../../shared/utils/pincodeLookup";
 import {
-  contactTypeOptions,
   designationOptions,
   cityOptions,
   districtOptions,
@@ -63,19 +62,6 @@ const AdditionalContactsSection = ({ entries, onEntriesChange }: AdditionalConta
             {entries.map((entry) => (
               <div className="repeatable-entry" key={entry.id}>
                 <div className="new-contract__grid">
-                  <div className="form-field">
-                    <span className="form-field__label">
-                      Contact Type <span className="form-field__required">*</span>
-                    </span>
-                    <SearchableSelect
-                      options={contactTypeOptions}
-                      value={entry.contactType}
-                      onChange={(value) => updateEntry(entry.id, { contactType: value })}
-                      placeholder="Select Contact Type"
-                      ariaLabel="Contact Type"
-                    />
-                  </div>
-
                   <div className="form-field">
                     <label className="form-field__label">
                       Contact Person <span className="form-field__required">*</span>
@@ -321,6 +307,7 @@ const AdditionalAddressSection = ({ entries, onEntriesChange }: AdditionalAddres
                       value={entry.district}
                       onChange={(value) => updateEntry(entry.id, { district: value })}
                       ariaLabel="Select District"
+                      allowCustom
                     />
                   </div>
 
@@ -528,6 +515,7 @@ const ContactsAddresses = ({
               value={district}
               onChange={onDistrictChange}
               ariaLabel="District"
+              allowCustom
             />
           </div>
           <div className="form-field">

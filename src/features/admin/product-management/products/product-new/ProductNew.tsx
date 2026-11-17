@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeftIcon, PlusIcon, Trash2Icon, UserIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
-import { API_URL } from "../../../../../core/api/api";
 import { useGetAllActiveCategoriesQuery } from "../../../../../core/store/categoryApi";
 import {
   useGetProductByIdQuery,
@@ -12,6 +11,10 @@ import {
   useUpdateProductMutation,
   parseProductFeatures,
 } from "../../../../../core/store/productsApi";
+import {
+  getProductImageUrl,
+  getRelatedProductImageUrl,
+} from "../../../../../shared/utils/productImage";
 import {
   statusOptions,
   weightClauseOptions,
@@ -50,7 +53,9 @@ function slugify(value: string): string {
 
 const ProductNew = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? "/admin/products";
   const editId = searchParams.get("id");
   const isEditing = Boolean(editId);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -67,6 +72,7 @@ const ProductNew = () => {
     value: String(cat.id),
     label: cat.categoryName ?? "",
   }));
+  const relatedImageUrl = existingProduct ? getRelatedProductImageUrl(existingProduct) : "";
 
   const [imagePreview, setImagePreview] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -112,7 +118,7 @@ const ProductNew = () => {
     setStatus(existingProduct.isActive ? "Active" : "Inactive");
     setWeightClause(existingProduct.weightClause ?? "mt");
     setAboutProduct(existingProduct.description ?? "");
-    setImagePreview(existingProduct.fileName ? `${API_URL}${existingProduct.fileName}` : "");
+    setImagePreview(getProductImageUrl(existingProduct));
 
     setSpecRows(
       features.nutritionalSpecifications?.length
@@ -183,7 +189,7 @@ const ProductNew = () => {
     setPendingDeleteRow(null);
   };
 
-  const handleCancel = () => navigate("/admin/products");
+  const handleCancel = () => navigate(returnTo);
 
   const handleSave = async () => {
     const trimmedName = productName.trim();
@@ -257,7 +263,7 @@ const ProductNew = () => {
         }).unwrap();
         localStorage.setItem("successMessage", "Product added successfully");
       }
-      navigate("/admin/products");
+      navigate(isEditing ? returnTo : "/admin/products");
     } catch (err) {
       setSubmitError(getErrorMessage(err, "Failed to save product."));
     } finally {
@@ -270,7 +276,7 @@ const ProductNew = () => {
       <div className="product-new">
         <div className="product-new__topbar">
           <h1>Edit Product</h1>
-          <Link to="/admin/products" className="product-new__back">
+          <Link to={returnTo} className="product-new__back">
             <ArrowLeftIcon aria-hidden /> Products List
           </Link>
         </div>
@@ -286,7 +292,7 @@ const ProductNew = () => {
       <div className="product-new">
         <div className="product-new__topbar">
           <h1>Edit Product</h1>
-          <Link to="/admin/products" className="product-new__back">
+          <Link to={returnTo} className="product-new__back">
             <ArrowLeftIcon aria-hidden /> Products List
           </Link>
         </div>
@@ -301,7 +307,7 @@ const ProductNew = () => {
     <div className="product-new">
       <div className="product-new__topbar">
         <h1>{isEditing ? "Update Product" : "New Product"}</h1>
-        <Link to="/admin/products" className="product-new__back">
+        <Link to={returnTo} className="product-new__back">
           <ArrowLeftIcon aria-hidden /> Products List
         </Link>
       </div>
@@ -310,7 +316,21 @@ const ProductNew = () => {
         <div className="product-new-form-card">
           <div className="product-new-upload">
             <div className="product-new-upload__preview">
-              {imagePreview ? <img src={imagePreview} alt="Product" /> : <UserIcon aria-hidden />}
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="Product"
+                  onError={(event) => {
+                    const image = event.currentTarget;
+                    if (relatedImageUrl && image.dataset.relatedFallback !== "true") {
+                      image.dataset.relatedFallback = "true";
+                      image.src = relatedImageUrl;
+                    }
+                  }}
+                />
+              ) : (
+                <UserIcon aria-hidden />
+              )}
             </div>
             <button
               type="button"

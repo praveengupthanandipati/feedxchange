@@ -95,8 +95,11 @@
 // Compact: one padding (--fx-card-padding, about 12px) at every width. $padding is kept for existing callers.
 @mixin card($padding: null) {
   background-color: v.$color-bg;
+  border: 1px solid var(--fx-glass-border);
   border-radius: v.$radius-lg;
-  box-shadow: v.$shadow-md;
+  box-shadow: var(--fx-glass-shadow);
+  backdrop-filter: blur(var(--fx-glass-blur)) saturate(145%);
+  -webkit-backdrop-filter: blur(var(--fx-glass-blur)) saturate(145%);
   padding: var(--fx-card-padding);
 }
 
