@@ -17,19 +17,24 @@ const StatusBadge = ({ status }: { status: ProductStatus }) => (
 );
 
 interface ColumnHandlers {
+  returnTo: string;
   onView: (product: Product) => void;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
 }
 
-export function buildProductColumns({ onView, onEdit, onDelete }: ColumnHandlers): TableColumn<Product>[] {
+export function buildProductColumns({ returnTo, onView, onEdit, onDelete }: ColumnHandlers): TableColumn<Product>[] {
   return [
     {
       key: "name",
       header: "Product Name",
       sortable: true,
       render: (row) => (
-        <Link to={`/admin/products/${row.id}`} className="products-list__link">
+        <Link
+          to={`/admin/products/${row.id}`}
+          state={{ returnTo }}
+          className="products-list__link"
+        >
           {row.name}
         </Link>
       ),

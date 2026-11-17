@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { DownloadIcon, EyeIcon, EyeOffIcon, PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
@@ -39,8 +39,15 @@ function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+function getPageFromSearchParams(pageParam: string | null): number {
+  const page = Number(pageParam);
+  return Number.isSafeInteger(page) && page > 0 ? page : 1;
+}
+
 const Products = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data, isLoading, error } = useGetProductsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -51,23 +58,42 @@ const Products = () => {
   const [status, setStatus] = useState<string>(DEFAULT_STATUS_FILTER);
   const [category, setCategory] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => getPageFromSearchParams(searchParams.get("page")));
   const [pendingDeleteProduct, setPendingDeleteProduct] = useState<Product | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const { message: successMessage, showSuccessMessage } = useSuccessToast();
+  const returnTo = `${location.pathname}${location.search}`;
 
-  const handleView = (product: Product) => {
-    navigate(`${product.id}`);
-  };
+  useEffect(() => {
+    const pageParam = currentPage === 1 ? null : String(currentPage);
+    if (searchParams.get("page") === pageParam) return;
 
-  const handleEdit = (product: Product) => {
-    navigate(`new?id=${product.id}`);
-  };
+    const nextSearchParams = new URLSearchParams(searchParams);
+    if (pageParam === null) nextSearchParams.delete("page");
+    else nextSearchParams.set("page", pageParam);
+    setSearchParams(nextSearchParams, { replace: true });
+  }, [currentPage, searchParams, setSearchParams]);
 
-  const handleDelete = (product: Product) => {
+  const handleView = useCallback(
+    (product: Product) => {
+      navigate(`${product.id}`, {
+        state: { returnTo },
+      });
+    },
+    [navigate, returnTo],
+  );
+
+  const handleEdit = useCallback(
+    (product: Product) => {
+      navigate(`new?id=${product.id}`, { state: { returnTo } });
+    },
+    [navigate, returnTo],
+  );
+
+  const handleDelete = useCallback((product: Product) => {
     setDeleteError(null);
     setPendingDeleteProduct(product);
-  };
+  }, []);
 
   const confirmDelete = async () => {
     if (!pendingDeleteProduct) return;
@@ -84,8 +110,8 @@ const Products = () => {
   };
 
   const columns = useMemo(
-    () => buildProductColumns({ onView: handleView, onEdit: handleEdit, onDelete: handleDelete }),
-    [],
+    () => buildProductColumns({ returnTo, onView: handleView, onEdit: handleEdit, onDelete: handleDelete }),
+    [returnTo, handleView, handleEdit, handleDelete],
   );
 
   const categoryOptions = useMemo(
@@ -96,10 +122,6 @@ const Products = () => {
       ),
     [rows],
   );
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [keyword, status, category]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
@@ -119,15 +141,36 @@ const Products = () => {
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
+
+  useEffect(() => {
+    if (data !== undefined && currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, data, totalPages]);
+
   const pagedRows = filteredRows.slice(
     (currentPageClamped - 1) * PAGE_SIZE,
     currentPageClamped * PAGE_SIZE,
   );
 
+  const handleKeywordChange = (value: string) => {
+    setKeyword(value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatus(value);
+    setCurrentPage(1);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    setCurrentPage(1);
+  };
+
   const handleClearFilters = () => {
     setKeyword("");
     setStatus(DEFAULT_STATUS_FILTER);
     setCategory("All");
+    setCurrentPage(1);
   };
 
   const handleExport = () => {
@@ -191,13 +234,13 @@ const Products = () => {
         {filtersVisible && (
           <ProductsFilters
             status={status}
-            onStatusChange={setStatus}
+            onStatusChange={handleStatusChange}
             statusOptions={statusFilterOptions}
             category={category}
-            onCategoryChange={setCategory}
+            onCategoryChange={handleCategoryChange}
             categoryOptions={categoryOptions}
             keyword={keyword}
-            onKeywordChange={setKeyword}
+            onKeywordChange={handleKeywordChange}
             onClear={handleClearFilters}
           />
         )}

@@ -1,12 +1,11 @@
 import { useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftIcon, PackageIcon } from "../../../../../shared/components/icon";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import Table from "../../../../../shared/components/table/Table";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
-import { API_URL } from "../../../../../core/api/api";
 import {
   useGetProductByIdQuery,
   useDeleteProductMutation,
@@ -14,6 +13,10 @@ import {
   type ProductPriceHistoryEntry,
   type ProductNutritionalSpec,
 } from "../../../../../core/store/productsApi";
+import {
+  getProductImageUrl,
+  getRelatedProductImageUrl,
+} from "../../../../../shared/utils/productImage";
 import { getProductStatus } from "../products-list/products.columns";
 import "./Productview.scss";
 import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
@@ -55,7 +58,9 @@ const specColumns: TableColumn<ProductNutritionalSpec>[] = [
 
 const Productview = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? "/admin/products";
   const { data: product, isLoading, isError, error: loadError } = useGetProductByIdQuery(id ?? "", { skip: !id });
   // A real 404 means there is no such product; any other failure is a load error.
   const loadFailed = isError && !(loadError && "status" in loadError && loadError.status === 404);
@@ -75,11 +80,13 @@ const Productview = () => {
     () => (product ? parseProductFeatures(product.productFeatures) : {}),
     [product],
   );
+  const productImageUrl = product ? getProductImageUrl(product) : "";
+  const relatedImageUrl = product ? getRelatedProductImageUrl(product) : "";
 
   if (isLoading) {
     return (
       <div className="product-view">
-        <Link to="/admin/products" className="product-view__back">
+        <Link to={returnTo} className="product-view__back">
           <ArrowLeftIcon aria-hidden /> Products
         </Link>
         <div className="product-view-card">
@@ -92,7 +99,7 @@ const Productview = () => {
   if (isError || !product) {
     return (
       <div className="product-view">
-        <Link to="/admin/products" className="product-view__back">
+        <Link to={returnTo} className="product-view__back">
           <ArrowLeftIcon aria-hidden /> Products
         </Link>
         <div className="product-view-card">
@@ -112,7 +119,7 @@ const Productview = () => {
     <div className="product-view">
       <div className="product-view__topbar">
         <h1>{product.name}</h1>
-        <Link to="/admin/products" className="product-view__back">
+        <Link to={returnTo} className="product-view__back">
           <ArrowLeftIcon aria-hidden /> Products
         </Link>
       </div>
@@ -122,7 +129,11 @@ const Productview = () => {
           <div className="product-view-profile__menu">
             <RowActionsMenu
               manageKeys={["products.manage"]}
-              onEdit={() => navigate(`/admin/products/new?id=${product.id}`)}
+              onEdit={() =>
+                navigate(`/admin/products/new?id=${product.id}`, {
+                  state: { returnTo },
+                })
+              }
               onDelete={() => {
                 setDeleteError(null);
                 setPendingDelete(true);
@@ -131,12 +142,18 @@ const Productview = () => {
           </div>
 
           <div className="product-view-profile__image">
-            {product.fileName ? (
+            {productImageUrl ? (
               <img
-                src={`${API_URL}${product.fileName}`}
+                src={productImageUrl}
                 alt={product.name ?? ""}
                 onError={(event) => {
-                  (event.target as HTMLImageElement).style.display = "none";
+                  const image = event.currentTarget;
+                  if (relatedImageUrl && image.dataset.relatedFallback !== "true") {
+                    image.dataset.relatedFallback = "true";
+                    image.src = relatedImageUrl;
+                    return;
+                  }
+                  image.style.display = "none";
                 }}
               />
             ) : (
@@ -319,7 +336,7 @@ const Productview = () => {
           try {
             await deleteProduct({ productId: product.id, actionPerformedBy }).unwrap();
             localStorage.setItem("successMessage", "Product deleted successfully");
-            navigate("/admin/products");
+            navigate(returnTo);
           } catch (err) {
             setDeleteError(getErrorMessage(err, "Failed to delete product."));
           }

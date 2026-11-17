@@ -9,7 +9,7 @@
   height: 3.75rem;
   flex-shrink: 0;
   padding: 0 v.$spacing-4;
-  background-color: v.$color-bg;
+  background-color: var(--fx-header-bg);
   border-bottom: 1px solid v.line(v.$color-border);
   border-top-left-radius: v.$radius-lg;
   border-top-right-radius: v.$radius-lg;
