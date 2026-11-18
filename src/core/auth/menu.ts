@@ -99,7 +99,7 @@ export const toNavSections = (menu: AccessMenu): AsideNavSection[] =>
             relatedPaths: child.relatedPaths.length > 0 ? child.relatedPaths : undefined,
           }));
         // a Sub Module normally has its own route (its overview page); if it has none, it opens its first page
-        const path = page.routePath ?? children[0]?.path;
+        const path = page.routePath || children[0]?.path;
         if (!path && children.length === 0) return [];
         return [
           {
