@@ -22,6 +22,8 @@ import {
   gstDetailsOptions,
   deliveryScheduleOptions,
   qualitySpecSourceOptions,
+  QUALITY_SPEC_FROM_MASTER,
+  QUALITY_SPEC_NOT_FROM_MASTER,
   paymentTermsOptions,
 } from "./newContract.data";
 import "./NewContract.scss";
@@ -64,10 +66,17 @@ const emptyCondition: ConditionState = {
   fromDate: "",
   toDate: "",
   specificDays: "",
-  qualitySpecSource: "",
+  qualitySpecSource: QUALITY_SPEC_FROM_MASTER,
   address: "",
   remarks: "",
 };
+
+/** "Do not show from Master" hides that side's quality specs table; they are then neither validated nor saved. */
+const showsQualitySpecs = (condition: ConditionState) => condition.qualitySpecSource !== QUALITY_SPEC_NOT_FROM_MASTER;
+
+/** The source is saved by its label, so the contract detail page reads "Show from Master" rather than the option key. */
+const qualitySpecSourceLabel = (value: string) =>
+  qualitySpecSourceOptions.find((option) => option.value === value)?.label ?? null;
 
 const asRecord = (value: unknown): Record<string, unknown> =>
   value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -979,7 +988,8 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
   }
 
   const specError =
-    validateFeatureSpecs("Seller", sellerSpecs) || validateFeatureSpecs("Buyer", buyerSpecs);
+    (showsQualitySpecs(sellerConditions) && validateFeatureSpecs("Seller", sellerSpecs)) ||
+    (showsQualitySpecs(buyerConditions) && validateFeatureSpecs("Buyer", buyerSpecs));
   if (specError) {
     setFormError(specError);
     return;
@@ -1085,18 +1095,18 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         sellerFromDate: sellerConditions.fromDate ? toApiDate(sellerConditions.fromDate) : now,
         sellerToDate: sellerConditions.toDate ? toApiDate(sellerConditions.toDate) : now,
         loadingAddressId: Number(sellerConditions.address) || 0,
-        sellerQualitySpecSource: sellerConditions.qualitySpecSource || null,
+        sellerQualitySpecSource: qualitySpecSourceLabel(sellerConditions.qualitySpecSource),
         sellerRemarksSpecialConditions: sellerConditions.remarks || "",
-        sellerQualitySpecifications: toSavePayload(Number(sellerId), sellerSpecs),
+        sellerQualitySpecifications: showsQualitySpecs(sellerConditions) ? toSavePayload(Number(sellerId), sellerSpecs) : [],
         buyerCommission: Number(buyerConditions.commission) || 0,
         buyerDeliverySchedule: buyerConditions.deliverySchedule || "ready-loading",
         buyerSpecificDays: Number(buyerConditions.specificDays) || 0,
         buyerFromDate: buyerConditions.fromDate ? toApiDate(buyerConditions.fromDate) : now,
         buyerToDate: buyerConditions.toDate ? toApiDate(buyerConditions.toDate) : now,
         deliveryAddressId: Number(buyerConditions.address) || 0,
-        buyerQualitySpecSource: buyerConditions.qualitySpecSource || null,
+        buyerQualitySpecSource: qualitySpecSourceLabel(buyerConditions.qualitySpecSource),
         buyerRemarksSpecialConditions: buyerConditions.remarks || "",
-        buyerQualitySpecifications: toSavePayload(Number(buyerId), buyerSpecs),
+        buyerQualitySpecifications: showsQualitySpecs(buyerConditions) ? toSavePayload(Number(buyerId), buyerSpecs) : [],
         remarks: paymentRemarks || existingContract?.paymentRemarks || "",
         approvalRequired: existingContract?.approvalRequired ?? true,
         createdBy: existingContract?.createdById ?? currentUserId,
@@ -1193,7 +1203,7 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
           Number(sellerConditions.address) || 0,
 
         sellerQualitySpecSource:
-          sellerConditions.qualitySpecSource || null,
+          qualitySpecSourceLabel(sellerConditions.qualitySpecSource),
 
         sellerRemarksSpecialConditions:
           sellerConditions.remarks || "",
@@ -1207,7 +1217,7 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         //     unit: "",
         //   },
         // ],
-        sellerQualitySpecifications: toSavePayload(Number(sellerId), sellerSpecs),
+        sellerQualitySpecifications: showsQualitySpecs(sellerConditions) ? toSavePayload(Number(sellerId), sellerSpecs) : [],
 
         buyerCommission:
           Number(buyerConditions.commission) || 0,
@@ -1232,7 +1242,7 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
           Number(buyerConditions.address) || 0,
 
         buyerQualitySpecSource:
-          buyerConditions.qualitySpecSource || null,
+          qualitySpecSourceLabel(buyerConditions.qualitySpecSource),
 
         buyerRemarksSpecialConditions:
           buyerConditions.remarks || "",
@@ -1246,7 +1256,7 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
         //     unit: "",
         //   },
         // ],
-        buyerQualitySpecifications: toSavePayload(Number(buyerId), buyerSpecs),
+        buyerQualitySpecifications: showsQualitySpecs(buyerConditions) ? toSavePayload(Number(buyerId), buyerSpecs) : [],
 
         remarks: paymentRemarks || "",
 
@@ -1464,7 +1474,7 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
       resolveOptionValue(
         qualitySpecSourceOptions,
         contract.sellerConditions?.qualitySpecSource
-      ),
+      ) || QUALITY_SPEC_FROM_MASTER,
 
     address:
       contract.loadingAddressId
@@ -1513,7 +1523,7 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
       resolveOptionValue(
         qualitySpecSourceOptions,
         contract.buyerConditions?.qualitySpecSource
-      ),
+      ) || QUALITY_SPEC_FROM_MASTER,
 
     address:
       contract.deliveryAddressId
@@ -1995,7 +2005,19 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
                 </div>
               )}
 
-              {renderFeatureSpecs("Seller", sellerSpecs, setSellerSpecs)}
+              <div className="form-field">
+                <span className="form-field__label">
+                  Quality Spec Source <span className="form-field__required">*</span>
+                </span>
+                <SearchableSelect
+                  options={qualitySpecSourceOptions}
+                  value={sellerConditions.qualitySpecSource}
+                  onChange={(value) => handleSellerConditionChange({ qualitySpecSource: value })}
+                  ariaLabel="Seller quality spec source"
+                />
+              </div>
+
+              {showsQualitySpecs(sellerConditions) && renderFeatureSpecs("Seller", sellerSpecs, setSellerSpecs)}
 
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">
@@ -2107,7 +2129,19 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
                 </div>
               )}
 
-              {renderFeatureSpecs("Buyer", buyerSpecs, setBuyerSpecs)}
+              <div className="form-field">
+                <span className="form-field__label">
+                  Quality Spec Source <span className="form-field__required">*</span>
+                </span>
+                <SearchableSelect
+                  options={qualitySpecSourceOptions}
+                  value={buyerConditions.qualitySpecSource}
+                  onChange={(value) => handleBuyerConditionChange({ qualitySpecSource: value })}
+                  ariaLabel="Buyer quality spec source"
+                />
+              </div>
+
+              {showsQualitySpecs(buyerConditions) && renderFeatureSpecs("Buyer", buyerSpecs, setBuyerSpecs)}
 
               <div className="form-field new-contract__grid--full">
                 <span className="form-field__label">

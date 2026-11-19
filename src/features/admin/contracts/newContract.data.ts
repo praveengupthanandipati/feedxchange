@@ -48,11 +48,13 @@ export const deliveryScheduleOptions = [
   { value: "specific-days", label: "Specific Days" },
 ];
 
+/** Whether a side's quality specs come from the product master (and are shown) or are left out of the contract. */
+export const QUALITY_SPEC_FROM_MASTER = "show-from-master";
+export const QUALITY_SPEC_NOT_FROM_MASTER = "do-not-show-from-master";
+
 export const qualitySpecSourceOptions = [
-  { value: "buyer-lab", label: "Buyer Lab" },
-  { value: "seller-lab", label: "Seller Lab" },
-  { value: "third-party", label: "Third-Party Lab" },
-  { value: "mutual", label: "Mutually Agreed" },
+  { value: QUALITY_SPEC_FROM_MASTER, label: "Show from Master" },
+  { value: QUALITY_SPEC_NOT_FROM_MASTER, label: "Do not show from Master" },
 ];
 
 export const addressOptions = [
