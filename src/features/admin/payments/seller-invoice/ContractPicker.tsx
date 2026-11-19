@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
+import { useOpenAndPendingContracts } from "../../../../core/store/useOpenAndPendingContracts";
 import { useProfileCities } from "../../../../shared/hooks/useProfileCities";
 import { ChevronDownIcon, FileTextIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import { useGetInvoiceContractsQuery, type InvoiceContract } from "../../../../core/store/sellerInvoiceApi";
-import { useGetAllOpenAndPendingContractsQuery } from "../../../../core/store/contractsApi";
 import { financialYearOf } from "../../contracts/contract-status/contractStatus.data";
 import { money } from "./sellerInvoice.data";
 import "./ContractPicker.scss";
@@ -32,7 +32,7 @@ const ContractPicker = ({ financialYear, value, onSelect, onDetails }: ContractP
   const [open, setOpen] = useState(true);
   const { label: partyLabel } = useProfileCities();
   const { data: contracts, isLoading, isError } = useGetInvoiceContractsQuery({}, { refetchOnMountOrArgChange: true });
-  const { data: openAndPending } = useGetAllOpenAndPendingContractsQuery();
+  const { data: openAndPending } = useOpenAndPendingContracts();
 
   const pending = useMemo(
     () =>

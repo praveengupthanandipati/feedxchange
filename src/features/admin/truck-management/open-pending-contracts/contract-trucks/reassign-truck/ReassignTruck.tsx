@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useOpenAndPendingContracts } from "../../../../../../core/store/useOpenAndPendingContracts";
 import PartyName from "../../../../../../shared/components/party/PartyName";
 import { useProfileCities } from "../../../../../../shared/hooks/useProfileCities";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -8,7 +9,6 @@ import SearchableSelect from "../../../../../../shared/components/dropdown/Searc
 import { useGetAllActiveDriversQuery } from "../../../../../../core/store/driversApi";
 import { useGetProfileAddressQuery } from "../../../../../../core/store/userProfilesCommonApi";
 import {
-  useGetAllOpenAndPendingContractsQuery,
   useGetContractByContractNumberQuery,
   type OpenAndPendingContract,
 } from "../../../../../../core/store/contractsApi";
@@ -103,7 +103,7 @@ const ReassignForm = ({ contractNumber, contractTruckId, overview }: ReassignFor
 
   const { data: sourceContract, isFetching: loadingSource } =
     useGetContractByContractNumberQuery(contractNumber);
-  const { data: openContracts } = useGetAllOpenAndPendingContractsQuery();
+  const { data: openContracts } = useOpenAndPendingContracts();
   const { data: drivers } = useGetAllActiveDriversQuery();
   const [reassignContractTruck, { isLoading: saving }] = useReassignContractTruckMutation();
 

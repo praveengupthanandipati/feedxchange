@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import TimePickerInput from "../../../../../shared/components/dropdown/TimePickerInput";
 import { createPortal } from "react-dom";
 import { SaveIcon, XIcon } from "../../../../../shared/components/icon";
-import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
 import MultiSelect from "../../../../../shared/components/dropdown/MultiSelect";
-import { timeOptions } from "../assignTransportsOptions.data";
+import { currentTimeValue, isPastDateTime, todayDateValue } from "../../open-pending-contracts/contract-trucks/contractDispatch.options";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../core/store/transportersApi";
 import AddressSelectField from "../../contract-trucks/AddressSelectField";
 import { useGetScheduleStatusesQuery } from "../../../../../core/store/contractsApi";
@@ -121,7 +121,8 @@ const ScheduleRequestDrawer = ({
         autoApprove: editingRow.autoApprove,
       });
     } else {
-      setForm(initialFormState);
+      // a new request starts at the current time (hours and minutes), which can be changed
+      setForm({ ...initialFormState, time: currentTimeValue() });
     }
     setErrors({});
     setSubmitError("");
@@ -156,6 +157,7 @@ const ScheduleRequestDrawer = ({
 
     if (!form.date) nextErrors.date = "Schedule date is required.";
     if (!form.time) nextErrors.time = "Schedule time is required.";
+    else if (!editingRow && isPastDateTime(form.date, form.time)) nextErrors.time = "Date and time can't be in the past.";
 
     if (!form.qty.trim()) {
       nextErrors.qty = "Truck quantity is required.";
@@ -370,6 +372,7 @@ const ScheduleRequestDrawer = ({
               <DatePickerInput
                 id="schedule-date"
                 value={form.date}
+                min={!editingRow ? todayDateValue() : undefined}
                 onChange={(value) => setField("date", value)}
                 ariaLabel="Date"
               />
@@ -380,12 +383,13 @@ const ScheduleRequestDrawer = ({
               <label className="schedule-request-drawer__label">
                 Time <span className="schedule-request-drawer__required">*</span>
               </label>
-              <SearchableSelect
-                options={timeOptions}
+              {/* Type HH:MM, or pick from the small Hours / Minutes panel; starts at the current time. */}
+              <TimePickerInput
+                className="schedule-request-drawer__control"
                 value={form.time}
+                min={!editingRow && form.date === todayDateValue() ? currentTimeValue() : undefined}
                 onChange={(value) => setField("time", value)}
-                placeholder="00:00"
-                ariaLabel="Select Time"
+                ariaLabel="Time"
               />
               {errors.time && <p className="schedule-request-drawer__error">{errors.time}</p>}
             </div>

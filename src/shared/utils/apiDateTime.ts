@@ -37,5 +37,5 @@ export function splitApiDateTimeForForm(value: string | null | undefined): {
   const date = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(
     parsed.getDate(),
   ).padStart(2, "0")}`;
-  return { date, time: `${String(parsed.getHours()).padStart(2, "0")}:00` };
+  return { date, time: `${String(parsed.getHours()).padStart(2, "0")}:${String(parsed.getMinutes()).padStart(2, "0")}` };
 }

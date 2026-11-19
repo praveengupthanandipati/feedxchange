@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronLeftIcon, LogOutIcon, XIcon } from "../../../shared/components/icon";
 import logo from "../../../shared/assets/img/logo.png";
 import favIcon from "../../../shared/assets/img/fav.png";
@@ -19,6 +19,12 @@ import "./aside.scss";
 const CONTRACT_SCOPED_ITEM_IDS = ["contract-dispatch-management", "pending-contracts"];
 
 const SCROLL_INDICATOR_TIMEOUT = 800;
+/** Pause before a hovered module heading opens its module (ms). */
+const HOVER_OPEN_DELAY = 150;
+
+/** The FeedXchange module (backend key FEEDXCHANGE, built-in menu id "your-company") is never collapsed. */
+const isAlwaysOpenSection = (section: { id: string; title?: string }) =>
+  ["feedxchange", "your-company"].includes(section.id.toLowerCase()) || /^feedxchange$/i.test(section.title?.trim() ?? "");
 
 interface AsideProps {
   mobileOpen?: boolean;
@@ -71,6 +77,56 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
     setOpenItemId((prev) => (prev === id ? null : id));
   };
 
+  // Module headings are collapsible. The current screen's module is open and never collapses on hover. Pointing at
+  // another module previews it (closes again when the pointer leaves, if nothing was opened); clicking / tapping a
+  // heading switches to that module; opening a screen makes its module the open one.
+  const location = useLocation();
+  /** A module the user switched to by clicking its heading (null = the current screen's module). */
+  const [openSectionId, setOpenSectionId] = useState<string | null>(null);
+  const hoverTimer = useRef<number | undefined>(undefined);
+  const activeSectionId = useMemo(() => {
+    const inside = (path?: string) => {
+      const base = path?.split("?")[0];
+      return Boolean(base) && (location.pathname === base || location.pathname.startsWith(`${base}/`));
+    };
+    return navSections.find((section) =>
+      section.items.some((item) => inside(item.path) || item.children?.some((child) => inside(child.path) || child.relatedPaths?.some(inside))),
+    )?.id;
+  }, [navSections, location.pathname]);
+  // Opening a screen: its module is the open one again.
+  useEffect(() => {
+    setOpenSectionId(null);
+  }, [activeSectionId]);
+  /** The one open module: the one switched to by a click, else the current screen's module. */
+  const shownSectionId = openSectionId ?? activeSectionId ?? null;
+  const toggleSection = (id: string) => {
+    window.clearTimeout(hoverTimer.current);
+    // Clicking the open module's heading closes it, except the current screen's module, which stays open.
+    if (id === shownSectionId) {
+      if (id !== activeSectionId) setOpenSectionId(null);
+      return;
+    }
+    setOpenSectionId(id === activeSectionId ? null : id);
+  };
+  // Hover preview: pointing at another module (after a short pause, so passing over headings does not open them) shows
+  // its sub-modules; moving the pointer away from it closes it again unless a screen in it was opened. The current
+  // screen's module stays open throughout.
+  const [hoverSectionId, setHoverSectionId] = useState<string | null>(null);
+  const enterSection = (id: string) => {
+    window.clearTimeout(hoverTimer.current);
+    if (collapsed || id === shownSectionId) return;
+    hoverTimer.current = window.setTimeout(() => setHoverSectionId(id), HOVER_OPEN_DELAY);
+  };
+  const leaveSection = (id: string) => {
+    window.clearTimeout(hoverTimer.current);
+    setHoverSectionId((prev) => (prev === id ? null : prev));
+  };
+  // Opening a screen ends any preview.
+  useEffect(() => {
+    setHoverSectionId(null);
+  }, [location.pathname]);
+  useEffect(() => () => window.clearTimeout(hoverTimer.current), []);
+
   const handleNavScroll = () => {
     setIsScrolling(true);
     window.clearTimeout(scrollTimer.current);
@@ -115,12 +171,32 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
         className={`aside__nav ${isScrolling ? "is-scrolling" : ""}`}
         onScroll={handleNavScroll}
       >
-        {navSections.map((section) => (
-          <div key={section.id} className="aside__section">
-            {section.title && (
-              <p className="aside__section-title">{section.title}</p>
+        {navSections.map((section) => {
+          // A module heading opens / closes its sub-modules. Always open: a section without a heading, and the
+          // FeedXchange module (Dashboard, Seller Buyer Report), whose heading is plain text.
+          const alwaysOpen = !section.title || isAlwaysOpenSection(section);
+          const sectionOpen = alwaysOpen || shownSectionId === section.id || hoverSectionId === section.id;
+          return (
+          <div
+            key={section.id}
+            className={`aside__section ${sectionOpen ? "" : "is-closed"}`}
+            // the whole module (heading and its list) counts as "pointed at", so moving down into the list keeps it open
+            onMouseEnter={alwaysOpen ? undefined : () => enterSection(section.id)}
+            onMouseLeave={alwaysOpen ? undefined : () => leaveSection(section.id)}
+          >
+            {section.title && alwaysOpen && <p className="aside__section-title">{section.title}</p>}
+            {section.title && !alwaysOpen && (
+              <button
+                type="button"
+                className="aside__section-title aside__section-toggle"
+                onClick={() => toggleSection(section.id)}
+                aria-expanded={sectionOpen}
+                aria-controls={`aside-section-${section.id}`}
+              >
+                {section.title}
+              </button>
             )}
-            <ul className="aside__list">
+            <ul className="aside__list" id={`aside-section-${section.id}`}>
               {section.items.map((item) => (
                 <AsideMenuItem
                   key={item.id}
@@ -135,7 +211,8 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
               ))}
             </ul>
           </div>
-        ))}
+          );
+        })}
       </nav>
 
       <div className="aside__footer">

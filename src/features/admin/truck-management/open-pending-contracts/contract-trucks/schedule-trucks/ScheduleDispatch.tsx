@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import TimePickerInput from "../../../../../../shared/components/dropdown/TimePickerInput";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeftIcon, CircleCheckBigIcon, FileTextIcon, SaveIcon, XIcon } from "../../../../../../shared/components/icon";
-import SearchableSelect from "../../../../../../shared/components/dropdown/SearchableSelect";
 import DatePickerInput from "../../../../../../shared/components/dropdown/DatePickerInput";
 import MultiSelect from "../../../../../../shared/components/dropdown/MultiSelect";
 import InfoPanel from "../InfoPanel";
@@ -9,7 +9,7 @@ import ContractSummaryPanel from "../../../contract-trucks/ContractSummaryPanel"
 import PendingContractSelector from "../../../contract-trucks/PendingContractSelector";
 import AddressSelectField from "../../../contract-trucks/AddressSelectField";
 import { useContractQuantitySummary } from "../../../contract-trucks/useContractQuantitySummary";
-import { timeOptions } from "../contractDispatch.options";
+import { currentTimeValue, isPastDateTime, todayDateValue } from "../contractDispatch.options";
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
 import {
   useGetContractByContractNumberQuery,
@@ -70,7 +70,8 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
   const buyerId = contract?.buyerId ?? 0;
   const contractId = contract?.id ?? 0;
 
-  const [form, setForm] = useState<FormState>(initialFormState);
+  // The time starts at the current time (hours and minutes) and can be changed.
+  const [form, setForm] = useState<FormState>(() => ({ ...initialFormState, time: currentTimeValue() }));
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState("");
   const [saved, setSaved] = useState(false);
@@ -123,6 +124,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
 
     if (!form.date) nextErrors.date = "Schedule date is required.";
     if (!form.time) nextErrors.time = "Schedule time is required.";
+    else if (isPastDateTime(form.date, form.time)) nextErrors.time = "Date and time can't be in the past.";
 
     if (!form.qty.trim()) {
       nextErrors.qty = "Truck quantity is required.";
@@ -144,7 +146,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
   };
 
   const handleReset = () => {
-    setForm(initialFormState);
+    setForm({ ...initialFormState, time: currentTimeValue() });
     setErrors({});
     setSubmitError("");
   };
@@ -308,6 +310,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
           <DatePickerInput
             id="schedule-date"
             value={form.date}
+            min={todayDateValue()}
             onChange={(value) => setField("date", value)}
             ariaLabel="Date"
           />
@@ -318,12 +321,13 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
           <label className="schedule-request-drawer__label">
             Time <span className="schedule-request-drawer__required">*</span>
           </label>
-          <SearchableSelect
-            options={timeOptions}
+          {/* Type HH:MM, or pick from the small Hours / Minutes panel; starts at the current time. */}
+          <TimePickerInput
+            className="schedule-request-drawer__control"
             value={form.time}
+            min={form.date === todayDateValue() ? currentTimeValue() : undefined}
             onChange={(value) => setField("time", value)}
-            placeholder="00:00"
-            ariaLabel="Select Time"
+            ariaLabel="Time"
           />
           {errors.time && <p className="schedule-request-drawer__error">{errors.time}</p>}
         </div>

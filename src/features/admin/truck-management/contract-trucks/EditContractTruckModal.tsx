@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import TimePickerInput from "../../../../shared/components/dropdown/TimePickerInput";
 import { createPortal } from "react-dom";
 import { PenIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import DriverSelectFields from "./DriverSelectFields";
 import AddressSelectField from "./AddressSelectField";
-import { timeOptions } from "../open-pending-contracts/contract-trucks/contractDispatch.options";
 import { useGetAllActiveTruckDetailsQuery } from "../../../../core/store/trucksApi";
 import { useGetAllActiveDriversQuery } from "../../../../core/store/driversApi";
 import { getApiErrorMessage, useUpdateContractTrucksMutation, type TruckByContract } from "../../../../core/store/contractTrucksApi";
@@ -314,12 +314,12 @@ const EditContractTruckModal = ({
                 <label className="assign-truck-drawer__label">
                   Time <span className="assign-truck-drawer__required">*</span>
                 </label>
-                <SearchableSelect
-                  options={timeOptions}
+                {/* Type HH:MM, or pick from the small Hours / Minutes panel; starts at the current time. */}
+                <TimePickerInput
+                  className="assign-truck-drawer__control"
                   value={form.time}
                   onChange={(value) => setField("time", value)}
-                  placeholder="00:00"
-                  ariaLabel="Select Time"
+                  ariaLabel="Time"
                 />
                 {errors.time && <p className="assign-truck-drawer__error">{errors.time}</p>}
               </div>

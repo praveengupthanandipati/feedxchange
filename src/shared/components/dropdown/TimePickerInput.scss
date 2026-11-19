@@ -1,0 +1,119 @@
+@use "../../assets/styles/variables" as v;
+@use "../../assets/styles/mixins" as m;
+
+$row-height: 1.75rem;
+$visible-rows: 5;
+
+// Time field: the text field (typed HH:MM) with a clock button on its right that opens a small Hours / Minutes panel.
+.time-picker {
+  position: relative;
+  width: 100%;
+
+  // Room for the clock button; the browser's own picker icon is hidden (the panel below replaces its popup).
+  &__input {
+    width: 100%;
+    padding-right: 2.25rem !important;
+
+    &::-webkit-calendar-picker-indicator {
+      display: none;
+    }
+  }
+
+  &__toggle {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    position: absolute;
+    top: 50%;
+    right: v.$spacing-1;
+    width: 1.75rem;
+    height: 1.75rem;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    color: v.fg(v.$color-text-muted);
+    transform: translateY(-50%);
+    cursor: pointer;
+
+    &:hover {
+      background-color: v.$color-bg-muted;
+      color: v.fg(v.$color-text);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  // Placed by the component (fixed, against the viewport, kept on screen): see useAnchoredPanel.
+  &__panel {
+    position: fixed;
+    z-index: v.$z-index-modal-top;
+    display: flex;
+    gap: v.$spacing-1;
+    padding: v.$spacing-2;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background-color: v.$color-bg;
+    box-shadow: v.$shadow-lg;
+  }
+
+  &__column {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    width: 3.25rem;
+  }
+
+  &__heading {
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.7rem);
+    font-weight: v.$font-weight-semibold;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  // Five rows visible; the rest scroll.
+  &__list {
+    max-height: $row-height * $visible-rows;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+    scrollbar-width: thin;
+
+    button {
+      @include m.font-base;
+      display: block;
+      width: 100%;
+      height: $row-height;
+      min-height: 0;
+      padding: 0;
+      border: none;
+      border-radius: v.$radius-sm;
+      background: transparent;
+      color: v.fg(v.$color-text);
+      font-size: v.$font-size-sm;
+      text-align: center;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background-color: v.$color-bg-muted;
+      }
+
+      &.is-selected {
+        background-color: v.$color-navy;
+        color: v.on(v.$color-white);
+        font-weight: v.$font-weight-semibold;
+      }
+
+      &:disabled {
+        color: v.fg(v.$color-gray-400);
+        cursor: not-allowed;
+      }
+    }
+  }
+}
