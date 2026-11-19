@@ -1,6 +1,6 @@
 import { useMemo } from "react";
+import { useOpenAndPendingContracts } from "../../../../core/store/useOpenAndPendingContracts";
 import {
-  useGetAllOpenAndPendingContractsQuery,
   useGetContractByContractNumberQuery,
 } from "../../../../core/store/contractsApi";
 import {
@@ -40,7 +40,7 @@ export function useContractQuantitySummary(contractNumber: string): ContractQuan
   const { data: contract } = useGetContractByContractNumberQuery(contractNumber, {
     skip: !shouldFetch,
   });
-  const { data: openAndPendingContracts } = useGetAllOpenAndPendingContractsQuery(undefined, {
+  const { data: openAndPendingContracts } = useOpenAndPendingContracts(undefined, {
     skip: !shouldFetch,
   });
 

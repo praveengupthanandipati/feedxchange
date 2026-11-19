@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useOpenAndPendingContracts } from "../../../../core/store/useOpenAndPendingContracts";
 import PartyName from "../../../../shared/components/party/PartyName";
 import { useProfileCities, withCity } from "../../../../shared/hooks/useProfileCities";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
@@ -6,7 +7,6 @@ import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import {
   useGetAllContractsQuery,
-  useGetAllOpenAndPendingContractsQuery,
 } from "../../../../core/store/contractsApi";
 import {
   ChevronLeftIcon,
@@ -175,7 +175,7 @@ const PendingContracts = () => {
   const [truckDrawerRow, setTruckDrawerRow] = useState<PendingContractRow | null>(null);
   const { setSelectedContract } = useSelectedContract();
 
-  const { data: openAndPendingContracts, isLoading: listLoading, isFetching, isError: listFailed } = useGetAllOpenAndPendingContractsQuery();
+  const { data: openAndPendingContracts, isLoading: listLoading, isFetching, isError: listFailed } = useOpenAndPendingContracts();
 
   // The list endpoint also returns contracts still pending approval, which cannot take trucks.
   // Only Open and Partially Dispatched contracts are shown; the real status comes from GetAllContracts.

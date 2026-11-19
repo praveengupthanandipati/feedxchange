@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { useOpenAndPendingContracts } from "../../../../core/store/useOpenAndPendingContracts";
 import { useProfileCities } from "../../../../shared/hooks/useProfileCities";
 import { ChevronLeftIcon, ChevronRightIcon, FileTextIcon, PlusIcon, SearchIcon } from "../../../../shared/components/icon";
 import { useGetInvoiceContractsQuery, type InvoiceContract } from "../../../../core/store/sellerInvoiceApi";
-import { useGetAllOpenAndPendingContractsQuery } from "../../../../core/store/contractsApi";
 import { financialYearOf } from "../../contracts/contract-status/contractStatus.data";
 import { money } from "../seller-invoice/sellerInvoice.data";
 import "./PendingContractsPanel.scss";
@@ -36,7 +36,7 @@ const PendingContractsPanel = ({ financialYear, onSelect, onDetails }: PendingCo
   const { label: partyLabel } = useProfileCities();
   const { data: contracts, isLoading, isError, refetch } = useGetInvoiceContractsQuery({}, { refetchOnMountOrArgChange: true });
   // The details the Open & Pending Contracts screen shows (despatched / arranged quantity, delivery schedule, payment terms).
-  const { data: openAndPending } = useGetAllOpenAndPendingContractsQuery();
+  const { data: openAndPending } = useOpenAndPendingContracts();
   const details = useMemo(() => new Map((openAndPending ?? []).map((row) => [row.contractNumber, row])), [openAndPending]);
 
   const rows = useMemo(() => {

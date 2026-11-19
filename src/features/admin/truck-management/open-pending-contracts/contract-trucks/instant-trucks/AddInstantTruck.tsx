@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import TimePickerInput from "../../../../../../shared/components/dropdown/TimePickerInput";
+import { currentTimeValue, isPastDateTime, todayDateValue } from "../contractDispatch.options";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeftIcon, CircleCheckBigIcon, FileTextIcon, SaveIcon, XIcon } from "../../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../../shared/components/dropdown/SearchableSelect";
@@ -8,7 +10,6 @@ import ContractSummaryPanel from "../../../contract-trucks/ContractSummaryPanel"
 import PendingContractSelector from "../../../contract-trucks/PendingContractSelector";
 import DriverSelectFields from "../../../contract-trucks/DriverSelectFields";
 import AddressSelectField from "../../../contract-trucks/AddressSelectField";
-import { timeOptions } from "../contractDispatch.options";
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
 import {
   useGetContractByContractNumberQuery,
@@ -70,7 +71,9 @@ function getCurrentDateValue(): string {
 }
 
 function getCurrentTimeValue(): string {
-  return `${String(new Date().getHours()).padStart(2, "0")}:00`;
+  // The current time with minutes (the field can still be changed).
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
 
 const DEFAULT_DISPATCH_STATUS_ID = 1;
@@ -173,6 +176,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
 
     if (!form.date) nextErrors.date = "Schedule date is required.";
     if (!form.time) nextErrors.time = "Schedule time is required.";
+    else if (isPastDateTime(form.date, form.time)) nextErrors.time = "Date and time can't be in the past.";
 
     if (!form.lrNumber.trim()) nextErrors.lrNumber = "LR number is required.";
 
@@ -437,6 +441,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
           <DatePickerInput
             id="schedule-date"
             value={form.date}
+            min={todayDateValue()}
             onChange={(value) => setField("date", value)}
             ariaLabel="Date"
           />
@@ -447,12 +452,13 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
           <label className="assign-truck-drawer__label">
             Time <span className="assign-truck-drawer__required">*</span>
           </label>
-          <SearchableSelect
-            options={timeOptions}
+          {/* Type HH:MM, or pick from the small Hours / Minutes panel; starts at the current time. */}
+          <TimePickerInput
+            className="assign-truck-drawer__control"
             value={form.time}
+            min={form.date === todayDateValue() ? currentTimeValue() : undefined}
             onChange={(value) => setField("time", value)}
-            placeholder="00:00"
-            ariaLabel="Select Time"
+            ariaLabel="Time"
           />
           {errors.time && <p className="assign-truck-drawer__error">{errors.time}</p>}
         </div>

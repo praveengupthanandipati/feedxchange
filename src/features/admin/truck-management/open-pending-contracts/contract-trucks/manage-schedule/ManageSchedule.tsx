@@ -259,11 +259,13 @@ const ScheduleRequestRow = ({
               <span className="manage-schedule-table__buttons">
                 <button
                   type="button"
-                  className="review-assign-trucks-btn review-assign-trucks-btn--reject"
+                  className="review-assign-trucks-btn review-assign-trucks-btn--reject manage-schedule-table__icon-btn"
                   onClick={handleReject}
                   disabled={updating}
+                  title="Reject"
+                  aria-label={`Reject request from ${transporterName}`}
                 >
-                  <XIcon aria-hidden /> Reject
+                  <XIcon aria-hidden />
                 </button>
               </span>
             </>
@@ -291,30 +293,30 @@ const ScheduleRequestRow = ({
                 />
                 <span>/MT</span>
               </label>
+              {/* Icon buttons beside the values (the action shows as a tooltip on hover). */}
               <span className="manage-schedule-table__buttons">
                 <button
                   type="button"
-                  className="review-assign-trucks-btn review-assign-trucks-btn--accept"
+                  className="review-assign-trucks-btn review-assign-trucks-btn--accept manage-schedule-table__icon-btn"
                   onClick={handleAccept}
                   disabled={updating}
+                  title="Accept"
+                  aria-label={`Accept request from ${transporterName}`}
                 >
-                  <CheckIcon aria-hidden /> Accept
+                  <CheckIcon aria-hidden />
                 </button>
                 <button
                   type="button"
-                  className="review-assign-trucks-btn review-assign-trucks-btn--reject"
+                  className="review-assign-trucks-btn review-assign-trucks-btn--reject manage-schedule-table__icon-btn"
                   onClick={handleReject}
                   disabled={updating}
+                  title="Reject"
+                  aria-label={`Reject request from ${transporterName}`}
                 >
-                  <XIcon aria-hidden /> Reject
+                  <XIcon aria-hidden />
                 </button>
               </span>
             </>
-          )}
-          {isAccepted && (
-            <span className="manage-schedule-table__remaining">
-              {assignedQty} MT assigned · {remainingQty} MT remaining
-            </span>
           )}
           {isAccepted && remainingQty > 0 && (
             <>
@@ -334,17 +336,21 @@ const ScheduleRequestRow = ({
                   to={`/admin/truck-management/open-pending-contracts/add-truck-to-schedule?contract=${encodeURIComponent(
                     contractNumber,
                   )}&transporterId=${detail.transporterProfileId}&dispatchScheduleTransporterId=${detail.dispatchScheduleTransporterId}`}
-                  className="review-assign-trucks-btn review-assign-trucks-btn--add"
+                  className="review-assign-trucks-btn review-assign-trucks-btn--add manage-schedule-table__icon-btn"
+                  title="Add Truck"
+                  aria-label={`Add truck for ${transporterName}`}
                 >
-                  <PlusIcon aria-hidden /> Add Truck
+                  <PlusIcon aria-hidden />
                 </Link>
                 <button
                   type="button"
-                  className="review-assign-trucks-btn review-assign-trucks-btn--reject"
+                  className="review-assign-trucks-btn review-assign-trucks-btn--reject manage-schedule-table__icon-btn"
                   onClick={handleCancel}
                   disabled={cancelling}
+                  title={cancelling ? "Cancelling…" : "Cancel"}
+                  aria-label={cancelling ? "Cancelling…" : `Cancel request from ${transporterName}`}
                 >
-                  <BanIcon aria-hidden /> {cancelling ? "Cancelling…" : "Cancel"}
+                  <BanIcon aria-hidden />
                 </button>
               </span>
             </>
@@ -356,6 +362,12 @@ const ScheduleRequestRow = ({
           )}
           {!isPending && !isAccepted && <span className="manage-schedule-table__muted">-</span>}
         </div>
+        {/* Below the action row: how much of the accepted quantity is on trucks and how much is left. */}
+        {isAccepted && (
+          <span className="manage-schedule-table__remaining">
+            {assignedQty} MT assigned · {remainingQty} MT remaining
+          </span>
+        )}
         {actionError && <span className="manage-schedule-table__error">{actionError}</span>}
       </td>
       <td>{formatApiDateTime(detail.scheduleDateTime)}</td>
@@ -386,10 +398,11 @@ const ScheduleRequestRow = ({
         >
           {statusLabel}
         </span>
-        <span className="manage-schedule-table__timestamps">
-          Notified {formatApiDateTime(detail.notifiedDateTime)}
-          {detail.responseDateTime && <> · Responded {formatApiDateTime(detail.responseDateTime)}</>}
-        </span>
+        {/* One below the other: when the transporter was notified, then when they responded. */}
+        <span className="manage-schedule-table__timestamps">Notified {formatApiDateTime(detail.notifiedDateTime)}</span>
+        {detail.responseDateTime && (
+          <span className="manage-schedule-table__timestamps">Responded {formatApiDateTime(detail.responseDateTime)}</span>
+        )}
       </td>
       <td className="manage-schedule-table__remarks">{detail.responseRemarks || "-"}</td>
     </tr>

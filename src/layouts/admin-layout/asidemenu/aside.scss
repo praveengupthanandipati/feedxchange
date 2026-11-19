@@ -53,6 +53,14 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
       max-height: 0;
     }
 
+    // The icon rail has no module headings, so every module's icons stay visible there (desktop only; the phone
+    // drawer shows headings and keeps them collapsible).
+    @include m.respond-to(lg) {
+      .aside__section.is-closed .aside__list {
+        display: block;
+      }
+    }
+
     // The collapsed icon-rail is a desktop affordance; the mobile drawer
     // always shows the full, labeled menu regardless of desktop state.
     @include m.respond-below(lg) {
@@ -195,6 +203,32 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
     margin: 0 0 v.$spacing-2;
     white-space: nowrap;
     transition: opacity v.$transition-fast;
+  }
+
+  // The module heading as a button that opens / closes its sub-modules (same look as the heading text, no icon).
+  &__section-toggle {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    width: 100%;
+    min-height: 1.75rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover {
+      color: v.fg(v.$color-orange-light);
+    }
+  }
+
+  // A closed module hides its sub-modules (not in the desktop icon rail, which has no headings: see below).
+  &__section.is-closed &__list {
+    display: none;
+  }
+
+  &__section.is-closed {
+    margin-top: v.$spacing-2;
   }
 
   &__list {

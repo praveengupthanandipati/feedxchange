@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import TimePickerInput from "../../../../../shared/components/dropdown/TimePickerInput";
+import { currentTimeValue, isPastDateTime, todayDateValue } from "../../open-pending-contracts/contract-trucks/contractDispatch.options";
 import { createPortal } from "react-dom";
 import { SaveIcon, XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import DatePickerInput from "../../../../../shared/components/dropdown/DatePickerInput";
-import { timeOptions } from "../assignTransportsOptions.data";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../core/store/transportersApi";
 import { useGetAllActiveTruckDetailsQuery } from "../../../../../core/store/trucksApi";
 import DriverSelectFields from "../../contract-trucks/DriverSelectFields";
@@ -82,7 +83,9 @@ function getCurrentDateValue(): string {
 }
 
 function getCurrentTimeValue(): string {
-  return `${String(new Date().getHours()).padStart(2, "0")}:00`;
+  // The current time with minutes (the field can still be changed).
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
 
 interface AssignNewTruckDrawerProps {
@@ -211,6 +214,7 @@ const AssignNewTruckDrawer = ({
 
     if (!form.date) nextErrors.date = "Schedule date is required.";
     if (!form.time) nextErrors.time = "Schedule time is required.";
+    else if (!editingRow && isPastDateTime(form.date, form.time)) nextErrors.time = "Date and time can't be in the past.";
 
     if (!form.qty.trim()) {
       nextErrors.qty = "Truck quantity is required.";
@@ -500,6 +504,7 @@ const AssignNewTruckDrawer = ({
               <DatePickerInput
                 id="schedule-date"
                 value={form.date}
+                min={!editingRow ? todayDateValue() : undefined}
                 onChange={(value) => setField("date", value)}
                 ariaLabel="Date"
               />
@@ -510,12 +515,13 @@ const AssignNewTruckDrawer = ({
               <label className="assign-truck-drawer__label">
                 Time <span className="assign-truck-drawer__required">*</span>
               </label>
-              <SearchableSelect
-                options={timeOptions}
+              {/* Type HH:MM, or pick from the small Hours / Minutes panel; starts at the current time. */}
+              <TimePickerInput
+                className="assign-truck-drawer__control"
                 value={form.time}
+                min={!editingRow && form.date === todayDateValue() ? currentTimeValue() : undefined}
                 onChange={(value) => setField("time", value)}
-                placeholder="00:00"
-                ariaLabel="Select Time"
+                ariaLabel="Time"
               />
               {errors.time && <p className="assign-truck-drawer__error">{errors.time}</p>}
             </div>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useOpenAndPendingContracts } from "../../../../core/store/useOpenAndPendingContracts";
 import PartyName from "../../../../shared/components/party/PartyName";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -16,7 +17,6 @@ import ScheduleTruckAssignment from "./schedule-truck-assignment/ScheduleTruckAs
 import {
   useGetContractByContractNumberQuery,
   useGetTruckAssignmentTypesQuery,
-  useGetAllOpenAndPendingContractsQuery,
 } from "../../../../core/store/contractsApi";
 import "./Assigntransports.scss";
 
@@ -37,7 +37,7 @@ const Assigntransports = () => {
     skip: !contractNumber,
   });
   const { data: assignmentTypes } = useGetTruckAssignmentTypesQuery();
-  const { data: openAndPendingContracts } = useGetAllOpenAndPendingContractsQuery();
+  const { data: openAndPendingContracts } = useOpenAndPendingContracts();
 
   const matchingOpenContract = useMemo(
     () => openAndPendingContracts?.find((row) => row.contractNumber === contractNumber),

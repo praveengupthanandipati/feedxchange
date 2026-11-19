@@ -1,7 +1,7 @@
 import { useMemo } from "react";
+import { useOpenAndPendingContracts } from "../../../../core/store/useOpenAndPendingContracts";
 import { useProfileCities } from "../../../../shared/hooks/useProfileCities";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
-import { useGetAllOpenAndPendingContractsQuery } from "../../../../core/store/contractsApi";
 import "./PendingContractSelector.scss";
 
 interface PendingContractSelectorProps {
@@ -10,7 +10,7 @@ interface PendingContractSelectorProps {
 }
 
 const PendingContractSelector = ({ value, onChange }: PendingContractSelectorProps) => {
-  const { data: contracts, isLoading } = useGetAllOpenAndPendingContractsQuery();
+  const { data: contracts, isLoading } = useOpenAndPendingContracts();
   const { label: partyLabel } = useProfileCities();
 
   const options = useMemo(

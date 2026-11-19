@@ -259,6 +259,24 @@
     }
   }
 
+  // The time field: same size as the date picker beside it (full width, standard field height), clock icon clickable.
+  &__control[type="time"] {
+    width: 100%;
+    min-width: 12rem;
+    height: var(--fx-control-height);
+    font-weight: v.$font-weight-medium;
+    cursor: pointer;
+
+    &::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    &::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+  }
+
   &__field {
     display: flex;
     flex-direction: column;

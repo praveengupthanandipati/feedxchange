@@ -75,18 +75,33 @@
     border-bottom: none;
   }
 
-  // The quantity, freight and buttons wrap onto their own lines rather than
-  // forcing the column wide enough to squeeze the remarks beside it.
+  // The quantity, freight and the icon buttons sit on one row (the table scrolls sideways if it needs to).
   &__action-cell {
-    white-space: normal;
+    white-space: nowrap;
     min-width: 13rem;
   }
 
   &__actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: v.$spacing-2;
+  }
+
+  // Accept / Reject / Add Truck / Cancel: icon only, square, as tall as the inputs beside them; the action shows
+  // as a tooltip on hover (title) and is read out by screen readers (aria-label). Written with the button's own class
+  // so it always wins over the shared button size, whichever stylesheet loads last.
+  .review-assign-trucks-btn.manage-schedule-table__icon-btn {
+    width: 2rem;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0;
+    gap: 0;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
   }
 
   // Accept and Reject stay side by side; only the inputs above them wrap away.
@@ -138,10 +153,10 @@
     letter-spacing: 0.03em;
   }
 
-  // Sits on its own line above the action controls.
+  // "x MT assigned · y MT remaining", on its own line below the action row.
   &__remaining {
     display: block;
-    flex: 1 1 100%;
+    margin-top: v.$spacing-1;
     color: v.fg(v.$color-text-muted);
     font-size: max(11px, 0.7rem);
   }

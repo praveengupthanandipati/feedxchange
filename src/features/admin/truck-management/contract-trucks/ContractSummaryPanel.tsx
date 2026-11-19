@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useOpenAndPendingContracts } from "../../../../core/store/useOpenAndPendingContracts";
 import PartyName from "../../../../shared/components/party/PartyName";
 import {
   ChevronDownIcon,
@@ -10,7 +11,6 @@ import {
 } from "../../../../shared/components/icon";
 import {
   useGetContractByContractNumberQuery,
-  useGetAllOpenAndPendingContractsQuery,
 } from "../../../../core/store/contractsApi";
 import { useContractTruckDetails } from "./useContractTruckDetails";
 import { useContractQuantitySummary } from "./useContractQuantitySummary";
@@ -68,7 +68,7 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
   // Collapsed by default; the quantity cards above stay visible.
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { data: contract } = useGetContractByContractNumberQuery(contractNumber, { skip: !contractNumber });
-  const { data: openAndPendingContracts } = useGetAllOpenAndPendingContractsQuery();
+  const { data: openAndPendingContracts } = useOpenAndPendingContracts();
   const { trucks } = useContractTruckDetails(contractNumber, Boolean(contractNumber));
 
   const matchingOpenContract = useMemo(
