@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ChevronLeftIcon, LogOutIcon, XIcon } from "../../../shared/components/icon";
+import { ChevronDownIcon, ChevronLeftIcon, LogOutIcon, XIcon } from "../../../shared/components/icon";
 import logo from "../../../shared/assets/img/logo.png";
 import favIcon from "../../../shared/assets/img/fav.png";
 import { asideNavSections } from "./aside.data";
@@ -19,8 +19,6 @@ import "./aside.scss";
 const CONTRACT_SCOPED_ITEM_IDS = ["contract-dispatch-management", "pending-contracts"];
 
 const SCROLL_INDICATOR_TIMEOUT = 800;
-/** Pause before a hovered module heading opens its module (ms). */
-const HOVER_OPEN_DELAY = 150;
 
 /** The FeedXchange module (backend key FEEDXCHANGE, built-in menu id "your-company") is never collapsed. */
 const isAlwaysOpenSection = (section: { id: string; title?: string }) =>
@@ -77,56 +75,42 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
     setOpenItemId((prev) => (prev === id ? null : id));
   };
 
-  // Module headings are collapsible. The current screen's module is open and never collapses on hover. Pointing at
-  // another module previews it (closes again when the pointer leaves, if nothing was opened); clicking / tapping a
-  // heading switches to that module; opening a screen makes its module the open one.
+  // Module headings are collapsible. The current screen's module is open; clicking / tapping another module's heading
+  // shows its sub-modules (hovering does nothing); opening a screen makes its module the open one.
   const location = useLocation();
   /** A module the user switched to by clicking its heading (null = the current screen's module). */
   const [openSectionId, setOpenSectionId] = useState<string | null>(null);
-  const hoverTimer = useRef<number | undefined>(undefined);
   const activeSectionId = useMemo(() => {
-    const inside = (path?: string) => {
+    // How well a menu path matches the current screen: an exact match beats any "screen under it" match, and a longer
+    // path beats a shorter one. So Update Schedule (Truck Management, …/open-pending-contracts/manage-schedule) wins over
+    // a module whose entry is only its parent route (…/open-pending-contracts), wherever the modules sit in the menu.
+    const score = (path?: string) => {
       const base = path?.split("?")[0];
-      return Boolean(base) && (location.pathname === base || location.pathname.startsWith(`${base}/`));
+      if (!base) return 0;
+      if (location.pathname === base) return 100000 + base.length;
+      return location.pathname.startsWith(`${base}/`) ? base.length : 0;
     };
-    return navSections.find((section) =>
-      section.items.some((item) => inside(item.path) || item.children?.some((child) => inside(child.path) || child.relatedPaths?.some(inside))),
-    )?.id;
+    let best: { id: string; score: number } | undefined;
+    for (const section of navSections) {
+      const paths = section.items.flatMap((item) => [
+        item.path,
+        ...(item.children ?? []).flatMap((child) => [child.path, ...(child.relatedPaths ?? [])]),
+      ]);
+      const sectionScore = Math.max(0, ...paths.map(score));
+      if (sectionScore > 0 && (!best || sectionScore > best.score)) best = { id: section.id, score: sectionScore };
+    }
+    return best?.id;
   }, [navSections, location.pathname]);
   // Opening a screen: its module is the open one again.
   useEffect(() => {
     setOpenSectionId(null);
   }, [activeSectionId]);
-  /** The one open module: the one switched to by a click, else the current screen's module. */
-  const shownSectionId = openSectionId ?? activeSectionId ?? null;
+  // The current screen's module always stays open; a clicked module opens beside it (one at a time: clicking another
+  // module closes the previously clicked one, clicking it again closes it).
   const toggleSection = (id: string) => {
-    window.clearTimeout(hoverTimer.current);
-    // Clicking the open module's heading closes it, except the current screen's module, which stays open.
-    if (id === shownSectionId) {
-      if (id !== activeSectionId) setOpenSectionId(null);
-      return;
-    }
-    setOpenSectionId(id === activeSectionId ? null : id);
+    if (id === activeSectionId) return;
+    setOpenSectionId((prev) => (prev === id ? null : id));
   };
-  // Hover preview: pointing at another module (after a short pause, so passing over headings does not open them) shows
-  // its sub-modules; moving the pointer away from it closes it again unless a screen in it was opened. The current
-  // screen's module stays open throughout.
-  const [hoverSectionId, setHoverSectionId] = useState<string | null>(null);
-  const enterSection = (id: string) => {
-    window.clearTimeout(hoverTimer.current);
-    if (collapsed || id === shownSectionId) return;
-    hoverTimer.current = window.setTimeout(() => setHoverSectionId(id), HOVER_OPEN_DELAY);
-  };
-  const leaveSection = (id: string) => {
-    window.clearTimeout(hoverTimer.current);
-    setHoverSectionId((prev) => (prev === id ? null : prev));
-  };
-  // Opening a screen ends any preview.
-  useEffect(() => {
-    setHoverSectionId(null);
-  }, [location.pathname]);
-  useEffect(() => () => window.clearTimeout(hoverTimer.current), []);
-
   const handleNavScroll = () => {
     setIsScrolling(true);
     window.clearTimeout(scrollTimer.current);
@@ -175,15 +159,9 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
           // A module heading opens / closes its sub-modules. Always open: a section without a heading, and the
           // FeedXchange module (Dashboard, Seller Buyer Report), whose heading is plain text.
           const alwaysOpen = !section.title || isAlwaysOpenSection(section);
-          const sectionOpen = alwaysOpen || shownSectionId === section.id || hoverSectionId === section.id;
+          const sectionOpen = alwaysOpen || activeSectionId === section.id || openSectionId === section.id;
           return (
-          <div
-            key={section.id}
-            className={`aside__section ${sectionOpen ? "" : "is-closed"}`}
-            // the whole module (heading and its list) counts as "pointed at", so moving down into the list keeps it open
-            onMouseEnter={alwaysOpen ? undefined : () => enterSection(section.id)}
-            onMouseLeave={alwaysOpen ? undefined : () => leaveSection(section.id)}
-          >
+          <div key={section.id} className={`aside__section ${sectionOpen ? "" : "is-closed"}`}>
             {section.title && alwaysOpen && <p className="aside__section-title">{section.title}</p>}
             {section.title && !alwaysOpen && (
               <button
@@ -193,7 +171,9 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
                 aria-expanded={sectionOpen}
                 aria-controls={`aside-section-${section.id}`}
               >
-                {section.title}
+                <span className="aside__section-label">{section.title}</span>
+                {/* open / closed arrow, shown only while the heading is hovered or focused */}
+                <ChevronDownIcon className={`aside__section-chevron ${sectionOpen ? "is-open" : ""}`} aria-hidden />
               </button>
             )}
             <ul className="aside__list" id={`aside-section-${section.id}`}>

@@ -53,6 +53,13 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
       max-height: 0;
     }
 
+    // no headings in the icon rail, so no heading arrow either (desktop; the phone drawer keeps it)
+    @include m.respond-to(lg) {
+      .aside__section-chevron {
+        display: none;
+      }
+    }
+
     // The icon rail has no module headings, so every module's icons stay visible there (desktop only; the phone
     // drawer shows headings and keeps them collapsible).
     @include m.respond-to(lg) {
@@ -220,6 +227,31 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
     &:hover {
       color: v.fg(v.$color-orange-light);
     }
+  }
+
+  &__section-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Small open / closed arrow at the end of a module heading: hidden until the heading is hovered (or keyboard-focused).
+  &__section-chevron {
+    flex-shrink: 0;
+    width: 0.85rem;
+    height: 0.85rem;
+    margin-left: auto;
+    opacity: 0;
+    transition: opacity v.$transition-fast, transform v.$transition-base;
+
+    &.is-open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__section-toggle:hover &__section-chevron,
+  &__section-toggle:focus-visible &__section-chevron {
+    opacity: 1;
   }
 
   // A closed module hides its sub-modules (not in the desktop icon rail, which has no headings: see below).

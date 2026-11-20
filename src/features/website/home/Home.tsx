@@ -8,6 +8,7 @@ import ServicesGrid from "../components/sections/ServicesGrid";
 import StatsBand from "../components/sections/StatsBand";
 import Testimonials from "../components/sections/Testimonials";
 import WhyChooseUs from "../components/sections/WhyChooseUs";
+import { whatsappLink } from "../data/content";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { sitePaths } from "../routes/paths";
 
@@ -20,7 +21,7 @@ const Home = () => {
       <Hero />
       <PartnersStrip />
       <PopularCategories />
-      <CtaBanner title="Find best matching raw material prices for your animal feed" text="" action={{ label: "Send an Enquiry", to: sitePaths.contact }} />
+      <CtaBanner title="Find best matching raw material prices for your animal feed" text="" action={{ label: "WhatsApp on 92475 98399", to: whatsappLink }} />
       <ServicesGrid />
       <DealingPartners />
       <WhyChooseUs />

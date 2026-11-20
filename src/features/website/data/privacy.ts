@@ -134,6 +134,6 @@ export const privacySections: PolicySection[] = [
 /** Postal block under "Contact Us", as written in the policy. */
 export const privacyContact = {
   name: "Sri Sai Raghavendra Trade Services",
-  address: "174, 1st floor, Mahatma Gandhi Wholesale Commercial Complex, Mahendra Nagar, Gollapudi, Vijayawada - 521225",
+  address: "174, 1st floor, Mahatma Gandhi Wholesale Commercial Complex, Mahendra Nagar, Gollapudi, Vijayawada, Andhra Pradesh - 521225",
   email: "contact@feedxchange.in",
 };

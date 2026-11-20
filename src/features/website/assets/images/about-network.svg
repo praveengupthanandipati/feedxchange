@@ -20,8 +20,9 @@
   <g filter="url(#a-shadow)">
     <circle cx="260" cy="210" r="58" fill="#0b2547"/>
   </g>
-  <path d="M242 228v-36h26M242 210h18" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M266 210l14 18M280 210l-14 18" stroke="#f5a524" stroke-width="7" stroke-linecap="round"/>
+  <!-- "fX": a small lowercase f and a large X -->
+  <path d="M236 232V208a10 10 0 0 1 10-10h4M229 214h15" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M256 186l34 48M290 186l-34 48" stroke="#f5a524" stroke-width="9" stroke-linecap="round"/>
 
   <!-- Nodes -->
   <g filter="url(#a-shadow)">
