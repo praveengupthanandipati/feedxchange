@@ -22,7 +22,9 @@ const iconFor = (name: string) => ICONS.find(([pattern]) => pattern.test(name))?
  * (or its first products when it has none); each tile opens the Products page on that category.
  */
 const PopularCategories = () => {
-  const { categories, productsIn } = useCatalogue();
+  const { categories: allCategories, productsIn } = useCatalogue();
+  // "Oil Cakes and DOC" is not shown here (Website UAT); it stays on the Products page.
+  const categories = allCategories.filter((category) => !/oil\s*cakes?\s*(and|&)\s*doc/i.test(category.name));
 
   // Nothing to show until the catalogue has loaded (or if it fails); the rest of the home page carries on.
   if (categories.length === 0) return null;

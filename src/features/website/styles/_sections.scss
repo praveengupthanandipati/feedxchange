@@ -656,6 +656,13 @@ $search-height: 3.75rem;
     p {
       color: v.fg(v.$ink-soft);
       font-size: v.$fs-sm;
+      // No single word left alone on the last line (e.g. "digitally"): the line before gives up a word to it.
+      text-wrap: pretty;
+    }
+
+    // Four in a row: slimmer side padding so each text has room to finish in two lines.
+    @include m.up(xl) {
+      padding-inline: v.$space-4;
     }
 
     // Phones: number beside the text.

@@ -1,7 +1,8 @@
-import { AtSignIcon, MapPinIcon, PhoneIcon } from "../../../shared/components/icon";
+import { AtSignIcon, MapPinIcon } from "../../../shared/components/icon";
+import { FaWhatsapp } from "react-icons/fa";
 import ContactForm from "../components/contact/ContactForm";
 import PageHero from "../components/sections/PageHero";
-import { company } from "../data/content";
+import { company, whatsappLink } from "../data/content";
 import { usePageTitle } from "../hooks/usePageTitle";
 
 const Contact = () => {
@@ -30,11 +31,11 @@ const Contact = () => {
 
               <li className="contact-panel__item">
                 <span className="contact-panel__icon">
-                  <PhoneIcon aria-hidden />
+                  <FaWhatsapp aria-hidden />
                 </span>
-                <h3>Phone</h3>
+                <h3>WhatsApp</h3>
                 <p>{company.hours}</p>
-                <a href={`tel:${company.phone.replace(/\s/g, "")}`}>{company.phone}</a>
+                <a href={whatsappLink} target="_blank" rel="noopener noreferrer">{company.phone}</a>
               </li>
 
               <li className="contact-panel__item contact-panel__item--wide">

@@ -1,12 +1,10 @@
 import { useEffect, useState, type MouseEvent } from "react";
 import { ArrowRightIcon, MessageCircleIcon, PlusIcon } from "../../../shared/components/icon";
-import { Link } from "react-router-dom";
 import CtaBanner from "../components/sections/CtaBanner";
 import PageHero from "../components/sections/PageHero";
-import { faqCategories } from "../data/content";
+import { faqCategories, whatsappLink } from "../data/content";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { useReducedMotion } from "../hooks/useReducedMotion";
-import { sitePaths } from "../routes/paths";
 
 const totalQuestions = faqCategories.reduce((sum, category) => sum + category.items.length, 0);
 
@@ -70,9 +68,9 @@ const Faqs = () => {
               <MessageCircleIcon aria-hidden />
               <h2>Still have questions?</h2>
               <p>Our team is happy to help with anything not covered here.</p>
-              <Link to={sitePaths.contact} className="faq-help__link">
-                Contact us <ArrowRightIcon aria-hidden />
-              </Link>
+              <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="faq-help__link">
+                WhatsApp us <ArrowRightIcon aria-hidden />
+              </a>
             </div>
           </aside>
 

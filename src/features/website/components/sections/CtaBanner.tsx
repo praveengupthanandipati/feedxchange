@@ -1,7 +1,7 @@
 import { useId } from "react";
 import { ArrowRightIcon } from "../../../../shared/components/icon";
 import { Link } from "react-router-dom";
-import { company } from "../../data/content";
+import { company, isExternalLink } from "../../data/content";
 import { sitePaths } from "../../routes/paths";
 
 interface CtaBannerProps {
@@ -22,7 +22,11 @@ const CtaBanner = ({ title = "Ready to grow your feed business?", text = `Join $
             {text && <p>{text}</p>}
           </div>
           <div className="cta__actions">
-            {action ? (
+            {action && isExternalLink(action.to) ? (
+              <a href={action.to} target="_blank" rel="noopener noreferrer" className="btn-site btn-site--primary">
+                {action.label} <ArrowRightIcon aria-hidden />
+              </a>
+            ) : action ? (
               <Link to={action.to} className="btn-site btn-site--primary">
                 {action.label} <ArrowRightIcon aria-hidden />
               </Link>

@@ -8,6 +8,7 @@ import {
 import { Link } from "react-router-dom";
 import SignupForm from "../components/join/SignupForm";
 import PageHero from "../components/sections/PageHero";
+import { whatsappLink } from "../data/content";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { sitePaths } from "../routes/paths";
 
@@ -37,7 +38,10 @@ const JoinUs = () => {
               <span>Join Feedxchange &ndash; One Account,</span> Endless Business Opportunities
             </h2>
             <p className="join__help">
-              Have questions? Visit our <Link to={sitePaths.faqs}>Help Center</Link> or reach out to our <Link to={sitePaths.contact}>Support Team</Link>
+              Have questions? Visit our <Link to={sitePaths.faqs}>Help Center</Link> or reach out to our Support Team on{" "}
+              <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                WhatsApp
+              </a>
             </p>
 
             <ul className="join-benefits">

@@ -44,6 +44,39 @@ export const businessTypes = [
   "Other",
 ];
 
+export const company = {
+  name: "FeedXchange",
+  tagline: "The trusted marketplace for animal feed ingredients.",
+  email: "contact@feedxchange.in",
+  phone: "+91 92475 98399",
+  /** Digits only, with country code, for wa.me links. */
+  whatsapp: "919247598399",
+  address: "174, 1st floor, Mahatma Gandhi Wholesale Commercial Complex, Mahendra Nagar, Gollapudi, Vijayawada, Andhra Pradesh - 521225",
+  hours: "Mon - Sat from 9am - 6pm",
+};
+
+export const whatsappLink = `https://wa.me/${company.whatsapp}?text=${encodeURIComponent("Hi FeedXchange, I'd like to know more.")}`;
+
+/** A link that leaves the site (the WhatsApp chat): opened with a plain <a> in a new tab instead of a router link. */
+export const isExternalLink = (to: string) => /^https?:\/\//i.test(to);
+
+/** "Trusted by" strip on the home page: the kinds of businesses served (Website UAT - no customer names). */
+export const trustedBusinessTypes = [
+  "Layer and Broiler Farms",
+  "Hatcheries",
+  "Fish Farms",
+  "Cattle Feed Plants",
+  "Poultry Feed Plants",
+  "Floating Fish Feed Plants",
+  "Prawn Feed Manufacturers",
+  "Edible Oil Refineries",
+  "Solvent Extraction Units",
+  "Expeller Units",
+  "Distilleries and Ethanol Manufacturers",
+  "Edible Oil Seed Suppliers",
+  "Food Grains suppliers",
+];
+
 export const navItems: NavItem[] = [
   { label: "Home", to: sitePaths.home },
   { label: "About", to: sitePaths.about },
@@ -51,21 +84,9 @@ export const navItems: NavItem[] = [
   { label: "Products", to: sitePaths.products, children: [] },
   { label: "FAQ's", to: sitePaths.faqs },
   { label: "Blogs", to: sitePaths.blogs },
-  { label: "Contact", to: sitePaths.contact },
+  // "Contact" is WhatsApp (Website UAT): it opens the WhatsApp chat on the company number.
+  { label: "WhatsApp", to: whatsappLink },
 ];
-
-export const company = {
-  name: "FeedXchange",
-  tagline: "The trusted marketplace for animal feed ingredients.",
-  email: "contact@feedxchange.in",
-  phone: "+91 98765 43210",
-  /** Digits only, with country code, for wa.me links. */
-  whatsapp: "919876543210",
-  address: "174, 1st floor, Mahatma Gandhi Whole Commercial Complex, Mahendra Nagar, Gollapudi, Vijayawada, Andhra Pradesh - 521225",
-  hours: "Mon - Sat from 9am - 6pm",
-};
-
-export const whatsappLink = `https://wa.me/${company.whatsapp}?text=${encodeURIComponent("Hi FeedXchange, I'd like to know more.")}`;
 
 export const hero = {
   eyebrow: "Agri-commerce, simplified",
@@ -110,12 +131,12 @@ export interface Service {
 }
 
 export const services: Service[] = [
-  { icon: ChartNoAxesColumnIcon, title: "Live Market Pricing", text: "Daily prices for maize, DDGS, soybean meal and more, with history and trends to time every purchase." },
-  { icon: FileTextIcon, title: "Digital Contracts", text: "Create, sign and track contracts online, with every amendment and approval kept in one audit trail." },
+  { icon: ChartNoAxesColumnIcon, title: "Live Market Pricing", text: "Daily prices for Soya DOC, GN DOC, DORB, DDGS and more, with history and trends to time every purchase." },
+  { icon: FileTextIcon, title: "Digital Contracts", text: "View immediately on your portal once contract is done, and track all pending contracts at once" },
   { icon: TruckIcon, title: "Logistics & Dispatch", text: "Schedule trucks, assign transporters and follow each load from the mill gate to your warehouse." },
   { icon: CreditCardIcon, title: "Secure Payments", text: "Invoices, payment advice and allocations reconciled automatically, so both sides always agree." },
   { icon: ShieldIcon, title: "Verified Partners", text: "Every buyer, seller and transporter is KYC-checked before they can trade on the platform." },
-  { icon: PackageIcon, title: "Quality Assurance", text: "Specification checks and lab reports attached to each consignment, before it leaves the seller." },
+  { icon: PackageIcon, title: "Quality Assurance", text: "Specification checks and lab reports processed for each consignment, before it leaves the seller." },
 ];
 
 export const reasons = [
@@ -133,8 +154,8 @@ export interface Step {
 export const steps: Step[] = [
   { title: "Register your business", text: "Sign up in minutes and complete a quick KYC check." },
   { title: "Discover & negotiate", text: "Browse live listings and agree on price, quantity and terms." },
-  { title: "Sign the contract", text: "Approve a digital contract that both sides can track." },
-  { title: "Dispatch & get paid", text: "Follow each truck and settle payments on delivery." },
+  { title: "Agree to the contract", text: "On agreement to the contract that both sides can track the transaction digitally" },
+  { title: "Dispatch & Payments", text: "Follows trucks wise despatches and details of payments made" },
 ];
 
 export interface Testimonial {
@@ -321,7 +342,7 @@ export const footerColumns: { title: string; links: NavLinkItem[] }[] = [
       { label: "About Us", to: sitePaths.about },
       { label: "FAQ's", to: sitePaths.faqs },
       { label: "Blogs", to: sitePaths.blogs },
-      { label: "Contact", to: sitePaths.contact },
+      { label: "WhatsApp", to: whatsappLink },
     ],
   },
   // The footer adds a "Products" column from the API catalogue (useCatalogue).

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { navItems } from "../../../features/website/data/content";
+import { isExternalLink, navItems } from "../../../features/website/data/content";
 import { sitePaths } from "../../../features/website/routes/paths";
 import ProductsDropdown from "./ProductsDropdown";
 
@@ -12,9 +12,15 @@ const DesktopNav = () => (
           <ProductsDropdown key={item.to} item={item} />
         ) : (
           <li key={item.to}>
+            {isExternalLink(item.to) ? (
+              <a href={item.to} target="_blank" rel="noopener noreferrer" className="site-nav__link">
+                {item.label}
+              </a>
+            ) : (
             <NavLink to={item.to} end={item.to === sitePaths.home} className={({ isActive }) => `site-nav__link ${isActive ? "is-active" : ""}`}>
               {item.label}
             </NavLink>
+            )}
           </li>
         ),
       )}

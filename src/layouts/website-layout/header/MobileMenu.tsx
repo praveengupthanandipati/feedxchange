@@ -2,11 +2,11 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   ChevronDownIcon,
   MailIcon,
-  PhoneIcon,
   XIcon,
 } from "../../../shared/components/icon";
+import { FaWhatsapp } from "react-icons/fa";
 import { NavLink, useLocation } from "react-router-dom";
-import { company, navItems } from "../../../features/website/data/content";
+import { company, isExternalLink, navItems, whatsappLink } from "../../../features/website/data/content";
 import { useCatalogue } from "../../../features/website/hooks/useCatalogue";
 import { productPath, sitePaths } from "../../../features/website/routes/paths";
 import Logo from "../../../features/website/components/common/Logo";
@@ -111,6 +111,10 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                       </ul>
                     </div>
                   </>
+                ) : isExternalLink(item.to) ? (
+                  <a href={item.to} target="_blank" rel="noopener noreferrer" className="mobile-menu__link">
+                    {item.label}
+                  </a>
                 ) : (
                   <NavLink to={item.to} end={item.to === sitePaths.home} className={({ isActive }) => `mobile-menu__link ${isActive ? "is-active" : ""}`}>
                     {item.label}
@@ -131,8 +135,8 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
             <span>Theme</span>
             <ThemePicker triggerClassName="site-theme" align="start" />
           </div>
-          <a href={`tel:${company.phone.replace(/\s/g, "")}`}>
-            <PhoneIcon aria-hidden /> {company.phone}
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+            <FaWhatsapp aria-hidden /> WhatsApp {company.phone}
           </a>
           <a href={`mailto:${company.email}`}>
             <MailIcon aria-hidden /> {company.email}

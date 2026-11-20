@@ -3,11 +3,11 @@ import {
   ClockIcon,
   MailIcon,
   MapPinIcon,
-  PhoneIcon,
   SendIcon,
 } from "../../../shared/components/icon";
+import { FaWhatsapp } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { company, footerColumns, socialLinks } from "../../../features/website/data/content";
+import { company, footerColumns, isExternalLink, socialLinks, whatsappLink } from "../../../features/website/data/content";
 import { useCatalogue } from "../../../features/website/hooks/useCatalogue";
 import { sitePaths } from "../../../features/website/routes/paths";
 import Logo from "../../../features/website/components/common/Logo";
@@ -55,7 +55,13 @@ const Footer = () => {
             <ul>
               {column.links.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.to}>{link.label}</Link>
+                  {isExternalLink(link.to) ? (
+                    <a href={link.to} target="_blank" rel="noopener noreferrer">
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link to={link.to}>{link.label}</Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -69,7 +75,7 @@ const Footer = () => {
               <MapPinIcon aria-hidden /> <span>{company.address}</span>
             </li>
             <li>
-              <PhoneIcon aria-hidden /> <a href={`tel:${company.phone.replace(/\s/g, "")}`}>{company.phone}</a>
+              <FaWhatsapp aria-hidden /> <a href={whatsappLink} target="_blank" rel="noopener noreferrer">WhatsApp {company.phone}</a>
             </li>
             <li>
               <MailIcon aria-hidden /> <a href={`mailto:${company.email}`}>{company.email}</a>
