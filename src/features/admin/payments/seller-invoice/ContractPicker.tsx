@@ -31,7 +31,7 @@ function formatDate(iso: string | null | undefined): string {
 const ContractPicker = ({ financialYear, value, onSelect, onDetails }: ContractPickerProps) => {
   const [open, setOpen] = useState(true);
   const { label: partyLabel } = useProfileCities();
-  const { data: contracts, isLoading, isError } = useGetInvoiceContractsQuery({}, { refetchOnMountOrArgChange: true });
+  const { data: contracts, isLoading, isError, error } = useGetInvoiceContractsQuery({}, { refetchOnMountOrArgChange: true });
   const { data: openAndPending } = useOpenAndPendingContracts();
 
   const pending = useMemo(
@@ -91,7 +91,9 @@ const ContractPicker = ({ financialYear, value, onSelect, onDetails }: ContractP
               isLoading
                 ? "Loading contracts…"
                 : isError
-                  ? "The contracts could not be loaded"
+                  ? (error as { status?: unknown } | undefined)?.status === 403
+                    ? "Your role does not include seller invoices"
+                    : "The contracts could not be loaded"
                   : options.length
                     ? "Search pending contracts"
                     : `No pending contracts${financialYear ? ` in ${financialYear}` : ""}`

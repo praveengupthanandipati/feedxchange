@@ -189,7 +189,9 @@ const TruckTripPage = () => {
             isLoading
               ? "Loading truck trips…"
               : error
-                ? "Failed to load truck trips."
+                ? (error as { status?: unknown }).status === 403
+                  ? "Your role does not include truck trips."
+                  : "Failed to load truck trips."
                 : "No truck trips match the current filters."
           }
           minHeight

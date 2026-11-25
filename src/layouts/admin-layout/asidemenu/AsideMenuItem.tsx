@@ -20,6 +20,24 @@ interface AsideMenuItemProps {
 
 const FLYOUT_CLOSE_DELAY = 150;
 
+const NEW_CONTRACT_PATH = "/admin/contracts/new";
+const CONTRACT_MASTER_PATH = "/admin/contracts";
+
+/**
+ * Updating or duplicating a contract uses the New Contract screen, but it is work on an existing contract: the menu
+ * highlights Contract Master then, not New Contract.
+ */
+const menuItemActive = (path: string | undefined, routeActive: boolean, pathname: string, state: unknown, search = "") => {
+  const s = state as { isEdit?: boolean; isDuplicate?: boolean } | null;
+  const params = new URLSearchParams(search);
+  const onExistingContract =
+    pathname === NEW_CONTRACT_PATH && Boolean(s?.isEdit || s?.isDuplicate || params.get("edit") || params.get("duplicate"));
+  if (!onExistingContract) return routeActive;
+  if (path === NEW_CONTRACT_PATH) return false;
+  if (path === CONTRACT_MASTER_PATH) return true;
+  return routeActive;
+};
+
 const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onRouteActive, onRouteLeft, onNavigate }: AsideMenuItemProps) => {
   const [flyoutOpen, setFlyoutOpen] = useState(false);
   const [flyoutPos, setFlyoutPos] = useState({ top: 0, left: 0 });
@@ -87,7 +105,7 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onRouteActive, onRou
         <li key={child.id}>
           <NavLink
             to={child.path}
-            className={`aside-item__child-link ${isChildActive(child) ? "is-active" : ""}`}
+            className={`aside-item__child-link ${menuItemActive(child.path, isChildActive(child), location.pathname, location.state, location.search) ? "is-active" : ""}`}
             onClick={onNavigate}
           >
             {/* An icon picked from the page's name (pages have no icon of their own). */}

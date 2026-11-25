@@ -95,12 +95,15 @@ const Paymentadvice = () => {
   // ---- data from the API
   const seller = sellerId ? Number(sellerId) : 0;
   const buyer = buyerId ? Number(buyerId) : 0;
-  // A business can't be its own buyer: never ask the API for that pair (it answers 400).
-  const hasPair = seller > 0 && buyer > 0 && seller !== buyer;
-  const pairArgs = { sellerId: seller, buyerId: buyer };
-
   const { data: sellers = [], isError: sellersFailed } = useGetPaymentSellersQuery();
-  const { data: buyers = [], isError: buyersFailed } = useGetPaymentBuyersQuery(seller || undefined);
+  // currentData: the buyers of THIS seller (undefined while they load, instead of the previous seller's list).
+  const { data: buyers = [], currentData: sellerBuyers, isError: buyersFailed } = useGetPaymentBuyersQuery(seller || undefined);
+  // Only a pair the API knows: a business can't be its own buyer, and the buyer must trade with this seller
+  // (otherwise it answers 400 "These two parties…", e.g. while the seller's buyer list is still loading).
+  // A receipt opened for editing keeps its own pair as before.
+  const hasPair =
+    seller > 0 && buyer > 0 && seller !== buyer && (editingId !== null || Boolean(sellerBuyers?.some((b) => b.id === buyer)));
+  const pairArgs = { sellerId: seller, buyerId: buyer };
   const { data: contracts = [] } = useGetAdvanceContractsQuery(pairArgs, { skip: !hasPair });
   const { data: openReceiptsData = NO_RECEIPTS, isFetching: receiptsLoading } = useGetReceiptsQuery(pairArgs, { skip: !hasPair });
   const { data: invoicesData = NO_INVOICES, isFetching: invoicesLoading } = useGetInvoicesToClearQuery(pairArgs, { skip: !hasPair });
@@ -123,11 +126,12 @@ const Paymentadvice = () => {
     if (!sellerId && sellers.length > 0) setSellerId(String(sellers[0].id));
   }, [sellers, sellerId]);
   useEffect(() => {
-    // Until the seller's own buyer list arrives, the full list may still be showing: skip the seller itself.
-    const eligible = buyers.filter((b) => String(b.id) !== sellerId);
+    // Pick from the chosen seller's own buyers only, once they have arrived (not from the full or previous list).
+    if (!sellerId || !sellerBuyers) return;
+    const eligible = sellerBuyers.filter((b) => String(b.id) !== sellerId);
     if (eligible.length === 0) return;
     if (!buyerId || !eligible.some((b) => String(b.id) === buyerId)) setBuyerId(String(eligible[0].id));
-  }, [buyers, buyerId, sellerId]);
+  }, [sellerBuyers, buyerId, sellerId]);
 
   useEffect(() => {
     if (!toast) return;

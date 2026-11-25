@@ -88,6 +88,12 @@ const Login = () => {
       reload();
       navigate("/admin/dashboard");
     } catch (err) {
+      // No answer (offline, timeout) or a server fault is not a wrong password: say so instead.
+      const status = err && typeof err === "object" && "status" in err ? (err as { status: unknown }).status : undefined;
+      if (status === "FETCH_ERROR" || status === "TIMEOUT_ERROR" || (typeof status === "number" && status >= 500)) {
+        setError("Could not reach the server. Please check your connection and try again.");
+        return;
+      }
       const message =
         err && typeof err === "object" && "data" in err
           ? (err as { data?: { message?: string } }).data?.message

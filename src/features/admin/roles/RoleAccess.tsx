@@ -33,7 +33,7 @@ const errorMessage = (error: unknown): string => {
 
 /** Assign pages to a role: Module -> Sub Module -> Page, with view / create / edit / delete per page. */
 const RoleAccess = () => {
-  const { data: roles = [], isSuccess: rolesLoaded, isError: rolesFailed } = useGetRolesQuery(undefined, { refetchOnMountOrArgChange: true });
+  const { data: roles = [], isSuccess: rolesLoaded, isError: rolesFailed, error: rolesError } = useGetRolesQuery(undefined, { refetchOnMountOrArgChange: true });
   const [roleId, setRoleId] = useState<number | null>(null);
   const { data: tree, isFetching, isError } = useGetRoleAccessTreeQuery(roleId ?? 0, { skip: roleId === null, refetchOnMountOrArgChange: true });
   const [save, { isLoading: saving }] = useSaveRoleAccessMutation();
@@ -180,7 +180,9 @@ const RoleAccess = () => {
       {message && <p className={`role-access__message role-access__message--${message.kind}`}>{message.text}</p>}
       {rolesFailed && (
         <p className="role-access__message role-access__message--error">
-          Could not load the roles you can manage. Make sure the API is running its latest version and try again.
+          {(rolesError as { status?: unknown } | undefined)?.status === 403
+            ? "Your role does not include managing other roles' access."
+            : "Could not load the roles you can manage. Please refresh the page and try again."}
         </p>
       )}
       {rolesLoaded && roles.length === 0 && <p className="role-access__hint">There are no roles below yours to manage.</p>}

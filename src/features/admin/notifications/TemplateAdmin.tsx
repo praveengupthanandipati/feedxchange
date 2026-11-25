@@ -259,7 +259,7 @@ const TemplateAdmin = () => {
   const [channelCode, setChannelCode] = useState("");
   const [search, setSearch] = useState("");
   const query = useMemo(() => ({ eventCode, channelCode, search }), [eventCode, channelCode, search]);
-  const { data: templates = [], isFetching, isError: templatesFailed } = useListTemplatesQuery(query);
+  const { data: templates = [], isFetching, isError: templatesFailed, error: templatesError } = useListTemplatesQuery(query);
   const [editing, setEditing] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
 
@@ -282,7 +282,11 @@ const TemplateAdmin = () => {
           <tbody>
             {isFetching && templates.length === 0 && <tr><td colSpan={7} className="text-secondary">Loading…</td></tr>}
             {!isFetching && templates.length === 0 && (
-              <tr><td colSpan={7} className="text-secondary">{templatesFailed ? "Templates could not be loaded. Please try again." : "No templates match."}</td></tr>
+              <tr><td colSpan={7} className="text-secondary">{templatesFailed
+                ? (templatesError as { status?: unknown } | undefined)?.status === 403
+                  ? "Your role does not include notification templates."
+                  : "Templates could not be loaded. Please try again."
+                : "No templates match."}</td></tr>
             )}
             {templates.map((t) => (
               <tr key={t.templateId} className={t.isActive ? "" : "text-secondary"}>
