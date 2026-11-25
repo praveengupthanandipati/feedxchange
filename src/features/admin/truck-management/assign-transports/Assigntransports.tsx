@@ -18,6 +18,8 @@ import {
   useGetContractByContractNumberQuery,
   useGetTruckAssignmentTypesQuery,
 } from "../../../../core/store/contractsApi";
+import { useAuth } from "../../../../core/auth/AuthContext";
+import TransporterRequests from "./transporter-requests/TransporterRequests";
 import "./Assigntransports.scss";
 
 function formatDisplayDate(value: string | undefined) {
@@ -29,7 +31,8 @@ function formatDisplayDate(value: string | undefined) {
   return `${day}/${month}/${date.getFullYear()}`;
 }
 
-const Assigntransports = () => {
+/** Assigning trucks to one contract (the original screen, opened with ?contract=...). */
+const ContractAssignTransports = () => {
   const [searchParams] = useSearchParams();
   const contractNumber = searchParams.get("contract") ?? "";
 
@@ -255,6 +258,22 @@ const Assigntransports = () => {
       </div>
     </div>
   );
+};
+
+/**
+ * Assign Transports.
+ *  - A transporter signed in: only the requests FeedXchange sent to it (no contract details), which it can accept or reject, plus its history.
+ *  - FeedXchange staff with a contract chosen (?contract=...): the contract's truck assignment, unchanged.
+ *  - FeedXchange staff without one: every transporter's requests and responses (read-only), plus history.
+ */
+const Assigntransports = () => {
+  const [searchParams] = useSearchParams();
+  const { roleName, businessUnitType } = useAuth();
+  const isTransporterUser = `${roleName} ${businessUnitType}`.toLowerCase().includes("transport");
+
+  if (isTransporterUser) return <TransporterRequests mode="transporter" />;
+  if (!searchParams.get("contract")) return <TransporterRequests mode="all" />;
+  return <ContractAssignTransports />;
 };
 
 export default Assigntransports;

@@ -1,0 +1,265 @@
+@use "../../../../../shared/assets/styles/variables" as v;
+@use "../../../../../shared/assets/styles/mixins" as m;
+
+.accepted-schedules {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+
+  &__hint {
+    margin: 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+
+  &__muted {
+    display: block;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+    padding: v.$spacing-3 v.$spacing-4;
+    border: 1px solid v.line(v.$color-border);
+    border-left: 4px solid v.$color-info;
+    border-radius: v.$radius-md;
+    background: v.$color-white;
+
+    &.is-full {
+      border-left-color: v.$color-success;
+    }
+  }
+
+  &__card-head {
+    display: grid;
+    grid-template-columns: minmax(10rem, 1.2fr) minmax(12rem, 1.5fr) minmax(13rem, 1.3fr) auto;
+    gap: v.$spacing-4;
+    align-items: center;
+
+    @include m.respond-below(md) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__product {
+    display: block;
+    margin-top: 2px;
+  }
+
+  &__route {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: v.$font-size-sm;
+
+    b {
+      display: inline-block;
+      min-width: 2.5rem;
+      color: v.fg(v.$color-text-muted);
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__qty {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    font-size: v.$font-size-sm;
+  }
+
+  &__bar {
+    height: 6px;
+    border-radius: v.$radius-pill;
+    background: v.$color-gray-100;
+    overflow: hidden;
+
+    span {
+      display: block;
+      height: 100%;
+      background: v.$color-success;
+    }
+  }
+
+  &__left {
+    color: v.fg(v.$color-warning);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__done {
+    color: v.fg(v.$color-success);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__trucks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-wrap: wrap;
+      gap: v.$spacing-2;
+      align-items: center;
+      padding: v.$spacing-1 v.$spacing-3;
+      border-radius: v.$radius-md;
+      background: v.$color-gray-100;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__chip {
+    padding: 0 v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background: v.alpha(v.$color-info, 0.16);
+    color: v.fg(v.$color-info);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__form {
+    padding-top: v.$spacing-3;
+    border-top: 1px dashed v.line(v.$color-border);
+  }
+
+  &__rows {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1.5rem repeat(2, minmax(10rem, 1.3fr)) repeat(2, minmax(7rem, 0.8fr)) minmax(10rem, 1.3fr) auto;
+    gap: v.$spacing-3;
+    align-items: start;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background: v.$color-gray-100;
+
+    @include m.respond-below(lg) {
+      grid-template-columns: 1.5rem 1fr 1fr;
+    }
+
+    @include m.respond-below(sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__row-no {
+    @include m.flex(row, center, center, 0);
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 1.5rem;
+    border-radius: 50%;
+    background: v.$color-navy;
+    color: v.fg(v.$color-white);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    min-width: 0;
+
+    label {
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-semibold;
+
+      b {
+        color: v.fg(v.$color-danger);
+      }
+    }
+
+    input {
+      height: 2.5rem;
+      padding: 0 v.$spacing-3;
+      border: 1px solid v.line(v.$color-border);
+      border-radius: v.$radius-md;
+      font: inherit;
+    }
+  }
+
+  &__row-actions {
+    display: flex;
+    gap: v.$spacing-2;
+    margin-top: 1.5rem;
+  }
+
+  &__icon {
+    @include m.flex(row, center, center, 0);
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.fg(v.$color-white);
+    cursor: pointer;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &--add {
+      background: v.$color-success;
+    }
+
+    &--delete {
+      background: v.$color-danger;
+    }
+  }
+
+  &__form-foot {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+    margin-top: v.$spacing-3;
+  }
+
+  &__form-buttons {
+    display: flex;
+    gap: v.$spacing-2;
+  }
+
+  &__allocated {
+    font-size: v.$font-size-sm;
+    color: v.fg(v.$color-text-muted);
+
+    &.is-over {
+      color: v.fg(v.$color-danger);
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__error {
+    margin: 0;
+    color: v.fg(v.$color-danger);
+    font-size: v.$font-size-sm;
+  }
+
+  &__success {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    color: v.fg(v.$color-success);
+    font-weight: v.$font-weight-semibold;
+
+    svg {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+  }
+
+  &__link {
+    margin-left: v.$spacing-3;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: v.fg(v.$color-info);
+    font: inherit;
+    cursor: pointer;
+  }
+}

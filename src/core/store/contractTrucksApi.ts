@@ -105,6 +105,8 @@ export interface ScheduleContractTruckPayload {
   remarks: string;
   freightPerMT: number;
   autoApprove:boolean;
+  /** The goods must be re-billed (for example a re-assigned truck); transporters see it on their request. Optional: left off, it is not required. */
+  billChangeRequired?: boolean;
   createdBy: number;
   createdOn: string;
 }

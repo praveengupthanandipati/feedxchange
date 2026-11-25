@@ -48,6 +48,7 @@ import {
   File,
   FileText,
   Folder,
+  Globe,
   Funnel,
   Gift,
   HardDrive,
@@ -178,6 +179,7 @@ export const EyeOffIcon = createIcon(EyeOff, "EyeOffIcon");
 export const FileIcon = createIcon(File, "FileIcon");
 export const FileTextIcon = createIcon(FileText, "FileTextIcon");
 export const FolderIcon = createIcon(Folder, "FolderIcon");
+export const GlobeIcon = createIcon(Globe, "GlobeIcon");
 export const FunnelIcon = createIcon(Funnel, "FunnelIcon");
 export const GiftIcon = createIcon(Gift, "GiftIcon");
 export const HardDriveIcon = createIcon(HardDrive, "HardDriveIcon");

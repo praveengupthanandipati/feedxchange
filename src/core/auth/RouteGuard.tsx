@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { asideNavSections } from "../../layouts/admin-layout/asidemenu/aside.data";
 import { filterNavSections, firstNavPath } from "../../layouts/admin-layout/asidemenu/filterNav";
-import { findPageForPath, toNavSections } from "./menu";
+import { allPages, findPageForPath, toNavSections } from "./menu";
 import { useAuth } from "./AuthContext";
 import NoAccess from "./NoAccess";
 import { requiredPermissionsFor } from "./routePermissions";
@@ -24,8 +24,14 @@ export const RoutePermissionGate = ({ children }: { children: ReactNode }) => {
   // Preferred: the Pages table (every screen and whether this user may open it). Otherwise the built-in route rules.
   const page = menu ? findPageForPath(menu, pathname) : null;
   const required = page ? null : requiredPermissionsFor(pathname);
-  const denied = page ? !page.allowed : !!required && !can(...required);
+  let denied = page ? !page.allowed : !!required && !can(...required);
+  const isDashboard = pathname === "/admin" || pathname === "/admin/dashboard";
+  // Holding the Dashboard permission, or a Dashboard page in the menu, is enough to open it, whatever else matched this route.
+  if (denied && isDashboard && (can("dashboard") || (menu ? allPages(menu).some((p) => p.pageKey.toLowerCase() === "dashboard" && p.allowed) : false))) {
+    denied = false;
+  }
   if (denied) {
+    console.warn("[RouteGuard] denied", pathname, { page, required, keys: permissionKeys ? [...permissionKeys] : null });
     // Roles without a Dashboard land on the first screen they can open instead of a dead end.
     if (pathname === "/admin" || pathname === "/admin/dashboard") {
       const sections = menu ? toNavSections(menu) : filterNavSections(asideNavSections, can);

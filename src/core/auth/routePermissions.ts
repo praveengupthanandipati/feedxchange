@@ -37,6 +37,8 @@ export const routePermissionRules: RoutePermissionRule[] = [
   { path: `${OPEN_PENDING}/*`, any: ["pending-contracts"] },
   { path: "/admin/truck-management/bulk-freight-approval", any: ["bulk-freight-approval"] },
   { path: "/admin/truck-management/assign-transports", any: ["pending-contracts", "freight-approval"] },
+  // Arrangement > Add Trucks to Schedules: the accepted-schedules section that used to sit on assign-transports, so the same keys
+  { path: "/admin/truck-management/arrangement/add-trucks-to-schedules", any: ["pending-contracts", "freight-approval"] },
   { path: `${TRANSPORTERS}/freight-approval`, any: ["freight-approval"] },
   { path: `${TRANSPORTERS}/transport-dashboard`, any: ["transport-dashboard"] },
   { path: `${TRANSPORTERS}/dashboard`, any: ["transport-dashboard"] },

@@ -27,6 +27,8 @@ export interface AccessPage {
 export interface AccessModule {
   moduleKey: string;
   name: string;
+  /** Icon name from the Modules table (same Fi* names as the Sub Modules). */
+  icon?: string | null;
   sortOrder: number;
   pages: AccessPage[];
 }
@@ -57,7 +59,13 @@ export const findPageForPath = (menu: AccessMenu, pathname: string): AccessPage 
   );
   if (matches.length === 0) return null;
   const params = (path: string) => (path.match(/:/g) ?? []).length;
-  matches.sort((a, b) => params(a.routePath!) - params(b.routePath!) || b.routePath!.length - a.routePath!.length);
+  // on a tie (two pages sharing one route) the one the user may open wins
+  matches.sort(
+    (a, b) =>
+      params(a.routePath!) - params(b.routePath!) ||
+      b.routePath!.length - a.routePath!.length ||
+      Number(b.allowed) - Number(a.allowed),
+  );
   return matches[0];
 };
 
@@ -111,6 +119,6 @@ export const toNavSections = (menu: AccessMenu): AsideNavSection[] =>
           },
         ];
       });
-      return { id: module.moduleKey, title: module.name, items };
+      return { id: module.moduleKey, title: module.name, icon: iconFor(module.icon), items };
     })
     .filter((section) => section.items.length > 0);

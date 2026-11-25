@@ -44,6 +44,9 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onRouteActive, onRou
   const isSectionActive =
     (hasPath && isInsidePath(item.path!)) || Boolean(item.children?.some(isChildActive));
 
+  // A page inside this submodule is the current one: the submodule is marked as the parent of the active page.
+  const isParentActive = hasChildren && Boolean(item.children?.some(isChildActive));
+
   const expanded = isOpen;
 
   // Navigating into this section opens it (closing the others), unless it is meant to stay closed until clicked;
@@ -108,7 +111,7 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onRouteActive, onRou
           <NavLink
             to={item.path ?? "#"}
             end
-            className={({ isActive }) => `aside-item__link ${isActive ? "is-active" : ""}`}
+            className={({ isActive }) => `aside-item__link ${isActive ? "is-active" : isParentActive ? "is-parent-active" : ""}`}
             aria-label={collapsed ? item.label : undefined}
             title={collapsed ? item.label : undefined}
             onClick={onNavigate}
@@ -122,7 +125,7 @@ const AsideMenuItem = ({ item, collapsed, isOpen, onToggle, onRouteActive, onRou
         ) : (
           <button
             type="button"
-            className="aside-item__link"
+            className={`aside-item__link ${isParentActive ? "is-parent-active" : ""}`}
             onClick={handleToggle}
             aria-expanded={expanded}
             aria-label={collapsed ? item.label : undefined}

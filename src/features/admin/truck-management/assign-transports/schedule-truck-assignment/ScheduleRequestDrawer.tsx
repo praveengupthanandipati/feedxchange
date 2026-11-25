@@ -31,6 +31,7 @@ interface FormState {
   freight: string;
   remarks: string;
   autoApprove: boolean;
+  billChangeRequired: boolean;
 }
 
 const initialFormState: FormState = {
@@ -45,6 +46,7 @@ const initialFormState: FormState = {
   freight: "",
   remarks: "",
   autoApprove: false,
+  billChangeRequired: false,
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -119,6 +121,7 @@ const ScheduleRequestDrawer = ({
         freight: parseNumeric(editingRow.freight),
         remarks: editingRow.remarks,
         autoApprove: editingRow.autoApprove,
+        billChangeRequired: editingRow.billChangeRequired ?? false,
       });
     } else {
       // a new request starts at the current time (hours and minutes), which can be changed
@@ -185,6 +188,7 @@ const ScheduleRequestDrawer = ({
       id: editingRow?.id ?? `str-${Date.now()}`,
       status: editingRow?.status ?? "Pending",
       autoApprove: form.autoApprove,
+      billChangeRequired: form.billChangeRequired,
       scheduleDateTime: formatScheduleDate(form.date, form.time),
       scheduleValue: new Date(`${form.date}T${form.time}`).getTime(),
       transporterProfileIds: form.transporters.map(Number),
@@ -222,6 +226,7 @@ const ScheduleRequestDrawer = ({
         remarks: form.remarks.trim(),
         freightPerMT: Number(form.freight),
         autoApprove: form.autoApprove,
+        billChangeRequired: form.billChangeRequired,
         createdBy: currentUserId,
         createdOn: new Date().toISOString(),
       }).unwrap();
@@ -448,6 +453,20 @@ const ScheduleRequestDrawer = ({
                 />
                 Auto Approve
               </label>
+            </div>
+
+            <div className="schedule-request-drawer__field schedule-request-drawer__field--checkbox">
+              <label className="schedule-request-drawer__checkbox">
+                <input
+                  type="checkbox"
+                  checked={form.billChangeRequired}
+                  onChange={(event) => setField("billChangeRequired", event.target.checked)}
+                />
+                Bill Change Required
+              </label>
+              <p className="schedule-request-drawer__hint">
+                Tick this when the goods must be re-billed (for example a re-assigned truck). Transporters see it on their request.
+              </p>
             </div>
           </div>
           {submitError && <p className="schedule-request-drawer__error">{submitError}</p>}

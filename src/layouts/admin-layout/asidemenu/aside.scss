@@ -229,6 +229,12 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
     }
   }
 
+  &__section-icon {
+    flex-shrink: 0;
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
   &__section-label {
     min-width: 0;
     overflow: hidden;
@@ -252,6 +258,17 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
   &__section-toggle:hover &__section-chevron,
   &__section-toggle:focus-visible &__section-chevron {
     opacity: 1;
+  }
+
+  // Level 1 - Module: the one holding the current page is picked out (orange label and a bar on its left edge).
+  &__section.is-active > &__section-title {
+    color: v.fg(v.$color-orange);
+    box-shadow: inset 2px 0 0 v.fg(v.$color-orange);
+  }
+
+  // Level 2 - Sub Modules sit one step in under their module heading (not in the icon rail, which has no headings).
+  &:not(.aside--collapsed) &__section-title ~ &__list {
+    padding-left: v.$spacing-3;
   }
 
   // A closed module hides its sub-modules (not in the desktop icon rail, which has no headings: see below).
@@ -329,6 +346,17 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
       color: v.fg(v.$color-white);
     }
 
+    // Level 2 - the Sub Module that holds the current page: tinted, so it differs from the page itself (white = current page).
+    &.is-parent-active {
+      background: v.alpha(v.$color-white, 0.12);
+      color: v.fg(v.$color-white);
+      font-weight: v.$font-weight-semibold;
+
+      .aside-item__icon {
+        color: v.fg(v.$color-orange);
+      }
+    }
+
     &.is-active {
       background: v.$color-white;
       color: v.fg(v.$color-navy);
@@ -386,10 +414,12 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
   }
 
   // Accordion sub-list — expanded (non-collapsed) mode
+  // Level 3 - Pages are indented further than their sub module and hang off a guide line.
   &__children {
     list-style: none;
-    margin: 0;
-    padding: 0;
+    margin: 0 0 0 1.55rem;
+    padding: 0 0 0 v.$spacing-1;
+    border-left: 1px solid v.alpha(v.line(v.$color-white), 0.18);
     max-height: 0;
     overflow: hidden;
     transition: max-height v.$transition-base;
@@ -404,7 +434,7 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
     display: flex;
     align-items: center;
     gap: v.$spacing-2;
-    margin: v.$spacing-1 0 0 2.6rem;
+    margin: v.$spacing-1 0 0 v.$spacing-1;
     padding: v.$spacing-2 v.$spacing-3;
     border-radius: v.$radius-md;
     font-size: max(11px, 0.8125rem);
@@ -425,6 +455,7 @@ $aside-item-height: 2.5rem; // about 32px at the admin app's 13px root (tokens.s
     }
 
     &.is-active {
+      background: v.alpha(v.fg(v.$color-orange), 0.16);
       color: v.fg(v.$color-orange-light);
       font-weight: v.$font-weight-semibold;
     }

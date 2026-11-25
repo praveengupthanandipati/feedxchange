@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { Navigate, Route } from "react-router-dom";
-import AdminNotFound from "./not-found/AdminNotFound";
+import AdminFallback from "./not-found/AdminFallback";
+import ComingSoon from "./coming-soon/ComingSoon";
 
 // Every admin screen is loaded on demand, so signing in downloads only the shell and the screen being opened.
 const NotificationPreferences = lazy(() => import("./notification-preferences/NotificationPreferences"));
@@ -82,6 +83,7 @@ const UpdateTruckStatus = lazy(() => import("./truck-management/open-pending-con
 const ReassignTruck = lazy(() => import("./truck-management/open-pending-contracts/contract-trucks/reassign-truck/ReassignTruck"));
 const ContractTruckChain = lazy(() => import("./truck-management/open-pending-contracts/contract-trucks/truck-chain/ContractTruckChain"));
 const Assigntransports = lazy(() => import("./truck-management/assign-transports/Assigntransports"));
+const AddTrucksToSchedules = lazy(() => import("./truck-management/arrangement/add-trucks-to-schedules/AddTrucksToSchedules"));
 const DriversList = lazy(() => import("./transporters/drivers/drivers-list/DriversList"));
 const DriverNew = lazy(() => import("./transporters/drivers/driver-create/NewDriver"));
 const DriverView = lazy(() => import("./transporters/drivers/driver-view/DriverView"));
@@ -239,6 +241,18 @@ export const adminRoutes = (
     <Route path="payments/payment-advice" element={<Paymentadvice />} />
     <Route path="payments/payment-allocation" element={<PaymentAllocation />} />
     <Route path="payments/refunds" element={<Refunds />} />
-    <Route path="*" element={<AdminNotFound />} />
+    <Route path="masters/notify-subscriptions" element={<ComingSoon />} />
+    <Route path="masters/roles-permissions" element={<ComingSoon />} />
+    <Route path="masters/templates" element={<ComingSoon />} />
+    <Route path="performance" element={<ComingSoon />} />
+    <Route path="projects" element={<ComingSoon />} />
+    <Route path="reports/do-truck-history" element={<ComingSoon />} />
+    <Route path="task/board" element={<ComingSoon />} />
+    <Route path="task/list" element={<ComingSoon />} />
+    <Route path="refer-client" element={<ComingSoon />} />
+    <Route path="truck-management/arrangement/add-trucks-to-schedules" element={<AddTrucksToSchedules />} />
+    <Route path="truck-management/arrangement/view-loading-status" element={<ComingSoon />} />
+    <Route path="truck-management/arrangement/share-unloading-details" element={<ComingSoon />} />
+    <Route path="*" element={<AdminFallback />} />
   </>
 );

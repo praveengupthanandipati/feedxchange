@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { createElement, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronDownIcon, ChevronLeftIcon, LogOutIcon, XIcon } from "../../../shared/components/icon";
 import logo from "../../../shared/assets/img/logo.png";
@@ -19,10 +19,6 @@ import "./aside.scss";
 const CONTRACT_SCOPED_ITEM_IDS = ["contract-dispatch-management", "pending-contracts"];
 
 const SCROLL_INDICATOR_TIMEOUT = 800;
-
-/** The FeedXchange module (backend key FEEDXCHANGE, built-in menu id "your-company") is never collapsed. */
-const isAlwaysOpenSection = (section: { id: string; title?: string }) =>
-  ["feedxchange", "your-company"].includes(section.id.toLowerCase()) || /^feedxchange$/i.test(section.title?.trim() ?? "");
 
 interface AsideProps {
   mobileOpen?: boolean;
@@ -52,7 +48,9 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
 
   const navSections = useMemo(
     () =>
-      withLocalSections(menu ? withLocalChildren(toNavSections(menu), can) : filterNavSections(asideNavSections, can)).map((section) => ({
+      // The backend menu already lists every module (and only what the user may open); the local sections (no permission keys, so
+      // open to everyone) are only the fallback while that menu is not available.
+      (menu ? withLocalChildren(toNavSections(menu), can) : withLocalSections(filterNavSections(asideNavSections, can))).map((section) => ({
         ...section,
         items: section.items.map((item) => {
           // Profile Settings is hidden for now (profileSettingsVisibility.ts), whichever menu it came from.
@@ -75,42 +73,29 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
     setOpenItemId((prev) => (prev === id ? null : id));
   };
 
-  // Module headings are collapsible. The current screen's module is open; clicking / tapping another module's heading
-  // shows its sub-modules (hovering does nothing); opening a screen makes its module the open one.
+  // Module headings are collapsible. Only the module holding the current page is open; all others are collapsed.
+  // Navigating to another module opens it (and closes the rest); a clicked heading toggles its own module.
   const location = useLocation();
-  /** A module the user switched to by clicking its heading (null = the current screen's module). */
-  const [openSectionId, setOpenSectionId] = useState<string | null>(null);
   const activeSectionId = useMemo(() => {
-    // How well a menu path matches the current screen: an exact match beats any "screen under it" match, and a longer
-    // path beats a shorter one. So Update Schedule (Truck Management, …/open-pending-contracts/manage-schedule) wins over
-    // a module whose entry is only its parent route (…/open-pending-contracts), wherever the modules sit in the menu.
-    const score = (path?: string) => {
-      const base = path?.split("?")[0];
-      if (!base) return 0;
-      if (location.pathname === base) return 100000 + base.length;
-      return location.pathname.startsWith(`${base}/`) ? base.length : 0;
+    const inside = (path?: string) => {
+      if (!path) return false;
+      const base = path.split("?")[0];
+      return location.pathname === base || location.pathname.startsWith(`${base}/`);
     };
-    let best: { id: string; score: number } | undefined;
-    for (const section of navSections) {
-      const paths = section.items.flatMap((item) => [
-        item.path,
-        ...(item.children ?? []).flatMap((child) => [child.path, ...(child.relatedPaths ?? [])]),
-      ]);
-      const sectionScore = Math.max(0, ...paths.map(score));
-      if (sectionScore > 0 && (!best || sectionScore > best.score)) best = { id: section.id, score: sectionScore };
-    }
-    return best?.id;
+    return (
+      navSections.find((section) =>
+        section.items.some(
+          (item) => inside(item.path) || item.children?.some((child) => inside(child.path) || child.relatedPaths?.some(inside)),
+        ),
+      )?.id ?? null
+    );
   }, [navSections, location.pathname]);
-  // Opening a screen: its module is the open one again.
+  const [openSectionId, setOpenSectionId] = useState<string | null>(null);
   useEffect(() => {
-    setOpenSectionId(null);
+    setOpenSectionId(activeSectionId);
+    // only when the page (or the module it belongs to) changes, not when the menu data refreshes
   }, [activeSectionId]);
-  // The current screen's module always stays open; a clicked module opens beside it (one at a time: clicking another
-  // module closes the previously clicked one, clicking it again closes it).
-  const toggleSection = (id: string) => {
-    if (id === activeSectionId) return;
-    setOpenSectionId((prev) => (prev === id ? null : id));
-  };
+  const toggleSection = (id: string) => setOpenSectionId((prev) => (prev === id ? null : id));
   const handleNavScroll = () => {
     setIsScrolling(true);
     window.clearTimeout(scrollTimer.current);
@@ -156,12 +141,11 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
         onScroll={handleNavScroll}
       >
         {navSections.map((section) => {
-          // A module heading opens / closes its sub-modules. Always open: a section without a heading, and the
-          // FeedXchange module (Dashboard, Seller Buyer Report), whose heading is plain text.
-          const alwaysOpen = !section.title || isAlwaysOpenSection(section);
-          const sectionOpen = alwaysOpen || activeSectionId === section.id || openSectionId === section.id;
+          // A module heading opens / closes its sub-modules. Only a section without a heading is always open.
+          const alwaysOpen = !section.title;
+          const sectionOpen = alwaysOpen || openSectionId === section.id;
           return (
-          <div key={section.id} className={`aside__section ${sectionOpen ? "" : "is-closed"}`}>
+          <div key={section.id} className={`aside__section ${sectionOpen ? "" : "is-closed"} ${section.id === activeSectionId ? "is-active" : ""}`}>
             {section.title && alwaysOpen && <p className="aside__section-title">{section.title}</p>}
             {section.title && !alwaysOpen && (
               <button
@@ -171,6 +155,7 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
                 aria-expanded={sectionOpen}
                 aria-controls={`aside-section-${section.id}`}
               >
+                {section.icon && createElement(section.icon, { className: "aside__section-icon", "aria-hidden": true })}
                 <span className="aside__section-label">{section.title}</span>
                 {/* open / closed arrow, shown only while the heading is hovered or focused */}
                 <ChevronDownIcon className={`aside__section-chevron ${sectionOpen ? "is-open" : ""}`} aria-hidden />

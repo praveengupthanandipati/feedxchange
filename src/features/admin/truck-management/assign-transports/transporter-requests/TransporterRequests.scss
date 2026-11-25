@@ -1,0 +1,385 @@
+@use "../../../../../shared/assets/styles/variables" as v;
+@use "../../../../../shared/assets/styles/mixins" as m;
+
+.transporter-requests {
+  @include m.card(v.$spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-5;
+  margin-bottom: v.$spacing-6;
+
+  @include m.respond-below(sm) {
+    padding: v.$spacing-3;
+  }
+
+  &__header {
+    h1 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      margin: 0;
+      color: v.fg(v.$color-info);
+      font-size: v.$font-size-xl;
+
+      svg {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+
+    p {
+      margin: v.$spacing-1 0 0;
+      color: v.fg(v.$color-text-muted);
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+
+    h2 {
+      margin: 0;
+      font-size: v.$font-size-lg;
+    }
+  }
+
+  &__section-head {
+    @include m.flex(row, space-between, center, v.$spacing-3);
+    flex-wrap: wrap;
+  }
+
+  &__count {
+    margin-left: v.$spacing-1;
+    padding: 0 v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background: v.$color-gray-100;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__empty {
+    margin: 0;
+    padding: v.$spacing-4;
+    border: 1px dashed v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    color: v.fg(v.$color-text-muted);
+    text-align: center;
+  }
+
+  // Addresses are long: wrap them instead of stretching the table.
+  // One short line per address ("Party, Place"; the full text is the hover tooltip), so the two address columns stay narrow.
+  &__address {
+    max-width: 14rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    // "Full Addresses": the whole address, wrapped.
+    &.is-full {
+      min-width: 12rem;
+      max-width: 18rem;
+      overflow: visible;
+      white-space: normal !important;
+    }
+  }
+
+  &__party,
+  &__place {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__place {
+    color: v.fg(v.$color-text-muted);
+  }
+
+  &__head-actions {
+    @include m.flex(row, flex-end, center, v.$spacing-2);
+    flex-wrap: wrap;
+  }
+
+  // Today / upcoming / earlier: a coloured edge on each row, a badge on the date and a heading row per group.
+  &__when {
+    display: block;
+    width: fit-content;
+    margin-top: 2px;
+    padding: 1px v.$spacing-2;
+    border-radius: v.$radius-pill;
+    font-size: 0.7rem;
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    &--today {
+      background: v.$color-orange;
+      color: v.fg(v.$color-white);
+    }
+
+    &--upcoming {
+      background: v.alpha(v.$color-info, 0.16);
+      color: v.fg(v.$color-info);
+    }
+
+    &--earlier {
+      background: v.alpha(v.$color-danger, 0.14);
+      color: v.fg(v.$color-danger);
+    }
+  }
+
+  &__row--today td:first-child,
+  &__row--today td:first-of-type {
+    box-shadow: inset 4px 0 0 v.$color-orange;
+  }
+
+  &__row--today {
+    background: v.alpha(v.$color-orange, 0.06);
+  }
+
+  &__row--upcoming td:first-child {
+    box-shadow: inset 4px 0 0 v.$color-info;
+  }
+
+  &__row--earlier td:first-child {
+    box-shadow: inset 4px 0 0 v.$color-danger;
+  }
+
+  &__group {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &__chevron {
+    display: inline-block;
+    width: 1em;
+    margin-right: v.$spacing-2;
+    transition: transform 0.15s ease;
+
+    &.is-open {
+      transform: rotate(90deg);
+    }
+  }
+
+  &__group td {
+    padding: v.$spacing-2 v.$spacing-3 !important;
+    font-weight: v.$font-weight-semibold;
+    white-space: normal !important;
+
+    small {
+      margin-left: v.$spacing-3;
+      color: v.fg(v.$color-text-muted);
+      font-weight: v.$font-weight-regular;
+    }
+  }
+
+  &__group--today td {
+    background: v.alpha(v.$color-orange, 0.18);
+    color: v.fg(v.$color-orange);
+    box-shadow: inset 4px 0 0 v.$color-orange;
+  }
+
+  &__group--upcoming td {
+    background: v.alpha(v.$color-info, 0.12);
+    color: v.fg(v.$color-info);
+    box-shadow: inset 4px 0 0 v.$color-info;
+  }
+
+  &__group--earlier td {
+    background: v.alpha(v.$color-danger, 0.1);
+    color: v.fg(v.$color-danger);
+    box-shadow: inset 4px 0 0 v.$color-danger;
+  }
+
+  &__product-name {
+    display: block;
+  }
+
+  &__bill-tag {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 2px v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background: v.$color-gray-100;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+
+    &.is-required {
+      background: v.alpha(v.$color-warning, 0.18);
+      color: v.fg(v.$color-warning);
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__none {
+    text-align: center !important;
+    color: v.fg(v.$color-text-muted);
+  }
+
+  &__remarks {
+    min-width: 10rem;
+    max-width: 16rem;
+    white-space: normal !important;
+  }
+
+  &__remarks-input {
+    display: block;
+    width: 100%;
+    min-width: 14rem;
+    margin-top: v.$spacing-2;
+    height: 2rem;
+    padding: 0 v.$spacing-2;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    font: inherit;
+  }
+
+  &__filters {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+    flex-wrap: wrap;
+    padding: v.$spacing-3;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background: v.$color-gray-100;
+
+    > * {
+      min-width: 12rem;
+    }
+  }
+
+  &__search {
+    height: 2.5rem;
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    font: inherit;
+  }
+
+  &__filter-actions {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    min-width: 0;
+  }
+
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    height: 2.25rem;
+    padding: 0 v.$spacing-4;
+    border: none;
+    border-radius: v.$radius-md;
+    color: v.fg(v.$color-white);
+    font: inherit;
+    font-weight: v.$font-weight-semibold;
+    cursor: pointer;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &--info {
+      background: v.$color-info;
+    }
+
+    &--navy {
+      background: v.$color-navy;
+    }
+
+    &--danger {
+      background: v.$color-danger;
+    }
+  }
+}
+
+// Sort / filter heading cells (the filter panel is portalled to <body>, so it is styled outside .transporter-requests)
+.column-header {
+  &__inner {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-2;
+  }
+
+  &__sort,
+  &__filter {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-1;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+
+    svg {
+      width: 0.9rem;
+      height: 0.9rem;
+    }
+  }
+
+  &__filter {
+    opacity: 0.6;
+
+    &:hover,
+    &.is-active {
+      opacity: 1;
+    }
+
+    &.is-active {
+      color: v.fg(v.$color-orange);
+    }
+  }
+
+  &__panel {
+    position: fixed;
+    z-index: v.$z-index-popover;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    width: 16rem;
+    padding: v.$spacing-3;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background: v.$color-white;
+    box-shadow: v.$shadow-lg;
+    font-size: v.$font-size-sm;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: v.$font-weight-regular;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: v.$spacing-1;
+    }
+
+    span {
+      color: v.fg(v.$color-text-muted);
+    }
+
+    input {
+      height: 2rem;
+      padding: 0 v.$spacing-2;
+      border: 1px solid v.line(v.$color-border);
+      border-radius: v.$radius-md;
+      font: inherit;
+    }
+  }
+
+  &__clear {
+    align-self: flex-start;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: v.fg(v.$color-info);
+    font: inherit;
+    cursor: pointer;
+  }
+}

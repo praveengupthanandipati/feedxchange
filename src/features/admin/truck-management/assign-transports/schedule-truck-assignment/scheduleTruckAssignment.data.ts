@@ -4,6 +4,8 @@ export interface ScheduleTruckRow {
   id: string;
   status: ScheduleTruckStatus;
   autoApprove: boolean;
+  /** The goods must be re-billed (for example a re-assigned truck). */
+  billChangeRequired?: boolean;
   scheduleDateTime: string;
   scheduleValue: number;
   transporterProfileIds: number[];

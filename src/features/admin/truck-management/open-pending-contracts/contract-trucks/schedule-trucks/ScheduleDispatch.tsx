@@ -41,6 +41,7 @@ interface FormState {
   freight: string;
   remarks: string;
   autoApprove: boolean;
+  billChangeRequired: boolean;
 }
 
 const initialFormState: FormState = {
@@ -55,6 +56,7 @@ const initialFormState: FormState = {
   freight: "",
   remarks: "",
   autoApprove: false,
+  billChangeRequired: false,
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -177,6 +179,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
         createdBy: currentUserId,
         createdOn: new Date().toISOString(),
         autoApprove: form.autoApprove,
+        billChangeRequired: form.billChangeRequired,
       }).unwrap();
 
       if (!created.succeeded) {
@@ -397,6 +400,20 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
               Auto approve is available only when a single transporter is selected.
             </p>
           )}
+        </div>
+
+        <div className="schedule-request-drawer__field schedule-request-drawer__field--checkbox">
+          <label className="schedule-request-drawer__checkbox">
+            <input
+              type="checkbox"
+              checked={form.billChangeRequired}
+              onChange={(event) => setField("billChangeRequired", event.target.checked)}
+            />
+            Bill Change Required
+          </label>
+          <p className="schedule-request-drawer__hint">
+            Tick this when the goods must be re-billed (for example a re-assigned truck). Transporters see it on their request.
+          </p>
         </div>
       </div>
       <LookupLoadError failed={transportersFailed} className="schedule-request-drawer__error" />

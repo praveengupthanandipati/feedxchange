@@ -25,5 +25,7 @@ export interface AsideNavItem {
 export interface AsideNavSection {
   id: string;
   title?: string;
+  /** Module icon (from the Modules table), shown beside the heading. */
+  icon?: IconComponent;
   items: AsideNavItem[];
 }
