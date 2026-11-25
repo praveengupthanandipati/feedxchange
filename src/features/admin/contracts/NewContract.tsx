@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useProfileCities, withCity } from "../../../shared/hooks/useProfileCities";
 import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import type { ChangeEvent } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { mapApiContract } from "./contractRow";
 import { ArrowLeftIcon, EyeIcon, EyeOffIcon } from "../../../shared/components/icon";
 import AddressSelectField from "../truck-management/contract-trucks/AddressSelectField";
 import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
@@ -10,6 +11,7 @@ import ToggleSwitch from "../../../shared/components/toggle/ToggleSwitch";
 import ConfirmDialog from "../../../shared/components/dialog/ConfirmDialog";
 import type { Contract } from "./contracts.data";
 import {
+  useGetAllContractsByFiltersQuery,
   useGetContractByContractNumberQuery,
   useSaveContractMutation,
   useUpdateContractMutation,
@@ -268,7 +270,29 @@ const REQUIRED_FIELD_LABELS: Record<string, string> = {
 
 const NewContract = () => {
   const location = useLocation();
-  const navState = (location.state as null | { contract?: Contract; isEdit?: boolean; isDuplicate?: boolean }) || null;
+  const routeState = (location.state as null | { contract?: Contract; isEdit?: boolean; isDuplicate?: boolean }) || null;
+  // ?edit=<number> / ?duplicate=<number> keep the mode after a refresh or in a new tab, where the state above is gone:
+  // the contract's list row is then looked up again (the same row the Contracts list passes in).
+  const [searchParams] = useSearchParams();
+  const urlEditNumber = searchParams.get("edit") ?? "";
+  const urlDuplicateNumber = urlEditNumber ? "" : searchParams.get("duplicate") ?? "";
+  const urlContractNumber = urlEditNumber || urlDuplicateNumber;
+  const needsListRow = !routeState?.contract && !!urlContractNumber;
+  const { data: contractRows, isFetching: contractRowsFetching } = useGetAllContractsByFiltersQuery(undefined, { skip: !needsListRow });
+  const listContract = useMemo(() => {
+    if (!needsListRow) return undefined;
+    const row = contractRows?.find((item) => item.contractNumber === urlContractNumber);
+    return row ? mapApiContract(row) : undefined;
+  }, [needsListRow, contractRows, urlContractNumber]);
+  const navState = useMemo(
+    () =>
+      needsListRow
+        ? { contract: listContract, isEdit: !!urlEditNumber, isDuplicate: !!urlDuplicateNumber }
+        : routeState,
+    [needsListRow, listContract, urlEditNumber, urlDuplicateNumber, routeState],
+  );
+  /** The address names a contract that is not in the list (deleted, or not visible to this user). */
+  const contractNotFound = needsListRow && !contractRowsFetching && contractRows !== undefined && !listContract;
   // Duplicate (copy icon in the contracts list): the form is filled from that contract like an edit, with Qty, Rate,
   // Delivery Schedule and Payment days left empty, and saving creates a new contract.
   const isDuplicate = !navState?.isEdit && !!navState?.isDuplicate;
@@ -1663,6 +1687,12 @@ const { data: products, isError: productsFailed } = useGetProductsQuery();
       )}
 
       <LookupLoadError failed={productsFailed || businessProfilesFailed} className="new-contract__error" />
+
+      {contractNotFound && (
+        <p className="new-contract__error" role="alert">
+          Contract {urlContractNumber} could not be found. Open it again from the Contracts list.
+        </p>
+      )}
 
       {formError && (
         <p className="new-contract__error" role="alert">
