@@ -112,7 +112,8 @@ const ProductsDashboard = ({ entries }: ProductsDashboardProps) => {
     ...(canViewProducts && canViewPrices ? [{ label: "Average product price", value: productsLoading ? "…" : money(averagePrice), icon: DollarSignIcon, color: "products-dashboard__card--green", path: "/admin/products/price-tracking" }] : []),
   ];
 
-  if (metrics.length === 0 && quickLinks.length === 0) return null;
+  // Nothing under Products is open to this role: say so instead of an empty page.
+  if (metrics.length === 0 && quickLinks.length === 0) return <p className="submodule-overview__empty">Nothing here is available for your role.</p>;
 
   return (
     <section className="products-dashboard" aria-label="Products summary">

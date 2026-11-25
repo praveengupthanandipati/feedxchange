@@ -128,7 +128,8 @@ const TransportersDashboard = ({ entries }: TransportersDashboardProps) => {
     });
   }
 
-  if (metrics.length === 0) return null;
+  // Nothing under Transporters is open to this role: say so instead of an empty page.
+  if (metrics.length === 0) return <p className="submodule-overview__empty">Nothing here is available for your role.</p>;
 
   const truckTypes = filteredTrucks.reduce<Record<string, number>>((totals, truck) => {
     const type = truck.truckType?.trim() || "Other";

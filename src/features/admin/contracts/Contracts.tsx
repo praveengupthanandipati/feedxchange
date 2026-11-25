@@ -22,10 +22,10 @@ import {
   useGetAllContractsByFiltersQuery,
     useGetAllContractStatusesQuery,
   useUpdateContractStatusMutation,
-  type PendingContractApiResponse,
 
 } from "../../../core/store/contractsApi";
 import { buildContractColumns } from "./contracts.columns";
+import { mapApiContract } from "./contractRow";
 import { useSuccessToast } from "../../../shared/components/toast/useSuccessToast";
 import SuccessToast from "../../../shared/components/toast/SuccessToast";
 import { DEFAULT_DATE_RANGE, DEFAULT_STATUS_FILTER, dateRangeOptions, type Contract } from "./contracts.data";
@@ -66,72 +66,6 @@ function escapeHtml(value: string) {
 
 function normalizeStatus(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-function mapApiContract(row: PendingContractApiResponse): Contract {
-  const qtyMeasure = row.basicDetails.quantityMeasure || "mt";
-  const quantity = row.basicDetails.quantity ?? 0;
-  const contractRate = row.basicDetails.contractRate ?? 0;
-  const netRateValue = row.basicDetails.netRate ?? contractRate;
-  return {
-    id: row.contractNumber,
-    contractId: row.contractId,
-    contractNumber: row.contractNumber,
-    date: row.contractDate ? new Date(row.contractDate).toLocaleDateString("en-IN") : "",
-    dateValue: row.contractDate ? new Date(row.contractDate).getTime() : 0,
-    status: row.basicDetails.calculatedStatus as Contract["status"],
-    seller: row.sellerName ?? "",
-    buyer: row.buyerName ?? "",
-    product: row.productName ?? "",
-    quantityMeasure: qtyMeasure,
-    qty: `${quantity} ${qtyMeasure}`,
-    qtyValue: quantity,
-    poTolerance: "",
-    aQty: `${row.basicDetails.arrangedQuantity ?? 0} ${qtyMeasure}`,
-    pQty: `${row.basicDetails.pendingQuantity ?? quantity} ${qtyMeasure}`,
-    dQty: `${row.basicDetails.dispatchedQuantity ?? 0} ${qtyMeasure}`,
-    cRate: `₹${contractRate}`,
-    cRateValue: contractRate,
-    gst: `${row.basicDetails.gstPercentage ?? 0}%`,
-    netRate: `₹${netRateValue}`,
-    netRateValue,
-    // Not returned by the GetAllContracts summary endpoint.
-    indicativeFreight: "",
-    rateRemarks: "",
-    deliveryType: row.basicDetails.deliveryType ?? "",
-    paymentTerms: "",
-    paymentBeforeDate: "",
-    immediateAdvancePercent: "",
-    immediateAdvanceDate: "",
-    balanceAdvancePercent: "",
-    balanceAdvanceDate: "",
-    sellerPaymentDueDays: "",
-    buyerPaymentDueDays: "",
-    paymentRemarks: "",
-    iFreight: "",
-    iFreightValue: 0,
-    sellerConditions: {
-      commission: "",
-      deliverySchedule: "ready-loading",
-      fromDate: "",
-      toDate: "",
-      specificDays: "",
-      qualitySpecSource: "",
-      address: "",
-      remarks: "",
-    },
-    buyerConditions: {
-      commission: "",
-      deliverySchedule: "ready-loading",
-      fromDate: "",
-      toDate: "",
-      specificDays: "",
-      qualitySpecSource: "",
-      address: "",
-      remarks: "",
-    },
-    approved: false,
-  };
 }
 
 const ContractsLoader = () => {
@@ -245,14 +179,16 @@ const Contracts = () => {
   //   }, 3000);
   // };
 
+  // The mode and contract number are also in the address, so a refresh (or a new tab) reopens the same contract.
   const handleEdit = (contract: Contract) => {
-      navigate("new",{
+      navigate(`new?edit=${encodeURIComponent(contract.contractNumber)}`,{
         state:{ contract,isEdit:true }
       });
     };
 
   // Copy icon beside the contract number: New Contract filled from this one, as a new contract.
-  const handleDuplicate = (contract: Contract) => navigate("new", { state: { contract, isDuplicate: true } });
+  const handleDuplicate = (contract: Contract) =>
+    navigate(`new?duplicate=${encodeURIComponent(contract.contractNumber)}`, { state: { contract, isDuplicate: true } });
 
   // useEffect(() => {
   //   if (!data?.contracts) return;

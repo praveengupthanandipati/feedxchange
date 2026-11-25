@@ -33,7 +33,7 @@ const errorMessage = (error: unknown): string => {
  * makes an override (highlighted), changing it back removes the override.
  */
 const UserAccess = () => {
-  const { data: users = [], isSuccess: usersLoaded, isError: usersFailed } = useGetManageableUsersQuery(undefined, { refetchOnMountOrArgChange: true });
+  const { data: users = [], isSuccess: usersLoaded, isError: usersFailed, error: usersError } = useGetManageableUsersQuery(undefined, { refetchOnMountOrArgChange: true });
   const [userId, setUserId] = useState<number | null>(null);
   const { data: tree, isFetching, isError, error } = useGetUserAccessTreeQuery(userId ?? 0, { skip: userId === null, refetchOnMountOrArgChange: true });
   const [save, { isLoading: saving }] = useSaveUserAccessMutation();
@@ -165,7 +165,9 @@ const UserAccess = () => {
       {message && <p className={`role-access__message role-access__message--${message.kind}`}>{message.text}</p>}
       {usersFailed && (
         <p className="role-access__message role-access__message--error">
-          Could not load the users you can manage. Make sure the API is running its latest version and try again.
+          {(usersError as { status?: unknown } | undefined)?.status === 403
+            ? "Your role does not include managing other users' access."
+            : "Could not load the users you can manage. Please refresh the page and try again."}
         </p>
       )}
       {usersLoaded && users.length === 0 && <p className="role-access__hint">There are no users below you to manage.</p>}
