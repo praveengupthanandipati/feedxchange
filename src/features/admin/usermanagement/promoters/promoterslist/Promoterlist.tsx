@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   BriefcaseIcon,
   ClockIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   MailIcon,
@@ -12,7 +11,7 @@ import {
   UsersIcon,
 } from "../../../../../shared/components/icon";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
-import type { TableColumn } from "../../../../../shared/components/table/table.types";
+import ExportButtons from "../../../../../shared/components/table/ExportButtons";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import PromotersFilters from "./PromotersFilters";
 import Pagination from "./Pagination";
@@ -32,16 +31,6 @@ import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 
 const PAGE_SIZE = 10;
 const DEFAULT_STATUS_FILTER: PromoterProfileStatus = "Active";
-
-function getExportCellValue(row: Promoter, column: TableColumn<Promoter>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const Promoterlist = () => {
   const navigate = useNavigate();
@@ -132,30 +121,6 @@ const Promoterlist = () => {
     currentPageClamped * PAGE_SIZE,
   );
 
-  const handleExport = () => {
-    const exportColumns = columns.filter((column) => column.key !== "actions");
-    const headerRow = exportColumns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = exportColumns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "promoters.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="promoters-page">
       <SuccessToast message={successMessage} />
@@ -171,13 +136,7 @@ const Promoterlist = () => {
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide Filters" : "Show Filters"}
             </button>
-            <button
-              type="button"
-              className="promoters-btn promoters-btn--warning"
-              onClick={handleExport}
-            >
-              <DownloadIcon aria-hidden /> Export
-            </button>
+            <ExportButtons name="Promoters" columns={columns} rows={filteredRows} />
             <Can any={["profiles.promoter.manage"]}>
               <button
                 type="button"

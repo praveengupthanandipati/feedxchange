@@ -1,28 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, PrinterIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import { buildBuyerWiseColumns } from "./buyerWise.columns";
-import { buyerRows, getMonthlyTotal, monthlyStats, type BuyerRow } from "./buyerWise.data";
+import { buyerRows, getMonthlyTotal, monthlyStats } from "./buyerWise.data";
 import "./BuyerWise.scss";
 
 const PAGE_SIZE = 10;
 
-function getExportCellValue(row: BuyerRow, column: TableColumn<BuyerRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-interface BuyerWiseProps {
-  onRegisterExport: (handler: (() => void) | null) => void;
-}
-
-const BuyerWise = ({ onRegisterExport }: BuyerWiseProps) => {
+const BuyerWise = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const columns = useMemo(() => buildBuyerWiseColumns(), []);
@@ -33,32 +18,6 @@ const BuyerWise = ({ onRegisterExport }: BuyerWiseProps) => {
     (currentPageClamped - 1) * PAGE_SIZE,
     currentPageClamped * PAGE_SIZE,
   );
-
-  useEffect(() => {
-    const handleExport = () => {
-      const headerRow = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-      const bodyRows = buyerRows
-        .map((row) => {
-          const cells = columns.map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`).join("");
-          return `<tr>${cells}</tr>`;
-        })
-        .join("");
-
-      const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-      const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "buyer-wise.xls";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    };
-
-    onRegisterExport(handleExport);
-    return () => onRegisterExport(null);
-  }, [columns, onRegisterExport]);
 
   const handlePrint = () => window.print();
 
@@ -81,6 +40,9 @@ const BuyerWise = ({ onRegisterExport }: BuyerWiseProps) => {
       </div>
 
       <Table
+        exportName="Buyer Wise Report"
+        exportData={buyerRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

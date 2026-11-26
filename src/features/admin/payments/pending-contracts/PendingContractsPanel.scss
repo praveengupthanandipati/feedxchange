@@ -37,11 +37,6 @@
     text-align: center;
   }
 
-  &__pager {
-    @include m.flex(row, flex-end, center, v.$spacing-2);
-    font-size: v.$font-size-sm;
-    color: v.fg(v.$color-text-muted);
-  }
 
   &__search {
     position: relative;
@@ -64,42 +59,7 @@
     }
   }
 
-  &__table-wrapper {
-    overflow: auto;
-    border: 1px solid v.line(v.$color-border);
-    scrollbar-width: thin;
-  }
-
-  &__table {
-    width: 100%;
-    min-width: 84rem;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: v.$font-size-sm;
-
-    th {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      padding: v.$spacing-2 v.$spacing-3;
-      background-color: v.$color-navy;
-      color: v.on(v.$color-white);
-      font-weight: v.$font-weight-semibold;
-      text-align: left;
-      white-space: nowrap;
-    }
-
-    td {
-      padding: v.$spacing-2 v.$spacing-3;
-      color: v.fg(v.$color-text);
-      white-space: nowrap;
-      border-top: 1px solid v.line(v.$color-border);
-    }
-
-    tbody tr:hover {
-      background-color: v.$color-bg-muted;
-    }
-  }
+  // the list itself is the shared Table (header, rows, toolbar, pager)
 
   &__num {
     text-align: right !important;

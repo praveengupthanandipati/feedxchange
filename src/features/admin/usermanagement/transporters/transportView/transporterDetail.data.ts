@@ -67,6 +67,9 @@ export interface TransporterProfile {
   referralBy: string;
   googleMapLocation: string;
   transporterDescription: string;
+  /** Serving Locations: states goods are picked up from / delivered to. */
+  sourceStates: string[];
+  destinationStates: string[];
   addresses: AddressRow[];
   contacts: ContactRow[];
   bankDetails: BankRow[];
@@ -104,6 +107,8 @@ export function mapTransporterProfileDetail(profile: TransporterProfileDetail): 
     referralBy: profile.referredBy,
     googleMapLocation: primaryAddress?.googleLocationUrl ?? "",
     transporterDescription: profile.aboutProfile,
+    sourceStates: profile.transporterProfileDetails?.sourceStates ?? [],
+    destinationStates: profile.transporterProfileDetails?.destinationStates ?? [],
     addresses: addressList.map((address) => ({
       id: String(address.addressId),
       officeName: address.officeName,

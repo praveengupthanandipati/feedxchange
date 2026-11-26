@@ -1,0 +1,1109 @@
+@use "../../../../../shared/assets/styles/variables" as v;
+@use "../../../../../shared/assets/styles/mixins" as m;
+
+// Colours of the quantities, used by the bars, their legends and the chips.
+$loaded: v.$color-success;
+$assigned: v.$color-info;
+$left: v.$color-gray-200;
+
+.schedules-mgmt {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-4;
+  padding-bottom: v.$spacing-6;
+  color: v.fg(v.$color-text);
+
+  // ------------------------------------------------------------ header
+  &__header {
+    @include m.flex(row, space-between, flex-start, v.$spacing-3);
+    flex-wrap: wrap;
+
+    h1 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      margin: 0;
+      font-size: v.$font-size-xl;
+      color: v.fg(v.$color-navy);
+
+      svg {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+
+    p {
+      margin: v.$spacing-1 0 0;
+      color: v.fg(v.$color-text-muted);
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-2;
+  }
+
+  // ------------------------------------------------------------ period (schedule date) dropdown in the header
+  &__period {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-2;
+
+    .schedules-mgmt__dates {
+      align-items: center;
+      margin-top: 0;
+    }
+  }
+
+  // A dropdown with an icon in front (period, sort and the filter dropdowns).
+  &__icon-select {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+
+    > svg {
+      position: absolute;
+      width: 1rem;
+      height: 1rem;
+      pointer-events: none;
+    }
+
+    .schedules-mgmt__icon-select-lead {
+      left: v.$spacing-3;
+      color: v.fg(v.$color-navy);
+    }
+
+    .schedules-mgmt__icon-select-caret {
+      right: v.$spacing-2;
+      color: v.fg(v.$color-text-muted);
+    }
+
+    select {
+      @include m.focus-ring(v.$color-orange);
+      min-width: 10.5rem;
+      max-width: 100%;
+      height: var(--fx-control-height);
+      padding: 0 2rem 0 2.25rem;
+      border: 1px solid v.line(v.$color-border);
+      border-radius: v.$radius-md;
+      background: v.$color-bg;
+      color: v.fg(v.$color-text);
+      font: inherit;
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-semibold;
+      text-overflow: ellipsis;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    // Filter dropdowns take the full width of their column.
+    &--wide {
+      width: 100%;
+
+      select {
+        width: 100%;
+        font-weight: v.$font-weight-regular;
+      }
+    }
+  }
+
+  // Small icons beside text: pills, chips, headings, facts, the bill-change tag and checkbox.
+  &__pills button,
+  &__chip,
+  &__flag,
+  &__check,
+  &__filter legend,
+  &__facts dt,
+  &__th {
+    svg {
+      flex: 0 0 auto;
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+  }
+
+  &__pills button,
+  &__chip,
+  &__flag,
+  &__filter legend,
+  &__facts dt,
+  &__th {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  &__th svg,
+  &__facts dt svg {
+    color: v.fg(v.$color-text-muted);
+  }
+
+  &__check svg {
+    color: v.fg(v.$color-orange-dark);
+  }
+
+  // ------------------------------------------------------------ Download menu (PDF / CSV)
+  &__download {
+    position: relative;
+  }
+
+  &__download-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    width: 20rem;
+    max-width: calc(100vw - 2rem);
+    padding: v.$spacing-2;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+    box-shadow: v.$shadow-md;
+  }
+
+  &__download-note {
+    margin: 0 0 v.$spacing-1;
+    padding: v.$spacing-1 v.$spacing-2;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+
+  &__download-option {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    padding: v.$spacing-1 v.$spacing-2 v.$spacing-2;
+    border-bottom: 1px solid v.line(v.$color-border);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+  }
+
+  &__download-item {
+    @include m.focus-ring(v.$color-orange);
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-3;
+    width: 100%;
+    padding: v.$spacing-2;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    color: v.fg(v.$color-text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    > svg {
+      flex: 0 0 auto;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: v.fg(v.$color-navy);
+    }
+
+    > span {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      font-size: v.$font-size-sm;
+
+      small {
+        color: v.fg(v.$color-text-muted);
+        font-size: 0.75rem;
+      }
+    }
+
+    &:hover:not(:disabled) {
+      background: v.$color-gray-100;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: progress;
+    }
+  }
+
+  &__sr-only {
+    @include m.visually-hidden;
+  }
+
+  // ------------------------------------------------------------ buttons
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-2);
+    @include m.focus-ring(v.$color-orange);
+    height: var(--fx-control-height);
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &:hover:not(:disabled) {
+      background: v.$color-gray-100;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &.is-active {
+      border-color: v.$color-navy;
+      background: v.alpha(v.$color-navy, 0.08);
+    }
+
+    &--primary {
+      border-color: v.$color-navy;
+      background: v.$color-navy;
+      color: v.fg(v.$color-white);
+
+      &:hover:not(:disabled) {
+        background: v.$color-navy-light;
+      }
+    }
+
+    &--ghost {
+      border-color: transparent;
+      background: transparent;
+      color: v.fg(v.$color-danger);
+    }
+  }
+
+  .is-spinning {
+    animation: schedules-mgmt-spin 0.9s linear infinite;
+  }
+
+  // ------------------------------------------------------------ stat tiles: 1 -> 2 -> 3 -> 5 per row
+  &__stats {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: v.$spacing-3;
+
+    @include m.respond-to(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @include m.respond-to(xl) {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  &__stat {
+    @include m.card;
+    @include m.focus-ring(v.$color-orange);
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-3;
+    width: 100%;
+    border-left: 4px solid var(--tone);
+    color: v.fg(v.$color-text);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+
+    &:not(:disabled):hover {
+      background: v.alpha(v.$color-navy, 0.03);
+    }
+
+    &.is-active {
+      box-shadow: 0 0 0 2px var(--tone);
+    }
+
+    &--navy { --tone: #{v.$color-navy}; }
+    &--orange { --tone: #{v.$color-orange}; }
+    &--green { --tone: #{v.$color-success}; }
+    &--sky { --tone: #{v.$color-info}; }
+    &--red { --tone: #{v.$color-danger}; }
+  }
+
+  &__stat-icon {
+    @include m.flex-center;
+    flex: 0 0 auto;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: v.$radius-md;
+    background: color-mix(in srgb, var(--tone) 14%, transparent);
+    color: var(--tone);
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  &__stat-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    strong {
+      font-size: v.$font-size-xl;
+      line-height: 1.2;
+    }
+
+    small {
+      @include m.truncate-text;
+      color: v.fg(v.$color-text-muted);
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__stat-label {
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  // ------------------------------------------------------------ overview bars
+  &__overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: v.$spacing-3;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__panel {
+    @include m.card;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+
+    h2 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      margin: 0;
+      font-size: v.$font-size-base;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+        color: v.fg(v.$color-text-muted);
+      }
+    }
+  }
+
+  // Stacked bar: the empty remainder is the "left" part.
+  &__bar {
+    display: flex;
+    height: 0.5rem;
+    overflow: hidden;
+    border-radius: v.$radius-pill;
+    background: $left;
+
+    span {
+      height: 100%;
+      transition: width 0.25s ease;
+    }
+
+    &--big {
+      height: 0.875rem;
+    }
+  }
+
+  // Shared colour classes for bar segments and legend dots
+  .is-loaded { background: $loaded; }
+  .is-assigned { background: $assigned; }
+  .is-left { background: $left; }
+  .is-pending { background: v.$color-orange; }
+  .is-freightproposed { background: v.$color-warning; }
+  .is-accepted { background: v.$color-success; }
+  .is-partiallyaccepted { background: v.alpha(v.$color-success, 0.55); }
+  .is-rejected { background: v.$color-danger; }
+  .is-expired { background: v.$color-gray-400; }
+  .is-cancelled { background: v.$color-gray-600; }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2 v.$spacing-4;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: v.$font-size-sm;
+
+    li,
+    button {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+    }
+
+    button {
+      @include m.focus-ring(v.$color-orange);
+      padding: 2px v.$spacing-2;
+      border: 1px solid transparent;
+      border-radius: v.$radius-pill;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+
+      &:hover {
+        background: v.$color-gray-100;
+      }
+
+      // These buttons are not bar segments: keep their own background.
+      &.is-active {
+        border-color: v.$color-navy;
+        background: v.alpha(v.$color-navy, 0.08);
+      }
+    }
+
+    i {
+      display: inline-block;
+      width: 0.625rem;
+      height: 0.625rem;
+      border-radius: 50%;
+    }
+
+    b {
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  // ------------------------------------------------------------ list card
+  &__card {
+    @include m.card;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-3;
+    min-width: 0;
+  }
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+    align-items: center;
+  }
+
+  &__search {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex: 1 1 18rem;
+    min-width: 0;
+    height: var(--fx-control-height);
+    padding: 0 v.$spacing-3;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+
+    &:focus-within {
+      @include m.field-focus-ring;
+    }
+
+    svg {
+      flex: 0 0 auto;
+      width: 1rem;
+      height: 1rem;
+      color: v.fg(v.$color-text-muted);
+    }
+
+    input {
+      flex: 1 1 auto;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__dates input {
+    height: var(--fx-control-height);
+    padding: 0 v.$spacing-2;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+    color: v.fg(v.$color-text);
+    font: inherit;
+    font-size: v.$font-size-sm;
+
+    &:focus {
+      @include m.field-focus-ring;
+    }
+  }
+
+  &__count {
+    display: inline-block;
+    min-width: 1.25rem;
+    padding: 0 0.375rem;
+    border-radius: v.$radius-pill;
+    background: v.$color-navy;
+    color: v.fg(v.$color-white);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    text-align: center;
+  }
+
+  // ------------------------------------------------------------ filters
+  // One row on wide screens: the response pills keep their size, the dropdowns share (and shrink into) what is left,
+  // the bill-change checkbox goes at the end. Narrower screens wrap onto more lines.
+  &__filters {
+    @include m.card;
+    // The card's backdrop blur makes it its own layer: lift it so open dropdown lists show over the tiles below.
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: v.$spacing-3;
+
+    @include m.respond-to(xl) {
+      flex-wrap: nowrap;
+    }
+  }
+
+  &__filter {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 11rem;
+    gap: v.$spacing-1;
+    min-width: 8rem;
+    margin: 0;
+    padding: 0;
+    border: none;
+
+    @include m.respond-below(sm) {
+      flex-basis: 100%;
+    }
+
+    .schedules-mgmt__icon-select select {
+      min-width: 0;
+    }
+
+    > span,
+    legend {
+      padding: 0;
+      color: v.fg(v.$color-text-muted);
+      font-size: v.$font-size-sm;
+      font-weight: v.$font-weight-semibold;
+    }
+
+    // The response pills: as wide as they need, never squeezed.
+    &--wide {
+      flex: 0 0 auto;
+      min-width: 0;
+
+      @include m.respond-below(xl) {
+        flex: 1 1 100%;
+      }
+    }
+  }
+
+  &__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-1;
+
+    @include m.respond-to(xl) {
+      flex-wrap: nowrap;
+    }
+
+    button {
+      @include m.focus-ring(v.$color-orange);
+      // same height as the dropdowns beside them, so the row lines up
+      height: var(--fx-control-height);
+      // compact, so the Response and Trucks groups, Product and the checkbox share one line
+      padding: 0 0.625rem;
+      white-space: nowrap;
+      border: 1px solid v.line(v.$color-border);
+      border-radius: v.$radius-pill;
+      background: v.$color-bg;
+      color: v.fg(v.$color-text);
+      font-size: v.$font-size-sm;
+      cursor: pointer;
+
+      &.is-active {
+        border-color: v.$color-navy;
+        background: v.$color-navy;
+        color: v.fg(v.$color-white);
+      }
+    }
+  }
+
+  &__dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+    margin-top: v.$spacing-2;
+
+    label {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__clear {
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
+
+  // ------------------------------------------------------------ filter dropdowns (Trucks, Product, Transporter)
+  &__filter--dd {
+    flex: 0 1 13rem;
+    min-width: 10rem;
+
+    > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+
+      svg {
+        width: 0.875rem;
+        height: 0.875rem;
+      }
+    }
+  }
+
+  &__dd {
+    position: relative;
+    width: 100%;
+  }
+
+  &__dd-button {
+    @include m.focus-ring(v.$color-orange);
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
+    width: 100%;
+    height: var(--fx-control-height);
+    padding: 0 v.$spacing-2 0 v.$spacing-3;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+    color: v.fg(v.$color-text);
+    font: inherit;
+    font-size: v.$font-size-sm;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      border-color: v.line(v.$color-gray-400);
+    }
+
+    // A filter is on: same navy as a chosen pill, so what is filtering stands out.
+    &.is-set {
+      border-color: v.$color-navy;
+      background: v.alpha(v.$color-navy, 0.08);
+      font-weight: v.$font-weight-semibold;
+    }
+
+    &.is-open .schedules-mgmt__dd-caret {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__dd-icon {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 1rem;
+    color: v.fg(v.$color-navy);
+  }
+
+  &__dd-text {
+    @include m.truncate-text;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__dd-caret {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 1rem;
+    color: v.fg(v.$color-text-muted);
+    transition: transform 0.15s ease;
+  }
+
+  &__dd-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 20;
+    min-width: 100%;
+    max-width: 20rem;
+    max-height: 16rem;
+    margin: 0;
+    padding: v.$spacing-1;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid v.line(v.$color-border);
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+    box-shadow: v.$shadow-md;
+  }
+
+  &__dd-option {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
+    padding: v.$spacing-2;
+    border-radius: v.$radius-sm;
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+    cursor: pointer;
+
+    > span {
+      flex: 1 1 auto;
+    }
+
+    &.is-active {
+      background: v.$color-gray-100;
+    }
+
+    &.is-selected {
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__dd-check {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 1rem;
+    color: v.fg(v.$color-success);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__dd-caret {
+      transition: none;
+    }
+  }
+
+  &__check {
+    @include m.flex(row, flex-start, center, v.$spacing-2);
+    flex: 0 0 auto;
+    min-height: var(--fx-control-height);
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  &__result-line {
+    margin: 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+
+  // ------------------------------------------------------------ table
+  &__table-wrap {
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    min-width: 56rem;
+    border-collapse: collapse;
+    font-size: v.$font-size-sm;
+
+    th {
+      padding: v.$spacing-2;
+      border-bottom: 1px solid v.line(v.$color-border);
+      color: v.fg(v.$color-text-muted);
+      font-weight: v.$font-weight-semibold;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: v.$spacing-3 v.$spacing-2;
+      border-bottom: 1px solid v.line(v.$color-border);
+      vertical-align: top;
+
+      > span {
+        display: block;
+      }
+    }
+  }
+
+  &__row {
+    cursor: pointer;
+
+    &:hover td {
+      background: v.alpha(v.$color-navy, 0.03);
+    }
+
+    &.is-open td {
+      border-bottom-color: transparent;
+      background: v.alpha(v.$color-navy, 0.05);
+    }
+  }
+
+  &__expand {
+    @include m.flex-center;
+    @include m.focus-ring(v.$color-orange);
+    width: 1.75rem;
+    height: 1.75rem;
+    border: none;
+    border-radius: v.$radius-sm;
+    background: transparent;
+    color: v.fg(v.$color-text-muted);
+    cursor: pointer;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+      transform: rotate(-90deg);
+      transition: transform 0.15s ease;
+    }
+
+    &[aria-expanded="true"] svg {
+      transform: none;
+    }
+
+    // Awaiting-response rows open View Schedules instead of expanding.
+    &--go {
+      color: v.fg(v.$color-orange-dark);
+
+      svg {
+        transform: none;
+      }
+    }
+  }
+
+  &__row.is-link:hover td {
+    background: v.alpha(v.$color-orange, 0.06);
+  }
+
+  &__route {
+    min-width: 14rem;
+
+    b {
+      display: inline-block;
+      width: 2.25rem;
+      color: v.fg(v.$color-text-muted);
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__nowrap {
+    white-space: nowrap;
+  }
+
+  &__muted {
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+
+  &__when {
+    width: fit-content;
+    margin-top: 2px;
+    padding: 0 v.$spacing-2;
+    border-radius: v.$radius-pill;
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+
+    &--today { background: v.alpha(v.$color-orange, 0.18); color: v.fg(v.$color-orange-dark); }
+    &--upcoming { background: v.alpha(v.$color-info, 0.16); color: v.fg(v.$color-info); }
+    &--past { background: v.$color-gray-100; color: v.fg(v.$color-text-muted); }
+  }
+
+  &__flag {
+    // The table makes cell spans blocks, so the icon is spaced by margin rather than gap.
+    svg {
+      margin-right: 0.25rem;
+      vertical-align: -2px;
+    }
+
+    width: fit-content;
+    margin-top: 2px;
+    padding: 0 v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background: v.alpha(v.$color-orange, 0.16);
+    color: v.fg(v.$color-orange-dark);
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+  }
+
+  &__arrangement {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    min-width: 9rem;
+
+    em {
+      color: v.fg(v.$color-orange-dark);
+      font-style: normal;
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__arrangement-text {
+    white-space: nowrap;
+  }
+
+  &__chip {
+    display: inline-flex;
+    padding: 2px v.$spacing-2;
+    border-radius: v.$radius-pill;
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+
+    &--pending { background: v.alpha(v.$color-orange, 0.18); color: v.fg(v.$color-orange-dark); }
+    &--freightproposed { background: v.alpha(v.$color-warning, 0.2); color: v.fg(v.$color-text); }
+    &--accepted { background: v.alpha(v.$color-success, 0.16); color: v.fg(v.$color-success); }
+    &--partiallyaccepted { background: v.alpha(v.$color-success, 0.1); color: v.fg(v.$color-success); }
+    &--rejected { background: v.alpha(v.$color-danger, 0.14); color: v.fg(v.$color-danger); }
+    &--expired,
+    &--cancelled { background: v.$color-gray-100; color: v.fg(v.$color-text-muted); }
+    &--truck-assigned { background: v.alpha(v.$color-info, 0.16); color: v.fg(v.$color-info); }
+    &--truck-loaded { background: v.alpha(v.$color-success, 0.16); color: v.fg(v.$color-success); }
+  }
+
+  // ------------------------------------------------------------ opened row
+  &__detail-row > td {
+    padding: 0 v.$spacing-2 v.$spacing-3;
+    border-bottom: 1px solid v.line(v.$color-border);
+    background: v.alpha(v.$color-navy, 0.05);
+    cursor: default;
+  }
+
+  &__detail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: v.$spacing-4;
+    padding: v.$spacing-3;
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+
+    h3 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      margin: 0 0 v.$spacing-2;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__detail-main {
+    min-width: 0;
+  }
+
+  &__trucks {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: v.$font-size-sm;
+
+    th,
+    td {
+      padding: v.$spacing-2;
+      border-bottom: 1px solid v.line(v.$color-border);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: v.fg(v.$color-text-muted);
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__facts {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+    margin: 0;
+    font-size: v.$font-size-sm;
+
+    dt {
+      color: v.fg(v.$color-text-muted);
+      font-weight: v.$font-weight-semibold;
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+
+  &__detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-2;
+
+    @include m.respond-to(lg) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__link {
+    @include m.flex(row, flex-start, center, v.$spacing-1);
+    color: v.fg(v.$color-info);
+    font-weight: v.$font-weight-semibold;
+
+    svg {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+  }
+
+  // ------------------------------------------------------------ states
+  &__empty {
+    @include m.flex(column, center, center, v.$spacing-2);
+    padding: v.$spacing-6 v.$spacing-3;
+    color: v.fg(v.$color-text-muted);
+    text-align: center;
+
+    svg {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__error {
+    margin: 0;
+    color: v.fg(v.$color-danger);
+    font-size: v.$font-size-sm;
+  }
+
+  &__more {
+    align-self: center;
+  }
+}
+
+@keyframes schedules-mgmt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .schedules-mgmt .is-spinning {
+    animation: none;
+  }
+}
+
+// Bargain history link under each request's response (freight bargaining)
+.schedules-mgmt__history {
+  display: block;
+  margin-top: 0.3rem;
+}

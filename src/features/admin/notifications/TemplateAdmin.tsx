@@ -16,7 +16,7 @@ import { formatApiDateTime } from "../../../shared/utils/apiDateTime";
 import { getErrorMessage } from "../../../core/api/getErrorMessage";
 import "../../../shared/notifications/Notifications.scss";
 
-const ROLES = ["", "BUYER", "SELLER", "TRANSPORTER", "DRIVER", "ADMIN", "SCHEDULE_INITIATOR"];
+const ROLES = ["", "BUYER", "SELLER", "TRANSPORTER", "DRIVER", "ADMIN", "SCHEDULE_INITIATOR", "SUPER_ADMIN"];
 const PROVIDER_STATUSES = ["", "Pending", "Approved", "Rejected"];
 
 // The API's own sentence when it is a plain one; never raw backend data.

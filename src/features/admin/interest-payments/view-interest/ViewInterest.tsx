@@ -332,6 +332,9 @@ const ViewInterest = () => {
 
       <div className="interest-table-view">
         <Table
+          exportName="Interest of Payments"
+          exportData={filtered.map((item, index) => ({ ...item, sNo: index + 1 }))}
+          columnToggle
           columns={columns}
           data={paged}
           rowKey={(row) => row.id}

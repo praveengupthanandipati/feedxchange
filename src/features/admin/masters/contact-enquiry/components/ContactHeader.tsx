@@ -1,13 +1,11 @@
-import { CloudUploadIcon, EyeIcon, EyeOffIcon } from "../../../../../shared/components/icon";
+import { EyeIcon, EyeOffIcon } from "../../../../../shared/components/icon";
 
 interface ContactHeaderProps {
   filtersVisible: boolean;
   onToggleFilters: () => void;
-  onExport: () => void;
-  canExport: boolean;
 }
 
-const ContactHeader = ({ filtersVisible, onToggleFilters, onExport, canExport }: ContactHeaderProps) => (
+const ContactHeader = ({ filtersVisible, onToggleFilters }: ContactHeaderProps) => (
   <div className="contact-enquiry__header">
     <h1>Contact Enquiry</h1>
     <div className="contact-enquiry__header-actions">
@@ -20,9 +18,6 @@ const ContactHeader = ({ filtersVisible, onToggleFilters, onExport, canExport }:
       >
         {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
         {filtersVisible ? "Hide" : "Show"}
-      </button>
-      <button type="button" className="contact-enquiry__btn contact-enquiry__btn--warning" onClick={onExport} disabled={!canExport}>
-        <CloudUploadIcon aria-hidden /> Export
       </button>
     </div>
   </div>

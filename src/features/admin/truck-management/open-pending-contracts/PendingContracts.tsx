@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useOpenAndPendingContracts } from "../../../../core/store/useOpenAndPendingContracts";
 import PartyName from "../../../../shared/components/party/PartyName";
-import { useProfileCities, withCity } from "../../../../shared/hooks/useProfileCities";
-import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
+import { Button, Input } from "../../../../shared/components/ui";
+import SearchableSelectField from "../../../../shared/components/dropdown/SearchableSelectField";
+import { describePeriod, type Period } from "../../business-dashboard/businessDashboard.utils";
+import BusinessPeriodFields from "../../common/business-period/BusinessPeriodFields";
+import { useBusinessFilter } from "../../common/business-period/useBusinessFilter";
+import { ALL_TIME, inPeriod } from "../../common/business-period/period";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import {
@@ -11,9 +15,7 @@ import {
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  DownloadIcon,
   EyeIcon,
-  EyeOffIcon,
   HouseIcon,
   LayoutGridIcon,
   ListIcon,
@@ -23,9 +25,8 @@ import {
   UserIcon,
   XIcon,
 } from "../../../../shared/components/icon";
-import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../shared/components/table/table.types";
+import ExportButtons from "../../../../shared/components/table/ExportButtons";
 import { buildPendingContractColumns } from "./pendingContracts.columns";
 import { mapOpenAndPendingContract, type PendingContractRow } from "./pendingContracts.data";
 import { useContractTruckDetails } from "../contract-trucks/useContractTruckDetails";
@@ -40,7 +41,10 @@ const CARD_PAGE_SIZE = 12;
 
 type ViewMode = "cards" | "table";
 type SortMode = "latest" | "pending" | "qty";
-const ALL_OPTION = { value: "All", label: "All" };
+type StatusFilter = "All" | PendingContractRow["status"];
+
+/** An open contract can be old, so the list starts on "All time" (unlike the Business Dashboard's financial year). */
+const DEFAULT_PERIOD: Period = ALL_TIME;
 
 interface TruckTrackingDrawerProps {
   open: boolean;
@@ -150,24 +154,13 @@ const TruckTrackingDrawer = ({ open, row, onClose }: TruckTrackingDrawerProps) =
   );
 };
 
-function getExportCellValue(row: PendingContractRow, column: TableColumn<PendingContractRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 const PendingContracts = () => {
-  const [sellerFilter, setSellerFilter] = useState("All");
-  const [buyerFilter, setBuyerFilter] = useState("All");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [scheduleFilter, setScheduleFilter] = useState("All");
+  // Business: "All" = every business the caller may see (staff: all; an owner: own + linked), owners start on their own
+  const business = useBusinessFilter();
+  const matchesBusiness = business.matches;
+  const [period, setPeriod] = useState<Period>(DEFAULT_PERIOD);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
   const [keyword, setKeyword] = useState("");
-  const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [view, setView] = useState<ViewMode>("cards");
   const [sortMode, setSortMode] = useState<SortMode>("latest");
@@ -195,29 +188,6 @@ const PendingContracts = () => {
       .map((row) => mapOpenAndPendingContract(row, statusByNumber.get(row.contractNumber)));
   }, [openAndPendingContracts, allContracts]);
 
-  // Seller / buyer filters read "Name, City"; the value stays the name the rows are matched on.
-  const { cityOfName } = useProfileCities();
-  const sellerOptions = useMemo(() => {
-    const names = Array.from(new Set(pendingContracts.map((row) => row.seller))).filter(
-      (name) => name && name !== "-",
-    );
-    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: withCity(name, cityOfName(name)) }))];
-  }, [pendingContracts, cityOfName]);
-
-  const buyerOptions = useMemo(() => {
-    const names = Array.from(new Set(pendingContracts.map((row) => row.buyer))).filter(
-      (name) => name && name !== "-",
-    );
-    return [ALL_OPTION, ...names.map((name) => ({ value: name, label: withCity(name, cityOfName(name)) }))];
-  }, [pendingContracts, cityOfName]);
-
-  const deliveryScheduleOptions = useMemo(() => {
-    const schedules = Array.from(new Set(pendingContracts.map((row) => row.deliverySchedule))).filter(
-      Boolean,
-    );
-    return [ALL_OPTION, ...schedules.map((schedule) => ({ value: schedule, label: schedule }))];
-  }, [pendingContracts]);
-
   const handleOpenTruckDetails = (row: PendingContractRow) => {
     setTruckDrawerRow(row);
     setTruckDrawerOpen(true);
@@ -231,18 +201,16 @@ const PendingContracts = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [sellerFilter, buyerFilter, dateFrom, dateTo, scheduleFilter, keyword, view, sortMode]);
+  }, [business.selectedId, period, statusFilter, keyword, view, sortMode]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
 
     return pendingContracts.filter((row) => {
-      if (sellerFilter !== "All" && row.seller !== sellerFilter) return false;
-      if (buyerFilter !== "All" && row.buyer !== buyerFilter) return false;
-      if (scheduleFilter !== "All" && row.deliverySchedule !== scheduleFilter) return false;
-
-      if (dateFrom && row.dateValue < new Date(dateFrom).getTime()) return false;
-      if (dateTo && row.dateValue > new Date(dateTo).getTime() + 24 * 60 * 60 * 1000 - 1) return false;
+      // a contract belongs to a business when it is its seller or its buyer
+      if (!matchesBusiness(row.sellerId, row.buyerId)) return false;
+      if (statusFilter !== "All" && row.status !== statusFilter) return false;
+      if (!inPeriod(period, row.dateValue)) return false;
 
       if (q) {
         const haystack = [row.id, row.seller, row.buyer, row.product].join(" ").toLowerCase();
@@ -251,7 +219,10 @@ const PendingContracts = () => {
 
       return true;
     });
-  }, [pendingContracts, sellerFilter, buyerFilter, scheduleFilter, dateFrom, dateTo, keyword]);
+  }, [pendingContracts, matchesBusiness, statusFilter, period, keyword]);
+
+  const filtersActive =
+    business.value !== business.defaultValue || period.key !== DEFAULT_PERIOD.key || statusFilter !== "All" || keyword.trim() !== "";
 
   // the cards follow the chosen sort; the table keeps its own column sorting
   const orderedRows = useMemo(() => {
@@ -278,38 +249,14 @@ const PendingContracts = () => {
         : "No open or pending contracts match the current filters.";
 
   const handleClearFilters = () => {
-    setSellerFilter("All");
-    setBuyerFilter("All");
-    setDateFrom("");
-    setDateTo("");
-    setScheduleFilter("All");
+    business.reset();
+    setPeriod(DEFAULT_PERIOD);
+    setStatusFilter("All");
     setKeyword("");
   };
 
-  const handleExportToExcel = () => {
-    const headerRow = pendingContractColumns
-      .map((column) => `<th>${escapeHtml(column.header)}</th>`)
-      .join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = pendingContractColumns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "open-pending-contracts.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
+  // Cards view has no table toolbar, so its CSV / PDF buttons (ExportButtons) sit in the header; Table view uses the toolbar
+  const EXPORT_NAME = "Open and Pending Contracts";
 
   return (
     <div className="pending-contracts-page">
@@ -319,88 +266,43 @@ const PendingContracts = () => {
             Open &amp; Pending Contract Transport
             <span className="pending-contracts-card__badge">New</span>
           </h1>
-          <div className="pending-contracts-card__actions">
-            <button
-              type="button"
-              className="pending-contracts-btn pending-contracts-btn--info"
-              onClick={() => setFiltersVisible((prev) => !prev)}
-            >
-              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
-              {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button
-              type="button"
-              className="pending-contracts-btn pending-contracts-btn--warning"
-              onClick={handleExportToExcel}
-            >
-              <DownloadIcon aria-hidden /> Export
-            </button>
-          </div>
+          {view === "cards" && (
+            <div className="pending-contracts-card__actions">
+              <ExportButtons name={EXPORT_NAME} columns={pendingContractColumns} rows={filteredRows} />
+            </div>
+          )}
         </div>
 
-        {filtersVisible && (
-          <div className="pending-contracts-filters">
-            <div className="pending-contracts-filters__row">
-              <SearchableSelect
-                options={sellerOptions}
-                value={sellerFilter}
-                onChange={setSellerFilter}
-                placeholder="Select Sellers"
-                ariaLabel="Select Sellers"
-              />
-              <SearchableSelect
-                options={buyerOptions}
-                value={buyerFilter}
-                onChange={setBuyerFilter}
-                placeholder="Select Buyers"
-                ariaLabel="Select Buyers"
-              />
-              <div className="pending-contracts-filters__date-range">
-                <DatePickerInput
-                  value={dateFrom}
-                  onChange={(value) => setDateFrom(value)}
-                  ariaLabel="Contract date range from"
-                  clearable
-                />
-                <span>to</span>
-                <DatePickerInput
-                  value={dateTo}
-                  onChange={(value) => setDateTo(value)}
-                  ariaLabel="Contract date range to"
-                  clearable
-                />
-              </div>
-              <SearchableSelect
-                options={deliveryScheduleOptions}
-                value={scheduleFilter}
-                onChange={setScheduleFilter}
-                placeholder="Delivery Schedule"
-                ariaLabel="Filter by delivery schedule"
-              />
-            </div>
-
-            <div className="pending-contracts-filters__search-row">
-              <div className="pending-contracts-filters__search">
-                <SearchIcon aria-hidden />
-                <input
-                  type="text"
-                  value={keyword}
-                  onChange={(event) => setKeyword(event.target.value)}
-                  placeholder="Search by Contract No, Seller, Buyer, Product Name"
-                />
-              </div>
-              <button
-                type="button"
-                className="pending-contracts-filters__clear"
-                onClick={handleClearFilters}
-                title="Clear filters"
-                aria-label="Clear filters"
-              >
-                <XIcon aria-hidden />
-              </button>
-            </div>
-          </div>
-        )}
+        <div className="bp-filters" role="search" aria-label="Filter contracts">
+          <BusinessPeriodFields business={business} period={period} onPeriodChange={setPeriod} />
+          <SearchableSelectField
+            label="Status"
+            value={statusFilter}
+            onChange={(value) => setStatusFilter(value as StatusFilter)}
+            options={[
+              { value: "All", label: "Open and partially dispatched" },
+              { value: "Open", label: "Open" },
+              { value: "Partially Dispatched", label: "Partially dispatched" },
+            ]}
+          />
+          <Input
+            label="Search"
+            type="search"
+            icon={SearchIcon}
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+            placeholder="Contract no, seller, buyer, product"
+            fieldClassName="bp-filters__search"
+          />
+          <Button icon={XIcon} onClick={handleClearFilters} disabled={!filtersActive} title="Clear filters">
+            Clear
+          </Button>
+        </div>
+        <p className="bp-filters__summary" aria-live="polite">
+          {describePeriod(period.from, period.to)}
+          {business.selectedName && ` · ${business.selectedName} as seller or buyer`}
+          {business.failed && " · The business list could not be loaded; showing every contract you can see."}
+        </p>
 
         <DashboardSummary rows={filteredRows} />
         <DashboardInsights rows={filteredRows} />
@@ -430,6 +332,9 @@ const PendingContracts = () => {
           <ContractCards rows={pagedRows} onOpenTruckDetails={handleOpenTruckDetails} emptyMessage={emptyMessage} />
         ) : (
           <Table
+            exportName={EXPORT_NAME}
+            exportData={orderedRows}
+            columnToggle
             columns={pendingContractColumns}
             data={pagedRows}
             rowKey={(row) => row.id}

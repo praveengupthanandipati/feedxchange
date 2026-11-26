@@ -4,7 +4,6 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   CircleCheckBigIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   RefreshCwIcon,
@@ -32,7 +31,6 @@ const formatNumber = (value: number) => value.toLocaleString("en-IN");
 const formatInr = (value: number) => `₹${formatNumber(value)}`;
 const options = (values: string[]) => Array.from(new Set(values)).map((value) => ({ value, label: value }));
 const totalCommission = (row: CommissionContract) => row.quantityMt * row.commissionPerMt;
-const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const GenerateInvoice = () => {
   const [contracts, setContracts] = useState<CommissionContract[]>(commissionContracts);
@@ -118,36 +116,6 @@ const GenerateInvoice = () => {
     setMessage({ type: "success", text: `Commission of ₹${value}/MT applied to ${targets.length} contract(s).` });
   };
 
-  const handleExport = () => {
-    const head = ["Contract Dt", "Contract No", "Party Name", "Action Type", "Commodity", "Contract Rate", "No of MT", "Commission / MT", "Total Commission"];
-    const body = rows
-      .map((row) =>
-        [
-          formatDisplayDate(row.contractDate),
-          row.contractNo,
-          row.partyName,
-          row.actionType,
-          row.commodity,
-          row.contractRate === null ? "-" : formatInr(row.contractRate),
-          String(row.quantityMt),
-          String(row.commissionPerMt),
-          formatInr(totalCommission(row)),
-        ]
-          .map((cell) => `<td>${escapeHtml(cell)}</td>`)
-          .join(""),
-      )
-      .map((cells) => `<tr>${cells}</tr>`)
-      .join("");
-    const html = `<meta charset="utf-8"><table><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table>`;
-    const url = URL.createObjectURL(new Blob([html], { type: "application/vnd.ms-excel" }));
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "company-invoice-contracts.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   const handleSave = () => {
     if (invoiceRows.length === 0) {
@@ -212,9 +180,6 @@ const GenerateInvoice = () => {
             {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {filtersVisible ? "Hide" : "Show"}
           </button>
-          <button type="button" className="generate-invoice__btn generate-invoice__btn--warning" onClick={handleExport} disabled={rows.length === 0}>
-            <DownloadIcon aria-hidden /> Export
-          </button>
           <button type="button" className="generate-invoice__btn generate-invoice__btn--warning" onClick={() => toggleAll(!allSelected)} disabled={rows.length === 0}>
             {allSelected ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
             {allSelected ? "Clear All" : "Toggle All"}
@@ -264,6 +229,8 @@ const GenerateInvoice = () => {
 
       <div className="generate-invoice__table-view">
         <Table
+          exportName="Company Invoice"
+          columnToggle
           columns={columns}
           data={rows}
           rowKey={(row) => row.id}

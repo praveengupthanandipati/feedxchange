@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import InfoTooltip from "../../../../../shared/components/tooltip/InfoTooltip";
@@ -12,6 +12,8 @@ import {
 } from "../../../../../core/store/transportersApi";
 import { useSaveTransporterProfileStep } from "./useSaveTransporterProfileStep";
 import { hydrateDraftFromTransporterProfile } from "./transporterWizard.utils";
+import { ServingLocationsEditor } from "../ServingLocations";
+import { SERVING_LOCATIONS_REQUIRED, hasServingLocations } from "../servingLocation.utils";
 
 const TransporterProfileStep = () => {
   const [searchParams] = useSearchParams();
@@ -20,6 +22,17 @@ const TransporterProfileStep = () => {
   const { submitting, submitError, handleSaveAndContinue } = useSaveTransporterProfileStep(
     "/admin/transporters/contacts",
   );
+  const [servingError, setServingError] = useState<string | null>(null);
+
+  // Serving Locations are required: both lists need at least one state before the profile is saved
+  const handleSave = () => {
+    if (!hasServingLocations(draft)) {
+      setServingError(SERVING_LOCATIONS_REQUIRED);
+      return;
+    }
+    setServingError(null);
+    handleSaveAndContinue();
+  };
 
   const { data: transporterLines, isError: transporterLinesFailed } = useGetAllTransporterLinesQuery();
   const transporterLineOptions = useMemo(
@@ -208,6 +221,16 @@ const TransporterProfileStep = () => {
         </div>
       </section>
 
+      <ServingLocationsEditor
+        sourceStates={draft.sourceStates}
+        destinationStates={draft.destinationStates}
+        onChange={(patch) => {
+          updateDraft(patch);
+          setServingError(null);
+        }}
+        error={servingError}
+      />
+
       {existingProfileLoadError && (
         <p className="new-contract__error" role="alert" style={{ color: "var(--fx-red-49-fg)" }}>
           Failed to load transporter profile.
@@ -230,7 +253,7 @@ const TransporterProfileStep = () => {
         <button
           type="button"
           className="new-contract__submit"
-          onClick={handleSaveAndContinue}
+          onClick={handleSave}
           disabled={submitting}
         >
           {submitting ? "Saving…" : profileId ? "Save & Continue" : "Save & Unlock Next Steps"}

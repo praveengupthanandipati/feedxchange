@@ -30,6 +30,9 @@ function entryColumns<T extends { id: string }>({
     {
       key: "amount",
       header: "Amount",
+      // what the user types in: not exported, and always shown
+      exportable: false,
+      hideable: false,
       render: (row) => {
         const error = errors[row.id]?.amount;
         return (
@@ -52,6 +55,8 @@ function entryColumns<T extends { id: string }>({
     {
       key: "receipt",
       header: "Select Receipt",
+      exportable: false,
+      hideable: false,
       render: (row) => {
         const receiptId = entries[row.id]?.receiptId ?? "";
         const error = errors[row.id]?.receipt;

@@ -61,6 +61,9 @@ const PendingSupplies = () => {
       </div>
 
       <Table
+        exportName="Pending Supplies"
+        exportData={filteredRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

@@ -9,6 +9,8 @@ import type { NotificationHistoryItem, ResendContentMode, ResendResult } from ".
 import { formatApiDateTime } from "../../../shared/utils/apiDateTime";
 import NotifyModal from "../../../shared/notifications/NotifyModal";
 import StatusPill from "./StatusPill";
+import Table from "../../../shared/components/table/Table";
+import type { TableColumn } from "../../../shared/components/table/table.types";
 import DeliveryDetailModal from "./DeliveryDetailModal";
 import { getErrorMessage } from "../../../core/api/getErrorMessage";
 import "../../../shared/notifications/Notifications.scss";
@@ -61,6 +63,71 @@ const ContractNotificationHistory = () => {
   const selectable = items.filter(resendable);
   const allSelected = selectable.length > 0 && selectable.every((i) => selected.has(i.deliveryId));
 
+  // The server pages the history; the toolbar's count and export cover the page shown. The tick column ("select") is never exported.
+  const columns: TableColumn<NotificationHistoryItem>[] = [
+    ...(canResend
+      ? [
+          {
+            key: "select",
+            header: "Select",
+            hideable: false,
+            width: "2.5rem",
+            render: (d: NotificationHistoryItem) => (
+              <input type="checkbox" className="form-check-input" disabled={!resendable(d)} checked={selected.has(d.deliveryId)}
+                onChange={() => toggle(d.deliveryId)} aria-label={`Select ${d.eventName} to ${d.recipientName ?? d.recipientRole} by ${d.channelCode}`} />
+            ),
+          },
+        ]
+      : []),
+    {
+      key: "eventName",
+      header: "Message",
+      sortable: true,
+      render: (d) => (
+        <>
+          {d.eventName}
+          {d.isResend && <span className="badge text-bg-secondary ms-1" title={`Resend of #${d.parentDeliveryId}`}>Resend</span>}
+          {d.isLegacy && <span className="badge text-bg-light ms-1">Legacy</span>}
+          {d.resendCount > 0 && <span className="small text-secondary ms-1">resent {d.resendCount}×</span>}
+        </>
+      ),
+      exportValue: (d) => `${d.eventName}${d.isResend ? " (resend)" : ""}${d.resendCount > 0 ? ` - resent ${d.resendCount}x` : ""}`,
+    },
+    {
+      key: "recipientName",
+      header: "Recipient",
+      sortable: true,
+      render: (d) => <>{d.recipientName ?? d.recipientRole}<div className="small text-secondary">{d.recipientRole}</div></>,
+      exportValue: (d) => [d.recipientName, d.recipientRole].filter(Boolean).join(" - "),
+    },
+    {
+      key: "channelCode",
+      header: "Channel",
+      sortable: true,
+      render: (d) => <>{d.channelCode}<div className="small text-secondary">{d.address}</div></>,
+      exportValue: (d) => [d.channelCode, d.address].filter(Boolean).join(" - "),
+    },
+    {
+      key: "status",
+      header: "Status",
+      sortable: true,
+      render: (d) => (
+        <>
+          <StatusPill status={d.status} />
+          {d.failureReason && <div className="small text-danger" style={{ maxWidth: "16rem", whiteSpace: "normal" }}>{d.failureReason}</div>}
+        </>
+      ),
+      exportValue: (d) => [d.status, d.failureReason].filter(Boolean).join(" - "),
+    },
+    { key: "createdAt", header: "Sent", sortable: true, render: (d) => formatApiDateTime(d.createdAt), exportValue: (d) => formatApiDateTime(d.createdAt) },
+    {
+      key: "actions",
+      header: "",
+      hideable: false,
+      render: (d) => <button type="button" className="btn btn-link btn-sm p-0" onClick={() => setViewId(d.deliveryId)}>View</button>,
+    },
+  ];
+
   const openResend = () => {
     setResendError(""); setResendResult(null); setReason(""); setMode("Original");
     idempotency.current = crypto.randomUUID();
@@ -106,49 +173,26 @@ const ContractNotificationHistory = () => {
       {error ? (
         <div className="alert alert-danger">{errorText(error)}</div>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-sm align-middle">
-            <thead>
-              <tr>
-                {canResend && (
-                  <th style={{ width: "2rem" }}>
-                    <input type="checkbox" className="form-check-input" aria-label="Select all" checked={allSelected}
-                      onChange={() => setSelected(allSelected ? new Set() : new Set(selectable.map((i) => i.deliveryId)))} />
-                  </th>
-                )}
-                <th>Message</th><th>Recipient</th><th>Channel</th><th>Status</th><th>Sent</th><th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {isFetching && items.length === 0 && <tr><td colSpan={7} className="text-secondary">Loading…</td></tr>}
-              {!isFetching && items.length === 0 && <tr><td colSpan={7} className="text-secondary">Nothing has been sent against this contract yet.</td></tr>}
-              {items.map((d) => (
-                <tr key={d.deliveryId}>
-                  {canResend && (
-                    <td>
-                      <input type="checkbox" className="form-check-input" disabled={!resendable(d)} checked={selected.has(d.deliveryId)}
-                        onChange={() => toggle(d.deliveryId)} aria-label={`Select ${d.eventName} to ${d.recipientName ?? d.recipientRole} by ${d.channelCode}`} />
-                    </td>
-                  )}
-                  <td>
-                    {d.eventName}
-                    {d.isResend && <span className="badge text-bg-secondary ms-1" title={`Resend of #${d.parentDeliveryId}`}>Resend</span>}
-                    {d.isLegacy && <span className="badge text-bg-light ms-1">Legacy</span>}
-                    {d.resendCount > 0 && <span className="small text-secondary ms-1">resent {d.resendCount}×</span>}
-                  </td>
-                  <td>{d.recipientName ?? d.recipientRole}<div className="small text-secondary">{d.recipientRole}</div></td>
-                  <td>{d.channelCode}<div className="small text-secondary">{d.address}</div></td>
-                  <td>
-                    <StatusPill status={d.status} />
-                    {d.failureReason && <div className="small text-danger" style={{ maxWidth: "16rem" }}>{d.failureReason}</div>}
-                  </td>
-                  <td className="text-nowrap">{formatApiDateTime(d.createdAt)}</td>
-                  <td><button type="button" className="btn btn-link btn-sm p-0" onClick={() => setViewId(d.deliveryId)}>View</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          toolbar={
+            canResend && selectable.length > 0 ? (
+              <label className="form-check-label d-inline-flex align-items-center gap-2 small">
+                <input type="checkbox" className="form-check-input m-0" checked={allSelected}
+                  onChange={() => setSelected(allSelected ? new Set() : new Set(selectable.map((i) => i.deliveryId)))} />
+                Select all that can be resent ({selectable.length})
+              </label>
+            ) : undefined
+          }
+          exportName={`Notifications - ${contractNumber}`}
+          exportSubtitle={pages > 1 ? `Page ${page} of ${pages} (${total} messages)` : undefined}
+          columnToggle
+          columns={columns}
+          data={items}
+          rowKey={(d) => String(d.deliveryId)}
+          loading={isFetching}
+          emptyMessage="Nothing has been sent against this contract yet."
+          mobileCards
+        />
       )}
 
       {pages > 1 && (

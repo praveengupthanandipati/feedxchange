@@ -6,11 +6,13 @@ import { UserActions, UserEmail, UserPhone, UserStatusBadge, type UserActionHand
 
 export interface UserListProps extends UserActionHandlers {
   rows: MasterUser[];
+  /** Every filtered row (the page passes only the current page as rows), for the row count and CSV / PDF export. */
+  exportRows?: MasterUser[];
   emptyMessage: string;
 }
 
 /** Laptop and desktop view. */
-const UsersTable = ({ rows, emptyMessage, onEdit, onDelete }: UserListProps) => {
+const UsersTable = ({ rows, exportRows, emptyMessage, onEdit, onDelete }: UserListProps) => {
   const columns: TableColumn<MasterUser>[] = [
     { key: "name", header: "Name", sortable: true, sortValue: fullName, render: (row) => <span className="users__wrap">{fullName(row)}</span> },
     { key: "actions", header: "Actions", width: "5.5rem", align: "center", render: (row) => <UserActions user={row} onEdit={onEdit} onDelete={onDelete} /> },
@@ -23,7 +25,7 @@ const UsersTable = ({ rows, emptyMessage, onEdit, onDelete }: UserListProps) => 
 
   return (
     <div className="users__table-view">
-      <Table columns={columns} data={rows} rowKey={(row) => row.id} className="users__table" emptyMessage={emptyMessage} />
+      <Table exportName="Users" exportData={exportRows} columnToggle columns={columns} data={rows} rowKey={(row) => row.id} className="users__table" emptyMessage={emptyMessage} />
     </div>
   );
 };

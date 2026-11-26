@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
-import { ChevronLeftIcon, ChevronRightIcon, DownloadIcon, EyeIcon, EyeOffIcon, XIcon } from "../../../../shared/components/icon";
+import { ChevronLeftIcon, ChevronRightIcon, EyeIcon, EyeOffIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../shared/components/table/table.types";
 import { buildSellerInvoiceColumns } from "./sellerInvoiceReports.columns";
 import {
   sellerInvoiceRows,
@@ -12,21 +11,12 @@ import {
   financialYearOptions,
   contractOptions,
   reportPartySummary,
-  type SellerInvoiceRow,
 } from "./sellerInvoiceReports.data";
 import "./SellerInvoiceReports.scss";
 
 const PAGE_SIZE = 10;
 
-function getExportCellValue(row: SellerInvoiceRow, column: TableColumn<SellerInvoiceRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const SellerInvoiceReports = () => {
   const [sellerFilter, setSellerFilter] = useState("Sai Feeds Pvt Ltd - Mumbai");
@@ -88,26 +78,6 @@ const SellerInvoiceReports = () => {
     setDateTo("");
   };
 
-  const handleExport = () => {
-    const headerRow = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = columns.map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`).join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "seller-invoice-report.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="seller-invoice-report-page">
@@ -122,13 +92,6 @@ const SellerInvoiceReports = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button
-              type="button"
-              className="seller-invoice-report-btn seller-invoice-report-btn--warning"
-              onClick={handleExport}
-            >
-              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -208,6 +171,9 @@ const SellerInvoiceReports = () => {
         </div>
 
         <Table
+          exportName="Seller Invoice Report"
+          exportData={filteredRows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}

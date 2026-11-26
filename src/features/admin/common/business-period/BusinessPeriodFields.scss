@@ -1,0 +1,35 @@
+@use "../../../../shared/assets/styles/variables" as v;
+@use "../../../../shared/assets/styles/mixins" as m;
+
+// Filter row of contract screens: Business / Period (shared) + the screen's own Status / Search / Clear.
+.bp-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: v.$spacing-2;
+  margin-bottom: 0.25rem;
+
+  .ui-field {
+    min-width: 10rem;
+  }
+
+  .bp-fields__business {
+    min-width: min(19rem, 100%) !important;
+  }
+
+  &__search {
+    flex: 1 1 15rem;
+  }
+
+  @include m.respond-below(md) {
+    .ui-field {
+      flex: 1 1 10rem;
+    }
+  }
+
+  &__summary {
+    margin: 0 0 v.$spacing-2;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.85rem);
+  }
+}

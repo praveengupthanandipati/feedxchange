@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import { createPortal } from "react-dom";
-import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, DownloadIcon, EyeIcon, EyeOffIcon, XIcon } from "../../../../shared/components/icon";
+import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, EyeIcon, EyeOffIcon, XIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import MultiSelect from "../../../../shared/components/dropdown/MultiSelect";
 import Table from "../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../shared/components/table/table.types";
 import { buildBulkFreightColumns } from "./bulkFreightApproval.columns";
 import {
   bulkFreightRows,
@@ -108,15 +107,7 @@ const FreightActionModal = ({ variant, open, rows, onClose, onConfirm }: Freight
   );
 };
 
-function getExportCellValue(row: BulkFreightRow, column: TableColumn<BulkFreightRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const BulkFreightApproval = () => {
   const [sellerFilter, setSellerFilter] = useState<string[]>([]);
@@ -198,28 +189,6 @@ const BulkFreightApproval = () => {
     setActionModal(null);
   };
 
-  const handleExport = () => {
-    const headerRow = bulkFreightColumns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = bulkFreightColumns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "bulk-freight-approval.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="bulk-freight-approval-page">
@@ -234,13 +203,6 @@ const BulkFreightApproval = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button
-              type="button"
-              className="bulk-freight-approval-btn bulk-freight-approval-btn--warning"
-              onClick={handleExport}
-            >
-              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -325,6 +287,9 @@ const BulkFreightApproval = () => {
         </div>
 
         <Table
+          exportName="Bulk Freight Approval"
+          exportData={filteredRows}
+          columnToggle
           columns={bulkFreightColumns}
           data={pagedRows}
           rowKey={(row) => row.lineId}

@@ -814,6 +814,9 @@ export interface OpenAndPendingContract {
   contractDate: string;
   seller: string | null;
   buyer: string | null;
+  /** Profile ids of the parties (the business filter matches on these). */
+  sellerId?: number | null;
+  buyerId?: number | null;
   pricePerMT: number;
   totalQuantityMT: number;
   dispatchedQuantityMT: number;

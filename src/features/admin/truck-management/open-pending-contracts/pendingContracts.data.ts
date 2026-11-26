@@ -7,6 +7,8 @@ export interface PendingContractRow {
   dateValue: number;
   seller: string;
   buyer: string;
+  sellerId: number | null;
+  buyerId: number | null;
   cRate: string;
   cRateValue: number;
   cQty: string;
@@ -50,6 +52,8 @@ export function mapOpenAndPendingContract(row: OpenAndPendingContract, status: P
     dateValue: Number.isNaN(dateValue) ? 0 : dateValue,
     seller: row.seller ?? "-",
     buyer: row.buyer ?? "-",
+    sellerId: row.sellerId ?? null,
+    buyerId: row.buyerId ?? null,
     cRate: `₹${row.pricePerMT.toLocaleString("en-IN")}`,
     cRateValue: row.pricePerMT,
     cQty: `${total} MT`,

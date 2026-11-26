@@ -91,6 +91,8 @@ const Contracts = () => {
       </div>
 
       <Table
+        exportName="Seller Buyer Contracts"
+        columnToggle
         columns={columns}
         data={contractRows}
         rowKey={(row) => row.id}

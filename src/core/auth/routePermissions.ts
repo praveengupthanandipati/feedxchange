@@ -16,10 +16,15 @@ const TRANSPORTERS = "/admin/truck-management/transporters";
 export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/", any: ["dashboard"] },
   { path: "/admin/dashboard", any: ["dashboard"] },
+  // FeedXchange > Business Dashboard (Sub Module BUSINESS_DASHBOARD; the API checks the same key)
+  { path: "/admin/business-dashboard", any: ["BUSINESS_DASHBOARD"] },
+  // FeedXchange > Transporter Dashboard (Sub Module TRANSPORTER_DASHBOARD; the API checks the same key)
+  { path: "/admin/transporter-dashboard", any: ["TRANSPORTER_DASHBOARD"] },
 
   { path: "/admin/contracts/new", any: ["contracts.manage"] },
-  { path: "/admin/contracts", any: ["contracts.view"] },
-  { path: "/admin/contracts/:id", any: ["contracts.view"] },
+  // CONTRACT_MASTER: the Contract Master menu key (e.g. Business Admin, view only)
+  { path: "/admin/contracts", any: ["contracts.view", "CONTRACT_MASTER"] },
+  { path: "/admin/contracts/:id", any: ["contracts.view", "CONTRACT_MASTER"] },
   { path: "/admin/contracts/:id/notifications", any: ["notifications.history"] },
   { path: "/admin/notification-templates", any: ["notification-templates.view"] },
   { path: "/admin/notification-preferences", any: ["notification-preferences.view"] },
@@ -39,6 +44,8 @@ export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/admin/truck-management/assign-transports", any: ["pending-contracts", "freight-approval"] },
   // Arrangement > Add Trucks to Schedules: the accepted-schedules section that used to sit on assign-transports, so the same keys
   { path: "/admin/truck-management/arrangement/add-trucks-to-schedules", any: ["pending-contracts", "freight-approval"] },
+  // Transporters > Schedules Management (the dashboard of the Arrangement sub module): same keys as its pages
+  { path: "/admin/truck-management/schedules-management", any: ["pending-contracts", "freight-approval"] },
   { path: `${TRANSPORTERS}/freight-approval`, any: ["freight-approval"] },
   { path: `${TRANSPORTERS}/transport-dashboard`, any: ["transport-dashboard"] },
   { path: `${TRANSPORTERS}/dashboard`, any: ["transport-dashboard"] },

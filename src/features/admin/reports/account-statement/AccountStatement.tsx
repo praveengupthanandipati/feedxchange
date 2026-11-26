@@ -3,7 +3,6 @@ import {
   CheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   PrinterIcon,
@@ -12,7 +11,6 @@ import {
 import DateRangeInput from "../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../shared/components/table/table.types";
 import { buildAccountStatementColumns } from "./accountStatement.columns";
 import {
   accountSummaryTotals,
@@ -20,21 +18,12 @@ import {
   money,
   sellerOptions,
   statementRows,
-  type StatementRow,
 } from "./accountStatement.data";
 import "./AccountStatement.scss";
 
 const PAGE_SIZE = 5;
 
-function getExportCellValue(row: StatementRow, column: TableColumn<StatementRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "-" : String(raw);
-}
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const AccountStatement = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -87,26 +76,6 @@ const AccountStatement = () => {
     setAppliedDateTo("");
   };
 
-  const handleExport = () => {
-    const headerRow = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = columns.map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`).join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "account-statement.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   const handlePrint = () => window.print();
 
@@ -142,9 +111,6 @@ const AccountStatement = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button type="button" className="account-statement-btn account-statement-btn--warning" onClick={handleExport}>
-              <DownloadIcon aria-hidden /> Export
             </button>
             <button type="button" className="account-statement-btn account-statement-btn--warning" onClick={handlePrint}>
               <PrinterIcon aria-hidden /> Print
@@ -213,6 +179,9 @@ const AccountStatement = () => {
         )}
 
         <Table
+          exportName="Account Statement"
+          exportData={filteredRows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}

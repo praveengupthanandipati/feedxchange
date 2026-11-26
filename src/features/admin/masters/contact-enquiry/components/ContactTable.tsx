@@ -6,12 +6,14 @@ import { ContactEmail, ContactPhone, ContactStatusBadge } from "./ContactBits";
 
 export interface ContactListProps {
   rows: ContactEnquiry[];
+  /** Every filtered row (the page passes only the current page as rows), for the row count and CSV / PDF export. */
+  exportRows?: ContactEnquiry[];
   emptyMessage: string;
   onUpdateStatus: (enquiry: ContactEnquiry) => void;
 }
 
 /** Laptop and desktop view. */
-const ContactTable = ({ rows, emptyMessage, onUpdateStatus }: ContactListProps) => {
+const ContactTable = ({ rows, exportRows, emptyMessage, onUpdateStatus }: ContactListProps) => {
   const columns: TableColumn<ContactEnquiry>[] = [
     { key: "fullName", header: "Full Name", sortable: true, render: (row) => <span className="contact-enquiry__wrap">{row.fullName}</span> },
     { key: "email", header: "Email", sortable: true, render: (row) => <ContactEmail email={row.email} /> },
@@ -43,7 +45,7 @@ const ContactTable = ({ rows, emptyMessage, onUpdateStatus }: ContactListProps) 
 
   return (
     <div className="contact-enquiry__table-view">
-      <Table columns={columns} data={rows} rowKey={(row) => row.id} className="contact-enquiry__table" emptyMessage={emptyMessage} />
+      <Table exportName="Contact Enquiries" exportData={exportRows} columnToggle columns={columns} data={rows} rowKey={(row) => row.id} className="contact-enquiry__table" emptyMessage={emptyMessage} />
     </div>
   );
 };

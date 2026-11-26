@@ -1,0 +1,13 @@
+@use "../../assets/styles/variables" as v;
+
+// SearchableSelect inside a ui-field: match the ui kit's Select (corner radius, normal weight), so a filter row looks uniform.
+.searchable-select-field {
+  .searchable-select {
+    min-width: 0;
+  }
+
+  .searchable-select__trigger {
+    border-radius: v.$radius-sm;
+    font-weight: v.$font-weight-regular;
+  }
+}

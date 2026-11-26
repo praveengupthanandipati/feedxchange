@@ -21,7 +21,9 @@ import {
   useGetHistorySellersQuery,
   useGetNotificationHistoryQuery,
 } from "../../../core/store/notificationsApi";
-import type { ChannelCode } from "../../../core/store/notificationsApi";
+import type { ChannelCode, NotificationHistoryItem } from "../../../core/store/notificationsApi";
+import Table from "../../../shared/components/table/Table";
+import type { TableColumn } from "../../../shared/components/table/table.types";
 import { apiErrorMessage } from "../../../core/store/sellerInvoiceApi";
 import { formatApiDateTime } from "../../../shared/utils/apiDateTime";
 import DeliveryDetailModal from "./DeliveryDetailModal";
@@ -104,6 +106,85 @@ const NotificationHistoryPanel = () => {
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const items = data?.items ?? [];
 
+  // The server pages the history (PAGE_SIZE at a time), so the toolbar's count and export cover the page shown.
+  const historyColumns: TableColumn<NotificationHistoryItem>[] = [
+    { key: "createdAt", header: "Sent", sortable: true, render: (d) => formatApiDateTime(d.createdAt), exportValue: (d) => formatApiDateTime(d.createdAt) },
+    {
+      key: "contractNumber",
+      header: "Contract",
+      sortable: true,
+      render: (d) => (
+        <span className="nc-stack">
+          {d.contractNumber ? <strong>{d.contractNumber}</strong> : <span className="nc-muted">—</span>}
+          {(d.sellerName || d.buyerName) && <small>{d.sellerName ? partyLabel(d.sellerName) : "?"} → {d.buyerName ? partyLabel(d.buyerName) : "?"}</small>}
+        </span>
+      ),
+      exportValue: (d) => [d.contractNumber, d.sellerName || d.buyerName ? `${d.sellerName ?? "?"} -> ${d.buyerName ?? "?"}` : null].filter(Boolean).join(" "),
+    },
+    {
+      key: "eventName",
+      header: "Message",
+      sortable: true,
+      render: (d) => (
+        <>
+          {d.eventName}
+          {d.isResend && <span className="nc-tag" title={`Resend of #${d.parentDeliveryId}`}>Resend</span>}
+          {d.isLegacy && <span className="nc-tag nc-tag--muted">Legacy</span>}
+        </>
+      ),
+      exportValue: (d) => `${d.eventName}${d.isResend ? " (resend)" : ""}`,
+    },
+    {
+      key: "recipientName",
+      header: "Recipient",
+      sortable: true,
+      render: (d) => (
+        <span className="nc-stack">
+          {d.recipientName ?? d.recipientRole}
+          {d.recipientRole && d.recipientName ? <small>{d.recipientRole}</small> : null}
+        </span>
+      ),
+      exportValue: (d) => [d.recipientName, d.recipientRole].filter(Boolean).join(" - "),
+    },
+    {
+      key: "channelCode",
+      header: "Channel",
+      sortable: true,
+      render: (d) => {
+        const Icon = CHANNEL_ICON[d.channelCode] ?? MailIcon;
+        return (
+          <span className="nc-stack">
+            <span className="nc-channel"><Icon aria-hidden /> {CHANNEL_LABEL[d.channelCode] ?? d.channelCode}</span>
+            {d.address && <small>{d.address}</small>}
+          </span>
+        );
+      },
+      exportValue: (d) => [CHANNEL_LABEL[d.channelCode] ?? d.channelCode, d.address].filter(Boolean).join(" - "),
+    },
+    {
+      key: "status",
+      header: "Status",
+      sortable: true,
+      render: (d) => (
+        <span className="nc-stack">
+          <StatusPill status={d.status} />
+          {d.failureReason && <small className="nc-danger">{d.failureReason}</small>}
+        </span>
+      ),
+      exportValue: (d) => [d.status, d.failureReason].filter(Boolean).join(" - "),
+    },
+    {
+      key: "actions",
+      header: "",
+      hideable: false,
+      render: (d) => (
+        <button type="button" className="nc-icon-btn" onClick={() => setViewId(d.deliveryId)} aria-label={`View message to ${d.recipientName ?? d.recipientRole}`} title="View message">
+          <EyeIcon aria-hidden />
+        </button>
+      ),
+    },
+  ];
+
   return (
     <div className="nc-panel">
       <form className="nc-filters" onSubmit={(e) => { e.preventDefault(); search(); }} aria-label="Find notifications">
@@ -173,39 +254,16 @@ const NotificationHistoryPanel = () => {
           {!isError && !isFetching && items.length === 0 && <div className="nc-none">Nothing was sent for these filters.</div>}
 
           {items.length > 0 && (
-            <div className="nc-table-wrap">
-              <table className="nc-table">
-                <thead>
-                  <tr><th>Sent</th><th>Contract</th><th>Message</th><th>Recipient</th><th>Channel</th><th>Status</th><th><span className="nc-sr">View</span></th></tr>
-                </thead>
-                <tbody>
-                  {items.map((d) => {
-                    const Icon = CHANNEL_ICON[d.channelCode] ?? MailIcon;
-                    return (
-                      <tr key={d.deliveryId}>
-                        <td className="nc-nowrap">{formatApiDateTime(d.createdAt)}</td>
-                        <td>
-                          {d.contractNumber ? <strong>{d.contractNumber}</strong> : <span className="nc-muted">—</span>}
-                          {(d.sellerName || d.buyerName) && <small>{d.sellerName ? partyLabel(d.sellerName) : "?"} → {d.buyerName ? partyLabel(d.buyerName) : "?"}</small>}
-                        </td>
-                        <td>
-                          {d.eventName}
-                          {d.isResend && <span className="nc-tag" title={`Resend of #${d.parentDeliveryId}`}>Resend</span>}
-                          {d.isLegacy && <span className="nc-tag nc-tag--muted">Legacy</span>}
-                        </td>
-                        <td>{d.recipientName ?? d.recipientRole}{d.recipientRole && d.recipientName ? <small>{d.recipientRole}</small> : null}</td>
-                        <td><span className="nc-channel"><Icon aria-hidden /> {CHANNEL_LABEL[d.channelCode] ?? d.channelCode}</span>{d.address && <small>{d.address}</small>}</td>
-                        <td>
-                          <StatusPill status={d.status} />
-                          {d.failureReason && <small className="nc-danger">{d.failureReason}</small>}
-                        </td>
-                        <td><button type="button" className="nc-icon-btn" onClick={() => setViewId(d.deliveryId)} aria-label={`View message to ${d.recipientName ?? d.recipientRole}`} title="View message"><EyeIcon aria-hidden /></button></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <Table
+              exportName="Notification History"
+              exportSubtitle={total > PAGE_SIZE ? `Page ${page} of ${pages} (${total} messages)` : undefined}
+              columnToggle
+              columns={historyColumns}
+              data={items}
+              rowKey={(d) => String(d.deliveryId)}
+              className="nc-table"
+              mobileCards
+            />
           )}
 
           {total > PAGE_SIZE && (

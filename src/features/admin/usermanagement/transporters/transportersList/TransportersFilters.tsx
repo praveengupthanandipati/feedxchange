@@ -25,6 +25,13 @@ interface TransportersFiltersProps {
   state: string;
   onStateChange: (value: string) => void;
   stateOptions: FilterOption[];
+  /** Serving Locations: states the transporter picks up from / delivers to. */
+  sourceState: string;
+  onSourceStateChange: (value: string) => void;
+  sourceStateOptions: FilterOption[];
+  destinationState: string;
+  onDestinationStateChange: (value: string) => void;
+  destinationStateOptions: FilterOption[];
   /** Shows the ✕ that resets the filters and search. */
   onClear?: () => void;
 }
@@ -40,6 +47,12 @@ const TransportersFilters = ({
   state,
   onStateChange,
   stateOptions,
+  sourceState,
+  onSourceStateChange,
+  sourceStateOptions,
+  destinationState,
+  onDestinationStateChange,
+  destinationStateOptions,
   onClear,
 }: TransportersFiltersProps) => {
   return (
@@ -66,6 +79,22 @@ const TransportersFilters = ({
         onChange={onStateChange}
         placeholder="Filter by State"
         ariaLabel="Filter by state"
+      />
+
+      <SearchableSelect
+        options={sourceStateOptions}
+        value={sourceState}
+        onChange={onSourceStateChange}
+        placeholder="Picks up from state"
+        ariaLabel="Filter by source state"
+      />
+
+      <SearchableSelect
+        options={destinationStateOptions}
+        value={destinationState}
+        onChange={onDestinationStateChange}
+        placeholder="Delivers to state"
+        ariaLabel="Filter by destination state"
       />
 
       <div className="transporters-filters__search">

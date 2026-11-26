@@ -171,7 +171,7 @@ const ContractSummaryPanel = ({ contractNumber, extraFields = [] }: ContractSumm
         </div>
       </div>
 
-      <div className="assign-transports-details">
+      <div className={`assign-transports-details${detailsOpen ? "" : " assign-transports-details--collapsed"}`}>
         <div className="assign-transports-details__header" style={detailsOpen ? undefined : { marginBottom: 0 }}>
           <button
             type="button"

@@ -204,6 +204,13 @@
       color: v.fg(v.$color-gray-500);
     }
   }
+
+  // Serving Locations (states picked up from / delivered to) under the contact lines
+  &__serving {
+    margin-top: v.$spacing-3;
+    padding-top: v.$spacing-3;
+    border-top: 1px solid v.line(v.$color-gray-100);
+  }
 }
 
 .transporters-pagination {

@@ -51,6 +51,9 @@ const PendingPayments = () => {
       </div>
 
       <Table
+        exportName="Pending Payments"
+        exportData={filteredRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

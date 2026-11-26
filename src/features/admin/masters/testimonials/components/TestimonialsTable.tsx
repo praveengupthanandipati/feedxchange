@@ -5,11 +5,13 @@ import { TestimonialActions, TestimonialStatusBadge, type TestimonialActionHandl
 
 export interface TestimonialListProps extends TestimonialActionHandlers {
   rows: Testimonial[];
+  /** Every filtered row (the page passes only the current page as rows), for the row count and CSV / PDF export. */
+  exportRows?: Testimonial[];
   emptyMessage: string;
 }
 
 /** Tablet, laptop and desktop view. */
-const TestimonialsTable = ({ rows, emptyMessage, onEdit, onDelete }: TestimonialListProps) => {
+const TestimonialsTable = ({ rows, exportRows, emptyMessage, onEdit, onDelete }: TestimonialListProps) => {
   const columns: TableColumn<Testimonial>[] = [
     {
       key: "customerName",
@@ -40,7 +42,7 @@ const TestimonialsTable = ({ rows, emptyMessage, onEdit, onDelete }: Testimonial
 
   return (
     <div className="testimonials__table-view">
-      <Table columns={columns} data={rows} rowKey={(row) => row.id} className="testimonials__table" emptyMessage={emptyMessage} />
+      <Table exportName="Testimonials" exportData={exportRows} columnToggle columns={columns} data={rows} rowKey={(row) => row.id} className="testimonials__table" emptyMessage={emptyMessage} />
     </div>
   );
 };

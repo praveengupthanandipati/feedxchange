@@ -1,5 +1,6 @@
-﻿import { Fragment, useState } from "react";
+﻿import { Fragment, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useSearchParams } from "react-router-dom";
 import { CheckIcon, EyeIcon, EyeOffIcon, TruckIcon, XIcon } from "../../../../../shared/components/icon";
 import { getErrorMessage } from "../../../../../core/api/getErrorMessage";
 import { formatApiDateTime } from "../../../../../shared/utils/apiDateTime";
@@ -11,6 +12,8 @@ import {
   type TransporterRequest,
 } from "../../../../../core/store/transporterRequestsApi";
 import ColumnHeader,{ useColumnControls, type ColumnFilters } from "./ColumnHeader";
+import { BargainHistoryButton } from "../../negotiation/BargainHistory";
+import { mt, rupees } from "../../negotiation/negotiation";
 import "../../open-pending-contracts/contract-trucks/manage-schedule/ManageSchedule.scss";
 import "../../transporter-review-assign-trucks/ReviewAndAssignTrucks.scss";
 import "./TransporterRequests.scss";
@@ -121,13 +124,19 @@ const AddressHeader = ({ c, field, label }: { c: Controls; field: keyof Pick<Col
 );
 
 /** One request the transporter can still answer: quantity and freight (prefilled with the offer), accept or reject. */
-const PendingRow = ({ request, canRespond, showTransporter, when, fullAddresses }: { request: TransporterRequest; canRespond: boolean; showTransporter: boolean; when: When; fullAddresses: boolean }) => {
+const PendingRow = ({ request, canRespond, showTransporter, when, fullAddresses, highlighted = false }: { request: TransporterRequest; canRespond: boolean; showTransporter: boolean; when: When; fullAddresses: boolean; highlighted?: boolean }) => {
   const [respond, { isLoading }] = useRespondToTransporterRequestMutation();
   const notify = useNotifyPrompt();
   const [qty, setQty] = useState(String(request.availableQuantityMT));
-  const [freight, setFreight] = useState(String(request.offeredFreightPerMT));
+  const [freight, setFreight] = useState(request.offeredFreightPerMT > 0 ? String(request.offeredFreightPerMT) : "");
+  // a revised freight (bargaining) changes what is offered: start from the new figure
+  useEffect(() => {
+    setFreight(request.offeredFreightPerMT > 0 ? String(request.offeredFreightPerMT) : "");
+  }, [request.offeredFreightPerMT]);
   const [remarks, setRemarks] = useState("");
   const [error, setError] = useState("");
+  // a freight other than the one offered is a counter-offer (it waits for approval) rather than an acceptance
+  const isCounter = freight.trim() !== "" && Number(freight) > 0 && Number(freight) !== request.offeredFreightPerMT;
 
   const submit = async (accept: boolean) => {
     setError("");
@@ -153,20 +162,26 @@ const PendingRow = ({ request, canRespond, showTransporter, when, fullAddresses 
         acceptedFreightPerMT: accept ? acceptedFreightPerMT : undefined,
         remarks: remarks.trim() || undefined,
       }).unwrap();
-      // The admins and whoever created the schedule are told about the response.
-      notify.ask({
-        eventCode: accept ? "TRANSPORTER_ACCEPTED" : "TRANSPORTER_REJECTED",
-        title: accept ? "Notify about this acceptance" : "Notify about this rejection",
-        sourceEntityType: "DispatchScheduleTransporter",
-        sourceEntityId: request.dispatchScheduleTransporterId,
-      });
+      // An acceptance and a counter-offer are told to the admins and whoever created the schedule by the server, straight away.
+      // A rejection still asks whom to tell, as before.
+      if (!accept) {
+        notify.ask({
+          eventCode: "TRANSPORTER_REJECTED",
+          title: "Notify about this rejection",
+          sourceEntityType: "DispatchScheduleTransporter",
+          sourceEntityId: request.dispatchScheduleTransporterId,
+        });
+      }
     } catch (err) {
       setError(getErrorMessage(err, "Could not save your response. Please try again."));
     }
   };
 
   return (
-    <tr className={`transporter-requests__row transporter-requests__row--${when}`}>
+    <tr
+      id={`transporter-request-${request.dispatchScheduleTransporterId}`}
+      className={`transporter-requests__row transporter-requests__row--${when}${highlighted ? " is-highlighted" : ""}`}
+    >
       {createPortal(notify.element, document.body)}
       {showTransporter && <td>{request.transporterName}</td>}
       <td>
@@ -188,6 +203,9 @@ const PendingRow = ({ request, canRespond, showTransporter, when, fullAddresses 
           <>{request.offeredQuantityMT} MT @ ₹{request.offeredFreightPerMT}/MT</>
         )}
         <span className="manage-schedule-table__timestamps">Notified {formatApiDateTime(request.notifiedDateTime)}</span>
+        {(request.negotiationRounds ?? 0) > 0 && (
+          <BargainHistoryButton dispatchScheduleTransporterId={request.dispatchScheduleTransporterId} rounds={request.negotiationRounds} />
+        )}
       </td>
       {canRespond ? (
         <td className="manage-schedule-table__action-cell">
@@ -212,7 +230,7 @@ const PendingRow = ({ request, canRespond, showTransporter, when, fullAddresses 
                 <span>/MT</span>
               </label>
               <span className="manage-schedule-table__buttons">
-                <button type="button" className="review-assign-trucks-btn review-assign-trucks-btn--accept manage-schedule-table__icon-btn" onClick={() => submit(true)} disabled={isLoading} title="Accept" aria-label="Accept request">
+                <button type="button" className="review-assign-trucks-btn review-assign-trucks-btn--accept manage-schedule-table__icon-btn" onClick={() => submit(true)} disabled={isLoading} title={isCounter ? "Send counter-offer" : "Accept"} aria-label={isCounter ? "Send counter-offer" : "Accept request"}>
                   <CheckIcon aria-hidden />
                 </button>
                 <button type="button" className="review-assign-trucks-btn review-assign-trucks-btn--reject manage-schedule-table__icon-btn" onClick={() => submit(false)} disabled={isLoading} title="Reject" aria-label="Reject request">
@@ -220,6 +238,16 @@ const PendingRow = ({ request, canRespond, showTransporter, when, fullAddresses 
                 </button>
               </span>
             </div>
+          )}
+          {isCounter && (
+            <span className="transporter-requests__counter-note">
+              {request.offeredFreightPerMT > 0
+                ? <>Counter-offer: {rupees(Number(freight))}/MT instead of {rupees(request.offeredFreightPerMT)}/MT goes to FeedXchange for approval. You can add trucks once it is approved.</>
+                : <>Your freight of {rupees(Number(freight))}/MT goes to FeedXchange for approval. You can add trucks once it is approved.</>}
+            </span>
+          )}
+          {!isCounter && request.offeredFreightPerMT <= 0 && (
+            <span className="transporter-requests__counter-note">No freight was set for this request. Enter your freight per MT to accept it.</span>
           )}
           <input
             type="text"
@@ -251,11 +279,39 @@ const TransporterRequests = ({ mode }: TransporterRequestsProps) => {
   const [openGroups, setOpenGroups] = useState<Record<When, boolean>>({ today: true, upcoming: false, earlier: false });
 
   const pendingQuery = useGetTransporterRequestsQuery({ statusId: pendingStatusId });
+  // Counter-offers waiting for FeedXchange / the requester to approve (freight bargaining)
+  const proposedStatusId = statuses?.find((s) => s.statusName.toLowerCase() === "freightproposed")?.responseStatusId;
+  const proposedQuery = useGetTransporterRequestsQuery({ statusId: proposedStatusId ?? -1 }, { skip: proposedStatusId === undefined });
+  const awaiting = proposedQuery.data ?? [];
 
   const pending = pendingQuery.data ?? [];
   const pendingControls = useColumnControls(pending, "asc");
   const today = todayKey();
   const failed = pendingQuery.isError;
+
+  // Opened from Schedules Management with ?request=<id>: open that request's group, bring it into view and mark it for a moment.
+  const [searchParams] = useSearchParams();
+  const focusId = Number(searchParams.get("request")) || 0;
+  const [highlightId, setHighlightId] = useState(0);
+  const [focusMissing, setFocusMissing] = useState(false);
+  const focusedFor = useRef(0);
+  useEffect(() => {
+    if (!focusId || focusedFor.current === focusId || !pendingQuery.data) return;
+    focusedFor.current = focusId;
+    const target = pendingQuery.data.find((r) => r.dispatchScheduleTransporterId === focusId);
+    if (!target) {
+      setFocusMissing(true);
+      return;
+    }
+    setFocusMissing(false);
+    setOpenGroups((g) => ({ ...g, [whenOf(target.scheduleDateTime, today)]: true }));
+    setHighlightId(focusId);
+    // After the group has rendered its rows. Not cancelled on a re-render: a refetch must not leave the row marked for good.
+    window.setTimeout(() => {
+      document.getElementById(`transporter-request-${focusId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+    window.setTimeout(() => setHighlightId(0), 4000);
+  }, [focusId, pendingQuery.data, today]);
 
   return (
     <div className="transporter-requests">
@@ -263,10 +319,15 @@ const TransporterRequests = ({ mode }: TransporterRequestsProps) => {
         <h1>
           <TruckIcon aria-hidden /> {isOwn ? "Truck Requests" : "Transporter Requests"}
         </h1>
-        <p>{isOwn ? "Requests received from FeedXchange. Accept or reject the new ones, then add trucks under Arrangement > Add Trucks to Schedules." : "Requests sent to transporters. Trucks for the accepted ones are added under Arrangement > Add Trucks to Schedules."}</p>
+        <p>{isOwn ? "Requests received from FeedXchange. Accept or reject the new ones, then add trucks under Schedules Management > Add Trucks to Schedules." : "Requests sent to transporters. Trucks for the accepted ones are added under Schedules Management > Add Trucks to Schedules."}</p>
       </div>
 
       {failed && <p className="manage-schedule-table__error" role="alert">The requests could not be loaded. Please try again.</p>}
+      {focusMissing && (
+        <p className="transporter-requests__notice" role="status">
+          The request you opened is no longer awaiting a response: it has been answered, has expired or was cancelled. See Schedules Management for where it stands.
+        </p>
+      )}
 
       <section className="transporter-requests__section">
         <div className="transporter-requests__section-head">
@@ -324,7 +385,7 @@ const TransporterRequests = ({ mode }: TransporterRequestsProps) => {
                         </td>
                       </tr>
                       {openGroups[when] && rows.map((request) => (
-                        <PendingRow key={request.dispatchScheduleTransporterId} request={request} canRespond={isOwn} showTransporter={!isOwn} when={when} fullAddresses={fullAddresses} />
+                        <PendingRow key={request.dispatchScheduleTransporterId} request={request} canRespond={isOwn} showTransporter={!isOwn} when={when} fullAddresses={fullAddresses} highlighted={highlightId === request.dispatchScheduleTransporterId} />
                       ))}
                     </Fragment>
                   );
@@ -334,6 +395,60 @@ const TransporterRequests = ({ mode }: TransporterRequestsProps) => {
           </div>
         )}
       </section>
+
+      {awaiting.length > 0 && (
+        <section className="transporter-requests__section" aria-label="Awaiting approval">
+          <div className="transporter-requests__section-head">
+            <h2>
+              Awaiting Approval <span className="transporter-requests__count">{awaiting.length}</span>
+            </h2>
+          </div>
+          <p className="transporter-requests__empty">
+            {isOwn
+              ? "Your counter-offers. FeedXchange or the requester will approve them or send a revised freight; a revised request comes back under New Requests."
+              : "Counter-offers from transporters, waiting for FeedXchange or the requester. Approve or revise them on the contract's Manage Schedule screen."}
+          </p>
+          <div className="manage-schedule-table__wrapper">
+            <table className="manage-schedule-table">
+              <thead>
+                <tr>
+                  {!isOwn && <th>Transporter</th>}
+                  <th>Scheduled</th>
+                  <th>Product</th>
+                  <th>Route</th>
+                  <th>Offered</th>
+                  <th>{isOwn ? "Your proposal" : "Proposal"}</th>
+                  <th>Proposed on</th>
+                </tr>
+              </thead>
+              <tbody>
+                {awaiting.map((r) => (
+                  <tr key={r.dispatchScheduleTransporterId}>
+                    {!isOwn && <td>{r.transporterName}</td>}
+                    <td>{formatApiDateTime(r.scheduleDateTime)}</td>
+                    <td>{r.productName ?? "-"}</td>
+                    <td>
+                      {r.sellerName} → {r.buyerName}
+                      <span className="manage-schedule-table__timestamps">{[r.loadingPlace, r.deliveryPlace].filter(Boolean).join(" → ")}</span>
+                    </td>
+                    <td>
+                      {mt(r.offeredQuantityMT)} @ {rupees(r.offeredFreightPerMT)}/MT
+                    </td>
+                    <td>
+                      <strong>
+                        {mt(r.proposedQuantityMT)} @ {rupees(r.proposedFreightPerMT)}/MT
+                      </strong>
+                      <span className="review-assign-trucks-panel__status review-assign-trucks-panel__status--pending">Awaiting approval</span>
+                      <BargainHistoryButton dispatchScheduleTransporterId={r.dispatchScheduleTransporterId} rounds={r.negotiationRounds} />
+                    </td>
+                    <td>{formatApiDateTime(r.responseDateTime)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

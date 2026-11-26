@@ -20,4 +20,6 @@ export interface TableColumn<T> {
   hideable?: boolean;
   /** "low": hidden on phones and small tablets (below 768px), to keep the important columns readable. */
   priority?: "low";
+  /** false keeps the column out of CSV / PDF exports (row actions and selection are always left out). */
+  exportable?: boolean;
 }

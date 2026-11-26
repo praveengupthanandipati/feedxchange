@@ -32,7 +32,7 @@ const Subscriptions = () => {
           setPage(1);
         }}
       />
-      <SubscriptionsTable rows={paged} emptyMessage={emptyMessage} />
+      <SubscriptionsTable rows={paged} exportRows={filtered} emptyMessage={emptyMessage} />
       <SubscriptionCards rows={paged} emptyMessage={emptyMessage} />
       <SubscriptionsPagination page={currentPage} pageSize={PAGE_SIZE} total={filtered.length} onPageChange={setPage} />
     </div>

@@ -20,6 +20,7 @@ import {
 } from "../../../../../../core/store/contractTrucksApi";
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
 import { splitApiDateTimeForForm } from "../../../../../../shared/utils/apiDateTime";
+import PendingDoContracts from "./PendingDoContracts";
 import "./ReassignTruck.scss";
 // The header row is shared with the Contract chain screen.
 import "../truck-chain/ContractTruckChain.scss";
@@ -456,6 +457,21 @@ const ReassignTruck = () => {
     if (contractNumber) setSelectedContract(contractNumber);
   }, [contractNumber, setSelectedContract]);
 
+
+  // No truck picked: the seller's contracts with trucks waiting for a DO (enter it, or re-assign the truck from there)
+  if (!contractTruckId) {
+    return (
+      <div className="reassign-truck">
+        <p className="reassign-truck__breadcrumb">
+          <Link to="/admin/truck-management/open-pending-contracts">Contracts</Link> / Delivery Orders &amp; re-assign
+        </p>
+        <div className="truck-chain__header">
+          <h1 className="reassign-truck__heading">Delivery Orders &amp; re-assign truck</h1>
+        </div>
+        <PendingDoContracts />
+      </div>
+    );
+  }
 
   return (
     <div className="reassign-truck">

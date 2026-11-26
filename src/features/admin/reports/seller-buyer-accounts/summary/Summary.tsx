@@ -46,6 +46,9 @@ const Summary = () => {
       </div>
 
       <Table
+        exportName="Seller Buyer Summary"
+        exportData={filteredRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

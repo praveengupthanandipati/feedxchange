@@ -18,6 +18,8 @@ const fromAllContracts = (row: GetAllContractsRow): OpenAndPendingContract => ({
   contractDate: row.contractDate,
   seller: row.sellerName,
   buyer: row.buyerName,
+  sellerId: row.sellerId,
+  buyerId: row.buyerId,
   pricePerMT: row.contractRate ?? 0,
   totalQuantityMT: row.quantity ?? 0,
   dispatchedQuantityMT: row.dispatchedQuantity ?? 0,

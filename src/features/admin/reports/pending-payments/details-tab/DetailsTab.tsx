@@ -52,6 +52,9 @@ const DetailsTab = ({ rows }: DetailsTabProps) => {
       </div>
 
       <Table
+        exportName="Pending Payments - Details"
+        exportData={filteredRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

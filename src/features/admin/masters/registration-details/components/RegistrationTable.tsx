@@ -6,12 +6,14 @@ import { RegistrationActions, RegistrationEmail, RegistrationPhone, Registration
 
 export interface RegistrationListProps {
   rows: Registration[];
+  /** Every filtered row (the page passes only the current page as rows), for the row count and CSV / PDF export. */
+  exportRows?: Registration[];
   emptyMessage: string;
   onUpdateStatus: (registration: Registration) => void;
 }
 
 /** Laptop and desktop view. */
-const RegistrationTable = ({ rows, emptyMessage, onUpdateStatus }: RegistrationListProps) => {
+const RegistrationTable = ({ rows, exportRows, emptyMessage, onUpdateStatus }: RegistrationListProps) => {
   const columns: TableColumn<Registration>[] = [
     { key: "name", header: "Name", sortable: true, render: (row) => <span className="registrations__wrap">{row.name}</span> },
     { key: "actions", header: "Actions", width: "5.5rem", align: "center", render: (row) => <RegistrationActions registration={row} onUpdateStatus={onUpdateStatus} /> },
@@ -31,7 +33,7 @@ const RegistrationTable = ({ rows, emptyMessage, onUpdateStatus }: RegistrationL
 
   return (
     <div className="registrations__table-view">
-      <Table columns={columns} data={rows} rowKey={(row) => row.id} className="registrations__table" emptyMessage={emptyMessage} />
+      <Table exportName="Registration Details" exportData={exportRows} columnToggle columns={columns} data={rows} rowKey={(row) => row.id} className="registrations__table" emptyMessage={emptyMessage} />
     </div>
   );
 };

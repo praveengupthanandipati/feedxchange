@@ -21,9 +21,14 @@ import "../../../assign-transports/Assigntransports.scss";
 import "../../../transporter-review-assign-trucks/ReviewAndAssignTrucks.scss";
 import "./ManageSchedule.scss";
 import { useNotifyPrompt } from "../../../../../../shared/notifications/useNotifyPrompt";
+import { useGetNegotiationsByContractQuery } from "../../../../../../core/store/scheduleNegotiationApi";
+import FreightDecision from "../../../negotiation/FreightDecision";
+import { BargainHistoryButton } from "../../../negotiation/BargainHistory";
+import { isFreightProposed, rupees } from "../../../negotiation/negotiation";
 
 function statusModifier(statusLabel: string): string {
   const normalized = statusLabel.toLowerCase();
+  if (normalized.includes("proposed")) return "pending";
   if (normalized.includes("partially")) return "partially-accepted";
   if (normalized.includes("accepted")) return "accepted";
   if (normalized.includes("rejected")) return "rejected";
@@ -34,6 +39,7 @@ function statusModifier(statusLabel: string): string {
 
 interface ScheduleRequestRowProps {
   contractNumber: string;
+  contractId: number;
   transporterName: string;
   detail: ScheduleTruckDispatchDetail;
   statusLabelById: Record<number, string>;
@@ -54,6 +60,7 @@ function committedQty(row: { acceptedQuantityMT: number | null; cancelledQuantit
 
 const ScheduleRequestRow = ({
   contractNumber,
+  contractId,
   transporterName,
   detail,
   statusLabelById,
@@ -81,10 +88,19 @@ const ScheduleRequestRow = ({
   useEffect(() => {
     setAcceptQty(String(availableQty));
   }, [availableQty]);
-  const [acceptFreight, setAcceptFreight] = useState(String(detail.offeredFreightPerMT));
+  const [acceptFreight, setAcceptFreight] = useState(detail.offeredFreightPerMT > 0 ? String(detail.offeredFreightPerMT) : "");
+  // A revised freight (bargaining) changes what is offered: keep the prefilled freight in step.
+  useEffect(() => {
+    setAcceptFreight(detail.offeredFreightPerMT > 0 ? String(detail.offeredFreightPerMT) : "");
+  }, [detail.offeredFreightPerMT]);
   const [cancelQty, setCancelQty] = useState("");
 
   const statusLabel = statusLabelById[detail.responseStatusId] ?? `Status #${detail.responseStatusId}`;
+  // Freight bargaining: the open proposal on this request and whether the signed-in user (admin / schedule initiator) may decide on it.
+  const { data: negotiations } = useGetNegotiationsByContractQuery(contractId, { skip: !contractId });
+  const negotiation = negotiations?.find((n) => n.dispatchScheduleTransporterId === detail.dispatchScheduleTransporterId);
+  const isProposed = isFreightProposed(statusLabel);
+  const [showRevise, setShowRevise] = useState(false);
   const isPending = statusLabel.toLowerCase() === "pending";
   const isAccepted = statusLabel.toLowerCase().includes("accepted");
   const acceptedQty = detail.acceptedQuantityMT ?? 0;
@@ -360,7 +376,35 @@ const ScheduleRequestRow = ({
               Fully assigned — no trucks left to add on this request.
             </span>
           )}
-          {!isPending && !isAccepted && <span className="manage-schedule-table__muted">-</span>}
+          {isProposed &&
+            (negotiation?.canDecide ? (
+              <FreightDecision
+                dispatchScheduleTransporterId={detail.dispatchScheduleTransporterId}
+                offeredFreightPerMT={detail.offeredFreightPerMT}
+                proposedFreightPerMT={negotiation.proposedFreightPerMT}
+                proposedQuantityMT={negotiation.proposedQuantityMT}
+                proposedRemarks={negotiation.proposedRemarks}
+              />
+            ) : (
+              <span className="manage-schedule-table__muted">
+                Transporter proposed {rupees(negotiation?.proposedFreightPerMT)}/MT — waiting for FeedXchange or the requester to approve it.
+              </span>
+            ))}
+          {isPending && negotiation?.canDecide && availableQty > 0 && (
+            showRevise ? (
+              <FreightDecision
+                dispatchScheduleTransporterId={detail.dispatchScheduleTransporterId}
+                offeredFreightPerMT={detail.offeredFreightPerMT}
+                proposedFreightPerMT={null}
+                proposedQuantityMT={null}
+              />
+            ) : (
+              <button type="button" className="bargain-link" onClick={() => setShowRevise(true)}>
+                Revise freight
+              </button>
+            )
+          )}
+          {!isPending && !isAccepted && !isProposed && <span className="manage-schedule-table__muted">-</span>}
         </div>
         {/* Below the action row: how much of the accepted quantity is on trucks and how much is left. */}
         {isAccepted && (
@@ -403,6 +447,7 @@ const ScheduleRequestRow = ({
         {detail.responseDateTime && (
           <span className="manage-schedule-table__timestamps">Responded {formatApiDateTime(detail.responseDateTime)}</span>
         )}
+        <BargainHistoryButton dispatchScheduleTransporterId={detail.dispatchScheduleTransporterId} rounds={negotiation?.rounds} />
       </td>
       <td className="manage-schedule-table__remarks">{detail.responseRemarks || "-"}</td>
     </tr>
@@ -471,6 +516,7 @@ const TransporterScheduleRows = ({
         <ScheduleRequestRow
           key={detail.dispatchScheduleTransporterId}
           contractNumber={contractNumber}
+          contractId={contractId}
           transporterName={transporterName}
           detail={detail}
           statusLabelById={statusLabelById}

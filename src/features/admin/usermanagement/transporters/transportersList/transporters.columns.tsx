@@ -73,5 +73,17 @@ export function buildTransporterColumns({
       header: "State",
       sortable: true,
     },
+    {
+      key: "sourceStates",
+      header: "Picks up from",
+      render: (row) => (row.sourceStates ?? []).join(", ") || "—",
+      exportValue: (row) => (row.sourceStates ?? []).join(", "),
+    },
+    {
+      key: "destinationStates",
+      header: "Delivers to",
+      render: (row) => (row.destinationStates ?? []).join(", ") || "—",
+      exportValue: (row) => (row.destinationStates ?? []).join(", "),
+    },
   ];
 }

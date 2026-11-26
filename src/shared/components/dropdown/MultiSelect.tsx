@@ -12,6 +12,10 @@ interface MultiSelectProps {
   placeholder?: string;
   ariaLabel?: string;
   disabled?: boolean;
+  /** Keep the placeholder on the first line and show the chosen items as chips underneath (inside the same box). */
+  chipsBelow?: boolean;
+  /** Chip colour (default: the neutral navy tint). */
+  tone?: "blue" | "green";
 }
 
 const MultiSelect = ({
@@ -21,6 +25,8 @@ const MultiSelect = ({
   placeholder = "Select...",
   ariaLabel,
   disabled = false,
+  chipsBelow = false,
+  tone,
 }: MultiSelectProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -83,8 +89,27 @@ const MultiSelect = ({
     onChange(value.filter((item) => item !== optionValue));
   };
 
+  const renderChips = (extraClass: string) => (
+    <span className={`multi-select__chips ${extraClass}`}>
+      {selectedOptions.map((option) => (
+        <span className={`multi-select__chip ${tone ? `multi-select__chip--${tone}` : ""}`} key={option.value}>
+          {option.label}
+          <span
+            className="multi-select__chip-remove"
+            role="button"
+            tabIndex={-1}
+            aria-label={`Remove ${option.label}`}
+            onClick={(event) => removeValue(option.value, event)}
+          >
+            <XIcon size={12} strokeWidth={ICON_STROKE_FINE} aria-hidden />
+          </span>
+        </span>
+      ))}
+    </span>
+  );
+
   return (
-    <div className="multi-select" ref={rootRef}>
+    <div className={`multi-select ${chipsBelow ? "multi-select--below" : ""}`} ref={rootRef}>
       <button
         ref={triggerRef}
         type="button"
@@ -95,27 +120,13 @@ const MultiSelect = ({
         aria-label={ariaLabel}
         disabled={disabled}
       >
-        {selectedOptions.length === 0 ? (
+        {chipsBelow || selectedOptions.length === 0 ? (
           <span className="multi-select__placeholder">{placeholder}</span>
         ) : (
-          <span className="multi-select__chips">
-            {selectedOptions.map((option) => (
-              <span className="multi-select__chip" key={option.value}>
-                {option.label}
-                <span
-                  className="multi-select__chip-remove"
-                  role="button"
-                  tabIndex={-1}
-                  aria-label={`Remove ${option.label}`}
-                  onClick={(event) => removeValue(option.value, event)}
-                >
-                  <XIcon size={12} strokeWidth={ICON_STROKE_FINE} aria-hidden />
-                </span>
-              </span>
-            ))}
-          </span>
+          renderChips("")
         )}
         <ChevronDownIcon className={open ? "is-open" : ""} size={14} strokeWidth={ICON_STROKE_FINE} aria-hidden />
+        {chipsBelow && selectedOptions.length > 0 && renderChips("multi-select__chips--below")}
       </button>
 
       {open &&

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  DownloadIcon,
   FunnelIcon,
   RefreshCwIcon,
   RotateCcwIcon,
@@ -37,9 +36,6 @@ const uniqueOptions = (values: string[], allLabel: string) => [
   ...Array.from(new Set(values.filter(Boolean))).map((value) => ({ value, label: value })),
 ];
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const TruncatedName = ({ value }: { value: string }) => (
   <span className="seller-dispatch-table__name">
@@ -157,33 +153,6 @@ const Sellerdispatch = () => {
     setKeyword("");
   };
 
-  const handleExportToExcel = () => {
-    const headerRow = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = columns
-          .map((column) => {
-            const value = column.exportValue
-              ? column.exportValue(row)
-              : String((row as unknown as Record<string, unknown>)[column.key] ?? "");
-            return `<td>${escapeHtml(value)}</td>`;
-          })
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<meta charset="utf-8"><table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "pending-seller-trucks-dispatch.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="seller-dispatch-page">
@@ -200,14 +169,6 @@ const Sellerdispatch = () => {
             >
               <FunnelIcon aria-hidden />
               {filtersVisible ? "Hide Filters" : "Show Filters"}
-            </button>
-            <button
-              type="button"
-              className="seller-dispatch-btn seller-dispatch-btn--warning"
-              onClick={handleExportToExcel}
-              disabled={filteredRows.length === 0}
-            >
-              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -276,6 +237,9 @@ const Sellerdispatch = () => {
         ) : (
           <>
             <Table
+              exportName="Pending Seller Trucks Dispatch"
+              exportData={filteredRows}
+              columnToggle
               columns={columns}
               data={pagedRows}
               rowKey={(row) => row.id}

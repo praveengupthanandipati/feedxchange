@@ -15,6 +15,9 @@ export interface TransporterDraft {
   group: string;
   referralCode: string;
   aboutTransporter: string;
+  /** Serving Locations: states goods are picked up from / delivered to. */
+  sourceStates: string[];
+  destinationStates: string[];
   billingAddressLine1: string;
   billingAddressLine2: string;
   landmark: string;
@@ -53,6 +56,8 @@ const emptyDraft = (): TransporterDraft => ({
   group: "",
   referralCode: "",
   aboutTransporter: "",
+  sourceStates: [],
+  destinationStates: [],
   billingAddressLine1: "",
   billingAddressLine2: "",
   landmark: "",

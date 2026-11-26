@@ -3,7 +3,6 @@ import DatePickerInput from "../../../../shared/components/dropdown/DatePickerIn
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   PrinterIcon,
@@ -12,27 +11,17 @@ import {
 } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../shared/components/table/table.types";
 import { buildPendingSuppliesColumns } from "./pendingSupplies.columns";
 import {
   commodityOptions,
   formatTodayLabel,
   pendingSupplyRows,
-  type PendingSupplyRow,
 } from "./pendingSupplies.data";
 import "./PendingSupplies.scss";
 
 const PAGE_SIZE = 8;
 
-function getExportCellValue(row: PendingSupplyRow, column: TableColumn<PendingSupplyRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const PendingSupplies = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -83,26 +72,6 @@ const PendingSupplies = () => {
     setAppliedDateTo("");
   };
 
-  const handleExport = () => {
-    const headerRow = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = columns.map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`).join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "pending-supplies.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   const handlePrint = () => window.print();
 
@@ -122,9 +91,6 @@ const PendingSupplies = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button type="button" className="pending-supplies-btn pending-supplies-btn--warning" onClick={handleExport}>
-              <DownloadIcon aria-hidden /> Export
             </button>
             <button type="button" className="pending-supplies-btn pending-supplies-btn--warning" onClick={handlePrint}>
               <PrinterIcon aria-hidden /> Print
@@ -173,6 +139,9 @@ const PendingSupplies = () => {
         )}
 
         <Table
+          exportName="Pending Supplies"
+          exportData={filteredRows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}

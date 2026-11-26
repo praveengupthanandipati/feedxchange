@@ -6,11 +6,13 @@ import BannerStatusBadge from "./BannerStatusBadge";
 
 export interface BannerListProps extends BannerActionHandlers {
   rows: Banner[];
+  /** Every filtered row (the page passes only the current page as rows), for the row count and CSV / PDF export. */
+  exportRows?: Banner[];
   emptyMessage: string;
 }
 
 /** Tablet, laptop and desktop view. */
-const BannersTable = ({ rows, emptyMessage, onEdit, onDelete }: BannerListProps) => {
+const BannersTable = ({ rows, exportRows, emptyMessage, onEdit, onDelete }: BannerListProps) => {
   const columns: TableColumn<Banner>[] = [
     {
       key: "image",
@@ -27,7 +29,7 @@ const BannersTable = ({ rows, emptyMessage, onEdit, onDelete }: BannerListProps)
 
   return (
     <div className="banners__table-view">
-      <Table columns={columns} data={rows} rowKey={(row) => String(row.id)} className="banners__table" emptyMessage={emptyMessage} />
+      <Table exportName="Banners" exportData={exportRows} columnToggle columns={columns} data={rows} rowKey={(row) => String(row.id)} className="banners__table" emptyMessage={emptyMessage} />
     </div>
   );
 };

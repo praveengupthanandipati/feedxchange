@@ -33,6 +33,11 @@ export interface TransporterRequest {
   notifiedDateTime: string | null;
   responseDateTime: string | null;
   responseRemarks: string | null;
+  /** The transporter's freight proposal waiting for approval (only while the status is "FreightProposed"). */
+  proposedQuantityMT?: number | null;
+  proposedFreightPerMT?: number | null;
+  /** Proposals and revisions so far (0 = no bargaining). */
+  negotiationRounds?: number;
 }
 
 export interface TransporterRequestFilters {
@@ -54,6 +59,13 @@ export interface RespondToRequestPayload {
 /** A truck already added to an accepted schedule. */
 export interface AssignedTruck {
   contractDispatchId: number;
+  truckId: number;
+  driverId: number;
+  trackingUrl: string | null;
+  /** True while the truck is still Assigned (not Loaded / Cancelled) and the signed-in user is the transporter. */
+  editable: boolean;
+  /** Part of a re-assignment chain (also serves other contracts): truck, driver and quantity changes apply to every contract of it. */
+  inChain?: boolean;
   truckNumber: string | null;
   driverName: string | null;
   driverPhone: string | null;
@@ -106,6 +118,61 @@ export interface TruckLookups {
   drivers: LookupDriver[];
 }
 
+/** An instant truck: added straight to a contract, not through a schedule. */
+export interface InstantTruck {
+  contractDispatchId: number;
+  transporterName: string;
+  /** Only for FeedXchange staff. */
+  contractNumber: string | null;
+  assignedOn: string;
+  productName: string | null;
+  sellerName: string | null;
+  buyerName: string | null;
+  loadingPlace: string | null;
+  deliveryPlace: string | null;
+  loadingAddress: string | null;
+  deliveryAddress: string | null;
+  freightPerMT: number;
+  /** The contract's quantity not on any truck yet: how far this truck's quantity may be raised. */
+  contractPendingQuantityMT: number;
+  truck: AssignedTruck;
+}
+
+/** Query string for an optional yyyy-MM-dd range. */
+const dateParams = (arg: { from?: string; to?: string } | void) => ({ ...(arg?.from ? { from: arg.from } : {}), ...(arg?.to ? { to: arg.to } : {}) });
+
+/** One request on the Schedules Management dashboard: the request, where its truck arrangement stands, and its trucks. */
+export interface ScheduleDashboardRow {
+  request: TransporterRequest;
+  /** Pending, Accepted, PartiallyAccepted, Rejected, Expired or Cancelled. */
+  responseStatus: string;
+  /** Only for FeedXchange staff; null for a transporter. */
+  contractNumber: string | null;
+  /** Accepted, less what was cancelled: what trucks have to be put on. */
+  committedQuantityMT: number;
+  /** On trucks still Assigned (not loaded yet). */
+  assignedQuantityMT: number;
+  loadedQuantityMT: number;
+  leftToAssignMT: number;
+  trucks: AssignedTruck[];
+}
+
+/** After an edit or delete: how many contracts the truck is on (more than one when re-assigned) and how many had their buyer and seller notified. */
+export interface TruckChangeResult {
+  contracts: number;
+  notifiedContracts: number;
+}
+
+export interface UpdateScheduleTruckPayload {
+  contractDispatchId: number;
+  truckId: number;
+  driverId: number;
+  quantityMT: number;
+  lrNumber?: string;
+  /** Blank removes the link. */
+  trackingUrl?: string;
+}
+
 export interface AddTrucksPayload {
   dispatchScheduleTransporterId: number;
   trucks: { truckId: number; driverId: number; quantityMT: number; lrNumber?: string; trackingUrl?: string }[];
@@ -129,9 +196,24 @@ export const transporterRequestsApi = contractTrucksApi.injectEndpoints({
       providesTags: ["ContractTruck"],
     }),
 
-    getAcceptedSchedules: builder.query<AcceptedSchedule[], void>({
-      query: () => ({ url: "/api/TransporterRequests/AcceptedSchedules", method: "GET" }),
+    /** Optional schedule-date range (yyyy-MM-dd, whole days). */
+    getAcceptedSchedules: builder.query<AcceptedSchedule[], { from?: string; to?: string } | void>({
+      query: (arg) => ({ url: "/api/TransporterRequests/AcceptedSchedules", method: "GET", params: dateParams(arg) }),
       transformResponse: unwrapArray<AcceptedSchedule>,
+      providesTags: ["ContractTruck"],
+    }),
+
+    /** Instant trucks (added straight to a contract) of the signed-in transporter; staff see all. Optional assigned-date range. */
+    getInstantTrucks: builder.query<InstantTruck[], { from?: string; to?: string } | void>({
+      query: (arg) => ({ url: "/api/TransporterRequests/InstantTrucks", method: "GET", params: dateParams(arg) }),
+      transformResponse: unwrapArray<InstantTruck>,
+      providesTags: ["ContractTruck"],
+    }),
+
+    /** Requests whose schedule falls within from..to (yyyy-MM-dd, whole days; either may be left out). */
+    getScheduleDashboard: builder.query<ScheduleDashboardRow[], { from?: string; to?: string }>({
+      query: ({ from, to }) => ({ url: "/api/TransporterRequests/Dashboard", method: "GET", params: { ...(from ? { from } : {}), ...(to ? { to } : {}) } }),
+      transformResponse: unwrapArray<ScheduleDashboardRow>,
       providesTags: ["ContractTruck"],
     }),
 
@@ -142,6 +224,17 @@ export const transporterRequestsApi = contractTrucksApi.injectEndpoints({
 
     addTrucksToSchedule: builder.mutation<{ contractDispatchIds: number[] }, AddTrucksPayload>({
       query: (body) => ({ url: "/api/TransporterRequests/AddTrucks", method: "POST", body }),
+      invalidatesTags: ["ContractTruck"],
+    }),
+
+    updateScheduleTruck: builder.mutation<TruckChangeResult, UpdateScheduleTruckPayload>({
+      query: (body) => ({ url: "/api/TransporterRequests/UpdateTruck", method: "POST", body }),
+      invalidatesTags: ["ContractTruck"],
+    }),
+
+    /** Takes a still-Assigned truck off the schedule (kept as Cancelled); its quantity goes back to "left to assign". */
+    deleteScheduleTruck: builder.mutation<TruckChangeResult, { contractDispatchId: number }>({
+      query: (body) => ({ url: "/api/TransporterRequests/DeleteTruck", method: "POST", body }),
       invalidatesTags: ["ContractTruck"],
     }),
 
@@ -157,5 +250,9 @@ export const {
   useRespondToTransporterRequestMutation,
   useGetAcceptedSchedulesQuery,
   useGetTruckLookupsQuery,
+  useGetScheduleDashboardQuery,
+  useGetInstantTrucksQuery,
   useAddTrucksToScheduleMutation,
+  useUpdateScheduleTruckMutation,
+  useDeleteScheduleTruckMutation,
 } = transporterRequestsApi;

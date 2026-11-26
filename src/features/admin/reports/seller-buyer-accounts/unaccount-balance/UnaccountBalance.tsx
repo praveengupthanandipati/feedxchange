@@ -44,6 +44,9 @@ const UnaccountBalance = () => {
       </div>
 
       <Table
+        exportName="Unaccounted Balance"
+        exportData={filteredRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

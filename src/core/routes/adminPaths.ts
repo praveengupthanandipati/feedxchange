@@ -4,6 +4,14 @@ export const ADMIN_BASE = "/admin";
 export const ADMIN_LOGIN = `${ADMIN_BASE}/login`;
 export const ADMIN_HOME = `${ADMIN_BASE}/dashboard`;
 
+/** Roles that land on their own screen after signing in instead of the general Dashboard (matched on Roles.RoleKey). */
+const ROLE_HOME: Record<string, string> = {
+  "transporter.admin": `${ADMIN_BASE}/transporter-dashboard`,
+};
+
+/** Where a user of this role starts: their own dashboard when the role has one, else the general Dashboard. */
+export const homePathForRole = (roleKey: string | null | undefined): string => ROLE_HOME[(roleKey ?? "").toLowerCase()] ?? ADMIN_HOME;
+
 /**
  * "/contracts/2026-5" -> "/admin/contracts/2026-5". Paths that already carry the prefix and full URLs pass through, so it is safe on
  * anything the server sends (menu routes, notification deep links) however old the data is.

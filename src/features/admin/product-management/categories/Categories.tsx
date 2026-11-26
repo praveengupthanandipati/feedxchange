@@ -431,6 +431,9 @@ const handleSave = async () => {
           </div>
         )}
         <Table
+          exportName="Categories"
+          exportData={rows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}

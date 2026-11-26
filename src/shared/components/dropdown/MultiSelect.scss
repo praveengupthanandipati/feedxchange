@@ -68,6 +68,31 @@
   }
 
   // 12px "x" in an 18px click area (the chip around it keeps the 24px target spacing)
+  &__chip--blue {
+    background-color: var(--fx-tint-blue-bg);
+    color: var(--fx-tint-blue-fg);
+  }
+
+  &__chip--green {
+    background-color: var(--fx-tint-green-bg);
+    color: var(--fx-tint-green-fg);
+  }
+
+  // placeholder (and the arrow) on the first line, the chosen items as chips on the lines below, all inside the one box
+  &--below &__trigger {
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &--below &__placeholder {
+    flex: 1;
+  }
+
+  &__chips--below {
+    flex-basis: 100%;
+    order: 3;
+  }
+
   &__chip-remove {
     @include m.flex-center;
     width: 18px;

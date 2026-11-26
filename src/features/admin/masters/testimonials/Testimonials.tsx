@@ -77,7 +77,7 @@ const Testimonials = () => {
         </p>
       )}
 
-      <TestimonialsTable rows={paged} emptyMessage={emptyMessage} onEdit={openEdit} onDelete={setDeleting} />
+      <TestimonialsTable rows={paged} exportRows={filtered} emptyMessage={emptyMessage} onEdit={openEdit} onDelete={setDeleting} />
       <TestimonialCards rows={paged} emptyMessage={emptyMessage} onEdit={openEdit} onDelete={setDeleting} />
 
       <TestimonialsPagination page={currentPage} pageSize={PAGE_SIZE} total={filtered.length} onPageChange={setPage} />

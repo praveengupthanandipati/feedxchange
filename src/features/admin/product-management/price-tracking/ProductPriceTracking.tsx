@@ -504,6 +504,9 @@ const ProductPriceTracking = () => {
         )}
 
         <Table
+          exportName="Price Tracking"
+          exportData={filteredRows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}

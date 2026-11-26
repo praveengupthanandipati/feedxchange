@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import TimePickerInput from "../../../../../../shared/components/dropdown/TimePickerInput";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeftIcon, CircleCheckBigIcon, FileTextIcon, SaveIcon, XIcon } from "../../../../../../shared/components/icon";
@@ -15,6 +15,9 @@ import {
   useGetContractByContractNumberQuery,
   useGetScheduleStatusesQuery,
 } from "../../../../../../core/store/contractsApi";
+import { useRouteTransporters } from "../../../../usermanagement/transporters/useRouteTransporters";
+import { isSuperAdmin } from "../../../../../../core/auth/session";
+import TransporterRouteHint from "../../../../usermanagement/transporters/TransporterRouteHint";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../../core/store/transportersApi";
 import { useScheduleContractTrucksMutation } from "../../../../../../core/store/contractTrucksApi";
 import { getErrorMessage } from "../../../../../../core/api/getErrorMessage";
@@ -82,10 +85,23 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
   const [scheduleContractTrucks, { isLoading: saving }] = useScheduleContractTrucksMutation();
   const notify = useNotifyPrompt();
 
-  const transporterOptions = useMemo(
-    () => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })),
-    [transporters],
-  );
+  // The route comes first: only the transporters serving the loading state -> delivery state are offered
+  const route = useRouteTransporters({
+    transporters,
+    sellerId,
+    buyerId,
+    loadingAddressId: form.loadingAddress,
+    deliveryAddressId: form.deliveryAddress,
+  });
+  const { eligibleIds, statesReady } = route;
+  // a change of address can leave a picked transporter off the route: drop it
+  useEffect(() => {
+    if (!statesReady) return;
+    setForm((prev) => {
+      const kept = prev.transporters.filter((id) => eligibleIds.has(id));
+      return kept.length === prev.transporters.length ? prev : { ...prev, transporters: kept, autoApprove: kept.length > 1 ? false : prev.autoApprove };
+    });
+  }, [statesReady, eligibleIds]);
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -138,10 +154,9 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
         : "This contract's full quantity is already scheduled or assigned.";
     }
 
-    if (!form.freight.trim()) {
-      nextErrors.freight = "Freight charges are required.";
-    } else if (!/^\d+(\.\d+)?$/.test(form.freight.trim()) || Number(form.freight) <= 0) {
-      nextErrors.freight = "Enter a valid freight amount greater than 0.";
+    // Freight is optional: left empty it goes as 0 and the transporter states its own freight when answering.
+    if (form.freight.trim() && (!/^\d+(\.\d+)?$/.test(form.freight.trim()) || Number(form.freight) < 0)) {
+      nextErrors.freight = "Enter a valid freight amount (0 or more), or leave it empty.";
     }
 
     return nextErrors;
@@ -175,7 +190,7 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
         toAddressId: Number(form.deliveryAddress),
         scheduleStatusId: defaultStatus?.scheduleStatusId ?? 1,
         remarks: form.remarks.trim(),
-        freightPerMT: Number(form.freight),
+        freightPerMT: form.freight.trim() ? Number(form.freight) : 0,
         createdBy: currentUserId,
         createdOn: new Date().toISOString(),
         autoApprove: form.autoApprove,
@@ -251,27 +266,6 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
       </div>
 
       <div className="schedule-request-drawer__grid">
-        <div className="schedule-request-drawer__field schedule-request-drawer__field--full">
-          <label className="schedule-request-drawer__label">
-            Select Transporter <span className="schedule-request-drawer__required">*</span>
-          </label>
-          <MultiSelect
-            options={transporterOptions}
-            value={form.transporters}
-            onChange={(value) =>
-              setForm((prev) => ({
-                ...prev,
-                transporters: value,
-                // Auto approve covers a single transporter only, so a second one
-                // clears it rather than leaving a ticked box that cannot be unticked.
-                autoApprove: value.length > 1 ? false : prev.autoApprove,
-              }))
-            }
-            placeholder="Select Transporter(s)"
-            ariaLabel="Select Transporter"
-          />
-          {errors.transporters && <p className="schedule-request-drawer__error">{errors.transporters}</p>}
-        </div>
 
         <div className="schedule-request-drawer__field">
           <label className="schedule-request-drawer__label">
@@ -320,6 +314,38 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
           {errors.date && <p className="schedule-request-drawer__error">{errors.date}</p>}
         </div>
 
+        <div className="schedule-request-drawer__field schedule-request-drawer__field--full">
+          <label className="schedule-request-drawer__label">
+            Select Transporter <span className="schedule-request-drawer__required">*</span>
+          </label>
+          <MultiSelect
+            options={route.options}
+            disabled={!route.enabled}
+            value={form.transporters}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                transporters: value,
+                // Auto approve covers a single transporter only, so a second one
+                // clears it rather than leaving a ticked box that cannot be unticked.
+                autoApprove: value.length > 1 ? false : prev.autoApprove,
+              }))
+            }
+            placeholder={route.placeholder}
+            ariaLabel="Select Transporter"
+          />
+          {errors.transporters && <p className="schedule-request-drawer__error">{errors.transporters}</p>}
+          {route.emptyMessage && <p className="schedule-request-drawer__hint">{route.emptyMessage}</p>}
+          <TransporterRouteHint
+            selectedIds={form.transporters}
+            transporters={transporters}
+            sellerId={sellerId}
+            buyerId={buyerId}
+            loadingAddressId={form.loadingAddress}
+            deliveryAddressId={form.deliveryAddress}
+          />
+        </div>
+
         <div className="schedule-request-drawer__field">
           <label className="schedule-request-drawer__label">
             Time <span className="schedule-request-drawer__required">*</span>
@@ -358,18 +384,19 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
 
         <div className="schedule-request-drawer__field">
           <label className="schedule-request-drawer__label" htmlFor="schedule-freight">
-            Freight Charges <span className="schedule-request-drawer__required">*</span>
+            Freight Charges
           </label>
           <input
             id="schedule-freight"
             type="text"
             inputMode="decimal"
             className="schedule-request-drawer__control"
-            placeholder="Freight Charges (e.g. ₹1800/MT)"
+            placeholder="Optional (e.g. ₹1800/MT) - empty means 0"
             value={form.freight}
             onChange={(event) => setField("freight", event.target.value)}
           />
           {errors.freight && <p className="schedule-request-drawer__error">{errors.freight}</p>}
+          <p className="schedule-request-drawer__hint">Optional. If you leave it empty, the freight is sent as ₹0/MT.</p>
         </div>
 
         <div className="schedule-request-drawer__field schedule-request-drawer__field--full">
@@ -385,6 +412,8 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
           />
         </div>
 
+        {/* Auto Approve is a Super Admin tool: nobody else is told a freight can be approved automatically */}
+        {isSuperAdmin() && (
         <div className="schedule-request-drawer__field schedule-request-drawer__field--checkbox">
           <label className="schedule-request-drawer__checkbox">
             <input
@@ -400,7 +429,14 @@ const ScheduleDispatchForm = ({ contractNumber }: { contractNumber: string }) =>
               Auto approve is available only when a single transporter is selected.
             </p>
           )}
+          {form.autoApprove && !autoApproveDisabled && (
+            <p className="schedule-request-drawer__hint">
+              The transporter must state its freight. If neither you nor FeedXchange approves or revises it within 10 minutes, it is approved
+              automatically, and everyone involved is notified.
+            </p>
+          )}
         </div>
+        )}
 
         <div className="schedule-request-drawer__field schedule-request-drawer__field--checkbox">
           <label className="schedule-request-drawer__checkbox">

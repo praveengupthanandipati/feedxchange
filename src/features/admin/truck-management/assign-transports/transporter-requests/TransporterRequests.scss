@@ -145,6 +145,25 @@
     box-shadow: inset 4px 0 0 v.$color-danger;
   }
 
+  // The request opened from Schedules Management (?request=<id>), marked for a few seconds.
+  &__row.is-highlighted td {
+    background: v.alpha(v.$color-info, 0.16);
+    transition: background-color 0.6s ease;
+  }
+
+  &__row.is-highlighted td:first-child {
+    box-shadow: inset 4px 0 0 v.$color-info;
+  }
+
+  &__notice {
+    margin: 0 0 v.$spacing-3;
+    padding: v.$spacing-2 v.$spacing-3;
+    border-left: 4px solid v.$color-info;
+    border-radius: v.$radius-sm;
+    background: v.alpha(v.$color-info, 0.1);
+    font-size: v.$font-size-sm;
+  }
+
   &__group {
     cursor: pointer;
     user-select: none;
@@ -382,4 +401,14 @@
     font: inherit;
     cursor: pointer;
   }
+}
+
+// Freight bargaining: shown under the Accept button when the freight entered differs from the one offered
+.transporter-requests__counter-note {
+  display: block;
+  max-width: 22rem;
+  margin-top: 0.25rem;
+  color: var(--fx-tint-amber-fg, inherit);
+  font-size: max(11px, 0.78rem);
+  white-space: normal;
 }

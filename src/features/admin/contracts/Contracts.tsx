@@ -1,21 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
-import DatePickerInput from "../../../shared/components/dropdown/DatePickerInput";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ChevronLeftIcon,
   CircleCheckBigIcon,
   CircleXIcon,
   ChevronRightIcon,
-  DownloadIcon,
-  EyeIcon,
-  EyeOffIcon,
   PlusIcon,
   SearchIcon,
   XIcon,
 } from "../../../shared/components/icon";
 import Table from "../../../shared/components/table/Table";
-import type { TableColumn } from "../../../shared/components/table/table.types";
-import SearchableSelect from "../../../shared/components/dropdown/SearchableSelect";
+import { Button, Card, Input } from "../../../shared/components/ui";
+import SearchableSelectField from "../../../shared/components/dropdown/SearchableSelectField";
+import { describePeriod, periodFor, type Period, type PeriodKey } from "../business-dashboard/businessDashboard.utils";
+import BusinessPeriodFields from "../common/business-period/BusinessPeriodFields";
+import { useBusinessFilter } from "../common/business-period/useBusinessFilter";
+import { ALL_TIME, inPeriod } from "../common/business-period/period";
 import ConfirmDialog from "../../../shared/components/dialog/ConfirmDialog";
 import {
   useDeleteContractMutation,
@@ -28,7 +28,7 @@ import { buildContractColumns } from "./contracts.columns";
 import { mapApiContract } from "./contractRow";
 import { useSuccessToast } from "../../../shared/components/toast/useSuccessToast";
 import SuccessToast from "../../../shared/components/toast/SuccessToast";
-import { DEFAULT_DATE_RANGE, DEFAULT_STATUS_FILTER, dateRangeOptions, type Contract } from "./contracts.data";
+import { DEFAULT_STATUS_FILTER, type Contract } from "./contracts.data";
 import ContractsDashboard, { ContractsFilterBar } from "./dashboard/ContractsDashboard";
 import { ATTENTION, inAttention, type AttentionKind, type MonthBar } from "./dashboard/contractsDashboard.utils";
 import { ChartColumnIcon } from "../../../shared/components/icon";
@@ -53,16 +53,10 @@ const isoDay = (time: number) => {
   const date = new Date(time);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 };
-const DAY_MS = 24 * 60 * 60 * 1000;
-function getExportCellValue(row: Contract, column: TableColumn<Contract>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
+/** The list opens on this financial year (the same default as the Business Dashboard). */
+const DEFAULT_PERIOD_KEY: Exclude<PeriodKey, "custom"> = "thisFY";
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
+
 
 function normalizeStatus(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -106,10 +100,10 @@ const Contracts = () => {
   [contractStatuses],
 );
   const [deleteContract] = useDeleteContractMutation();
-  const [dateRangeFilter, setDateRangeFilter] = useState(showAllOnOpen ? "All" : DEFAULT_DATE_RANGE);
-  const [customFrom, setCustomFrom] = useState("");
-  const [customTo, setCustomTo] = useState("");
-  const [filtersVisible, setFiltersVisible] = useState(false);
+  // Business: "All" = every business the user may see (staff: all; an owner: own + linked), owners start on their own.
+  const business = useBusinessFilter();
+  // Period (contract date): the Business Dashboard's presets; a month bar in the overview sets a custom range.
+  const [period, setPeriod] = useState<Period>(() => (showAllOnOpen ? ALL_TIME : periodFor(DEFAULT_PERIOD_KEY)));
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Contract | null>(null);
@@ -118,9 +112,15 @@ const Contracts = () => {
   const [monthStart, setMonthStart] = useState<number | null>(null);
   const [dashboardShown, setDashboardShown] = useState(readDashboardShown);
   const [now] = useState(() => Date.now());
+  // The chosen business's contracts (as seller or buyer): the list and the overview both follow it.
+  const matchesBusiness = business.matches;
+  const businessData = useMemo(() => data?.filter((contract) => matchesBusiness(contract.sellerId, contract.buyerId)), [data, matchesBusiness]);
   const focusIds = useMemo(
-    () => (focus && data ? new Set(data.filter((contract) => inAttention(focus, contract, now)).map((contract) => contract.contractNumber)) : null),
-    [focus, data, now],
+    () =>
+      focus && businessData
+        ? new Set(businessData.filter((contract) => inAttention(focus, contract, now)).map((contract) => contract.contractNumber))
+        : null,
+    [focus, businessData, now],
   );
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -197,12 +197,9 @@ const Contracts = () => {
   // }, [data]);
 
   useEffect(() => {
-  if (!data) return;
-
-    setRows(
-      data.map(mapApiContract),
-    );
-}, [data]);
+    if (!businessData) return;
+    setRows(businessData.map(mapApiContract));
+  }, [businessData]);
 
   // Success messages left by the contract form / Change Status are shown by useSuccessToast above.
 
@@ -252,7 +249,7 @@ const Contracts = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, statusFilter, dateRangeFilter, customFrom, customTo, focus]);
+  }, [keyword, statusFilter, period, business.selectedId, focus]);
 
   // The default "Open" is matched to the status list's own value once it loads, so the Status dropdown shows it selected.
   useEffect(() => {
@@ -290,82 +287,8 @@ const filteredRows = useMemo(() => {
     }
     
 
-    // Date filters
-    if (dateRangeFilter === "Yesterday") {
-      const yesterday = new Date(Date.now() - DAY_MS).toDateString();
-      if (!row.dateValue || new Date(row.dateValue).toDateString() !== yesterday) {
-        return false;
-      }
-    }
-
-    if (dateRangeFilter === "Today") {
-      const rowDate = new Date(row.dateValue);
-      const today = new Date();
-
-      if (rowDate.toDateString() !== today.toDateString()) {
-        return false;
-      }
-    }
-
-    if (dateRangeFilter === "Last 7 Days") {
-       const endOfToday = new Date().setHours(23, 59, 59, 999);
-       if (row.dateValue < Date.now() - 7 * DAY_MS || row.dateValue > endOfToday) {
-         return false;
-       }
-      if (row.dateValue < Date.now() - 7 * DAY_MS) {
-        return false;
-      }
-    }
-
-    if (dateRangeFilter === "Last 30 Days") {
-      // const endOfToday = new Date().setHours(23, 59, 59, 999);
-      // if (row.dateValue < Date.now() - 30 * DAY_MS || row.dateValue > endOfToday) {
-      //   return false;
-      // }
-      if (row.dateValue < Date.now() - 30 * DAY_MS) {
-        return false;
-      }
-    }
-
-    if (dateRangeFilter === "Previous Month") {
-      const today = new Date();
-
-      const firstOfThisMonth = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        1,
-      ).getTime();
-
-      const firstOfPreviousMonth = new Date(
-        today.getFullYear(),
-        today.getMonth() - 1,
-        1,
-      ).getTime();
-
-      if (
-        row.dateValue < firstOfPreviousMonth ||
-        row.dateValue >= firstOfThisMonth
-      ) {
-        return false;
-      }
-    }
-
-    if (dateRangeFilter === "Custom Date Range") {
-      if (
-        customFrom &&
-        row.dateValue < new Date(customFrom).getTime()
-      ) {
-        return false;
-      }
-
-      if (
-        customTo &&
-        row.dateValue >
-          new Date(customTo).getTime() + DAY_MS - 1
-      ) {
-        return false;
-      }
-    }
+    // Period (contract date)
+    if (!inPeriod(period, row.dateValue)) return false;
 
     // Search
     if (searchText) {
@@ -390,9 +313,7 @@ const filteredRows = useMemo(() => {
   contractStatuses,
   keyword,
   statusFilter,
-  dateRangeFilter,
-  customFrom,
-  customTo,
+  period,
   focusIds,
 ]);
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
@@ -402,12 +323,14 @@ const filteredRows = useMemo(() => {
     currentPageClamped * PAGE_SIZE,
   );
 
-  const totalQuantityValue = rows.reduce((sum, row) => sum + row.qtyValue, 0);
 
   const dataShowingLabel =
     [
-      statusFilter && statusFilter !== "All" ? statusFilter : null,
-      dateRangeFilter !== "All" ? dateRangeFilter : null,
+      business.selectedName,
+      statusFilter && statusFilter !== "All"
+        ? (statusOptions.find((option) => option.value === statusFilter)?.label ?? statusFilter)
+        : null,
+      period.key !== "all" ? describePeriod(period.from, period.to) : null,
       focus ? ATTENTION[focus].label : null,
     ]
       .filter(Boolean)
@@ -416,11 +339,19 @@ const filteredRows = useMemo(() => {
   const handleClearFilters = () => {
     setKeyword("");
     setStatusFilter("");
-    setDateRangeFilter("All");
-    setCustomFrom("");
-    setCustomTo("");
+    business.reset();
+    setPeriod(ALL_TIME);
     setFocus(null);
     setMonthStart(null);
+  };
+
+  const filtersActive =
+    keyword.trim() !== "" || statusFilter !== "" || business.value !== business.defaultValue || period.key !== "all" || focus !== null;
+
+  /** A period picked in the filter row replaces a month picked in the overview. */
+  const changePeriod = (next: Period) => {
+    setMonthStart(null);
+    setPeriod(next);
   };
 
   // ---------- overview -> the list's filters ----------
@@ -439,10 +370,8 @@ const filteredRows = useMemo(() => {
   // The overview counts every contract, so a pick there lists all dates (Yesterday etc. would hide most of them).
   // A month bar is itself a date filter and is kept.
   const showAllDates = () => {
-    if (dateRangeFilter === "Custom Date Range" && monthStart !== null) return;
-    setDateRangeFilter("All");
-    setCustomFrom("");
-    setCustomTo("");
+    if (period.key === "custom" && monthStart !== null) return;
+    setPeriod(ALL_TIME);
   };
 
   const pickStatus = (status: string) => {
@@ -464,17 +393,13 @@ const filteredRows = useMemo(() => {
   const pickMonth = (month: MonthBar) => {
     if (monthStart === month.start) {
       setMonthStart(null);
-      setDateRangeFilter("All");
-      setCustomFrom("");
-      setCustomTo("");
+      setPeriod(ALL_TIME);
       return;
     }
     const start = new Date(month.start);
     const end = new Date(start.getFullYear(), start.getMonth() + 1, 0).getTime();
     setMonthStart(month.start);
-    setDateRangeFilter("Custom Date Range");
-    setCustomFrom(isoDay(month.start));
-    setCustomTo(isoDay(end));
+    setPeriod({ key: "custom", from: isoDay(month.start), to: isoDay(end) });
   };
 
   const pickSearch = (text: string) => {
@@ -482,42 +407,45 @@ const filteredRows = useMemo(() => {
     setKeyword((current) => (current.toLowerCase() === text.toLowerCase() ? "" : text));
   };
 
-  const handleExport = () => {
-    const exportColumns = columns.filter((column) => column.key !== "actions");
-    const headerRow = exportColumns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = exportColumns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "contracts.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
   
   
-  const totalContractsValue = rows.length;
 
   return (
     <div className="contracts-page">
-      <button type="button" className="contracts-dashboard-toggle" aria-expanded={dashboardShown} onClick={toggleDashboard}>
-        <ChartColumnIcon aria-hidden /> {dashboardShown ? "Hide overview" : "Show overview"}
-      </button>
+      {/* Every filter at the top: the overview and the list below both follow it */}
+      <Card className="contracts-top-filters" aria-label="Contract filters">
+        <div className="bp-filters" role="search" aria-label="Filter contracts">
+          <BusinessPeriodFields business={business} period={period} onPeriodChange={changePeriod} />
+          <SearchableSelectField
+            label="Status"
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[{ value: "", label: "All statuses" }, ...statusOptions]}
+          />
+          <Input
+            label="Search"
+            type="search"
+            icon={SearchIcon}
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+            placeholder="Contract no, seller, buyer, product"
+            fieldClassName="bp-filters__search"
+          />
+          <Button icon={XIcon} onClick={handleClearFilters} disabled={!filtersActive} title="Clear filters">
+            Clear
+          </Button>
+          <Button icon={ChartColumnIcon} aria-expanded={dashboardShown} onClick={toggleDashboard} className="contracts-top-filters__overview">
+            {dashboardShown ? "Hide overview" : "Show overview"}
+          </Button>
+        </div>
+        {business.failed && (
+          <p className="bp-filters__summary">The business list could not be loaded; showing every contract you can see.</p>
+        )}
+      </Card>
 
       {dashboardShown && (
         <ContractsDashboard
-          contracts={data}
+          contracts={businessData}
           loading={isLoading}
           error={isError}
           now={now}
@@ -525,7 +453,7 @@ const filteredRows = useMemo(() => {
             status: statusFilter,
             focus,
             search: keyword,
-            monthStart: dateRangeFilter === "Custom Date Range" ? monthStart : null,
+            monthStart: period.key === "custom" ? monthStart : null,
           }}
           onStatus={pickStatus}
           onFocus={pickFocus}
@@ -535,20 +463,6 @@ const filteredRows = useMemo(() => {
         />
       )}
 
-      {/* the overview has these figures and more; the two tiles stay for anyone who hides it */}
-      {!dashboardShown && (
-      <div className="contracts-page__summary">
-        <div className="contracts-summary contracts-summary--primary">
-          <span>Total Contracts</span>
-          <strong>{totalContractsValue}</strong>
-        </div>
-        <div className="contracts-summary contracts-summary--success">
-          <span>Total Quantity</span>
-          <strong>{totalQuantityValue.toLocaleString("en-IN")} MT</strong>
-        </div>
-      </div>
-      )}
-
       {/* What the overview picked, right above the list it filters */}
       {dashboardShown && (
         <ContractsFilterBar
@@ -556,7 +470,7 @@ const filteredRows = useMemo(() => {
             status: statusFilter,
             focus,
             search: keyword,
-            monthStart: dateRangeFilter === "Custom Date Range" ? monthStart : null,
+            monthStart: period.key === "custom" ? monthStart : null,
           }}
           onClear={handleClearFilters}
         />
@@ -569,21 +483,6 @@ const filteredRows = useMemo(() => {
             <p>Data Showing: {dataShowingLabel}</p>
           </div>
           <div className="contracts-card__actions">
-            <button
-              type="button"
-              className="contracts-btn contracts-btn--outline"
-              onClick={() => setFiltersVisible((prev) => !prev)}
-            >
-              {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
-              {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button
-              type="button"
-              className="contracts-btn contracts-btn--warning"
-              onClick={handleExport}
-            >
-              <DownloadIcon aria-hidden /> Export
-            </button>
             <Can any={["contracts.manage"]}>
               <button
                 type="button"
@@ -595,63 +494,6 @@ const filteredRows = useMemo(() => {
             </Can>
           </div>
         </div>
-
-        {filtersVisible && (
-          <div className="contracts-filters">
-            <SearchableSelect
-              options={dateRangeOptions}
-              value={dateRangeFilter}
-              onChange={setDateRangeFilter}
-              ariaLabel="Filter by date range"
-            />
-
-            <div className="contracts-filters__search">
-              <SearchIcon aria-hidden />
-              <input
-                type="text"
-                value={keyword}
-                onChange={(event) => setKeyword(event.target.value)}
-                placeholder="Search by Contract No, Seller, Buyer, Product"
-              />
-            </div>
-
-            {dateRangeFilter === "Custom Date Range" && (
-              <div className="contracts-filters__date-range">
-                <DatePickerInput
-                  value={customFrom}
-                  onChange={(value) => setCustomFrom(value)}
-                  ariaLabel="From date"
-                  clearable
-                />
-                <span>to</span>
-                <DatePickerInput
-                  value={customTo}
-                  onChange={(value) => setCustomTo(value)}
-                  ariaLabel="To date"
-                  clearable
-                />
-              </div>
-            )}
-
-            <SearchableSelect
-              options={statusOptions}
-              value={statusFilter}
-              onChange={setStatusFilter}
-              placeholder="Select Status"
-              ariaLabel="Filter by status"
-            />
-
-            <button
-              type="button"
-              className="contracts-filters__clear"
-              onClick={handleClearFilters}
-              title="Clear filters"
-              aria-label="Clear filters"
-            >
-              <XIcon aria-hidden />
-            </button>
-          </div>
-        )}
 
         {selectedPendingNumbers.length > 0 && (
           <Can any={["contracts.manage", "contract-status"]}>
@@ -686,6 +528,9 @@ const filteredRows = useMemo(() => {
   <ContractsLoader />
 ) : (
         <Table
+          exportName="Contracts"
+          exportData={filteredRows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}

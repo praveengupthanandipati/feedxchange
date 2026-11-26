@@ -74,7 +74,7 @@ const Users = () => {
         </p>
       )}
 
-      <UsersTable rows={paged} emptyMessage={emptyMessage} onEdit={(user) => openPanel({ mode: "edit", user })} onDelete={setDeleting} />
+      <UsersTable rows={paged} exportRows={users} emptyMessage={emptyMessage} onEdit={(user) => openPanel({ mode: "edit", user })} onDelete={setDeleting} />
       <UserCards rows={paged} emptyMessage={emptyMessage} onEdit={(user) => openPanel({ mode: "edit", user })} onDelete={setDeleting} />
 
       <UsersPagination page={currentPage} pageSize={PAGE_SIZE} total={users.length} onPageChange={setPage} />

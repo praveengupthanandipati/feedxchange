@@ -305,35 +305,15 @@
   white-space: nowrap;
 }
 
-.nc-table-wrap {
-  overflow-x: auto;
-}
-
+// Notification history list: the shared Table (header, rows, toolbar); only the cell details are styled here.
 .nc-table {
-  width: 100%;
-  min-width: 56rem;
-  border-collapse: collapse;
-  font-size: v.$font-size-sm;
-
-  th {
-    padding: v.$spacing-3 v.$spacing-4;
-    background-color: v.$color-gray-50;
-    color: v.fg(v.$color-text-muted);
-    font-size: max(11px, 0.72rem);
-    font-weight: v.$font-weight-semibold;
-    letter-spacing: 0.04em;
-    text-align: left;
-    text-transform: uppercase;
-  }
-
   td {
-    padding: v.$spacing-3 v.$spacing-4;
-    border-top: 1px solid v.line(v.$color-border);
     vertical-align: top;
   }
 
-  tbody tr:hover {
-    background-color: v.$color-gray-50;
+  .nc-stack {
+    display: inline-flex;
+    flex-direction: column;
   }
 
   small {

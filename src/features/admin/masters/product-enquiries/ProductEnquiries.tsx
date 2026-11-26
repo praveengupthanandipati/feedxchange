@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import { productEnquiries, type EnquiryUpdate, type ProductEnquiry } from "./productEnquiries.data";
-import { exportEnquiries, matchesSearch } from "./productEnquiries.utils";
+import { matchesSearch } from "./productEnquiries.utils";
 import EnquiriesFilters from "./components/EnquiriesFilters";
 import EnquiriesHeader from "./components/EnquiriesHeader";
 import EnquiriesPagination from "./components/EnquiriesPagination";
@@ -52,7 +52,7 @@ const ProductEnquiries = () => {
 
   return (
     <div className="product-enquiries">
-      <EnquiriesHeader filtersVisible={filtersVisible} onToggleFilters={() => setFiltersVisible((prev) => !prev)} onExport={() => exportEnquiries(filtered)} canExport={filtered.length > 0} />
+      <EnquiriesHeader filtersVisible={filtersVisible} onToggleFilters={() => setFiltersVisible((prev) => !prev)} />
 
       {filtersVisible && (
         <EnquiriesFilters
@@ -75,7 +75,7 @@ const ProductEnquiries = () => {
         </p>
       )}
 
-      <EnquiriesTable rows={paged} emptyMessage={emptyMessage} onUpdateStatus={openPanel} />
+      <EnquiriesTable rows={paged} exportRows={filtered} emptyMessage={emptyMessage} onUpdateStatus={openPanel} />
       <EnquiryCards rows={paged} emptyMessage={emptyMessage} onUpdateStatus={openPanel} />
 
       <EnquiriesPagination page={currentPage} pageSize={PAGE_SIZE} total={filtered.length} onPageChange={setPage} />

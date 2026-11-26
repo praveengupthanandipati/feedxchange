@@ -406,6 +406,9 @@ const SellerTruckReview = () => {
 
               <div className="seller-truck-review__table-view">
                 <Table
+                  exportName="Seller Truck Review"
+                  exportData={contracts}
+                  columnToggle
                   columns={contractColumns}
                   data={pagedContracts}
                   rowKey={(contract) => contract.id}

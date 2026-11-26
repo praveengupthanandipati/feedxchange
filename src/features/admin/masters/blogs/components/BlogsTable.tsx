@@ -5,11 +5,13 @@ import { BlogActions, BlogLink, BlogStatusBadge, type BlogActionHandlers } from 
 
 export interface BlogListProps extends BlogActionHandlers {
   rows: Blog[];
+  /** Every filtered row (the page passes only the current page as rows), for the row count and CSV / PDF export. */
+  exportRows?: Blog[];
   emptyMessage: string;
 }
 
 /** Laptop and desktop view. */
-const BlogsTable = ({ rows, emptyMessage, onEdit, onDelete }: BlogListProps) => {
+const BlogsTable = ({ rows, exportRows, emptyMessage, onEdit, onDelete }: BlogListProps) => {
   const columns: TableColumn<Blog>[] = [
     {
       key: "image",
@@ -37,7 +39,7 @@ const BlogsTable = ({ rows, emptyMessage, onEdit, onDelete }: BlogListProps) => 
 
   return (
     <div className="blogs__table-view">
-      <Table columns={columns} data={rows} rowKey={(row) => row.id} className="blogs__table" emptyMessage={emptyMessage} />
+      <Table exportName="Blogs" exportData={exportRows} columnToggle columns={columns} data={rows} rowKey={(row) => row.id} className="blogs__table" emptyMessage={emptyMessage} />
     </div>
   );
 };

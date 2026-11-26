@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DownloadIcon, EyeIcon, EyeOffIcon, PlusIcon } from "../../../../../shared/components/icon";
+import { EyeIcon, EyeOffIcon, PlusIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import SuccessToast from "../../../../../shared/components/toast/SuccessToast";
 import { useSuccessToast } from "../../../../../shared/components/toast/useSuccessToast";
 import TruckTripFilters from "./TruckTripFilters";
@@ -25,15 +24,7 @@ function buildStringOptions(values: string[], allLabel: string): FilterOption[] 
   return [{ value: "All", label: allLabel }, ...unique.map((value) => ({ value, label: value }))];
 }
 
-function getExportCellValue(row: TruckTrip, column: TableColumn<TruckTrip>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const TruckTripPage = () => {
   const navigate = useNavigate();
@@ -104,29 +95,6 @@ const TruckTripPage = () => {
     currentPageClamped * PAGE_SIZE,
   );
 
-  const handleExport = () => {
-    const exportColumns = columns.filter((column) => column.key !== "actions");
-    const headerRow = exportColumns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = exportColumns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "truck-trips.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="truck-trip-page">
@@ -142,9 +110,6 @@ const TruckTripPage = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button type="button" className="truck-trip-btn truck-trip-btn--warning" onClick={handleExport}>
-              <DownloadIcon aria-hidden /> Export
             </button>
             <Can any={["truck-trips.manage"]}>
               <button
@@ -182,6 +147,9 @@ const TruckTripPage = () => {
         )}
 
         <Table
+          exportName="Truck Trips"
+          exportData={filteredRows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => String(row.tripId)}

@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useOpenAndPendingContracts } from "../../../../core/store/useOpenAndPendingContracts";
 import { useProfileCities } from "../../../../shared/hooks/useProfileCities";
-import { ChevronLeftIcon, ChevronRightIcon, FileTextIcon, PlusIcon, SearchIcon } from "../../../../shared/components/icon";
+import { FileTextIcon, PlusIcon, SearchIcon } from "../../../../shared/components/icon";
 import { useGetInvoiceContractsQuery, type InvoiceContract } from "../../../../core/store/sellerInvoiceApi";
 import { financialYearOf } from "../../contracts/contract-status/contractStatus.data";
 import { money } from "../seller-invoice/sellerInvoice.data";
+import Table from "../../../../shared/components/table/Table";
+import type { TableColumn } from "../../../../shared/components/table/table.types";
 import "./PendingContractsPanel.scss";
 
 interface PendingContractsPanelProps {
@@ -32,7 +34,6 @@ const mt = (value: number | null | undefined) => (value == null ? "" : `${value}
  */
 const PendingContractsPanel = ({ financialYear, onSelect, onDetails }: PendingContractsPanelProps) => {
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
   const { label: partyLabel } = useProfileCities();
   const { data: contracts, isLoading, isError, refetch } = useGetInvoiceContractsQuery({}, { refetchOnMountOrArgChange: true });
   // The details the Open & Pending Contracts screen shows (despatched / arranged quantity, delivery schedule, payment terms).
@@ -52,13 +53,49 @@ const PendingContractsPanel = ({ financialYear, onSelect, onDetails }: PendingCo
       .sort((a, b) => (b.contractDate ?? "").localeCompare(a.contractDate ?? ""));
   }, [contracts, financialYear, search]);
 
-  useEffect(() => setPage(1), [financialYear, search]);
-
-  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const currentPage = Math.min(page, pageCount);
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const pageRows = rows.slice(start, start + PAGE_SIZE);
-  const colCount = 15;
+  /** Despatched / arranged / pending from the Open & Pending list (undefined until it loads). */
+  const qty = (c: InvoiceContract) => {
+    const d = details.get(c.contractNumber);
+    const total = d?.totalQuantityMT ?? c.totalQtyMT;
+    const despatched = d?.dispatchedQuantityMT;
+    const pending = d?.pendingQuantityMT;
+    return { d, total, despatched, pending, arranged: d ? Math.max(total - (despatched ?? 0) - (pending ?? 0), 0) : undefined };
+  };
+  const num = (key: string, header: string, value: (c: InvoiceContract) => number | null | undefined, title?: string): TableColumn<InvoiceContract> => ({
+    key, header, headerTooltip: title, sortable: true, align: "right",
+    render: (c) => mt(value(c)), sortValue: (c) => value(c) ?? -1, exportValue: (c) => mt(value(c)),
+  });
+  const columns: TableColumn<InvoiceContract>[] = [
+    { key: "contractNumber", header: "Contract #", sortable: true, hideable: false, render: (c) => <span className="si-pending__contract-no">{c.contractNumber}</span> },
+    { key: "contractDate", header: "Contract Date", sortable: true, render: (c) => formatDate(c.contractDate), exportValue: (c) => formatDate(c.contractDate) },
+    { key: "sellerName", header: "Seller", sortable: true, render: (c) => partyLabel(c.sellerName, c.sellerId), exportValue: (c) => partyLabel(c.sellerName, c.sellerId) },
+    { key: "buyerName", header: "Buyer", sortable: true, render: (c) => partyLabel(c.buyerName, c.buyerId), exportValue: (c) => partyLabel(c.buyerName, c.buyerId) },
+    { key: "productName", header: "Product", sortable: true },
+    { key: "ratePerMT", header: "Rate / MT", sortable: true, align: "right", render: (c) => money(c.ratePerMT), exportValue: (c) => String(c.ratePerMT) },
+    { key: "gstPercent", header: "GST %", sortable: true, align: "right", render: (c) => `${c.gstPercent}%` },
+    num("totalQty", "Contract Qty", (c) => qty(c).total),
+    num("despatched", "Despatched", (c) => qty(c).despatched),
+    num("arranged", "Arranged", (c) => qty(c).arranged),
+    num("pending", "Pending", (c) => qty(c).pending),
+    num("pendingQtyMT", "To Invoice", (c) => c.pendingQtyMT, "Contract quantity not invoiced yet"),
+    { key: "deliverySchedule", header: "Delivery Schedule", priority: "low", render: (c) => qty(c).d?.deliverySchedule ?? "", exportValue: (c) => qty(c).d?.deliverySchedule ?? "" },
+    { key: "paymentTermName", header: "Payment Terms", priority: "low", render: (c) => qty(c).d?.paymentTermName ?? "", exportValue: (c) => qty(c).d?.paymentTermName ?? "" },
+    {
+      key: "actions",
+      header: "",
+      hideable: false,
+      render: (c) => (
+        <div className="si-pending__actions">
+          <button type="button" className="si-icon-btn" onClick={() => onDetails(c.contractNumber)} aria-label={`Contract ${c.contractNumber} details`} title="Contract details">
+            <SearchIcon aria-hidden />
+          </button>
+          <button type="button" className="si-pending__select" onClick={() => onSelect(c)} title="Add an invoice against this contract">
+            <PlusIcon aria-hidden /> Add invoice
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <section className="si-pending" aria-labelledby="si-pending-title">
@@ -80,102 +117,27 @@ const PendingContractsPanel = ({ financialYear, onSelect, onDetails }: PendingCo
         </div>
       </div>
 
-      <div className="si-pending__table-wrapper">
-        <table className="si-pending__table">
-          <thead>
-            <tr>
-              <th>Contract #</th>
-              <th>Contract Date</th>
-              <th>Seller</th>
-              <th>Buyer</th>
-              <th>Product</th>
-              <th className="si-pending__num">Rate / MT</th>
-              <th className="si-pending__num">GST %</th>
-              <th className="si-pending__num">Contract Qty</th>
-              <th className="si-pending__num">Despatched</th>
-              <th className="si-pending__num">Arranged</th>
-              <th className="si-pending__num">Pending</th>
-              <th className="si-pending__num">To Invoice</th>
-              <th>Delivery Schedule</th>
-              <th>Payment Terms</th>
-              <th aria-label="Actions" />
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={colCount} className="si-pending__empty">Loading pending contracts…</td>
-              </tr>
-            ) : isError ? (
-              <tr>
-                <td colSpan={colCount} className="si-pending__empty">
-                  The pending contracts could not be loaded.{" "}
-                  <button type="button" className="si-link-btn" onClick={() => refetch()}>
-                    Try again
-                  </button>
-                </td>
-              </tr>
-            ) : pageRows.length === 0 ? (
-              <tr>
-                <td colSpan={colCount} className="si-pending__empty">
-                  {search.trim()
-                    ? "No pending contracts match your search."
-                    : `No pending contracts${financialYear ? ` in ${financialYear}` : ""}.`}
-                </td>
-              </tr>
-            ) : (
-              pageRows.map((c) => {
-                const d = details.get(c.contractNumber);
-                const total = d?.totalQuantityMT ?? c.totalQtyMT;
-                const despatched = d?.dispatchedQuantityMT;
-                const pending = d?.pendingQuantityMT;
-                const arranged = d ? Math.max(total - (despatched ?? 0) - (pending ?? 0), 0) : undefined;
-                return (
-                  <tr key={c.contractNumber}>
-                    <td className="si-pending__contract-no">{c.contractNumber}</td>
-                    <td>{formatDate(c.contractDate)}</td>
-                    <td className="si-pending__party" title={partyLabel(c.sellerName, c.sellerId)}>{partyLabel(c.sellerName, c.sellerId)}</td>
-                    <td className="si-pending__party" title={partyLabel(c.buyerName, c.buyerId)}>{partyLabel(c.buyerName, c.buyerId)}</td>
-                    <td>{c.productName}</td>
-                    <td className="si-pending__num">{money(c.ratePerMT)}</td>
-                    <td className="si-pending__num">{c.gstPercent}%</td>
-                    <td className="si-pending__num">{mt(total)}</td>
-                    <td className="si-pending__num">{mt(despatched)}</td>
-                    <td className="si-pending__num">{mt(arranged)}</td>
-                    <td className="si-pending__num">{mt(pending)}</td>
-                    <td className="si-pending__num" title="Contract quantity not invoiced yet">{mt(c.pendingQtyMT)}</td>
-                    <td>{d?.deliverySchedule ?? ""}</td>
-                    <td>{d?.paymentTermName ?? ""}</td>
-                    <td>
-                      <div className="si-pending__actions">
-                        <button type="button" className="si-icon-btn" onClick={() => onDetails(c.contractNumber)} aria-label={`Contract ${c.contractNumber} details`} title="Contract details">
-                          <SearchIcon aria-hidden />
-                        </button>
-                        <button type="button" className="si-pending__select" onClick={() => onSelect(c)} title="Add an invoice against this contract">
-                          <PlusIcon aria-hidden /> Add invoice
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {!isLoading && !isError && pageCount > 1 && (
-        <div className="si-pending__pager">
-          <span>
-            {start + 1}–{Math.min(start + PAGE_SIZE, rows.length)} of {rows.length}
-          </span>
-          <button type="button" className="si-icon-btn" onClick={() => setPage(currentPage - 1)} disabled={currentPage <= 1} aria-label="Previous page">
-            <ChevronLeftIcon aria-hidden />
+      {isError ? (
+        <p className="si-pending__empty">
+          The pending contracts could not be loaded.{" "}
+          <button type="button" className="si-link-btn" onClick={() => refetch()}>
+            Try again
           </button>
-          <button type="button" className="si-icon-btn" onClick={() => setPage(currentPage + 1)} disabled={currentPage >= pageCount} aria-label="Next page">
-            <ChevronRightIcon aria-hidden />
-          </button>
-        </div>
+        </p>
+      ) : (
+        <Table
+          exportName="Contracts to Invoice"
+          exportSubtitle={financialYear ? `Financial year ${financialYear}` : undefined}
+          columnToggle
+          columns={columns}
+          data={rows}
+          rowKey={(c) => c.contractNumber}
+          pageSize={PAGE_SIZE}
+          loading={isLoading}
+          stickyFirstColumn
+          className="si-pending__table"
+          emptyMessage={search.trim() ? "No pending contracts match your search." : `No pending contracts${financialYear ? ` in ${financialYear}` : ""}.`}
+        />
       )}
     </section>
   );

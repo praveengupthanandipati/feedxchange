@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, CircleAlertIcon, Columns3Icon } from "../icon";
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, CircleAlertIcon, Columns3Icon, DownloadIcon, FileTextIcon } from "../icon";
+import { exportTableCsv, exportTablePdf } from "./tableExport";
 import { Skeleton } from "../ui";
 import InfoTooltip from "../tooltip/InfoTooltip";
 import type { SortDirection, TableColumn } from "./table.types";
@@ -37,6 +38,17 @@ interface TableProps<T> {
   pageSize?: number;
   /** Adds a Columns menu above the table to show or hide columns (see TableColumn.hidden / hideable). */
   columnToggle?: boolean;
+  /** The screen's own controls (search, filters), drawn above the table in one row with the row count, exports and Columns (last). */
+  toolbar?: ReactNode;
+  /**
+   * Turns on the row count, Export CSV and Export PDF in the toolbar; also the PDF title and the file name (e.g. "Contracts").
+   * The visible columns are exported, without row actions.
+   */
+  exportName?: string;
+  /** The rows to export and count when the screen pages them itself (pass every filtered row). Default: all rows of the table. */
+  exportData?: T[];
+  /** A line under the PDF title, e.g. the filters in use. */
+  exportSubtitle?: string;
   /** Below 768px each row becomes a card of "label: value" lines instead of a table that scrolls sideways. */
   mobileCards?: boolean;
 }
@@ -127,13 +139,17 @@ function Table<T>({
   expandedRowKey = null,
   expandedRowKeys,
   renderExpandedRow,
-  variant = "default",
+  variant = "light",
   className = "",
   onRowClick,
   loading = false,
   stickyFirstColumn = false,
   pageSize,
   columnToggle = false,
+  toolbar,
+  exportName,
+  exportData,
+  exportSubtitle,
   mobileCards = false,
 }: TableProps<T>) {
   const [hiddenKeys, setHiddenKeys] = useState<ReadonlySet<string>>(
@@ -168,6 +184,18 @@ function Table<T>({
 
     return sortDirection === "asc" ? sorted : sorted.reverse();
   }, [data, sortKey, sortDirection, columns]);
+
+  // export: the visible columns, and every row the screen passes (or every row of the table, in its current sort)
+  const exportRows = exportData ?? sortedData;
+  const [exporting, setExporting] = useState(false);
+  const runPdf = async () => {
+    setExporting(true);
+    try {
+      await exportTablePdf(exportName ?? "Export", shownColumns, exportRows, exportSubtitle);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleSort = (column: TableColumn<T>) => {
     if (!column.sortable) return;
@@ -342,12 +370,41 @@ function Table<T>({
       </div>
   );
 
-  if (!columnToggle && !pager) return table;
+  const hasToolbar = columnToggle || Boolean(toolbar) || Boolean(exportName);
+
+  if (!hasToolbar && !pager) return table;
   return (
     <div className="table-frame">
-      {columnToggle && (
-        <div className="table-toolbar">
-          <ColumnMenu columns={columns} hidden={hiddenKeys} onToggle={toggleColumn} />
+      {hasToolbar && (
+        <div className={`table-toolbar ${toolbar || exportName ? "table-toolbar--with-content" : ""}`}>
+          <div className="table-toolbar__content">{toolbar}</div>
+          {exportName && (
+            <>
+              <span className="table-toolbar__count" aria-live="polite">
+                {exportRows.length.toLocaleString("en-IN")} row{exportRows.length === 1 ? "" : "s"}
+              </span>
+              <button
+                type="button"
+                className="table-toolbar__btn"
+                onClick={() => exportTableCsv(exportName, shownColumns, exportRows)}
+                disabled={exportRows.length === 0}
+                title="Download these rows as a CSV file (opens in Excel)"
+              >
+                <DownloadIcon aria-hidden /> CSV
+              </button>
+              <button
+                type="button"
+                className="table-toolbar__btn"
+                onClick={runPdf}
+                disabled={exportRows.length === 0 || exporting}
+                aria-busy={exporting || undefined}
+                title="Download these rows as a PDF report"
+              >
+                <FileTextIcon aria-hidden /> PDF
+              </button>
+            </>
+          )}
+          {columnToggle && <ColumnMenu columns={columns} hidden={hiddenKeys} onToggle={toggleColumn} />}
         </div>
       )}
       {table}

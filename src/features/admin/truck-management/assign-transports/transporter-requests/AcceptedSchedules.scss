@@ -110,6 +110,43 @@
       border-radius: v.$radius-md;
       background: v.$color-gray-100;
       font-size: v.$font-size-sm;
+
+      &.is-editing {
+        outline: 2px solid v.alpha(v.$color-info, 0.5);
+      }
+    }
+  }
+
+  // Editing a truck in a re-assignment chain: only LR number and tracking link can change.
+  &__locked-note {
+    margin: 0 0 v.$spacing-2;
+    padding: v.$spacing-2 v.$spacing-3;
+    border-left: 4px solid v.$color-info;
+    border-radius: v.$radius-sm;
+    background: v.alpha(v.$color-info, 0.1);
+    font-size: v.$font-size-sm;
+  }
+
+  // Instant trucks: amber edge and a tag, so they read apart from scheduled ones.
+  &__card--instant {
+    border-left-color: v.$color-orange;
+  }
+
+  &__instant-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: v.$spacing-2;
+    padding: 0 v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background: v.alpha(v.$color-orange, 0.16);
+    color: v.fg(v.$color-orange-dark);
+    font-size: 0.75rem;
+    font-weight: v.$font-weight-semibold;
+
+    svg {
+      width: 0.75rem;
+      height: 0.75rem;
     }
   }
 
@@ -134,19 +171,22 @@
 
   &__row {
     display: grid;
-    grid-template-columns: 1.5rem repeat(2, minmax(10rem, 1.3fr)) repeat(2, minmax(7rem, 0.8fr)) minmax(10rem, 1.3fr) auto;
+    // # | Truck | Driver Name | Driver Contact No | Qty | LR | Tracking URL | buttons
+    grid-template-columns: 1.5rem minmax(9rem, 1.2fr) minmax(10rem, 1.3fr) minmax(9rem, 1fr) repeat(2, minmax(6rem, 0.7fr)) minmax(9rem, 1.1fr) auto;
     gap: v.$spacing-3;
     align-items: start;
     padding: v.$spacing-3;
     border-radius: v.$radius-md;
     background: v.$color-gray-100;
 
+    // Narrower: two fields per line, with the row number on a line of its own (it used to take a 1.5rem column that later fields
+    // wrapped into, squeezing e.g. "Driver Contact No").
     @include m.respond-below(lg) {
-      grid-template-columns: 1.5rem 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     @include m.respond-below(sm) {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 
@@ -155,6 +195,11 @@
     width: 1.5rem;
     height: 1.5rem;
     margin-top: 1.5rem;
+
+    @include m.respond-below(lg) {
+      grid-column: 1 / -1;
+      margin-top: 0;
+    }
     border-radius: 50%;
     background: v.$color-navy;
     color: v.fg(v.$color-white);
@@ -212,6 +257,26 @@
 
     &--delete {
       background: v.$color-danger;
+    }
+
+    &--edit {
+      background: v.$color-info;
+    }
+
+    // Edit / Delete inside a truck chip
+    &--small {
+      width: 1.75rem;
+      height: 1.75rem;
+
+      svg {
+        width: 0.875rem;
+        height: 0.875rem;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   }
 

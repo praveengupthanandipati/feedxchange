@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import DatePickerInput from "../../../../shared/components/dropdown/DatePickerInput";
 import {
   CheckIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   Maximize2Icon,
@@ -11,20 +10,11 @@ import {
 } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../shared/components/table/table.types";
 import { buildContractStatusColumns } from "./contractWiseStatus.columns";
 import { contractStatusRows, filterOptions, type ContractStatusRow } from "./contractWiseStatus.data";
 import "./ContractwiseStatus.scss";
 
-function getExportCellValue(row: ContractStatusRow, column: TableColumn<ContractStatusRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const ContractSuppliesPanel = ({ row }: { row: ContractStatusRow }) => (
   <div className="contract-wise-status-supplies">
@@ -112,32 +102,6 @@ const ContractwiseStatus = () => {
     setAppliedDateTo("");
   };
 
-  const handleExport = () => {
-    const headerRow = columns
-      .filter((column) => column.key !== "expand")
-      .map((column) => `<th>${escapeHtml(column.header)}</th>`)
-      .join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = columns
-          .filter((column) => column.key !== "expand")
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "contract-wise-status.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="contract-wise-status-page">
@@ -152,13 +116,6 @@ const ContractwiseStatus = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button
-              type="button"
-              className="contract-wise-status-btn contract-wise-status-btn--warning"
-              onClick={handleExport}
-            >
-              <DownloadIcon aria-hidden /> Export
             </button>
             <button
               type="button"
@@ -213,6 +170,8 @@ const ContractwiseStatus = () => {
         )}
 
         <Table
+          exportName="Contract Wise Status"
+          columnToggle
           columns={columns}
           data={filteredRows}
           rowKey={(row) => row.id}

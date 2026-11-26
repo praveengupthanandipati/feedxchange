@@ -114,7 +114,7 @@ const Banners = () => {
         </p>
       )}
 
-      <BannersTable rows={paged} emptyMessage={emptyMessage} onEdit={(banner) => setPanel({ mode: "edit", banner })} onDelete={setDeleting} />
+      <BannersTable rows={paged} exportRows={filtered} emptyMessage={emptyMessage} onEdit={(banner) => setPanel({ mode: "edit", banner })} onDelete={setDeleting} />
       <BannerCards rows={paged} emptyMessage={emptyMessage} onEdit={(banner) => setPanel({ mode: "edit", banner })} onDelete={setDeleting} />
 
       <BannersPagination page={currentPage} pageSize={PAGE_SIZE} total={filtered.length} onPageChange={setPage} />

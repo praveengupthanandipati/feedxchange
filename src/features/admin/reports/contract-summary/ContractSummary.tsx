@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from "react";
-import { CheckIcon, DownloadIcon, EyeIcon, EyeOffIcon, RefreshCwIcon } from "../../../../shared/components/icon";
+import { useState } from "react";
+import { CheckIcon, EyeIcon, EyeOffIcon, RefreshCwIcon } from "../../../../shared/components/icon";
 import DateRangeInput from "../../../../shared/components/dropdown/DateRangeInput";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import AccountSummaryTab from "./account-summary-tab/AccountSummaryTab";
@@ -18,11 +18,6 @@ const ContractSummary = () => {
   const [appliedDateFrom, setAppliedDateFrom] = useState("");
   const [appliedDateTo, setAppliedDateTo] = useState("");
 
-  const exportHandlerRef = useRef<(() => void) | null>(null);
-  const registerExport = useCallback((handler: (() => void) | null) => {
-    exportHandlerRef.current = handler;
-  }, []);
-
   const handleApply = () => {
     setAppliedFilter(selectedFilter);
     setAppliedDateFrom(dateFrom);
@@ -38,8 +33,6 @@ const ContractSummary = () => {
     setAppliedDateTo("");
   };
 
-  const handleExport = () => exportHandlerRef.current?.();
-
   return (
     <div className="contract-summary-page">
       <div className="contract-summary-card">
@@ -53,9 +46,6 @@ const ContractSummary = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button type="button" className="contract-summary-btn contract-summary-btn--warning" onClick={handleExport}>
-              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -114,10 +104,9 @@ const ContractSummary = () => {
             filterValue={appliedFilter}
             dateFrom={appliedDateFrom}
             dateTo={appliedDateTo}
-            onRegisterExport={registerExport}
           />
         ) : (
-          <AccountSummaryTab onRegisterExport={registerExport} />
+          <AccountSummaryTab />
         )}
       </div>
     </div>

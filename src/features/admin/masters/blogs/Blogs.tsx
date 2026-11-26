@@ -105,7 +105,7 @@ const Blogs = () => {
         </p>
       )}
 
-      <BlogsTable rows={paged} emptyMessage={emptyMessage} onEdit={(blog) => openPanel({ mode: "edit", blog })} onDelete={setDeleting} />
+      <BlogsTable rows={paged} exportRows={filtered} emptyMessage={emptyMessage} onEdit={(blog) => openPanel({ mode: "edit", blog })} onDelete={setDeleting} />
       <BlogCards rows={paged} emptyMessage={emptyMessage} onEdit={(blog) => openPanel({ mode: "edit", blog })} onDelete={setDeleting} />
 
       <BlogsPagination page={currentPage} pageSize={PAGE_SIZE} total={filtered.length} onPageChange={setPage} />

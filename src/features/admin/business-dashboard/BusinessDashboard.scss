@@ -1,0 +1,651 @@
+@use "../../../shared/assets/styles/variables" as v;
+@use "../../../shared/assets/styles/mixins" as m;
+
+// Business Dashboard. Theme tokens only (colours, tints, chart tokens), so it follows Light, Dark and High contrast.
+
+.business-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  min-width: 0;
+
+  @each $hue in ("blue", "teal", "green", "orange", "amber", "red", "purple") {
+    .bd-tint--#{$hue} {
+      --tint-bg: var(--fx-tint-#{$hue}-bg);
+      --tint-border: var(--fx-tint-#{$hue}-border);
+      --tint-accent: var(--fx-tint-#{$hue}-accent);
+      --tint-fg: var(--fx-tint-#{$hue}-fg);
+    }
+  }
+
+  .bd-muted {
+    color: v.fg(v.$color-text-muted);
+  }
+
+  .bd-mono {
+    font-family: v.$font-family-mono;
+    letter-spacing: 0.02em;
+  }
+
+  .bd-link {
+    @include m.focus-ring;
+    padding: 0;
+    border: none;
+    background: none;
+    color: v.fg(v.$color-primary);
+    font: inherit;
+    font-weight: v.$font-weight-semibold;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+}
+
+// ---------------------------------------------------------------- header filters
+
+.bd-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: v.$spacing-2;
+
+  .ui-field {
+    min-width: 9.5rem;
+  }
+
+  &__business {
+    min-width: min(18rem, 100%) !important;
+  }
+
+  @include m.respond-below(md) {
+    width: 100%;
+
+    .ui-field {
+      flex: 1 1 10rem;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- layout
+
+.bd-layout {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+  transition: opacity v.$transition-fast;
+
+  &.is-refreshing {
+    opacity: 0.65;
+  }
+}
+
+.bd-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: v.$spacing-3;
+
+  @media (min-width: 1100px) {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+
+  &__side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: v.$spacing-3;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (min-width: 1100px) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    @media (min-width: 1400px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}
+
+// ---------------------------------------------------------------- KPI cards
+
+.bd-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12.5rem), 1fr));
+  gap: v.$spacing-3;
+}
+
+.bd-kpi {
+  @include m.card;
+  display: grid;
+  grid-template-rows: auto auto 5px auto;
+  row-gap: 0.3rem;
+  min-width: 0;
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+  text-align: left;
+  color: v.fg(v.$color-text);
+
+  &[class*="bd-tint--"] {
+    border: 1px solid var(--tint-border);
+    border-left: 4px solid var(--tint-accent);
+    background-color: var(--tint-bg);
+    box-shadow: none;
+  }
+
+  &--button {
+    @include m.focus-ring;
+    cursor: pointer;
+    transition: box-shadow v.$transition-fast, transform v.$transition-fast;
+
+    &:hover {
+      box-shadow: v.$shadow-md;
+      transform: translateY(-1px);
+    }
+  }
+
+  &.is-active {
+    outline: 2px solid var(--tint-accent);
+    outline-offset: 1px;
+  }
+
+  &__head {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+  }
+
+  &__label {
+    @include m.truncate-text;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+  }
+
+  &__icon {
+    @include m.flex-center;
+    flex: 0 0 auto;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: v.$radius-md;
+    background-color: var(--tint-accent, v.$color-primary);
+    color: v.$color-white;
+  }
+
+  &__value {
+    @include m.truncate-text;
+    @include m.font-heading(v.$font-weight-bold);
+    font-size: v.$font-size-xl;
+    line-height: 1.2;
+    color: var(--tint-fg, v.fg(v.$color-text));
+  }
+
+  &__meter {
+    position: relative;
+    overflow: hidden;
+    height: 5px;
+    border-radius: v.$radius-pill;
+    background-color: v.alpha(v.$color-gray-500, 0.18);
+
+    &[aria-hidden="true"] {
+      background: none;
+    }
+  }
+
+  &__meter-fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--tint-accent, v.$color-primary);
+  }
+
+  &__note {
+    @include m.truncate-text;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.85rem);
+  }
+}
+
+// ---------------------------------------------------------------- profile
+
+.bd-profile {
+  &__head {
+    @include m.flex(row, flex-start, center, v.$spacing-3);
+  }
+
+  &__avatar {
+    @include m.flex-center;
+    @include m.font-heading(v.$font-weight-bold);
+    flex: 0 0 auto;
+    overflow: hidden;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: v.$radius-lg;
+    background-color: v.$color-primary;
+    color: v.$color-white;
+    font-size: v.$font-size-lg;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__title {
+    min-width: 0;
+
+    h2 {
+      @include m.font-heading(v.$font-weight-bold);
+      margin: 0;
+      font-size: v.$font-size-lg;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    p {
+      margin: 0.1rem 0 0;
+      font-size: v.$font-size-sm;
+    }
+  }
+
+  &__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.4rem;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
+    gap: v.$spacing-2 v.$spacing-3;
+    margin: 0;
+    padding: v.$spacing-3 0;
+    border-top: 1px solid v.line(v.$color-border);
+    border-bottom: 1px solid v.line(v.$color-border);
+  }
+
+  // Transporter Dashboard: Serving Locations between the details grid and the contact lines
+  &__serving {
+    padding-bottom: v.$spacing-3;
+    border-bottom: 1px solid v.line(v.$color-border);
+  }
+
+  &__contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: v.$font-size-sm;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: v.$spacing-2;
+      min-width: 0;
+      overflow-wrap: anywhere;
+
+      svg {
+        flex: 0 0 auto;
+        margin-top: 0.15rem;
+        color: v.fg(v.$color-text-muted);
+      }
+    }
+  }
+
+  &__counts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    gap: v.$spacing-2;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      padding: 0.5rem 0.65rem;
+      border-radius: v.$radius-md;
+      background-color: v.$color-bg-muted;
+    }
+
+    strong {
+      @include m.font-heading(v.$font-weight-bold);
+      font-size: v.$font-size-lg;
+      line-height: 1.2;
+    }
+
+    span {
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.8rem);
+    }
+  }
+
+  &__children {
+    font-size: v.$font-size-sm;
+  }
+}
+
+.bd-detail {
+  min-width: 0;
+
+  dt {
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
+    font-weight: v.$font-weight-medium;
+  }
+
+  dd {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    overflow-wrap: anywhere;
+  }
+}
+
+// ---------------------------------------------------------------- charts
+
+.bd-chart {
+  &__body {
+    height: 16rem;
+  }
+
+  &__empty {
+    @include m.flex-center;
+    flex: 1 1 auto;
+    min-height: 8rem;
+    margin: 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+  }
+}
+
+.bd-donut {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: v.$spacing-3;
+
+  &__chart {
+    position: relative;
+    flex: 0 0 9.5rem;
+    width: 9.5rem;
+    height: 9.5rem;
+  }
+
+  &__total {
+    @include m.flex(column, center, center);
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    strong {
+      @include m.font-heading(v.$font-weight-bold);
+      font-size: v.$font-size-xl;
+      line-height: 1;
+    }
+
+    small {
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.75rem);
+    }
+  }
+}
+
+.bd-legend {
+  flex: 1 1 9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: v.$font-size-sm;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
+
+    &.is-zero {
+      opacity: 0.55;
+    }
+  }
+
+  &__swatch {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 2px;
+  }
+
+  &__label {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__value {
+    font-weight: v.$font-weight-semibold;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.bd-ranked {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: v.$font-size-sm;
+
+  li:not(.bd-ranked__key) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 0.2rem;
+    column-gap: v.$spacing-2;
+  }
+
+  &__name {
+    @include m.truncate-text;
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__value {
+    color: v.fg(v.$color-text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__bar {
+    grid-column: 1 / -1;
+    display: flex;
+    overflow: hidden;
+    height: 6px;
+    border-radius: v.$radius-pill;
+    background-color: v.alpha(v.$color-gray-500, 0.15);
+
+    > span {
+      display: block;
+      height: 100%;
+    }
+  }
+
+  &__sold {
+    background-color: var(--fx-chart-1);
+  }
+
+  &__bought {
+    background-color: var(--fx-chart-4);
+  }
+
+  &__key {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: max(11px, 0.78rem);
+  }
+}
+
+// ---------------------------------------------------------------- tabs and tables
+
+.bd-details {
+  scroll-margin-top: 5rem;
+}
+
+.bd-tabs {
+  display: flex;
+  gap: v.$spacing-1;
+  overflow-x: auto;
+  margin-top: calc(-1 * v.$spacing-2);
+  border-bottom: 1px solid v.line(v.$color-border);
+  scrollbar-width: thin;
+
+  &__tab {
+    @include m.font-base(v.$font-weight-semibold);
+    @include m.focus-ring(v.$color-orange);
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-2;
+    padding: v.$spacing-2 v.$spacing-4;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      color: v.fg(v.$color-text);
+    }
+
+    &.is-active {
+      color: v.fg(v.$color-primary);
+      border-bottom-color: v.$color-orange;
+    }
+  }
+
+  &__count {
+    min-width: 1.4rem;
+    padding: 0 v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background-color: v.$color-bg-muted;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.8rem);
+    text-align: center;
+  }
+}
+
+.bd-tabpanel {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  min-width: 0;
+}
+
+.bd-toolbar {
+  @include m.flex(row, space-between, flex-end, v.$spacing-2);
+  flex-wrap: wrap;
+
+  // Search, filters, row count, Export CSV and (from the table) Columns: one row from 992px, wrapping below
+  &__filters {
+    flex: 1 1 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: v.$spacing-2;
+    min-width: 0;
+
+    > .ui-field {
+      flex: 0 0 auto;
+    }
+
+    > .bd-toolbar__search {
+      flex: 1 1 14rem;
+      max-width: 24rem;
+    }
+  }
+
+  &__search {
+    min-width: min(12rem, 100%);
+  }
+
+  @include m.respond-to(lg) {
+    flex-wrap: nowrap;
+
+    &__filters {
+      flex-wrap: nowrap;
+    }
+  }
+}
+
+.bd-note {
+  margin: 0;
+  padding: v.$spacing-2 v.$spacing-3;
+  border-radius: v.$radius-md;
+  background-color: var(--fx-tint-amber-bg);
+  color: v.fg(v.$color-text);
+  font-size: v.$font-size-sm;
+}
+
+.bd-cell-stack {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+
+  small {
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.78rem);
+  }
+
+  &--end {
+    align-items: flex-end;
+  }
+}
+
+.bd-cell-inline {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.bd-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$spacing-2;
+  min-width: 7rem;
+
+  &__track {
+    flex: 1 1 auto;
+    overflow: hidden;
+    height: 6px;
+    border-radius: v.$radius-pill;
+    background-color: v.alpha(v.$color-gray-500, 0.18);
+  }
+
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--fx-chart-2);
+  }
+
+  &__value {
+    min-width: 2.6rem;
+    font-size: max(11px, 0.8rem);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+}
+
+.bd-footnote {
+  margin: 0;
+  color: v.fg(v.$color-text-muted);
+  font-size: max(11px, 0.8rem);
+}

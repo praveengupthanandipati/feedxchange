@@ -4,7 +4,6 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CircleAlertIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   RefreshCwIcon,
@@ -12,7 +11,6 @@ import {
 } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../shared/components/table/table.types";
 import {
   Amount,
   ContractRate,
@@ -28,18 +26,7 @@ import "./PendingDeliveryOrders.scss";
 
 const PAGE_SIZE = 10;
 
-function getExportCellValue(
-  row: PendingDeliveryOrderRow,
-  column: TableColumn<PendingDeliveryOrderRow>,
-): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 interface MobileCardsProps {
   rows: PendingDeliveryOrderRow[];
@@ -185,28 +172,6 @@ const PendingDeliveryOrders = () => {
     setKeyword("");
   };
 
-  const handleExportToExcel = () => {
-    const headerRow = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = columns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<meta charset="utf-8"><table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "pending-delivery-orders.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="pending-dos-page">
@@ -223,13 +188,6 @@ const PendingDeliveryOrders = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button
-              type="button"
-              className="pending-dos-btn pending-dos-btn--warning"
-              onClick={handleExportToExcel}
-            >
-              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -276,6 +234,9 @@ const PendingDeliveryOrders = () => {
 
         <div className="pending-dos-table-view">
           <Table
+            exportName="Pending Delivery Orders"
+            exportData={filteredRows}
+            columnToggle
             columns={columns}
             data={pagedRows}
             rowKey={(row) => row.id}

@@ -4,6 +4,7 @@ import { MailIcon } from "../../../../../shared/components/icon";
 import SendMessageModal from "../../../../../shared/notifications/SendMessageModal";
 import Can from "../../../../../core/auth/Can";
 import type { TransporterProfile } from "./transporterDetail.data";
+import { ServingStateChips } from "../ServingLocations";
 import {
   useGetAllTransporterLinesQuery,
   useGetTransporterTypesByLineQuery,
@@ -118,6 +119,11 @@ const OverviewTab = ({ profile, profileId }: OverviewTabProps) => {
             }
           />
         </div>
+      </section>
+
+      <section className="business-owner-detail__section">
+        <h2 className="business-owner-detail__section-title">Serving Locations</h2>
+        <ServingStateChips source={profile.sourceStates} destination={profile.destinationStates} />
       </section>
 
       <section className="business-owner-detail__section">

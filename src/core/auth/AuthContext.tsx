@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { ReactNode } from "react";
 import { apiFetch, revokeSessionOnServer, SESSION_REFRESHED_EVENT } from "../api/tokenRefresh";
 import { unsubscribeWebPush } from "../../shared/notifications/webPush";
+import { resetApiCaches } from "../store/store";
 import { hasAnyPermission } from "./access";
 import { canOnPage, normalizeMenu } from "./menu";
 import type { AccessMenu, PageAction } from "./menu";
@@ -76,6 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     void unsubscribeWebPush();
     revokeSessionOnServer(); // reads the refresh token, so it must run before the session is cleared
     clearSession();
+    resetApiCaches(); // the next user must not see this user's cached data
     setMenu(null);
     setPostLogoutPath("/"); // signing out on purpose leads back to the public website
     setState(readState());
@@ -95,6 +97,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (lastUserId.current !== state.userId) {
       lastUserId.current = state.userId;
       setMenu(null);
+      // nor the previous user's cached API data (lists are limited per user on the server)
+      resetApiCaches();
     }
     if (!state.isAuthenticated || state.permissionKeys === null) return;
     const controller = new AbortController();

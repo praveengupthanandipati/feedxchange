@@ -11,7 +11,6 @@ import {
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   HouseIcon,
@@ -23,7 +22,6 @@ import {
 } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import Table from "../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../shared/components/table/table.types";
 import TruckList from "../contract-trucks/TruckList";
 import { useContractTruckDetails } from "../contract-trucks/useContractTruckDetails";
 import { buildPendingContractColumns } from "./pendingContracts.columns";
@@ -33,15 +31,7 @@ import "./PendingContracts.scss";
 const PAGE_SIZE = 10;
 const ALL_OPTION = { value: "All", label: "All" };
 
-function getExportCellValue(row: PendingContractRow, column: TableColumn<PendingContractRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const PendingContractsLoader = () => (
   <div
@@ -290,30 +280,6 @@ const PendingContracts = () => {
     setKeyword("");
   };
 
-  const handleExportToExcel = () => {
-    const headerRow = pendingContractColumns
-      .map((column) => `<th>${escapeHtml(column.header)}</th>`)
-      .join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = pendingContractColumns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "pending-contracts.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="pending-contracts-page">
@@ -328,13 +294,6 @@ const PendingContracts = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button
-              type="button"
-              className="pending-contracts-btn pending-contracts-btn--warning"
-              onClick={handleExportToExcel}
-            >
-              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -408,6 +367,9 @@ const PendingContracts = () => {
           <PendingContractsLoader />
         ) : (
           <Table
+            exportName="Pending Contract Transport"
+            exportData={filteredRows}
+            columnToggle
             columns={pendingContractColumns}
             data={pagedRows}
             rowKey={(row) => row.id}

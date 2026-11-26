@@ -90,6 +90,8 @@ const Refunds = () => {
   const { cityOf } = useProfileCities();
   const sellerOptions = useMemo(() => sellers.map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) })), [sellers, cityOf]);
   const buyerOptions = useMemo(() => buyers.map((p) => ({ value: String(p.id), label: withCity(p.name, cityOf(p.id)) })), [buyers, cityOf]);
+  // printed under the PDF title of both tables
+  const pairLabel = `Seller: ${sellerOptions.find((o) => o.value === sellerId)?.label ?? "-"} | Buyer: ${buyerOptions.find((o) => o.value === buyerId)?.label ?? "-"}`;
 
   const setAmount = (receipt: Receipt, raw: string) => {
     const cleaned = raw.replace(/[^0-9.]/g, "");
@@ -159,6 +161,9 @@ const Refunds = () => {
     {
       key: "refundNow",
       header: "Refund Amount",
+      // what the user types in: not exported, and always shown
+      exportable: false,
+      hideable: false,
       render: (r) => (
         <div className="refunds-table__refund-input">
           <input
@@ -260,6 +265,9 @@ const Refunds = () => {
 
             <h2 className="refunds-card__subtitle">Unallocated amounts</h2>
             <Table
+              exportName="Unallocated Amounts"
+              exportSubtitle={pairLabel}
+              columnToggle
               columns={receiptColumns}
               data={receipts}
               rowKey={(row) => String(row.receiptId)}
@@ -307,7 +315,7 @@ const Refunds = () => {
             )}
 
             <h2 className="refunds-card__subtitle">Refunds made</h2>
-            <Table columns={historyColumns} data={refunds} rowKey={(row) => String(row.refundId)} emptyMessage="No refunds yet." className="refunds-table" />
+            <Table exportName="Refunds Made" exportSubtitle={pairLabel} columnToggle columns={historyColumns} data={refunds} rowKey={(row) => String(row.refundId)} emptyMessage="No refunds yet." className="refunds-table" />
           </>
         )}
       </section>

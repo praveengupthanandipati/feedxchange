@@ -6,6 +6,7 @@ import type {
 import { date, dateTime, humanize, money, num, percent, qty, text, travelTime } from "./format";
 import { Card, Empty, Field, FieldGrid, Pill, StatusPill, TableWrap } from "./ui";
 import { withCity } from "../../../../shared/hooks/useProfileCities";
+import { isSuperAdmin } from "../../../../core/auth/session";
 
 /** One panel per tab of the contract detail page. Each takes the whole details object and reads what it needs. */
 
@@ -347,7 +348,7 @@ export const TrucksTab = ({ d }: Props) => {
                 <div className="cd-subcard__head">
                   <strong>{dateTime(sc.scheduleDateTime)}</strong>
                   <StatusPill status={sc.status} />
-                  {sc.autoApprove && <Pill tone="info">Auto-approve</Pill>}
+                  {sc.autoApprove && isSuperAdmin() && <Pill tone="info">Auto-approve</Pill>}
                 </div>
                 <FieldGrid>
                   <Field label="Quantity" value={qty(sc.quantityMT)} />

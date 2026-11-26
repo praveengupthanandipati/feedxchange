@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from "react";
-import { CheckIcon, DownloadIcon, EyeIcon, EyeOffIcon, RefreshCwIcon } from "../../../../shared/components/icon";
+import { useState } from "react";
+import { CheckIcon, EyeIcon, EyeOffIcon, RefreshCwIcon } from "../../../../shared/components/icon";
 import SearchableSelect from "../../../../shared/components/dropdown/SearchableSelect";
 import BuyerWise from "./buyer-wise/BuyerWise";
 import CommodityWise from "./commodity-wise/CommodityWise";
@@ -20,19 +20,12 @@ const MonthlyReports = () => {
   const [selectedFinancialYear, setSelectedFinancialYear] = useState("");
   const [appliedFinancialYear, setAppliedFinancialYear] = useState("");
 
-  const exportHandlerRef = useRef<(() => void) | null>(null);
-  const registerExport = useCallback((handler: (() => void) | null) => {
-    exportHandlerRef.current = handler;
-  }, []);
-
   const handleApply = () => setAppliedFinancialYear(selectedFinancialYear);
 
   const handleReset = () => {
     setSelectedFinancialYear("");
     setAppliedFinancialYear("");
   };
-
-  const handleExport = () => exportHandlerRef.current?.();
 
   return (
     <div className="monthly-reports-page">
@@ -47,9 +40,6 @@ const MonthlyReports = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button type="button" className="monthly-reports-btn monthly-reports-btn--export" onClick={handleExport}>
-              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -91,11 +81,11 @@ const MonthlyReports = () => {
         </div>
 
         {activeTab === "month" && (
-          <MonthlyWise financialYear={appliedFinancialYear || defaultFinancialYear} onRegisterExport={registerExport} />
+          <MonthlyWise financialYear={appliedFinancialYear || defaultFinancialYear} />
         )}
-        {activeTab === "commodity" && <CommodityWise onRegisterExport={registerExport} />}
-        {activeTab === "seller" && <SellerWise onRegisterExport={registerExport} />}
-        {activeTab === "buyer" && <BuyerWise onRegisterExport={registerExport} />}
+        {activeTab === "commodity" && <CommodityWise />}
+        {activeTab === "seller" && <SellerWise />}
+        {activeTab === "buyer" && <BuyerWise />}
       </div>
     </div>
   );

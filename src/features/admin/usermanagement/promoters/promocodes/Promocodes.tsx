@@ -274,6 +274,9 @@ const Promocodes = () => {
         />
 
         <Table
+          exportName="Promo Codes"
+          exportData={filteredRows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}

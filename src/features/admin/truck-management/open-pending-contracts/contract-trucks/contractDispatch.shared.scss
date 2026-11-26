@@ -32,3 +32,15 @@
     color: v.fg(v.$color-gray-400);
   }
 }
+
+// A dispatch form right under the Contract Details panel: the card already spaces the two apart, so the form adds no top padding
+// (otherwise a wide empty band shows under a collapsed "Contract Details").
+.assign-transports-details + .instant-truck-form,
+.assign-transports-details + .schedule-dispatch-form {
+  padding-top: 0;
+
+  // its first block (Bill Change Option) sits on the page background, so its top padding would only add empty space
+  > .assign-truck-drawer__bill-box:first-child {
+    padding-top: 0;
+  }
+}

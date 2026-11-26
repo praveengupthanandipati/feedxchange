@@ -4,7 +4,7 @@ import { useAuth } from "../../../../core/auth/AuthContext";
 import { useGetAllRegistrationDetailsQuery, useUpdateRegistrationStatusMutation } from "../../../../core/store/registrationDetailsApi";
 import { apiErrorMessage } from "../../../../core/store/sellerInvoiceApi";
 import { REGISTRATION_STATUSES, type Registration, type RegistrationStatus, type RegistrationUpdate } from "./registrationDetails.data";
-import { exportRegistrations, matchesSearch, toRegistration, toStatusCode } from "./registrationDetails.utils";
+import { matchesSearch, toRegistration, toStatusCode } from "./registrationDetails.utils";
 import RegistrationCards from "./components/RegistrationCards";
 import RegistrationFilters from "./components/RegistrationFilters";
 import RegistrationHeader from "./components/RegistrationHeader";
@@ -91,7 +91,6 @@ const RegistrationDetails = () => {
           setPage(1);
         }}
         onStatusChange={changeStatus}
-        onExport={() => exportRegistrations(filtered)}
         onReset={() => {
           setSearch("");
           changeStatus("");
@@ -106,6 +105,7 @@ const RegistrationDetails = () => {
 
       <RegistrationTable
         rows={paged}
+        exportRows={filtered}
         emptyMessage={emptyMessage}
         onUpdateStatus={(registration) => {
           setMessage("");

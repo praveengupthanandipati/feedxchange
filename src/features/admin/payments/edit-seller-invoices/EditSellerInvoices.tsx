@@ -274,6 +274,8 @@ const EditSellerInvoices = () => {
         {isError && <p className="edit-invoices__error">{apiErrorMessage(error, "Could not load the invoices.")}</p>}
 
         <Table
+          exportName="Seller Invoices"
+          columnToggle
           columns={columns}
           data={items}
           rowKey={(row) => String(row.invoiceId)}

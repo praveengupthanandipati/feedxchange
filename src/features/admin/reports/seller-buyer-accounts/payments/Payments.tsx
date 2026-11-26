@@ -63,6 +63,8 @@ const Payments = () => {
       </div>
 
       <Table
+        exportName="Payment Receipts"
+        columnToggle
         columns={columns}
         data={paymentRows}
         rowKey={(row) => row.id}

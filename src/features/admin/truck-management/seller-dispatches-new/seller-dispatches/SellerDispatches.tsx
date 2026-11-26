@@ -5,7 +5,6 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CircleAlertIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   PenIcon,
@@ -46,9 +45,6 @@ const Badge = ({ value }: { value: string }) => (
   <span className={`seller-dispatches__badge seller-dispatches__badge--${slug(value)}`}>{value}</span>
 );
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const SellerDispatches = () => {
   const rows = sellerDispatchRows;
@@ -127,29 +123,6 @@ const SellerDispatches = () => {
     { key: "status", header: "Status", sortable: true, render: (row) => <Badge value={row.status} />, exportValue: (row) => row.status },
   ];
 
-  const handleExport = () => {
-    const exportColumns = columns.filter((column) => column.key !== "dispatch");
-    const head = exportColumns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const body = filteredRows
-      .map((row) => {
-        const cells = exportColumns.map((column) => {
-          const value = column.exportValue
-            ? column.exportValue(row)
-            : String((row as unknown as Record<string, unknown>)[column.key] ?? "");
-          return `<td>${escapeHtml(value)}</td>`;
-        });
-        return `<tr>${cells.join("")}</tr>`;
-      })
-      .join("");
-
-    const html = `<meta charset="utf-8"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
-    const url = URL.createObjectURL(new Blob([html], { type: "application/vnd.ms-excel" }));
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "seller-dispatches.xls";
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="seller-dispatches">
@@ -165,9 +138,6 @@ const SellerDispatches = () => {
           >
             {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {filtersVisible ? "Hide" : "Show"}
-          </button>
-          <button type="button" className="seller-dispatches__btn seller-dispatches__btn--warning" onClick={handleExport}>
-            <DownloadIcon aria-hidden /> Export
           </button>
         </div>
       </div>
@@ -226,6 +196,9 @@ const SellerDispatches = () => {
 
       <div className="seller-dispatches__table-view">
         <Table
+          exportName="Seller Dispatches"
+          exportData={filteredRows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.contractNo}

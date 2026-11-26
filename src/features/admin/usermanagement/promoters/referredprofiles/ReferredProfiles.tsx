@@ -76,6 +76,9 @@ const ReferredProfiles = () => {
         />
 
         <Table
+          exportName="Referred Business Profiles"
+          exportData={filteredRows}
+          columnToggle
           columns={columns}
           data={pagedRows}
           rowKey={(row) => row.id}

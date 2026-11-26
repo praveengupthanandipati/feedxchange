@@ -35,6 +35,9 @@ export function buildTransporterProfilePayload(
     transporterProfileDetails: {
       transporterLineId: toNumber(draft.transporterLineId),
       transporterTypeId: toNumber(draft.typeOfTransporter),
+      // sent only once chosen: a screen that has none (an older transporter, before its profile step is saved) leaves the saved ones alone
+      sourceStates: draft.sourceStates.length > 0 ? draft.sourceStates : undefined,
+      destinationStates: draft.destinationStates.length > 0 ? draft.destinationStates : undefined,
     },
     addresses: [],
     contacts: draft.contacts.map((contact) => ({
@@ -90,6 +93,8 @@ export function hydrateDraftFromTransporterProfile(profile: TransporterProfileDe
     group: profile.groupName,
     referralCode: profile.referredBy,
     aboutTransporter: profile.aboutProfile,
+    sourceStates: profile.transporterProfileDetails?.sourceStates ?? [],
+    destinationStates: profile.transporterProfileDetails?.destinationStates ?? [],
     billingAddressLine1: primaryAddress?.addressLine1 ?? "",
     billingAddressLine2: primaryAddress?.addressLine2 ?? "",
     landmark: primaryAddress?.landmark ?? "",

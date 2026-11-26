@@ -69,7 +69,6 @@ function matchesParty(invoice: CompanyInvoice, filters: Filters) {
 
 const formatInr = (value: number) => `₹${value.toLocaleString("en-IN")}`;
 const options = (values: string[]) => Array.from(new Set(values)).map((value) => ({ value, label: value }));
-const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 function downloadInvoice(invoice: CompanyInvoice) {
   const lines = [
@@ -299,19 +298,6 @@ const ViewInvoices = () => {
     setPage(1);
   };
 
-  const handleExport = () => {
-    const head = ["S.No", "Invoice #", "Company Name", "From Date", "To Date", "Party Name", "Qty", "Net Amount"];
-    const body = filtered
-      .map((invoice, index) =>
-        [String(index + 1), invoice.invoiceNo, invoice.company, formatDisplayDate(invoice.fromDate), formatDisplayDate(invoice.toDate), invoice.partyName, String(invoiceQty(invoice)), formatInr(invoiceNetAmount(invoice))]
-          .map((cell) => `<td>${escapeHtml(cell)}</td>`)
-          .join(""),
-      )
-      .map((cells) => `<tr>${cells}</tr>`)
-      .join("");
-    const html = `<meta charset="utf-8"><table><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table>`;
-    downloadBlob(new Blob([html], { type: "application/vnd.ms-excel" }), "company-invoices.xls");
-  };
 
   const handleSave = () => {
     // TODO: send the edits and deletions to the API once the endpoint is available.
@@ -394,9 +380,6 @@ const ViewInvoices = () => {
             {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
             {filtersVisible ? "Hide" : "Show"}
           </button>
-          <button type="button" className="view-invoices__btn view-invoices__btn--warning" onClick={handleExport} disabled={filtered.length === 0}>
-            <DownloadIcon aria-hidden /> Export
-          </button>
           <button type="button" className="view-invoices__btn view-invoices__btn--warning" onClick={() => setExpandedKeys(allExpanded ? [] : paged.map((invoice) => invoice.id))} disabled={paged.length === 0}>
             {allExpanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
             {allExpanded ? "Collapse All" : "Toggle All"}
@@ -446,6 +429,9 @@ const ViewInvoices = () => {
 
       <div className="view-invoices__table-view">
         <Table
+          exportName="Company Invoices"
+          exportData={filtered.map((item, index) => ({ ...item, sNo: index + 1 }))}
+          columnToggle
           columns={columns}
           data={paged}
           rowKey={(row) => row.id}

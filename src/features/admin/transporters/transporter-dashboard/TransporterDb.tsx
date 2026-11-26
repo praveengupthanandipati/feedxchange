@@ -8,7 +8,6 @@ import {
   CircleAlertIcon,
   CircleCheckBigIcon,
   ClockIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   FileTextIcon,
@@ -87,9 +86,6 @@ const BillChange = ({ value }: { value: TransportRow["billChange"] }) => (
   <span className={value === "Change Bill" ? "transport-db__bill--change" : ""}>{value}</span>
 );
 
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const TransporterDb = () => {
   const navigate = useNavigate();
@@ -211,31 +207,6 @@ const TransporterDb = () => {
     },
   ];
 
-  const handleExport = () => {
-    const exportColumns = columns.filter((column) => column.key !== "actions");
-    const head = exportColumns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const body = filteredRows
-      .map((row) => {
-        const cells = exportColumns
-          .map((column) => {
-            const value = column.exportValue
-              ? column.exportValue(row)
-              : String((row as unknown as Record<string, unknown>)[column.key] ?? "");
-            return `<td>${escapeHtml(value)}</td>`;
-          })
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<meta charset="utf-8"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
-    const url = URL.createObjectURL(new Blob([html], { type: "application/vnd.ms-excel" }));
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "transport-dashboard.xls";
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="transport-db">
@@ -271,9 +242,6 @@ const TransporterDb = () => {
             >
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
-            </button>
-            <button type="button" className="transport-db__btn transport-db__btn--warning" onClick={handleExport}>
-              <DownloadIcon aria-hidden /> Export
             </button>
           </div>
         </div>
@@ -341,6 +309,9 @@ const TransporterDb = () => {
 
         <div className="transport-db__table-view">
           <Table
+            exportName="Transport Dashboard"
+            exportData={filteredRows}
+            columnToggle
             columns={columns}
             data={pagedRows}
             rowKey={(row) => row.id}

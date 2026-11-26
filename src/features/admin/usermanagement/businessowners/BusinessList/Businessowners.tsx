@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   BriefcaseIcon,
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   MapPinIcon,
@@ -13,13 +12,13 @@ import {
   XIcon,
 } from "../../../../../shared/components/icon";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
+import ExportButtons from "../../../../../shared/components/table/ExportButtons";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import Pagination from "./Pagination";
 import SuccessToast from "../../../../../shared/components/toast/SuccessToast";
 import { useSuccessToast } from "../../../../../shared/components/toast/useSuccessToast";
-
 
 import "./Businessowners.scss";
 
@@ -242,16 +241,6 @@ const BusinessOwnersFilters = ({
   );
 };
 
-function getExportCellValue(row: BusinessOwner, column: TableColumn<BusinessOwner>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 const Businessowners = () => {
   const navigate = useNavigate();
   const { data, isLoading, error } = useGetBusinessProfileSummaryQuery(undefined, {
@@ -403,30 +392,6 @@ const Businessowners = () => {
     setGroup("All");
   };
 
-  const handleExport = () => {
-    const exportColumns = columns.filter((column) => column.key !== "actions");
-    const headerRow = exportColumns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = exportColumns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "business-owners.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="business-owners-page">
       <SuccessToast message={successMessage} />
@@ -442,13 +407,7 @@ const Businessowners = () => {
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide Filters" : "Show Filters"}
             </button>
-            <button
-              type="button"
-              className="business-owners-btn business-owners-btn--warning"
-              onClick={handleExport}
-            >
-              <DownloadIcon aria-hidden /> Export
-            </button>
+            <ExportButtons name="Business Owners" columns={columns} rows={filteredRows} />
             <Can any={["profiles.business.manage"]}>
               <button
                 type="button"

@@ -2,6 +2,7 @@ import { ChevronUpIcon, CircleCheckBigIcon, CircleXIcon, TruckIcon } from "../..
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import type { ScheduleTruckRow } from "./scheduleTruckAssignment.data";
+import { isSuperAdmin } from "../../../../../core/auth/session";
 
 interface ColumnHandlers {
   onEdit: (row: ScheduleTruckRow) => void;
@@ -35,18 +36,23 @@ export function buildScheduleTruckColumns({
       ),
       exportValue: (row) => row.status,
     },
-    {
-      key: "autoApprove",
-      header: "Auto Approve",
-      align: "center",
-      render: (row) =>
-        row.autoApprove ? (
-          <CircleCheckBigIcon className="schedule-truck-table__auto-approve schedule-truck-table__auto-approve--on" aria-label="Auto approve enabled" />
-        ) : (
-          <CircleXIcon className="schedule-truck-table__auto-approve schedule-truck-table__auto-approve--off" aria-label="Auto approve disabled" />
-        ),
-      exportValue: (row) => (row.autoApprove ? "Yes" : "No"),
-    },
+    // Auto Approve is a Super Admin tool: nobody else is told a freight can be approved automatically
+    ...(isSuperAdmin()
+      ? ([
+        {
+          key: "autoApprove",
+          header: "Auto Approve",
+          align: "center",
+          render: (row) =>
+            row.autoApprove ? (
+              <CircleCheckBigIcon className="schedule-truck-table__auto-approve schedule-truck-table__auto-approve--on" aria-label="Auto approve enabled" />
+            ) : (
+              <CircleXIcon className="schedule-truck-table__auto-approve schedule-truck-table__auto-approve--off" aria-label="Auto approve disabled" />
+            ),
+          exportValue: (row) => (row.autoApprove ? "Yes" : "No"),
+        },
+        ] as TableColumn<ScheduleTruckRow>[])
+      : []),
     {
       key: "trucks",
       header: "Trucks",

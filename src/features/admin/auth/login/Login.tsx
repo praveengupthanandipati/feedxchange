@@ -7,6 +7,7 @@ import { useLoginMutation } from "../../../../core/store/authApi";
 import { useAuth } from "../../../../core/auth/AuthContext";
 import { clearSession, saveTokens, savePermissionKeys } from "../../../../core/auth/session";
 import { sitePaths } from "../../../website/routes/paths";
+import { homePathForRole } from "../../../../core/routes/adminPaths";
 import ResetPassword from "./ResetPassword";
 import "./Login.scss";
 
@@ -86,7 +87,7 @@ const Login = () => {
 
       persistSession(data);
       reload();
-      navigate("/admin/dashboard");
+      navigate(homePathForRole(data?.roleKey));
     } catch (err) {
       // No answer (offline, timeout) or a server fault is not a wrong password: say so instead.
       const status = err && typeof err === "object" && "status" in err ? (err as { status: unknown }).status : undefined;

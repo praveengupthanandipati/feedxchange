@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  DownloadIcon,
   EyeIcon,
   EyeOffIcon,
   MapPinIcon,
@@ -10,12 +9,13 @@ import {
   TagIcon,
   TruckIcon,
 } from "../../../../../shared/components/icon";
-import type { TableColumn } from "../../../../../shared/components/table/table.types";
+import ExportButtons from "../../../../../shared/components/table/ExportButtons";
 import RowActionsMenu from "../../../../../shared/components/table/RowActionsMenu";
 import ConfirmDialog from "../../../../../shared/components/dialog/ConfirmDialog";
 import SuccessToast from "../../../../../shared/components/toast/SuccessToast";
 import { useSuccessToast } from "../../../../../shared/components/toast/useSuccessToast";
 import TransportersFilters from "./TransportersFilters";
+import { ServingStateChips } from "../ServingLocations";
 import Pagination from "./Pagination";
 import { buildTransporterColumns } from "./transporters.columns";
 import { buildFilterOptions } from "../../businessowners/BusinessList/Businessowners";
@@ -39,16 +39,6 @@ const StatusBadge = ({ status }: { status: TransporterProfileStatus }) => (
     {status}
   </span>
 );
-
-function getExportCellValue(row: Transporter, column: TableColumn<Transporter>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const Transprters = () => {
   const navigate = useNavigate();
@@ -98,6 +88,8 @@ const Transprters = () => {
   const [status, setStatus] = useState<string>(DEFAULT_STATUS_FILTER);
   const [transporterType, setTransporterType] = useState("All");
   const [state, setState] = useState("All");
+  const [sourceState, setSourceState] = useState("All");
+  const [destinationState, setDestinationState] = useState("All");
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<Transporter | null>(null);
@@ -146,10 +138,12 @@ const Transprters = () => {
   );
 
   const stateOptions = useMemo(() => buildFilterOptions(rows.map((row) => row.stateName)), [rows]);
+  const sourceStateOptions = useMemo(() => buildFilterOptions(rows.flatMap((row) => row.sourceStates ?? [])), [rows]);
+  const destinationStateOptions = useMemo(() => buildFilterOptions(rows.flatMap((row) => row.destinationStates ?? [])), [rows]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, status, transporterType, state]);
+  }, [keyword, status, transporterType, state, sourceState, destinationState]);
 
   const filteredRows = useMemo(() => {
     const q = keyword.trim().toLowerCase();
@@ -158,6 +152,8 @@ const Transprters = () => {
       if (status !== "All" && row.status !== status) return false;
       if (transporterType !== "All" && row.transporterTypeName !== transporterType) return false;
       if (state !== "All" && row.stateName !== state) return false;
+      if (sourceState !== "All" && !(row.sourceStates ?? []).includes(sourceState)) return false;
+      if (destinationState !== "All" && !(row.destinationStates ?? []).includes(destinationState)) return false;
 
       if (q) {
         const haystack = [
@@ -166,6 +162,8 @@ const Transprters = () => {
           row.location,
           row.stateName,
           row.mobileNumber,
+          ...(row.sourceStates ?? []),
+          ...(row.destinationStates ?? []),
         ]
           .join(" ")
           .toLowerCase();
@@ -174,7 +172,7 @@ const Transprters = () => {
 
       return true;
     });
-  }, [rows, keyword, status, transporterType, state]);
+  }, [rows, keyword, status, transporterType, state, sourceState, destinationState]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const currentPageClamped = Math.min(currentPage, totalPages);
@@ -182,30 +180,6 @@ const Transprters = () => {
     (currentPageClamped - 1) * PAGE_SIZE,
     currentPageClamped * PAGE_SIZE,
   );
-
-  const handleExport = () => {
-    const exportColumns = columns.filter((column) => column.key !== "actions");
-    const headerRow = exportColumns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-    const bodyRows = filteredRows
-      .map((row) => {
-        const cells = exportColumns
-          .map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`)
-          .join("");
-        return `<tr>${cells}</tr>`;
-      })
-      .join("");
-
-    const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "transporters.xls";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="transporters-page">
@@ -222,13 +196,7 @@ const Transprters = () => {
               {filtersVisible ? <EyeOffIcon aria-hidden /> : <EyeIcon aria-hidden />}
               {filtersVisible ? "Hide" : "Show"}
             </button>
-            <button
-              type="button"
-              className="transporters-btn transporters-btn--warning"
-              onClick={handleExport}
-            >
-              <DownloadIcon aria-hidden /> Export
-            </button>
+            <ExportButtons name="Transporters" columns={columns} rows={filteredRows} />
             <Can any={["profiles.transporter.manage"]}>
               <button
                 type="button"
@@ -253,11 +221,19 @@ const Transprters = () => {
             state={state}
             onStateChange={setState}
             stateOptions={stateOptions}
+            sourceState={sourceState}
+            onSourceStateChange={setSourceState}
+            sourceStateOptions={sourceStateOptions}
+            destinationState={destinationState}
+            onDestinationStateChange={setDestinationState}
+            destinationStateOptions={destinationStateOptions}
             onClear={() => {
               setKeyword("");
               setStatus(DEFAULT_STATUS_FILTER);
               setTransporterType("All");
               setState("All");
+              setSourceState("All");
+              setDestinationState("All");
             }}
           />
         )}
@@ -296,6 +272,10 @@ const Transprters = () => {
                   <span><TagIcon aria-hidden /> {transporter.transporterTypeName || transporter.transporterSubTypeName || "Transporter type not specified"}</span>
                   <span><PhoneIcon aria-hidden /> {transporter.mobileNumber || "Phone not provided"}</span>
                   <span><MapPinIcon aria-hidden /> {[transporter.location, transporter.stateName].filter(Boolean).join(", ") || "Location not provided"}</span>
+                </div>
+
+                <div className="transporter-profile-card__serving">
+                  <ServingStateChips source={transporter.sourceStates} destination={transporter.destinationStates} compact />
                 </div>
               </article>
             ))}

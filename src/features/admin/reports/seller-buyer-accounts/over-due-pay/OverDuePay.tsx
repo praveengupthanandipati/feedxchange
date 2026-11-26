@@ -44,6 +44,9 @@ const OverDuePay = () => {
       </div>
 
       <Table
+        exportName="Overdue Payments"
+        exportData={filteredRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

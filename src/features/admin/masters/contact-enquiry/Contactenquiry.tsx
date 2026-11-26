@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { CircleCheckBigIcon } from "../../../../shared/components/icon";
 import { contactEnquiries, type ContactEnquiry, type ContactEnquiryUpdate } from "./contactEnquiry.data";
-import { exportContactEnquiries, matchesSearch } from "./contactEnquiry.utils";
+import { matchesSearch } from "./contactEnquiry.utils";
 import ContactCards from "./components/ContactCards";
 import ContactFilters from "./components/ContactFilters";
 import ContactHeader from "./components/ContactHeader";
@@ -55,8 +55,6 @@ const Contactenquiry = () => {
       <ContactHeader
         filtersVisible={filtersVisible}
         onToggleFilters={() => setFiltersVisible((prev) => !prev)}
-        onExport={() => exportContactEnquiries(filtered)}
-        canExport={filtered.length > 0}
       />
 
       {filtersVisible && (
@@ -80,7 +78,7 @@ const Contactenquiry = () => {
         </p>
       )}
 
-      <ContactTable rows={paged} emptyMessage={emptyMessage} onUpdateStatus={openPanel} />
+      <ContactTable rows={paged} exportRows={filtered} emptyMessage={emptyMessage} onUpdateStatus={openPanel} />
       <ContactCards rows={paged} emptyMessage={emptyMessage} onUpdateStatus={openPanel} />
 
       <ContactPagination page={currentPage} pageSize={PAGE_SIZE} total={filtered.length} onPageChange={setPage} />

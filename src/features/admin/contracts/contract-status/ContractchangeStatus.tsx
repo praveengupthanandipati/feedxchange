@@ -220,6 +220,8 @@ const GetContractsDrawer = ({
 
           {rows !== null && (
             <Table
+              exportName="Contract Status"
+              columnToggle
               columns={columns}
               data={rows}
               rowKey={(row) => row.contractNumber}

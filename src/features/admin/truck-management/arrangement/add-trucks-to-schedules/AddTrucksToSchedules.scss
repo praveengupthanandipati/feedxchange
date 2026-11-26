@@ -1,0 +1,24 @@
+@use "../../../../../shared/assets/styles/variables" as v;
+
+// The filter bar on Add Trucks to Schedules (built from the Schedules Management filter pieces).
+.add-trucks-filters {
+  margin-bottom: v.$spacing-4;
+
+  &__dates {
+    align-self: flex-end;
+    margin-top: 0;
+
+    input {
+      height: var(--fx-control-height);
+    }
+  }
+
+  &__note {
+    flex: 1 1 14rem;
+    align-self: center;
+    margin: 0;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    text-align: right;
+  }
+}

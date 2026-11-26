@@ -384,3 +384,39 @@
     }
   }
 }
+
+// Filter panel at the top of Contract Master (Business / Period / Status / Search): the overview and the list follow it.
+.contracts-top-filters {
+  gap: 0;
+
+  // One row on a laptop screen: Business | Period | Status | Search | Clear | Hide overview (last). Fields share the width;
+  // below ~1000px the row wraps.
+  .bp-filters {
+    margin-bottom: 0;
+
+    .ui-field {
+      flex: 0 1 9.5rem;
+      min-width: 8rem;
+    }
+
+    .bp-fields__business {
+      flex: 1 1 15rem;
+      min-width: 12rem !important;
+      max-width: 22rem;
+    }
+
+    .bp-filters__search {
+      flex: 1 1 12rem;
+      min-width: 10rem;
+    }
+
+    .ui-btn {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+  }
+
+  .bp-filters__summary {
+    margin: v.$spacing-2 0 0;
+  }
+}

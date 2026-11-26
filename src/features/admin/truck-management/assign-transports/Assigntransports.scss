@@ -171,6 +171,12 @@
     padding: v.$spacing-5;
   }
 
+  // collapsed to its "Contract Details" heading: a compact bar, no empty band under it
+  &--collapsed {
+    padding-top: v.$spacing-3;
+    padding-bottom: 0;
+  }
+
   &__header {
     @include m.flex(row, space-between, center);
     flex-wrap: wrap;

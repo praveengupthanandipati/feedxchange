@@ -1,28 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, PrinterIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import { buildSellerWiseColumns } from "./sellerWise.columns";
-import { getMonthlyTotal, monthlyStats, sellerRows, type SellerRow } from "./sellerWise.data";
+import { getMonthlyTotal, monthlyStats, sellerRows } from "./sellerWise.data";
 import "./SellerWise.scss";
 
 const PAGE_SIZE = 10;
 
-function getExportCellValue(row: SellerRow, column: TableColumn<SellerRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-interface SellerWiseProps {
-  onRegisterExport: (handler: (() => void) | null) => void;
-}
-
-const SellerWise = ({ onRegisterExport }: SellerWiseProps) => {
+const SellerWise = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const columns = useMemo(() => buildSellerWiseColumns(), []);
@@ -33,32 +18,6 @@ const SellerWise = ({ onRegisterExport }: SellerWiseProps) => {
     (currentPageClamped - 1) * PAGE_SIZE,
     currentPageClamped * PAGE_SIZE,
   );
-
-  useEffect(() => {
-    const handleExport = () => {
-      const headerRow = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-      const bodyRows = sellerRows
-        .map((row) => {
-          const cells = columns.map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`).join("");
-          return `<tr>${cells}</tr>`;
-        })
-        .join("");
-
-      const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-      const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "seller-wise.xls";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    };
-
-    onRegisterExport(handleExport);
-    return () => onRegisterExport(null);
-  }, [columns, onRegisterExport]);
 
   const handlePrint = () => window.print();
 
@@ -81,6 +40,9 @@ const SellerWise = ({ onRegisterExport }: SellerWiseProps) => {
       </div>
 
       <Table
+        exportName="Seller Wise Report"
+        exportData={sellerRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

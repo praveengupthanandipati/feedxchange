@@ -202,6 +202,65 @@
 
 .table-toolbar {
   @include m.flex(row, flex-end, center, v.$spacing-2);
+
+  // the screen's own controls on the left, the Columns button last; wraps on narrow screens
+  &--with-content {
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  &__content {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  // with only the count and buttons, they sit at the right
+  &--with-content > &__content:empty + &__count {
+    margin-left: auto;
+  }
+
+  &__count {
+    align-self: center;
+    color: v.fg(v.$color-text-muted);
+    font-size: v.$font-size-sm;
+    white-space: nowrap;
+  }
+
+  // Export CSV / PDF: same shape as the Columns button (also used by ExportButtons on card screens)
+  &__btn {
+    @include m.flex(row, center, center, v.$spacing-1);
+    @include m.focus-ring;
+    flex: 0 0 auto;
+    min-height: var(--fx-control-height-sm);
+    padding: 0 0.6rem;
+    border: 1px solid v.line(v.$color-gray-300);
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: v.line(v.$color-primary);
+      color: v.fg(v.$color-primary);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
 }
 
 .table-columns {
@@ -392,4 +451,11 @@
     outline: 2px solid currentColor;
     outline-offset: 2px;
   }
+}
+
+// CSV / PDF buttons outside a table (ExportButtons, on screens that show cards)
+.table-export-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$spacing-2;
 }

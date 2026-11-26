@@ -1,28 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, PrinterIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
-import type { TableColumn } from "../../../../../shared/components/table/table.types";
 import { buildCommodityWiseColumns } from "./commodityWise.columns";
-import { commodityRows, getMonthlyTotal, monthlyStats, type CommodityRow } from "./commodityWise.data";
+import { commodityRows, getMonthlyTotal, monthlyStats } from "./commodityWise.data";
 import "./CommodityWise.scss";
 
 const PAGE_SIZE = 10;
 
-function getExportCellValue(row: CommodityRow, column: TableColumn<CommodityRow>): string {
-  if (column.exportValue) return column.exportValue(row);
-  const raw = (row as unknown as Record<string, unknown>)[column.key];
-  return raw === undefined || raw === null ? "" : String(raw);
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-interface CommodityWiseProps {
-  onRegisterExport: (handler: (() => void) | null) => void;
-}
-
-const CommodityWise = ({ onRegisterExport }: CommodityWiseProps) => {
+const CommodityWise = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const columns = useMemo(() => buildCommodityWiseColumns(), []);
@@ -33,32 +18,6 @@ const CommodityWise = ({ onRegisterExport }: CommodityWiseProps) => {
     (currentPageClamped - 1) * PAGE_SIZE,
     currentPageClamped * PAGE_SIZE,
   );
-
-  useEffect(() => {
-    const handleExport = () => {
-      const headerRow = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join("");
-      const bodyRows = commodityRows
-        .map((row) => {
-          const cells = columns.map((column) => `<td>${escapeHtml(getExportCellValue(row, column))}</td>`).join("");
-          return `<tr>${cells}</tr>`;
-        })
-        .join("");
-
-      const html = `<table><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table>`;
-      const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "commodity-wise.xls";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    };
-
-    onRegisterExport(handleExport);
-    return () => onRegisterExport(null);
-  }, [columns, onRegisterExport]);
 
   const handlePrint = () => window.print();
 
@@ -81,6 +40,9 @@ const CommodityWise = ({ onRegisterExport }: CommodityWiseProps) => {
       </div>
 
       <Table
+        exportName="Commodity Wise Report"
+        exportData={commodityRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

@@ -45,6 +45,9 @@ const SummaryTab = ({ rows }: SummaryTabProps) => {
       </div>
 
       <Table
+        exportName="Pending Payments - Summary"
+        exportData={rows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

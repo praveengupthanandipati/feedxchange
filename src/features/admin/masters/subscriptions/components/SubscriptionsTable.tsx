@@ -5,6 +5,8 @@ import SubscriptionStatusBadge from "./SubscriptionStatusBadge";
 
 export interface SubscriptionListProps {
   rows: Subscription[];
+  /** Every filtered row (the page passes only the current page as rows), for the row count and CSV / PDF export. */
+  exportRows?: Subscription[];
   emptyMessage: string;
 }
 
@@ -15,9 +17,9 @@ const columns: TableColumn<Subscription>[] = [
 ];
 
 /** Tablet, laptop and desktop view. */
-const SubscriptionsTable = ({ rows, emptyMessage }: SubscriptionListProps) => (
+const SubscriptionsTable = ({ rows, exportRows, emptyMessage }: SubscriptionListProps) => (
   <div className="subscriptions__table-view">
-    <Table columns={columns} data={rows} rowKey={(row) => row.id} className="subscriptions__table" emptyMessage={emptyMessage} />
+    <Table exportName="Subscriptions" exportData={exportRows} columnToggle columns={columns} data={rows} rowKey={(row) => row.id} className="subscriptions__table" emptyMessage={emptyMessage} />
   </div>
 );
 

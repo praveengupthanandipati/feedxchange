@@ -1,0 +1,215 @@
+@use "../../../../shared/assets/styles/variables" as v;
+@use "../../../../shared/assets/styles/mixins" as m;
+
+// Freight bargaining: the admin / initiator decision panel, the history button and dialog.
+
+.freight-decision {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 18rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--fx-tint-amber-border);
+  border-left: 4px solid var(--fx-tint-amber-accent);
+  border-radius: v.$radius-md;
+  background-color: var(--fx-tint-amber-bg);
+  white-space: normal;
+
+  &__proposal {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    line-height: 1.4;
+  }
+
+  &__remark {
+    color: v.fg(v.$color-text-muted);
+    font-style: italic;
+  }
+
+  &__note {
+    display: block;
+    color: v.fg(v.$color-text-muted);
+    font-size: max(11px, 0.78rem);
+  }
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  &__field input,
+  &__remarks {
+    min-height: var(--fx-control-height-sm);
+    padding: 0 0.55rem;
+    border: 1px solid var(--fx-field-border);
+    border-radius: v.$radius-sm;
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-text);
+    font: inherit;
+    font-size: v.$font-size-sm;
+  }
+
+  &__field input {
+    width: 7.5rem;
+  }
+
+  &__remarks {
+    width: 100%;
+  }
+
+  &__approve,
+  &__revise {
+    @include m.flex(row, center, center, 0.3rem);
+    @include m.focus-ring;
+    min-height: var(--fx-control-height-sm);
+    padding: 0 0.7rem;
+    border-radius: v.$radius-sm;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__approve {
+    border: 1px solid transparent;
+    background-color: v.$color-success;
+    color: v.$color-white;
+  }
+
+  &__revise {
+    border: 1px solid v.line(v.$color-primary);
+    background-color: v.$color-bg;
+    color: v.fg(v.$color-primary);
+  }
+
+  &__error {
+    margin: 0;
+    color: v.fg(v.$color-danger);
+    font-size: v.$font-size-sm;
+  }
+
+  &__done {
+    margin: 0;
+    padding: 0.45rem 0.7rem;
+    border-radius: v.$radius-md;
+    background-color: var(--fx-tint-green-bg);
+    color: v.fg(v.$color-text);
+    font-size: v.$font-size-sm;
+    white-space: normal;
+  }
+}
+
+.bargain-link {
+  @include m.flex(row, flex-start, center, 0.3rem);
+  @include m.focus-ring;
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  color: v.fg(v.$color-primary);
+  font: inherit;
+  font-size: max(11px, 0.8rem);
+  font-weight: v.$font-weight-semibold;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+
+  svg {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+}
+
+.bargain-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(64rem, 100%);
+  max-height: min(48rem, 92vh);
+  border-radius: v.$radius-lg;
+  background-color: v.$color-bg;
+  box-shadow: v.$shadow-lg;
+
+  &__backdrop {
+    @include m.flex-center;
+    position: fixed;
+    inset: 0;
+    z-index: v.$z-index-modal;
+    padding: v.$spacing-3;
+    background-color: rgba(10, 20, 35, 0.45);
+  }
+
+  &__head {
+    @include m.flex(row, space-between, center, v.$spacing-2);
+    padding: v.$spacing-3 v.$spacing-4;
+    border-bottom: 1px solid v.line(v.$color-border);
+
+    h2 {
+      @include m.flex(row, flex-start, center, v.$spacing-2);
+      margin: 0;
+      font-size: v.$font-size-lg;
+    }
+  }
+
+  &__body {
+    overflow: auto;
+    padding: v.$spacing-4;
+  }
+}
+
+.bargain {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-3;
+
+  &__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: v.$spacing-2 v.$spacing-3;
+    margin: 0;
+
+    dt {
+      color: v.fg(v.$color-text-muted);
+      font-size: max(11px, 0.78rem);
+    }
+
+    dd {
+      margin: 0;
+      font-weight: v.$font-weight-semibold;
+    }
+  }
+
+  &__who {
+    display: inline-flex;
+    flex-direction: column;
+
+    small {
+      color: v.fg(v.$color-text-muted);
+    }
+  }
+
+  &__changed {
+    color: v.fg(v.$color-warning);
+    font-weight: v.$font-weight-semibold;
+  }
+
+  &__remarks {
+    white-space: normal;
+  }
+
+  &__error {
+    margin: 0;
+    color: v.fg(v.$color-danger);
+  }
+}

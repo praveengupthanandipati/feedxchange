@@ -33,7 +33,15 @@ export interface Transporter {
   transporterLineName: string;
   // TODO: not yet returned by GetAllTransporterProfilesSummary — ask backend to add these two fields.
   location: string;
+  /** The transporter's city and state (primary address), as the summary returns them. */
+  city?: string;
   stateName: string;
+  /** Trips completed on the platform (trucks marked Loaded) and the year the profile was created. */
+  completedTrips?: number;
+  memberSinceYear?: number | null;
+  /** Serving Locations: states goods can be picked up from / delivered to. */
+  sourceStates?: string[];
+  destinationStates?: string[];
 }
 
 export interface AddTransporterProfilePayload {
@@ -55,6 +63,9 @@ export interface AddTransporterProfilePayload {
   transporterProfileDetails: {
     transporterLineId: number;
     transporterTypeId: number;
+    /** Required when a transporter is created; when updating, leave out to keep the saved ones. */
+    sourceStates?: string[];
+    destinationStates?: string[];
   };
   addresses: AddressPayload[];
   contacts: ContactPayload[];
@@ -85,6 +96,8 @@ export interface TransporterProfileDetailInfo {
   isVerified: boolean;
   verifiedBy: number;
   verifiedOn: string;
+  sourceStates?: string[];
+  destinationStates?: string[];
 }
 
 export interface TransporterLineApiItem {

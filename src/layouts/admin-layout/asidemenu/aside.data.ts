@@ -118,6 +118,7 @@ export const asideNavSections: AsideNavSection[] = [
     id: "your-company",
     title: "FeedxChange",
     items: [
+      { id: "business-dashboard", permissions: ["BUSINESS_DASHBOARD"], label: "Business Dashboard", icon: ChartPieIcon, path: "/admin/business-dashboard" },
       { id: "dashboard", permissions: ["dashboard"], label: "Dashboard", icon: HouseIcon, path: "/admin/dashboard" },
       { id: "contract", permissions: ["contracts.view"], label: "Contracts", icon: FileTextIcon, path: "/admin/contracts" },
       { id: "contract-status", permissions: ["contract-status"], label: "Contract Status", icon: ActivityIcon, path: "/admin/contract-status" },

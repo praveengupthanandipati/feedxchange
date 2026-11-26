@@ -222,6 +222,10 @@ const PaymentAllocation = () => {
 
         {mode === "contracts" && (
           <Table
+            exportName="Pending Contracts for Payment Allocation"
+            exportData={visibleContracts}
+            exportSubtitle={`Seller: ${seller} | Buyer: ${buyer}`}
+            columnToggle
             columns={contractColumns}
             data={pagedContracts}
             rowKey={(row) => row.id}
@@ -231,6 +235,10 @@ const PaymentAllocation = () => {
         )}
         {mode === "invoices" && (
           <Table
+            exportName="Pending Invoices for Payment Allocation"
+            exportData={visibleInvoices}
+            exportSubtitle={`Seller: ${seller} | Buyer: ${buyer}`}
+            columnToggle
             columns={invoiceColumns}
             data={pagedInvoices}
             rowKey={(row) => row.id}

@@ -2,6 +2,8 @@ import { lazy } from "react";
 import { Navigate, Route } from "react-router-dom";
 import AdminFallback from "./not-found/AdminFallback";
 import ComingSoon from "./coming-soon/ComingSoon";
+import { homePathForRole } from "../../core/routes/adminPaths";
+import { getRoleKey } from "../../core/auth/session";
 
 // Every admin screen is loaded on demand, so signing in downloads only the shell and the screen being opened.
 const NotificationPreferences = lazy(() => import("./notification-preferences/NotificationPreferences"));
@@ -10,6 +12,8 @@ const ContractNotificationHistory = lazy(() => import("./notifications/ContractN
 const NotificationsCenter = lazy(() => import("./notifications/NotificationsCenter"));
 const TemplateAdmin = lazy(() => import("./notifications/TemplateAdmin"));
 const Dashboard = lazy(() => import("./dashboard/Dashboard"));
+const BusinessDashboard = lazy(() => import("./business-dashboard/BusinessDashboard"));
+const TransporterProfileDashboard = lazy(() => import("./transporter-profile-dashboard/TransporterProfileDashboard"));
 const Contracts = lazy(() => import("./contracts/Contracts"));
 const ContractDetail = lazy(() => import("./contracts/ContractDetail"));
 const NewContract = lazy(() => import("./contracts/NewContract"));
@@ -83,6 +87,7 @@ const UpdateTruckStatus = lazy(() => import("./truck-management/open-pending-con
 const ReassignTruck = lazy(() => import("./truck-management/open-pending-contracts/contract-trucks/reassign-truck/ReassignTruck"));
 const ContractTruckChain = lazy(() => import("./truck-management/open-pending-contracts/contract-trucks/truck-chain/ContractTruckChain"));
 const Assigntransports = lazy(() => import("./truck-management/assign-transports/Assigntransports"));
+const SchedulesManagement = lazy(() => import("./truck-management/arrangement/schedules-management/SchedulesManagement"));
 const AddTrucksToSchedules = lazy(() => import("./truck-management/arrangement/add-trucks-to-schedules/AddTrucksToSchedules"));
 const DriversList = lazy(() => import("./transporters/drivers/drivers-list/DriversList"));
 const DriverNew = lazy(() => import("./transporters/drivers/driver-create/NewDriver"));
@@ -115,14 +120,19 @@ const SubModuleOverview = lazy(() => import("./overview/SubModuleOverview"));
 const RoleAccess = lazy(() => import("./roles/RoleAccess"));
 const UserAccess = lazy(() => import("./roles/UserAccess"));
 
+/** /admin itself: sends the user to their role's own start screen (the Transporter Dashboard for a Transporter Admin). */
+const AdminHome = () => <Navigate to={homePathForRole(getRoleKey())} replace />;
+
 /**
  * The admin application's routes, relative to /admin (the shell in app.routes.tsx mounts them there, behind the login check and the
  * admin layout). Paths are written without the prefix; "index" is /admin itself.
  */
 export const adminRoutes = (
   <>
-    <Route index element={<Navigate to="dashboard" replace />} />
+    <Route index element={<AdminHome />} />
     <Route path="dashboard" element={<Dashboard />} />
+    <Route path="business-dashboard" element={<BusinessDashboard />} />
+    <Route path="transporter-dashboard" element={<TransporterProfileDashboard />} />
     <Route path="settings" element={<Settings />} />
     <Route path="contracts" element={<Contracts />} />
     <Route path="contracts/:id" element={<ContractDetail />} />
@@ -250,6 +260,7 @@ export const adminRoutes = (
     <Route path="task/board" element={<ComingSoon />} />
     <Route path="task/list" element={<ComingSoon />} />
     <Route path="refer-client" element={<ComingSoon />} />
+    <Route path="truck-management/schedules-management" element={<SchedulesManagement />} />
     <Route path="truck-management/arrangement/add-trucks-to-schedules" element={<AddTrucksToSchedules />} />
     <Route path="truck-management/arrangement/view-loading-status" element={<ComingSoon />} />
     <Route path="truck-management/arrangement/share-unloading-details" element={<ComingSoon />} />

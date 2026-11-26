@@ -44,6 +44,9 @@ const AvgPayments = () => {
       </div>
 
       <Table
+        exportName="Average Payments"
+        exportData={filteredRows}
+        columnToggle
         columns={columns}
         data={pagedRows}
         rowKey={(row) => row.id}

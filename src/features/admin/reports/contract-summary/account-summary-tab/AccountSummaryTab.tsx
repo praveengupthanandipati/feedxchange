@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { DownloadIcon, PrinterIcon } from "../../../../../shared/components/icon";
 import Table from "../../../../../shared/components/table/Table";
 import { buildAccountSummaryColumns } from "./accountSummaryTab.columns";
@@ -25,11 +25,7 @@ function exportPartyRows(rows: AccountSummaryRow[]) {
   URL.revokeObjectURL(url);
 }
 
-interface AccountSummaryTabProps {
-  onRegisterExport: (handler: (() => void) | null) => void;
-}
-
-const AccountSummaryTab = ({ onRegisterExport }: AccountSummaryTabProps) => {
+const AccountSummaryTab = () => {
   // TODO: wire up to a real print/document API once available.
   const handlePrint = () => undefined;
   const handleDownload = () => undefined;
@@ -41,11 +37,6 @@ const AccountSummaryTab = ({ onRegisterExport }: AccountSummaryTabProps) => {
 
   const handlePrintAll = () => undefined;
   const handleDownloadAll = () => exportPartyRows(accountSummaryRows);
-
-  useEffect(() => {
-    onRegisterExport(() => exportPartyRows(accountSummaryRows));
-    return () => onRegisterExport(null);
-  }, [onRegisterExport]);
 
   return (
     <div className="account-summary-tab">
@@ -59,6 +50,8 @@ const AccountSummaryTab = ({ onRegisterExport }: AccountSummaryTabProps) => {
       </div>
 
       <Table
+        exportName="Account Summary"
+        columnToggle
         columns={columns}
         data={accountSummaryRows}
         rowKey={(row) => row.id}

@@ -7,12 +7,14 @@ import EnquiryStatusBadge from "./EnquiryStatusBadge";
 
 export interface EnquiryListProps {
   rows: ProductEnquiry[];
+  /** Every filtered row (the page passes only the current page as rows), for the row count and CSV / PDF export. */
+  exportRows?: ProductEnquiry[];
   emptyMessage: string;
   onUpdateStatus: (enquiry: ProductEnquiry) => void;
 }
 
 /** Laptop and desktop view. */
-const EnquiriesTable = ({ rows, emptyMessage, onUpdateStatus }: EnquiryListProps) => {
+const EnquiriesTable = ({ rows, exportRows, emptyMessage, onUpdateStatus }: EnquiryListProps) => {
   const columns: TableColumn<ProductEnquiry>[] = [
     { key: "productName", header: "Product Name", sortable: true },
     { key: "qtyMt", header: "Qty in MT", sortable: true },
@@ -37,7 +39,7 @@ const EnquiriesTable = ({ rows, emptyMessage, onUpdateStatus }: EnquiryListProps
 
   return (
     <div className="product-enquiries__table-view">
-      <Table columns={columns} data={rows} rowKey={(row) => row.id} className="product-enquiries__table" emptyMessage={emptyMessage} />
+      <Table exportName="Product Enquiries" exportData={exportRows} columnToggle columns={columns} data={rows} rowKey={(row) => row.id} className="product-enquiries__table" emptyMessage={emptyMessage} />
     </div>
   );
 };
