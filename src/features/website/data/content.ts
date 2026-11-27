@@ -82,7 +82,7 @@ export const navItems: NavItem[] = [
   { label: "About", to: sitePaths.about },
   // children marks Products as a menu; its categories and products come from the API (useCatalogue) in the header menus.
   { label: "Products", to: sitePaths.products, children: [] },
-  { label: "FAQ's", to: sitePaths.faqs },
+  { label: "FAQs", to: sitePaths.faqs },
   { label: "Blogs", to: sitePaths.blogs },
   // "Contact" is WhatsApp (Website UAT): it opens the WhatsApp chat on the company number.
   { label: "WhatsApp", to: whatsappLink },
@@ -340,7 +340,7 @@ export const footerColumns: { title: string; links: NavLinkItem[] }[] = [
     links: [
       { label: "Home", to: sitePaths.home },
       { label: "About Us", to: sitePaths.about },
-      { label: "FAQ's", to: sitePaths.faqs },
+      { label: "FAQs", to: sitePaths.faqs },
       { label: "Blogs", to: sitePaths.blogs },
       { label: "WhatsApp", to: whatsappLink },
     ],
@@ -378,6 +378,16 @@ export const faqCategories: FaqCategory[] = [
           "The portal is built to support the entire animal feed raw material procurement ecosystem. This includes Poultry Farms, Fish Farms, Prawn Farms, Cattle Feed Plants, Feed Manufacturers, Enrolled Transporters, and Referral Aggregators.",
       },
       {
+        question: "What documents do I need to register?",
+        answer:
+          "To register and verify your account, you will need to submit scanned copies of your Know Your Customer (KYC) documents—specifically your GST registration certificate, PAN card, and other relevant business or transport licenses (such as Aadhaar for sole proprietorships, if applicable).",
+      },
+      {
+        question: "Who can see my KYC documents?",
+        answer:
+          "Your KYC documents are never displayed publicly. However, to ensure complete transparency between trading partners, once a contract is officially executed through FeedXchange, the Buyer can view the Seller’s KYC documents and the Seller can view the Buyer’s KYC documents. Access is strictly limited to the specific parties involved in a confirmed contract.",
+      },
+      {
         question: "Is there a fee to use the portal?",
         answer:
           "Currently, creating an account and accessing the digital portal is completely free. Should we introduce premium subscription features in the future, all users will be notified well in advance.",
@@ -395,6 +405,11 @@ export const faqCategories: FaqCategory[] = [
           "Because commodity markets are highly volatile, the prices displayed on the portal are indicative and meant for real-time market tracking. Final contract prices are always subject to confirmation at the exact time the deal is locked and executed.",
       },
       {
+        question: "Can a contract be cancelled or modified after execution?",
+        answer:
+          "Once a contract is confirmed and executed, it is legally binding between the Buyer and the Seller. Any cancellation or modification (such as changes in quantity, rate, or dispatch schedule) requires mutual written agreement between both parties, facilitated through our team.",
+      },
+      {
         question: "Are the prices shown on the portal inclusive of GST and freight?",
         answer:
           "The indicative prices displayed on the portal are generally basic prices (Ex-factory/Ex-warehouse) unless explicitly stated otherwise. Applicable GST and negotiated freight charges will be clearly outlined when the final contract is executed.",
@@ -407,7 +422,12 @@ export const faqCategories: FaqCategory[] = [
       {
         question: "What happens if there is a dispute over the quality of the materials?",
         answer:
-          "We are committed to fair trade, so it’s a rare case to even occur. If there is a discrepancy in quality or delivery, we step in to actively mediate the dispute between the buyer and the supplier. If poor quality is proven, it will result in a debit to the supplier. Please note that all final financial settlements regarding quality claims are handled directly between the buyer and the supplier.",
+          "We are committed to fair trade, if there is a discrepancy in quality or delivery we step in to actively mediate the dispute between the buyer and the supplier. If  quality parameters are not met , it will result in a debit to the supplier. Please note that all final financial settlements regarding quality claims are handled directly between the buyer and the supplier.",
+      },
+      {
+        question: "What happens if a buyer does not pay or a seller does not deliver?",
+        answer:
+          "FeedXchange (Sri Sai Raghavendra Trade Services) acts strictly as a Canvassing Agent and Facilitator—we are not a party to the sale contract. While we step in to mediate between the Buyer and the Seller to help resolve issues, we do not guarantee payment by any Buyer or supply, quality, or timely delivery by any Seller, and we are not financially liable for any default by either party. All financial settlements are agreed and executed directly between the Buyer and the Seller.",
       },
     ],
   },
@@ -425,6 +445,18 @@ export const faqCategories: FaqCategory[] = [
         question: "How do canvassing fees work?",
         answer:
           "For our services in facilitating the trade, negotiating best prices, and mediating disputes, a standard canvassing/service fee may apply depending on your specific trading agreement with us. If applicable, this fee is billed separately and paid directly to Sri Sai Raghavendra Trade Services.",
+      },
+    ],
+  },
+  {
+    id: "logistics",
+    title: "Logistics & Transporters",
+    icon: TruckIcon,
+    items: [
+      {
+        question: "How is freight arranged, and who pays it?",
+        answer:
+          "Once a contract is executed, the Buyer, Seller, or our team (acting as Canvassing Agents) can either arrange transport offline or broadcast the loading requirement to enrolled Transporters on the Portal. Transporters can view requirements, negotiate freight rates, and assign vehicles directly. Freight charges and transit terms are agreed upon and settled directly between the Transporter and the party responsible for paying the freight.",
       },
     ],
   },
