@@ -3,24 +3,22 @@
 
 // ---------- Inner page banner ----------
 .page-hero {
-  padding: v.$space-7 0;
+  // Compact: 5px top/bottom on every screen size.
+  padding: 5px 0;
   background-color: v.$navy-900;
   background-image: radial-gradient(120% 140% at 100% 0%, v.$navy-600 0%, v.$navy-900 60%);
   color: v.alpha(v.on(v.$white), 0.8);
 
-  @include m.up(lg) {
-    padding: v.$space-8 0;
-  }
-
   h1 {
     @include m.fluid-type(2rem, 3rem);
-    margin-top: v.$space-3;
+    margin-top: 5px;
     color: v.fg(v.$white);
   }
 
+  // One line wherever it fits (wraps only on screens too narrow for it).
   p {
-    max-width: 36rem;
-    margin-top: v.$space-3;
+    max-width: none;
+    margin-top: 5px;
     font-size: v.$fs-lg;
   }
 

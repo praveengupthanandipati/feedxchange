@@ -119,7 +119,7 @@ function validateField(key: Field, values: SignupValues, counts: OptionCounts): 
       if (!text) return undefined;
       return REFERRAL_PATTERN.test(text) ? undefined : "Referral codes are 4–12 letters or numbers.";
     case "agree":
-      return values.agree ? undefined : "Please accept the Terms & Conditions.";
+      return values.agree ? undefined : "Please accept the Terms & Conditions and Privacy Policy.";
     default:
       return undefined;
   }
@@ -491,6 +491,10 @@ const SignupForm = () => {
             I agree to FeedXchange{" "}
             <Link to={sitePaths.terms} target="_blank" rel="noopener">
               Terms &amp; Conditions
+            </Link>{" "}
+            and{" "}
+            <Link to={sitePaths.privacy} target="_blank" rel="noopener">
+              Privacy Policy
             </Link>{" "}
             <span className="su-agree__star" aria-hidden>
               *

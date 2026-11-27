@@ -18,11 +18,12 @@
 
   <!-- Hub -->
   <g filter="url(#a-shadow)">
-    <circle cx="260" cy="210" r="58" fill="#0b2547"/>
+    <circle cx="260" cy="210" r="46" fill="#fff"/>
   </g>
-  <!-- "fX": a small lowercase f and a large X -->
-  <path d="M236 232V208a10 10 0 0 1 10-10h4M229 214h15" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M256 186l34 48M290 186l-34 48" stroke="#f5a524" stroke-width="9" stroke-linecap="round"/>
+  <!-- Blue dotted ring around the hub -->
+  <circle cx="260" cy="210" r="52" fill="none" stroke="#1b4a85" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="0.1 6"/>
+  <!-- The website favicon (public/favicon.png), embedded so it also shows when this SVG is used as an <img> -->
+  <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF0AAABhCAYAAAC0ya0VAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABIhJREFUeNrs3T9y2kAUx3FZQ2q7T2bgBjhVyuAThD5FaFIbnyDiBCF1GlKkJzeAMh0+QWAm6aFO4bx1VhmZ8Ef72H3vt6x2RsM4Mcj+svogZEu+eHh4yFzHi1fvO3QzqfzT0i5rWhY/v3+e7bvv76/PC7rpZemOYYt5RxPNhB/SMqPIa4f7Tu39LhONftVymN1XNlY12DUFn7qs8dnbXws72z+mOtUv6vBCwft0M6alveO/X1L4heuKKbwh6HWCzW9aNWa3if3uwKcZ268ZKx8Y/1NkJj8SfHYkuBld+tzCdcXEjHnhLRKc6bt5qQTvOjxWw0xNXnJPwbOtXUhXZjap8zJlBC+ZGTfMOEa3Np+yqd/SY/QY4c2TNU8uun2XOfTwmBNLVMPMnlHdZSw87b617WMNHWf7EuxN04r5OtU5tsf3uPdiZ/kP36/Sh47BRLA3c0MTIcTX/2/vJcQLWczMfGIGH9aZMGX0foAvvM15MgH2Zlac9VPwTt375fa4Sqi34jHuzQxo/WvOll23Y848bnKuzARlpRq9F/gbiYWZ4KxIzvRYmAnOSjW61KFVZGZEWNl5GCBRZsRY0YiOyowYK1rR0ZgRZUUzOgoz4qxoRkdhRpwV7ejazKiwghBdixk1VhCiazGjxgpKdGlmVFlBii7FjDorSNGlmFFnBS16aGYgWEGMHooZGFYQo4diBoYV1Oi+mYFiBTm6L2bgWEGO7osZOFbQo5/KzB0iK+VoAUdn/3pe9vfsEThWYpjpbGa4W1Ym9PNi9OinMAPHSkzR2yE3e0lWYooemhkxVmKLHoQZaVZijO6VGQpufrNN5QSEmKL7Zmai9U3EFt0LM/Y0m24TXYgZy8oHzW8gxuglM9zZPtD+4mONPnK8xkx1mK1k00R3G/cUnM2LPfI4aKIL80Dhzan435ro9VlZeHzyNk30gKwgMRNTdO+BtJiJJbpPVtSZiSG6V1YQmIkhevAg0sygRw/JihozyNFZrJhjK7RMGbNdjBnk6NwAE1reUPg+I7wIM6jRR8zLDZotozxkO6GPIc/QRozOZiV7esj2MmP8oEKCGcTop7CyPSCZQYvug5X/ngw0ZpCi+2Jle8AxgxTdJyvQzKBED8EKLDMI0UOxAssMQvSQrEAyox1dghU4ZjSjS7ECx4xmdElWkJhZaEXXYAWCGbPF5AmxgsDMXIsXTVa0mZlpREdgRZMZ8egorGgxsynPbZWKvgFjRYOZqfQuYwHIijQzY8nocwo+BmRFkpm5+euUUtHRWZFippB8R2pYWYKzEpqZ+fbFIfKGleDMDKSOvcTGSihm7uxVOZ6MFhgrY0VWdjHD+ZW+qworO7f0FhArPbq5zXCGYYZ7Cvt9duBvR+UIrNgXrkl2HuOxwaFLWeUIrNhdqvaZBO9V98lDRz8XVrhjVSe4z+ips2KOk1/XCe7zhTRlVkYUu3C5g4/oqbJiZvew7uz2GT1FVkzsgnPdR1/RU2Lli5kop8T2Ef3cWTFvcGblwryE7N7oI+FjJJ0T1hlyGJtN2DXHaZfxR4ABANi4xH4NKtOuAAAAAElFTkSuQmCC" x="231" y="180" width="58" height="60.5" preserveAspectRatio="xMidYMid meet"/>
 
   <!-- Nodes -->
   <g filter="url(#a-shadow)">

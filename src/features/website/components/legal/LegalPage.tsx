@@ -1,8 +1,7 @@
 import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
-import { CalendarIcon, ChevronDownIcon, ShieldIcon } from "../../../../shared/components/icon";
+import { ChevronDownIcon, ShieldIcon } from "../../../../shared/components/icon";
 import type { PolicyPoint, PolicySection } from "../../data/legal";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
-import PageHero from "../sections/PageHero";
 
 const number = (index: number) => String(index + 1).padStart(2, "0");
 
@@ -32,7 +31,7 @@ interface LegalPageProps {
  * Legal document page (Privacy Policy, Terms and Conditions): numbered sections with a contents menu
  * (sticky sidebar on laptops, a fold-out list on phones) that highlights the section being read.
  */
-const LegalPage = ({ title, updated, sections, badge, extras = {} }: LegalPageProps) => {
+const LegalPage = ({ title, sections, badge, extras = {} }: LegalPageProps) => {
   const reducedMotion = useReducedMotion();
   const [activeId, setActiveId] = useState(sections[0]?.id);
   const [tocOpen, setTocOpen] = useState(false);
@@ -62,8 +61,6 @@ const LegalPage = ({ title, updated, sections, badge, extras = {} }: LegalPagePr
 
   return (
     <>
-      <PageHero title={title} text={`Last Updated: ${updated}`} />
-
       <section className="section legal">
         <div className="site-container legal__layout">
           {/* ---------- Contents ---------- */}
@@ -96,9 +93,6 @@ const LegalPage = ({ title, updated, sections, badge, extras = {} }: LegalPagePr
             <header className="legal-doc__meta">
               <span className="legal-doc__badge">
                 <ShieldIcon aria-hidden /> {badge}
-              </span>
-              <span className="legal-doc__date">
-                <CalendarIcon aria-hidden /> Last Updated: <time>{updated}</time>
               </span>
             </header>
 

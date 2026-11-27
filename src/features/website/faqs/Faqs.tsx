@@ -13,7 +13,7 @@ const totalQuestions = faqCategories.reduce((sum, category) => sum + category.it
  * jumps to each group and highlights the one in view. Each group is an accordion.
  */
 const Faqs = () => {
-  usePageTitle("FAQ's", "Answers to common questions about trading, payments, quality checks and deliveries on FeedXchange.");
+  usePageTitle("FAQs", "Answers to common questions about trading, payments, quality checks and deliveries on FeedXchange.");
   // Keyed "categoryId-index"; the first question starts open.
   const [openKey, setOpenKey] = useState<string | null>(`${faqCategories[0].id}-0`);
   const [activeId, setActiveId] = useState(faqCategories[0].id);
