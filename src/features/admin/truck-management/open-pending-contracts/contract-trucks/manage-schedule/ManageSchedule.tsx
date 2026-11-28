@@ -387,7 +387,7 @@ const ScheduleRequestRow = ({
               />
             ) : (
               <span className="manage-schedule-table__muted">
-                Transporter proposed {rupees(negotiation?.proposedFreightPerMT)}/MT — waiting for FeedXchange or the requester to approve it.
+                Transporter proposed {rupees(negotiation?.proposedFreightPerMT)}/MT — waiting for feedXchange or the requester to approve it.
               </span>
             ))}
           {isPending && negotiation?.canDecide && availableQty > 0 && (

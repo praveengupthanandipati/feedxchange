@@ -10,7 +10,7 @@ export type Theme = Exclude<ThemeChoice, "system">;
 export const THEME_KEY = "fx-theme";
 
 export const THEME_CHOICES: { value: ThemeChoice; label: string; hint: string }[] = [
-  { value: "light", label: "Light", hint: "The FeedXchange colours on a white page" },
+  { value: "light", label: "Light", hint: "The feedXchange colours on a white page" },
   { value: "dark", label: "Dark", hint: "Light text on a dark page, easier at night" },
   { value: "high-contrast", label: "High contrast", hint: "Darker text and stronger borders" },
   { value: "system", label: "Match my device", hint: "Follows your device's light, dark or contrast setting" },

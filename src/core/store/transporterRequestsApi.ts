@@ -16,7 +16,7 @@ export interface TransporterRequest {
   deliveryPlace: string | null;
   loadingAddress: string | null;
   deliveryAddress: string | null;
-  /** What FeedXchange wrote on the request. */
+  /** What feedXchange wrote on the request. */
   requestRemarks: string | null;
   /** The request involves a re-assigned truck: a bill change is needed. */
   billChange: boolean;
@@ -150,7 +150,7 @@ export interface TruckLookups {
 export interface InstantTruck {
   contractDispatchId: number;
   transporterName: string;
-  /** Only for FeedXchange staff. */
+  /** Only for feedXchange staff. */
   contractNumber: string | null;
   assignedOn: string;
   productName: string | null;
@@ -174,7 +174,7 @@ export interface ScheduleDashboardRow {
   request: TransporterRequest;
   /** Pending, Accepted, PartiallyAccepted, Rejected, Expired or Cancelled. */
   responseStatus: string;
-  /** Only for FeedXchange staff; null for a transporter. */
+  /** Only for feedXchange staff; null for a transporter. */
   contractNumber: string | null;
   /** Accepted, less what was cancelled: what trucks have to be put on. */
   committedQuantityMT: number;

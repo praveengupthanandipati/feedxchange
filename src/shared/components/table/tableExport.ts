@@ -190,7 +190,7 @@ export async function exportTablePdf<T>(name: string, columns: TableColumn<T>[],
       doc.setFontSize(8);
       doc.setTextColor(...MUTED);
       doc.text(`Page ${doc.getNumberOfPages()}`, pageWidth - margin, pageHeight - 16, { align: "right" });
-      doc.text("FeedXchange", margin, pageHeight - 16);
+      doc.text("feedXchange", margin, pageHeight - 16);
     },
   });
 

@@ -18,7 +18,7 @@ const About = () => {
   useSeo({
     title: "About Us: Feed Ingredient Traders Since 1996",
     description:
-      "FeedXchange is built by Sri Sai Raghavendra Trade Services, Vijayawada, trading feed raw materials since 1996: de-oiled cakes, grains, DDGS for India's feed makers.",
+      "feedXchange is built by Sri Sai Raghavendra Trade Services, Vijayawada, trading feed raw materials since 1996: de-oiled cakes, grains, DDGS for India's feed makers.",
     keywords: ["Sri Sai Raghavendra Trade Services", "feed ingredient traders Vijayawada", "feed raw material traders Andhra Pradesh"],
     pageType: "AboutPage",
     breadcrumbs: [],
@@ -28,7 +28,7 @@ const About = () => {
 
   return (
     <>
-      <PageHero title="About Us" text="Welcome to FeedXchange.in, an initiative by Sri Sai Raghavendra Trade Services." />
+      <PageHero title="About Us" text="Welcome to feedXchange.in, an initiative by Sri Sai Raghavendra Trade Services." />
 
       {/* ---------- Who we are ---------- */}
       <section className="section" aria-labelledby="story-title">
@@ -37,7 +37,7 @@ const About = () => {
             <SectionHead id="story-title" eyebrow="Who we are" title="Bridging Tradition and Technology in the Animal Feed Industry" align="left" />
             <div className="prose-site">
               <p>
-                Welcome to <strong>FeedXchange.in</strong>, an initiative by <strong>{about.parent}</strong>.
+                Welcome to <strong>feedXchange.in</strong>, an initiative by <strong>{about.parent}</strong>.
               </p>
               <p>
                 Based out of {about.city}, we have been a trusted cornerstone in the animal feed industry since {about.founded}. For nearly three decades, we have proudly
@@ -55,7 +55,7 @@ const About = () => {
           </div>
 
           <div className="split__visual about-intro__visual" data-reveal data-reveal-delay="120">
-            <img src={aboutImage} alt="The FeedXchange partner network" width={520} height={420} loading="lazy" />
+            <img src={aboutImage} alt="The feedXchange partner network" width={520} height={420} loading="lazy" />
             <div className="about-badge about-badge--year">
               <span>Since</span>
               <strong>{about.founded}</strong>
@@ -147,7 +147,7 @@ const About = () => {
             id="team-title"
             eyebrow="Meet the team"
             title="Meet the Team Behind the Trade"
-            text={`The enduring success of ${about.parent} and the vision for FeedXchange are driven by our dedicated leadership:`}
+            text={`The enduring success of ${about.parent} and the vision for feedXchange are driven by our dedicated leadership:`}
           />
 
           <article className="team-card team-card--featured" data-reveal>
@@ -189,17 +189,17 @@ const About = () => {
         </div>
       </section>
 
-      {/* ---------- FeedXchange ---------- */}
+      {/* ---------- feedXchange ---------- */}
       <section className="section section--alt" aria-labelledby="evolution-title">
         <div className="site-container about-evolution">
           <div data-reveal>
-            <SectionHead id="evolution-title" eyebrow="The next evolution" title="The Next Evolution: FeedXchange.in" align="left" />
+            <SectionHead id="evolution-title" eyebrow="The next evolution" title="The Next Evolution: feedXchange.in" align="left" />
             <div className="prose-site">
               <p>
                 As an extension of our decades of offline service, we recognized the need to bring the animal feed market into the digital age. This vision led to the
-                creation of FeedXchange.in&mdash;to our knowledge, the first-of-its-kind portal in India dedicated specifically to the animal feed ingredient trade.
+                creation of feedXchange.in&mdash;to our knowledge, the first-of-its-kind portal in India dedicated specifically to the animal feed ingredient trade.
               </p>
-              <p>FeedXchange is designed to eliminate the guesswork and friction of traditional procurement. Through our platform, we offer:</p>
+              <p>feedXchange is designed to eliminate the guesswork and friction of traditional procurement. Through our platform, we offer:</p>
             </div>
 
             <ol className="about-timeline" aria-label="Our journey">
@@ -239,7 +239,7 @@ const About = () => {
             our mission is to make your operations <em>smoother, faster, and more profitable.</em>
           </h2>
           <p>
-            At Sri Sai Raghavendra Trade Services, we are proud of where we came from, and through FeedXchange.in, we are excited about where the industry is going.
+            At Sri Sai Raghavendra Trade Services, we are proud of where we came from, and through feedXchange.in, we are excited about where the industry is going.
           </p>
         </div>
       </section>

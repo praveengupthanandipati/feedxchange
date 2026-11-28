@@ -14,7 +14,14 @@ const totalQuestions = faqCategories.reduce((sum, category) => sum + category.it
  * jumps to each group and highlights the one in view. Each group is an accordion.
  */
 const Faqs = () => {
-  usePageTitle("FAQs", "Answers to common questions about trading, payments, quality checks and deliveries on FeedXchange.");
+  useSeo({
+    title: "FAQs",
+    description: "Answers to common questions about trading, payments, quality checks and deliveries on feedXchange.",
+    pageType: "FAQPage",
+    breadcrumbs: [],
+    // every question as FAQPage structured data, so search and AI answers can quote them
+    schema: [faqPageSchema("/faqs", faqCategories.flatMap((category) => category.items))],
+  });
   // Keyed "categoryId-index"; the first question starts open.
   const [openKey, setOpenKey] = useState<string | null>(`${faqCategories[0].id}-0`);
   const [activeId, setActiveId] = useState(faqCategories[0].id);
@@ -45,7 +52,7 @@ const Faqs = () => {
 
   return (
     <>
-      <PageHero title="Frequently Asked Questions (FAQ)" text="Everything you need to know about FeedXchange.in, organised by topic." />
+      <PageHero title="Frequently Asked Questions (FAQ)" text="Everything you need to know about feedXchange.in, organised by topic." />
 
       <section className="section">
         <div className="site-container faq-layout">

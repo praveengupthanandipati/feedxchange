@@ -20,7 +20,7 @@ const Home = () => {
   useSeo({
     ready: !catalogueLoading,
     title: "B2B Animal Feed Ingredients Marketplace India",
-    fullTitle: "FeedXchange | B2B Animal Feed Ingredients Marketplace India",
+    fullTitle: "feedXchange | B2B Animal Feed Ingredients Marketplace India",
     description:
       "Buy and sell animal feed ingredients online in India: de-oiled cakes, soybean meal, DDGS, rice bran (DORB) and maize. Live prices, verified sellers, tracked trucks.",
     keywords: ["buy feed ingredients online", "feed raw material suppliers India", "live feed ingredient prices", "maize DDGS", "soya DOC"],
@@ -31,14 +31,14 @@ const Home = () => {
       <Hero />
       <PartnersStrip />
       <PopularCategories />
-      <CtaBanner title="Find best matching raw material prices for your animal feed" text="" action={{ label: "WhatsApp on 92475 98399", to: whatsappLink }} />
+      <CtaBanner title="Find best matching raw material prices for your animal feed" text="" action={{ label: "WhatsApp on 8499083999", to: whatsappLink }} />
       <ServicesGrid />
       <DealingPartners />
       <WhyChooseUs />
       <StatsBand />
       <HowItWorks />
       <Testimonials />
-      <CtaBanner title="Join Hands with FeedXchange – Your Trusted Partner in Animal Feed & Livestock Trade Success" text="" action={{ label: "Let's work together", to: sitePaths.join }} />
+      <CtaBanner title="Join Hands with feedXchange – Your Trusted Partner in Animal Feed & Livestock Trade Success" text="" action={{ label: "Let's work together", to: sitePaths.join }} />
     </>
   );
 };

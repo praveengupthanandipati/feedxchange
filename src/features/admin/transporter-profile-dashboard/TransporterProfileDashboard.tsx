@@ -393,9 +393,9 @@ const initialPeriod = (): Period => {
 };
 
 /**
- * FeedXchange -> Transporter Dashboard: one transporter at a glance. Profile details, the trips (trucks assigned in a period) with their freight,
+ * feedXchange -> Transporter Dashboard: one transporter at a glance. Profile details, the trips (trucks assigned in a period) with their freight,
  * truck requests and how they were answered, the registered fleet, the businesses it carries for and its routes. Transporter users see their own
- * profile; FeedXchange staff pick any transporter.
+ * profile; feedXchange staff pick any transporter.
  */
 const TransporterProfileDashboard = () => {
   const [period, setPeriod] = useState<Period>(initialPeriod);

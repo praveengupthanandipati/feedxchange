@@ -301,7 +301,7 @@ const SignupForm = () => {
         <CircleCheckBigIcon aria-hidden />
         <h2>Registration complete</h2>
         <p>
-          Your email <strong>{verifiedEmail}</strong> is verified and your FeedXchange business account is ready. Log in to continue.
+          Your email <strong>{verifiedEmail}</strong> is verified and your feedXchange business account is ready. Log in to continue.
         </p>
         <Link to={ADMIN_LOGIN} className="btn-site btn-site--primary">
           Log in <ArrowRightIcon aria-hidden />
@@ -316,7 +316,7 @@ const SignupForm = () => {
         <CircleCheckBigIcon aria-hidden />
         <h2>Verify your email</h2>
         <p>
-          We&rsquo;ve sent a one-time password (OTP) to <strong>{sentTo}</strong>. Enter it to activate your FeedXchange business account.
+          We&rsquo;ve sent a one-time password (OTP) to <strong>{sentTo}</strong>. Enter it to activate your feedXchange business account.
         </p>
         <button type="button" className="btn-site btn-site--outline" onClick={() => setSentTo(null)}>
           Use a different email
@@ -488,7 +488,7 @@ const SignupForm = () => {
             <CheckIcon />
           </span>
           <span>
-            I agree to FeedXchange{" "}
+            I agree to feedXchange{" "}
             <Link to={sitePaths.terms} target="_blank" rel="noopener">
               Terms &amp; Conditions
             </Link>{" "}

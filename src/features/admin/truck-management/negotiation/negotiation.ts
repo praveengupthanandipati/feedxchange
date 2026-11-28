@@ -31,10 +31,10 @@ export const ACTION_TONES: Record<NegotiationAction, BadgeTone> = {
 };
 
 export const ACTOR_LABELS: Record<NegotiationActor, string> = {
-  Admin: "FeedXchange",
+  Admin: "feedXchange",
   Initiator: "Requested by",
   Transporter: "Transporter",
-  System: "FeedXchange (automatic)",
+  System: "feedXchange (automatic)",
 };
 
 export const rupees = (value: number | null | undefined) =>

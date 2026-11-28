@@ -25,7 +25,7 @@ const postalAddress = {
   addressCountry: "IN",
 };
 
-/** What FeedXchange trades: used as "knowsAbout" so search and AI answer engines connect the brand to these topics. */
+/** What feedXchange trades: used as "knowsAbout" so search and AI answer engines connect the brand to these topics. */
 export const TOPICS = [
   "Animal feed ingredients",
   "Feed raw materials",
@@ -48,7 +48,7 @@ export const organizationSchema = (): Json => ({
   "@type": "Organization",
   "@id": ORG_ID,
   name: company.name,
-  alternateName: ["FeedXchange.in", "Feed Xchange"],
+  alternateName: ["feedXchange.in", "Feed Xchange"],
   url: `${SITE_URL}/`,
   logo: { "@type": "ImageObject", url: LOGO, width: 592, height: 97 },
   image: DEFAULT_IMAGE,
@@ -107,7 +107,7 @@ export const websiteSchema = (): Json => ({
   "@id": WEBSITE_ID,
   url: `${SITE_URL}/`,
   name: company.name,
-  alternateName: "FeedXchange.in",
+  alternateName: "feedXchange.in",
   description: "B2B marketplace for animal feed ingredients in India",
   inLanguage: "en-IN",
   publisher: { "@id": ORG_ID },

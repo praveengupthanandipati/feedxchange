@@ -39,5 +39,5 @@ export const initialNotifications: AppNotification[] = [
   { id: "n11", category: "dispatch", title: "Truck KA05G3311 reached destination", message: "Green Valley Dairy delivery for CON-2026-004 marked as received.", createdAt: minutesAgo(3 * DAY), read: true, link: "/admin/truck-management/seller-dispatches-new" },
   { id: "n12", category: "payments", title: "Payment overdue: INV-2026-002", message: "KK Proteins Pvt Ltd is 5 days past the due date for ₹37,800.", createdAt: minutesAgo(4 * DAY), read: false, link: "/admin/payments/payment-advice/view" },
   { id: "n13", category: "contracts", title: "Contract CON-2026-003 updated", message: "Quantity changed from 20 MT to 25 MT by the buyer.", createdAt: minutesAgo(5 * DAY), read: true, link: "/admin/contracts" },
-  { id: "n14", category: "system", title: "Scheduled maintenance", message: "FeedXchange will be unavailable on Sunday 02:00–03:00 AM IST.", createdAt: minutesAgo(6 * DAY), read: true },
+  { id: "n14", category: "system", title: "Scheduled maintenance", message: "feedXchange will be unavailable on Sunday 02:00–03:00 AM IST.", createdAt: minutesAgo(6 * DAY), read: true },
 ];

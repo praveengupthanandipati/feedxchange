@@ -5,7 +5,7 @@ import { useSeo } from "../seo/useSeo";
 const Terms = () => {
   useSeo({
     title: "Terms and Conditions",
-    description: "The terms that govern registering, buying, selling and transporting animal feed ingredients on FeedXchange, India's B2B feed ingredient marketplace.",
+    description: "The terms that govern registering, buying, selling and transporting animal feed ingredients on feedXchange, India's B2B feed ingredient marketplace.",
     breadcrumbs: [],
   });
 

@@ -4,7 +4,7 @@ import { company } from "../data/content";
 import { DEFAULT_IMAGE, SITE_URL, absoluteUrl, breadcrumbSchema, graph, webPageSchema, type Crumb } from "./schema";
 
 export interface SeoOptions {
-  /** The page's own title, e.g. "Feed Ingredient Prices". " | FeedXchange" is added unless fullTitle is set. */
+  /** The page's own title, e.g. "Feed Ingredient Prices". " | feedXchange" is added unless fullTitle is set. */
   title: string;
   /** The whole <title> as is (the home page puts its keyword first and the brand last itself). */
   fullTitle?: string;
@@ -40,7 +40,7 @@ const DEFAULT_KEYWORDS = [
   "DDGS",
   "de-oiled rice bran",
   "feed ingredient prices",
-  "FeedXchange",
+  "feedXchange",
 ];
 
 /** Creates or updates one <meta>/<link> in <head> and returns how to put it back. */

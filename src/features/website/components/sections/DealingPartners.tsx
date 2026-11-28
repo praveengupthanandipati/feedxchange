@@ -3,7 +3,7 @@ import { useReducedMotion } from "../../hooks/useReducedMotion";
 import SectionHead from "../common/SectionHead";
 import DealingIcon from "./DealingIcon";
 
-/** "Dealing Partners": the four kinds of farms FeedXchange serves. */
+/** "Dealing Partners": the four kinds of farms feedXchange serves. */
 const DealingPartners = () => {
   const reducedMotion = useReducedMotion();
 

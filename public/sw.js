@@ -1,5 +1,5 @@
-// FeedXchange service worker: desktop notifications while no FeedXchange tab is open (Web Push).
-// It only shows a notification when no FeedXchange window is on screen; when one is, the in-app toast (SignalR) already tells the user.
+// feedXchange service worker: desktop notifications while no feedXchange tab is open (Web Push).
+// It only shows a notification when no feedXchange window is on screen; when one is, the in-app toast (SignalR) already tells the user.
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
@@ -9,14 +9,14 @@ self.addEventListener("push", (event) => {
   try {
     data = event.data ? event.data.json() : {};
   } catch {
-    data = { title: "FeedXchange", body: event.data ? event.data.text() : "" };
+    data = { title: "feedXchange", body: event.data ? event.data.text() : "" };
   }
 
   event.waitUntil(
     (async () => {
       const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
       if (windows.some((w) => w.visibilityState === "visible" && w.focused)) return;
-      await self.registration.showNotification(data.title || "FeedXchange", {
+      await self.registration.showNotification(data.title || "feedXchange", {
         body: data.body || "",
         icon: "/favicon.png",
         tag: data.inboxId ? `fx-${data.inboxId}` : "fx",

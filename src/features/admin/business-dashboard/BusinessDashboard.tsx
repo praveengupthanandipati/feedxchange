@@ -395,9 +395,9 @@ const initialPeriod = (): Period => {
 };
 
 /**
- * FeedXchange -> Business Dashboard: one business at a glance. Profile details, contracts executing and executed in a period
+ * feedXchange -> Business Dashboard: one business at a glance. Profile details, contracts executing and executed in a period
  * (by contract date), the trucks on those contracts and the products it lists or traded. Business users see their own business
- * (and its group businesses, through the picker); FeedXchange staff pick any business.
+ * (and its group businesses, through the picker); feedXchange staff pick any business.
  */
 const BusinessDashboard = () => {
   const [period, setPeriod] = useState<Period>(initialPeriod);

@@ -32,11 +32,11 @@ const Blogs = () => {
           {
             "@type": "Blog",
             "@id": absoluteUrl("/blogs#blog"),
-            name: "FeedXchange Blog",
+            name: "feedXchange Blog",
             url: absoluteUrl("/blogs"),
             blogPost: posts.map((post) => ({
               "@type": "BlogPosting",
-              headline: post.name?.trim() || "FeedXchange update",
+              headline: post.name?.trim() || "feedXchange update",
               ...(post.description ? { abstract: post.description.trim().slice(0, 300) } : {}),
               ...(post.createdAt ? { datePublished: post.createdAt } : {}),
               ...(post.createdByName ? { author: { "@type": "Person", name: post.createdByName } } : {}),
@@ -58,7 +58,7 @@ const Blogs = () => {
 
   return (
     <>
-      <PageHero title="Blogs" text="Market insights, nutrition tips and platform news from the FeedXchange team." />
+      <PageHero title="Blogs" text="Market insights, nutrition tips and platform news from the feedXchange team." />
       <section className="section">
         <div className="site-container">
           {status ? (

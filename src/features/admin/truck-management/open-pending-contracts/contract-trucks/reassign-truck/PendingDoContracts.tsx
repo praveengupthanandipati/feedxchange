@@ -58,7 +58,7 @@ const DoDialog = ({ contract, truck, onClose, onDone }: DoDialogProps) => {
     try {
       const result = await enterDo({ contractDispatchId: truck.contractDispatchId, doNumber: doNumber.trim(), doDate, doMessage: doMessage.trim() || undefined }).unwrap();
       const where = result.legsUpdated > 1 ? ` It was copied to all ${result.legsUpdated} contracts of this truck (${result.contracts.join(", ")}).` : "";
-      onDone(`DO ${result.doNumber} entered for truck ${truck.truckNumber}.${where} The transporter and FeedXchange have been notified.`);
+      onDone(`DO ${result.doNumber} entered for truck ${truck.truckNumber}.${where} The transporter and feedXchange have been notified.`);
     } catch (err) {
       setError(getErrorMessage(err, "The DO could not be saved. Please try again."));
     }
@@ -212,7 +212,7 @@ const ContractCard = ({ contract, tab, onEnterDo }: ContractCardProps) => (
 
 /**
  * Re-assign Truck, without a truck picked: the seller's contracts that have trucks assigned but no Delivery Order (DO) yet, contract by contract.
- * For each truck the seller can enter the DO (it is copied to every leg of the truck's re-assignment chain, and the transporter and FeedXchange are
+ * For each truck the seller can enter the DO (it is copied to every leg of the truck's re-assignment chain, and the transporter and feedXchange are
  * told) or re-assign the truck to another contract where they are the buyer of the same product.
  */
 const PendingDoContracts = () => {

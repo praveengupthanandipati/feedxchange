@@ -148,7 +148,7 @@ const ProfilePreferencesPanel = ({ profileId, compact = false, readOnly = false 
               ? undefined
               : readOnly
                 ? "Change this from the profile's edit screen."
-                : "Only FeedXchange administrators can switch automatic notifications on or off."
+                : "Only feedXchange administrators can switch automatic notifications on or off."
           }
           onClick={() => void changeMode()}
         >
@@ -161,7 +161,7 @@ const ProfilePreferencesPanel = ({ profileId, compact = false, readOnly = false 
       )}
 
       {!readOnly && !canSwitchMode && !auto && (
-        <p className="pref-hint"><InfoIcon aria-hidden /> Contacts' preferences can be prepared now. Ask a FeedXchange administrator to switch automatic notifications on when you are ready.</p>
+        <p className="pref-hint"><InfoIcon aria-hidden /> Contacts' preferences can be prepared now. Ask a feedXchange administrator to switch automatic notifications on when you are ready.</p>
       )}
 
       {/* ------------------------------------------------ settings */}

@@ -18,9 +18,9 @@ const PAYMENT_SCREENS = ["ADD_SELLER_INVOICE", "VIEW_SELLER_INVOICES", "ADD_PAYM
 export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/", any: ["dashboard"] },
   { path: "/admin/dashboard", any: ["dashboard"] },
-  // FeedXchange > Business Dashboard (Sub Module BUSINESS_DASHBOARD; the API checks the same key)
+  // feedXchange > Business Dashboard (Sub Module BUSINESS_DASHBOARD; the API checks the same key)
   { path: "/admin/business-dashboard", any: ["BUSINESS_DASHBOARD"] },
-  // FeedXchange > Transporter Dashboard (Sub Module TRANSPORTER_DASHBOARD; the API checks the same key)
+  // feedXchange > Transporter Dashboard (Sub Module TRANSPORTER_DASHBOARD; the API checks the same key)
   { path: "/admin/transporter-dashboard", any: ["TRANSPORTER_DASHBOARD"] },
 
   { path: "/admin/contracts/new", any: ["contracts.manage"] },

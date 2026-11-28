@@ -1,7 +1,7 @@
 import { apiFetch } from "../../core/api/tokenRefresh";
 import { isTauri } from "./desktopNotify";
 
-// Desktop notifications while the browser has no FeedXchange tab open: the browser's push service wakes the service worker (public/sw.js),
+// Desktop notifications while the browser has no feedXchange tab open: the browser's push service wakes the service worker (public/sw.js),
 // which shows the notification. This needs the user's permission, HTTPS (or localhost) and VAPID keys on the server. In a browser only:
 // Tauri's WebView has no push service (see docs/notifications-tauri.md).
 

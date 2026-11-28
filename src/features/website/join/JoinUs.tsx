@@ -29,14 +29,14 @@ const JoinUs = () => {
   useSeo({
     title: "Register Free as Seller, Buyer or Transporter",
     description:
-      "Register free on FeedXchange as a feed ingredient seller, buyer (poultry, aqua, cattle feed mill) or transporter. KYC once, then trade and track every contract.",
+      "Register free on feedXchange as a feed ingredient seller, buyer (poultry, aqua, cattle feed mill) or transporter. KYC once, then trade and track every contract.",
     keywords: ["register feed ingredient seller", "feed mill buyer registration", "transporter registration India"],
     breadcrumbs: [],
   });
 
   return (
     <>
-      <PageHero title="Join with us" text="Register your business and start trading feed ingredients on FeedXchange." />
+      <PageHero title="Join with us" text="Register your business and start trading feed ingredients on feedXchange." />
       <section className="section join">
         <div className="site-container join__layout">
           <div className="join__intro" data-reveal>

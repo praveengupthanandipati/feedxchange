@@ -20,7 +20,7 @@ import { useNotifyPrompt } from "../../../../../shared/notifications/useNotifyPr
 type BillChangeOption = "direct" | "changeToBeDone";
 
 const DEFAULT_BILL_MESSAGE =
-  "Kindly contact FeedXchange team or Buyer for Bill Change and release the vehicle with correct bill";
+  "Kindly contact feedXchange team or Buyer for Bill Change and release the vehicle with correct bill";
 
 interface FormState {
   billChangeOption: BillChangeOption;
@@ -486,7 +486,7 @@ const ScheduleRequestDrawer = ({
               </label>
               {form.autoApprove && (
                 <p className="schedule-request-drawer__hint">
-                  The transporter must state its freight. If neither you nor FeedXchange approves or revises it within 10 minutes, it is approved
+                  The transporter must state its freight. If neither you nor feedXchange approves or revises it within 10 minutes, it is approved
                   automatically, and everyone involved is notified.
                 </p>
               )}

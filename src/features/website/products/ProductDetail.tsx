@@ -22,9 +22,9 @@ const ProductDetail = () => {
   const product = findBySlug(slug);
   const seoDescription = product
     ? (product.description ||
-        `${product.name} (${product.categoryName}) for poultry, aqua and cattle feed: today's indicative price, specifications and KYC-verified sellers across India on FeedXchange.`
+        `${product.name} (${product.categoryName}) for poultry, aqua and cattle feed: today's indicative price, specifications and KYC-verified sellers across India on feedXchange.`
       ).slice(0, 160)
-    : "Feed ingredient details, prices and verified sellers on FeedXchange.";
+    : "Feed ingredient details, prices and verified sellers on feedXchange.";
   useSeo({
     title: product ? `${product.name} Price Today & Suppliers in India` : isLoading ? "Products" : "Product not found",
     description: seoDescription,
@@ -59,7 +59,7 @@ const ProductDetail = () => {
   const summary = `${product.categoryName} from verified manufacturers, at transparent, real-time prices.`;
   const description =
     product.description ||
-    `${product.name} sourced from verified manufacturers and traded through FeedXchange at transparent, real-time prices. Final specifications and pricing are confirmed when the contract is executed.`;
+    `${product.name} sourced from verified manufacturers and traded through feedXchange at transparent, real-time prices. Final specifications and pricing are confirmed when the contract is executed.`;
   // The chart works in ₹ per MT; the catalogue price is usually per kg.
   const pricePerMt = /kg/i.test(product.weightClause) ? product.price * 1000 : product.price;
 
@@ -67,7 +67,7 @@ const ProductDetail = () => {
   const rest = catalogue.filter((item) => item.id !== product.id);
   const others = [...rest.filter((item) => item.categoryId === product.categoryId), ...rest.filter((item) => item.categoryId !== product.categoryId)].slice(0, 5);
 
-  const shareText = `${product.name} on FeedXchange: ${window.location.href}`;
+  const shareText = `${product.name} on feedXchange: ${window.location.href}`;
   // Phones get the native share sheet; everything else opens WhatsApp with the link filled in.
   const share = (event: MouseEvent<HTMLAnchorElement>) => {
     if (typeof navigator.share !== "function") return;

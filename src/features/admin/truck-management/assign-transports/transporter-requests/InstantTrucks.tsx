@@ -20,7 +20,7 @@ const InstantTruckCard = ({ item, lookups, refreshLookups, showTransporter, onDe
   const [editing, setEditing] = useState(false);
   const t = item.truck;
   const loaded = t.status !== "Assigned";
-  // Delete: while not loaded, and not for a truck re-assigned across contracts (that one is cancelled by FeedXchange).
+  // Delete: while not loaded, and not for a truck re-assigned across contracts (that one is cancelled by feedXchange).
   // Delete while not loaded; a re-assigned truck comes off every contract it serves.
   const canDelete = t.editable;
   const [deleteTruck, { isLoading: deleting }] = useDeleteScheduleTruckMutation();

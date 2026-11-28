@@ -63,7 +63,7 @@ const UserPreferencesPanel = ({ prefs, banner, onSave, onPause, onResume, busy =
         <span className="pref-avatar pref-avatar--large" aria-hidden>{prefs.userName.slice(0, 1).toUpperCase()}</span>
         <div>
           <h2>{prefs.userName}</h2>
-          <p>{prefs.profileName ?? "FeedXchange"}</p>
+          <p>{prefs.profileName ?? "feedXchange"}</p>
           <div className="pref-drawer__reach">
             <span className={prefs.email ? "" : "is-missing"}><MailIcon aria-hidden /> {prefs.email ?? "No email"}</span>
             <span className={prefs.mobile ? "" : "is-missing"}><PhoneIcon aria-hidden /> {prefs.mobile ?? "No mobile"}</span>

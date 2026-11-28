@@ -128,7 +128,7 @@ const PriceHistory = ({ seed, basePrice }: { seed: string; basePrice: number }) 
       {lockedNotice && (
         <p className="price-history__notice" role="status">
           <LockIcon aria-hidden /> {lockedNotice} price history is available to registered members.{" "}
-          <Link to={sitePaths.join}>Join FeedXchange</Link> to unlock it.
+          <Link to={sitePaths.join}>Join feedXchange</Link> to unlock it.
         </p>
       )}
 

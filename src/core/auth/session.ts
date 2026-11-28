@@ -105,7 +105,7 @@ export const savePermissionKeys = (keys: string[] | undefined, roleKey?: string 
 
 export const getRoleKey = (): string => read(ROLE_KEY_KEY) ?? "";
 
-/** FeedXchange's Super Admin. Some facts (a freight being approved automatically) are for them only. */
+/** feedXchange's Super Admin. Some facts (a freight being approved automatically) are for them only. */
 /** A transporter user (role transporter.admin / manager / operator). */
 export const isTransporterRole = (): boolean => getRoleKey().toLowerCase().startsWith("transporter.");
 

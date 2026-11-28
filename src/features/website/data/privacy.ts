@@ -9,7 +9,7 @@ export const privacySections: PolicySection[] = [
     id: "introduction",
     title: "Introduction",
     intro: [
-      'Welcome to FeedXchange.in (the "Portal"), owned and operated by Sri Sai Raghavendra Trade Services, based in Vijayawada, Andhra Pradesh ("We", "Us", "Our", or the "Company"). We respect your privacy and are committed to protecting your personal and business data.',
+      'Welcome to feedXchange.in (the "Portal"), owned and operated by Sri Sai Raghavendra Trade Services, based in Vijayawada, Andhra Pradesh ("We", "Us", "Our", or the "Company"). We respect your privacy and are committed to protecting your personal and business data.',
       "This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our Portal or use our services as a Buyer, Seller, Transporter, or Aggregator. By registering on or using the Portal, you consent to the data practices described in this policy.",
     ],
   },
@@ -57,7 +57,7 @@ export const privacySections: PolicySection[] = [
     id: "kyc-sharing",
     title: "Unique Data Sharing Practice (Explicit Consent for KYC Sharing)",
     intro: [
-      "FeedXchange.in operates on a model of absolute transparency between transacting parties. By using this Portal and executing a contract, you explicitly acknowledge and agree to the following data-sharing practice:",
+      "feedXchange.in operates on a model of absolute transparency between transacting parties. By using this Portal and executing a contract, you explicitly acknowledge and agree to the following data-sharing practice:",
     ],
     points: [
       {

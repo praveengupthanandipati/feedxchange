@@ -9,8 +9,8 @@ const Contact = () => {
   useSeo({
     title: "Contact Us: Vijayawada, Andhra Pradesh",
     description:
-      "Call +91 92475 98399, WhatsApp or email contact@feedxchange.in to buy, sell or transport feed ingredients. Office in Gollapudi, Vijayawada; Mon-Sat 9am-6pm.",
-    keywords: ["FeedXchange contact", "feed ingredient supplier Vijayawada", "feed raw material dealer Andhra Pradesh"],
+      "Call +91 8499083999, WhatsApp or email contact@feedxchange.in to buy, sell or transport feed ingredients. Office in Gollapudi, Vijayawada; Mon-Sat 9am-6pm.",
+    keywords: ["feedXchange contact", "feed ingredient supplier Vijayawada", "feed raw material dealer Andhra Pradesh"],
     pageType: "ContactPage",
     breadcrumbs: [],
   });

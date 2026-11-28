@@ -64,7 +64,7 @@ const NotificationBell = () => {
     const result = await enableDesktopNotifications();
     setPermission(result);
     setDesktopOn(result === "granted");
-    // Also register for pushes, so notifications arrive when no FeedXchange tab is open (browsers only, when the server has push set up).
+    // Also register for pushes, so notifications arrive when no feedXchange tab is open (browsers only, when the server has push set up).
     if (result === "granted") void subscribeWebPush().catch(() => undefined);
   };
 

@@ -1,7 +1,7 @@
 import { stats } from "../../data/content";
 
 const StatsBand = () => (
-  <section className="section section--dark stats-band" aria-label="FeedXchange in numbers">
+  <section className="section section--dark stats-band" aria-label="feedXchange in numbers">
     <div className="site-container">
       <dl className="stats-band__grid">
         {stats.map((stat, index) => (

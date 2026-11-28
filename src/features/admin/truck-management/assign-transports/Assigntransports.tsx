@@ -262,9 +262,9 @@ const ContractAssignTransports = () => {
 
 /**
  * Assign Transports.
- *  - A transporter signed in: only the requests FeedXchange sent to it (no contract details), which it can accept or reject, plus its history.
- *  - FeedXchange staff with a contract chosen (?contract=...): the contract's truck assignment, unchanged.
- *  - FeedXchange staff without one: every transporter's requests and responses (read-only), plus history.
+ *  - A transporter signed in: only the requests feedXchange sent to it (no contract details), which it can accept or reject, plus its history.
+ *  - feedXchange staff with a contract chosen (?contract=...): the contract's truck assignment, unchanged.
+ *  - feedXchange staff without one: every transporter's requests and responses (read-only), plus history.
  */
 const Assigntransports = () => {
   const [searchParams] = useSearchParams();

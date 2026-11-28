@@ -2,7 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { apiBaseQuery } from "../api/baseQuery";
 import type { DashboardAddress, DashboardContact, DashboardProfileOption } from "./businessDashboardApi";
 
-// Shapes of the /api/TransporterDashboard endpoints (FeedXchange -> Transporter Dashboard). The server works out every figure;
+// Shapes of the /api/TransporterDashboard endpoints (feedXchange -> Transporter Dashboard). The server works out every figure;
 // the screen only formats, filters and sorts them. Needs the TRANSPORTER_DASHBOARD permission.
 
 export interface TransporterProfile {

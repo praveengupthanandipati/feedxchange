@@ -15,7 +15,7 @@ interface FreightDecisionProps {
 }
 
 /**
- * For FeedXchange admins and the schedule's initiator: approve the transporter's proposed freight (the request is accepted and trucks can be
+ * For feedXchange admins and the schedule's initiator: approve the transporter's proposed freight (the request is accepted and trucks can be
  * added) or send a revised freight back to the transporter. Both notify the transporter automatically.
  */
 const FreightDecision = ({ dispatchScheduleTransporterId, offeredFreightPerMT, proposedFreightPerMT, proposedQuantityMT, proposedRemarks }: FreightDecisionProps) => {

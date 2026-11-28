@@ -8,7 +8,7 @@ interface LogoProps {
   inverse?: boolean;
 }
 
-/** The FeedXchange wordmark (591 × 96), linking home. */
+/** The feedXchange wordmark (591 × 96), linking home. */
 const Logo = ({ inverse = false }: LogoProps) => (
   <Link to={sitePaths.home} className={`site-logo ${inverse ? "site-logo--inverse" : ""}`}>
     <img src={logo} alt={company.name} width={591} height={96} />

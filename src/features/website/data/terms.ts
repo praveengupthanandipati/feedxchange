@@ -8,14 +8,14 @@ export const termsSections: PolicySection[] = [
     id: "introduction",
     title: "Introduction",
     intro: [
-      'Welcome to FeedXchange.in (hereinafter referred to as the "Portal"), an exclusive digital platform owned and operated by Sri Sai Raghavendra Trade Services, based in Vijayawada, Andhra Pradesh (hereinafter referred to as "We", "Us", "Our", or the "Company"). We have been serving as trusted Canvassing Agents for Animal Feed Ingredients since 1996.',
+      'Welcome to feedXchange.in (hereinafter referred to as the "Portal"), an exclusive digital platform owned and operated by Sri Sai Raghavendra Trade Services, based in Vijayawada, Andhra Pradesh (hereinafter referred to as "We", "Us", "Our", or the "Company"). We have been serving as trusted Canvassing Agents for Animal Feed Ingredients since 1996.',
       'By accessing, registering, or using this Portal, you (the "User", "Client", "Buyer", "Seller", "Transporter", or "Aggregator") agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please refrain from using our Portal.',
     ],
   },
   {
     id: "services-and-access",
     title: "Nature of Services and Portal Access",
-    intro: ["FeedXchange.in is a B2B digital portal designed to provide transparent access to information regarding animal feed ingredients, logistics, and trade facilitation."],
+    intro: ["feedXchange.in is a B2B digital portal designed to provide transparent access to information regarding animal feed ingredients, logistics, and trade facilitation."],
     points: [
       {
         label: "Access Levels",
@@ -52,7 +52,7 @@ export const termsSections: PolicySection[] = [
     points: [
       {
         label: "Payment for Goods",
-        text: "All financial transactions and payments for the supply of physical goods are to be made directly to the respective Manufacturer/Supplier's bank account. FeedXchange.in does not act as a payment gateway for the purchase of goods, nor do we collect funds on behalf of the suppliers for the materials procured.",
+        text: "All financial transactions and payments for the supply of physical goods are to be made directly to the respective Manufacturer/Supplier's bank account. feedXchange.in does not act as a payment gateway for the purchase of goods, nor do we collect funds on behalf of the suppliers for the materials procured.",
       },
       {
         label: "Canvassing Fees",
@@ -89,7 +89,7 @@ export const termsSections: PolicySection[] = [
     intro: ['To encourage platform growth, we offer a referral program for designated "Aggregators."'],
     points: [
       { label: "Aggregator Access", text: "Aggregators are provided with a separate login and dashboard to track the users they have successfully onboarded to the Portal." },
-      { label: "Incentives", text: "Aggregators may be eligible for referral bonuses or credits for bringing new, verified users to FeedXchange.in." },
+      { label: "Incentives", text: "Aggregators may be eligible for referral bonuses or credits for bringing new, verified users to feedXchange.in." },
       {
         label: "Program Policies",
         text: "The issuance of referral bonuses or credits is subject to the Company’s internal policies, which may require the referred user to successfully register, clear KYC checks, or execute a certain volume of contracts. The Company reserves the right to modify, suspend, or terminate the referral program and its payout structures at our sole discretion.",
@@ -164,7 +164,7 @@ export const termsSections: PolicySection[] = [
     id: "intellectual-property",
     title: "Intellectual Property and Trademarks",
     intro: [
-      'The name "FeedXchange" (and "feedxchange.in"), along with the website design, the price tracking mechanisms, logos, and all original content, are the exclusive intellectual property of Sri Sai Raghavendra Trade Services. We have formally applied for trademark registration for the name "feedxchange.in". Unauthorized use, reproduction, scraping, or distribution of our intellectual property or pending/registered trademarks is strictly prohibited and may result in legal action.',
+      'The name "feedXchange" (and "feedxchange.in"), along with the website design, the price tracking mechanisms, logos, and all original content, are the exclusive intellectual property of Sri Sai Raghavendra Trade Services. We have formally applied for trademark registration for the name "feedxchange.in". Unauthorized use, reproduction, scraping, or distribution of our intellectual property or pending/registered trademarks is strictly prohibited and may result in legal action.',
     ],
   },
   {

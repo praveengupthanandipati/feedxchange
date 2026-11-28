@@ -8,7 +8,7 @@ import logo from "../../assets/images/logo.svg";
  * images and fonts are ready.
  */
 const SiteLoader = ({ leaving = false }: { leaving?: boolean }) => (
-  <div className={`fx-loader ${leaving ? "fx-loader--leaving" : ""}`} role="status" aria-live="polite" aria-label="Loading FeedXchange">
+  <div className={`fx-loader ${leaving ? "fx-loader--leaving" : ""}`} role="status" aria-live="polite" aria-label="Loading feedXchange">
     <style>{CSS}</style>
     <div className="fx-loader__ring">
       <img src={logo} alt="" width={150} height={24} />

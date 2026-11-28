@@ -19,7 +19,7 @@ import "../../transporter-review-assign-trucks/ReviewAndAssignTrucks.scss";
 import "./TransporterRequests.scss";
 
 interface TransporterRequestsProps {
-  /** "transporter": the signed-in transporter's own requests, which it can answer. "all": every transporter's, read-only (FeedXchange staff). */
+  /** "transporter": the signed-in transporter's own requests, which it can answer. "all": every transporter's, read-only (feedXchange staff). */
   mode: "transporter" | "all";
 }
 
@@ -242,8 +242,8 @@ const PendingRow = ({ request, canRespond, showTransporter, when, fullAddresses,
           {isCounter && (
             <span className="transporter-requests__counter-note">
               {request.offeredFreightPerMT > 0
-                ? <>Counter-offer: {rupees(Number(freight))}/MT instead of {rupees(request.offeredFreightPerMT)}/MT goes to FeedXchange for approval. You can add trucks once it is approved.</>
-                : <>Your freight of {rupees(Number(freight))}/MT goes to FeedXchange for approval. You can add trucks once it is approved.</>}
+                ? <>Counter-offer: {rupees(Number(freight))}/MT instead of {rupees(request.offeredFreightPerMT)}/MT goes to feedXchange for approval. You can add trucks once it is approved.</>
+                : <>Your freight of {rupees(Number(freight))}/MT goes to feedXchange for approval. You can add trucks once it is approved.</>}
             </span>
           )}
           {!isCounter && request.offeredFreightPerMT <= 0 && (
@@ -279,7 +279,7 @@ const TransporterRequests = ({ mode }: TransporterRequestsProps) => {
   const [openGroups, setOpenGroups] = useState<Record<When, boolean>>({ today: true, upcoming: false, earlier: false });
 
   const pendingQuery = useGetTransporterRequestsQuery({ statusId: pendingStatusId });
-  // Counter-offers waiting for FeedXchange / the requester to approve (freight bargaining)
+  // Counter-offers waiting for feedXchange / the requester to approve (freight bargaining)
   const proposedStatusId = statuses?.find((s) => s.statusName.toLowerCase() === "freightproposed")?.responseStatusId;
   const proposedQuery = useGetTransporterRequestsQuery({ statusId: proposedStatusId ?? -1 }, { skip: proposedStatusId === undefined });
   const awaiting = proposedQuery.data ?? [];
@@ -319,7 +319,7 @@ const TransporterRequests = ({ mode }: TransporterRequestsProps) => {
         <h1>
           <TruckIcon aria-hidden /> {isOwn ? "Truck Requests" : "Transporter Requests"}
         </h1>
-        <p>{isOwn ? "Requests received from FeedXchange. Accept or reject the new ones, then add trucks under Schedules Management > Add Trucks to Schedules." : "Requests sent to transporters. Trucks for the accepted ones are added under Schedules Management > Add Trucks to Schedules."}</p>
+        <p>{isOwn ? "Requests received from feedXchange. Accept or reject the new ones, then add trucks under Schedules Management > Add Trucks to Schedules." : "Requests sent to transporters. Trucks for the accepted ones are added under Schedules Management > Add Trucks to Schedules."}</p>
       </div>
 
       {failed && <p className="manage-schedule-table__error" role="alert">The requests could not be loaded. Please try again.</p>}
@@ -405,8 +405,8 @@ const TransporterRequests = ({ mode }: TransporterRequestsProps) => {
           </div>
           <p className="transporter-requests__empty">
             {isOwn
-              ? "Your counter-offers. FeedXchange or the requester will approve them or send a revised freight; a revised request comes back under New Requests."
-              : "Counter-offers from transporters, waiting for FeedXchange or the requester. Approve or revise them on the contract's Manage Schedule screen."}
+              ? "Your counter-offers. feedXchange or the requester will approve them or send a revised freight; a revised request comes back under New Requests."
+              : "Counter-offers from transporters, waiting for feedXchange or the requester. Approve or revise them on the contract's Manage Schedule screen."}
           </p>
           <div className="manage-schedule-table__wrapper">
             <table className="manage-schedule-table">

@@ -379,7 +379,7 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
             <textarea
               id="bill-change-message"
               className="assign-truck-drawer__textarea"
-              placeholder="Kindly contact FeedXchange team or Buyer for Bill Change..."
+              placeholder="Kindly contact feedXchange team or Buyer for Bill Change..."
               value={form.billChangeMessage}
               onChange={(event) => setField("billChangeMessage", event.target.value)}
             />

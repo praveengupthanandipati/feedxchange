@@ -5,7 +5,7 @@ import logoUrl from "../../../../../shared/assets/img/logo.png";
 /**
  * Schedules Management reports: a PDF and a CSV of every request in the chosen period, with its trucks and freight. Built in the
  * browser from what the page already loaded (no extra request); jsPDF is loaded only when a PDF is asked for. Same look as the
- * contract summary PDF (navy band, FeedXchange logo, orange accent).
+ * contract summary PDF (navy band, feedXchange logo, orange accent).
  *
  * Freight: a truck added to a schedule always carries the freight agreed on that schedule (the server refuses any other), so a truck's
  * freight amount is its quantity x the agreed rate per MT.
@@ -17,7 +17,7 @@ export interface ReportMeta {
   /** yyyy-MM-dd */
   from: string;
   to: string;
-  /** FeedXchange staff see every transporter and the contract number; a transporter only its own. */
+  /** feedXchange staff see every transporter and the contract number; a transporter only its own. */
   showTransporter: boolean;
   /** Set when the report holds only the requests matching the screen's filters: a short description of them. */
   filtersNote?: string;
@@ -43,7 +43,7 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
 const dayLabel = (key: string) => (key ? `${key.slice(8, 10)}/${key.slice(5, 7)}/${key.slice(0, 4)}` : "");
 const periodText = (m: ReportMeta) => (m.from === m.to ? dayLabel(m.from) : `${dayLabel(m.from)} to ${dayLabel(m.to)}`);
-const fileStem = (m: ReportMeta) => `FeedXchange-Schedules-${m.from}${m.from === m.to ? "" : `_to_${m.to}`}`;
+const fileStem = (m: ReportMeta) => `feedXchange-Schedules-${m.from}${m.from === m.to ? "" : `_to_${m.to}`}`;
 const nowText = () => formatApiDateTime(new Date().toISOString());
 
 /** Totals over the requests (cancelled trucks never count). */
@@ -88,13 +88,13 @@ const csvCell = (value: unknown): string => {
 };
 
 /**
- * CSV for Excel: a few FeedXchange title lines, then one line per truck with the request's details repeated on each; a request
+ * CSV for Excel: a few feedXchange title lines, then one line per truck with the request's details repeated on each; a request
  * without trucks gets one line with the truck columns empty. Quantities in MT and amounts in rupees are plain numbers.
  */
 export function downloadSchedulesCsv(rows: ScheduleDashboardRow[], meta: ReportMeta): void {
   const t = totalsOf(rows);
   const lines: unknown[][] = [
-    ["FeedXchange - Schedules Report"],
+    ["feedXchange - Schedules Report"],
     ["Period", `${meta.periodLabel} (${periodText(meta)})`],
     ["Generated", nowText()],
     ...(meta.filtersNote ? [["Filters", meta.filtersNote]] : []),
@@ -109,7 +109,7 @@ export function downloadSchedulesCsv(rows: ScheduleDashboardRow[], meta: ReportM
     "Response", "Requested on", "Responded on",
     "Offered (MT)", "Offered freight (Rs/MT)", "Accepted (MT)", "Accepted freight (Rs/MT)", "Cancelled (MT)",
     "On the way (MT)", "Loaded (MT)", "Left to arrange (MT)", "Agreed freight value (Rs)",
-    "FeedXchange remarks", "Transporter remarks",
+    "feedXchange remarks", "Transporter remarks",
     "Truck", "Driver", "Driver phone", "Truck quantity (MT)", "LR number", "Truck status", "Truck freight (Rs/MT)", "Truck freight amount (Rs)", "Tracking URL",
   ];
   lines.push(head);
@@ -391,7 +391,7 @@ export async function downloadSchedulesPdf(rows: ScheduleDashboardRow[], meta: R
         ["Agreed freight value", isAccepted(row) ? rs(row.committedQuantityMT * rate) : "-"],
         ["Requested on", r.notifiedDateTime ? formatApiDateTime(r.notifiedDateTime) : "-"],
         ["Responded on", r.responseDateTime ? formatApiDateTime(r.responseDateTime) : "-"],
-        ["FeedXchange remarks", r.requestRemarks],
+        ["feedXchange remarks", r.requestRemarks],
         ["Transporter remarks", r.responseRemarks],
       ]);
 
@@ -438,7 +438,7 @@ export async function downloadSchedulesPdf(rows: ScheduleDashboardRow[], meta: R
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(...MUTED);
-    doc.text(clean(`FeedXchange - Schedules Report - ${periodText(meta)}`), margin, pageHeight - 14);
+    doc.text(clean(`feedXchange - Schedules Report - ${periodText(meta)}`), margin, pageHeight - 14);
     doc.text(`Page ${p} of ${pages}`, pageWidth - margin, pageHeight - 14, { align: "right" });
   }
 

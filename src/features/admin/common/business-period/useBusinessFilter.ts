@@ -5,12 +5,12 @@ import { useGetDashboardProfilesQuery, type DashboardProfileOption } from "../..
 export type BusinessFilterValue = "all" | `${number}`;
 
 export interface BusinessFilter {
-  /** FeedXchange staff: every business. A business owner: their own business and its linked businesses (the server decides). */
+  /** feedXchange staff: every business. A business owner: their own business and its linked businesses (the server decides). */
   options: DashboardProfileOption[];
   failed: boolean;
   value: string;
   setValue: (value: string) => void;
-  /** A business owner's own business; "all" for FeedXchange staff. */
+  /** A business owner's own business; "all" for feedXchange staff. */
   defaultValue: string;
   selectedId: number | null;
   selectedName: string | null;
@@ -20,7 +20,7 @@ export interface BusinessFilter {
 }
 
 /**
- * The Business filter of contract screens. A business owner starts on their own business; FeedXchange staff start on "All".
+ * The Business filter of contract screens. A business owner starts on their own business; feedXchange staff start on "All".
  * The contract lists are already limited to the user's businesses by the API, so "All" never shows another company's data.
  */
 export function useBusinessFilter(): BusinessFilter {

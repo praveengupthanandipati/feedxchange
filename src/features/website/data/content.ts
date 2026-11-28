@@ -45,17 +45,17 @@ export const businessTypes = [
 ];
 
 export const company = {
-  name: "FeedXchange",
+  name: "feedXchange",
   tagline: "The trusted marketplace for animal feed ingredients.",
   email: "contact@feedxchange.in",
-  phone: "+91 92475 98399",
+  phone: "+91 8499083999",
   /** Digits only, with country code, for wa.me links. */
-  whatsapp: "919247598399",
+  whatsapp: "918499083999",
   address: "174, 1st floor, Mahatma Gandhi Wholesale Commercial Complex, Mahendra Nagar, Gollapudi, Vijayawada, Andhra Pradesh - 521225",
   hours: "Mon - Sat from 9am - 6pm",
 };
 
-export const whatsappLink = `https://wa.me/${company.whatsapp}?text=${encodeURIComponent("Hi FeedXchange, I'd like to know more.")}`;
+export const whatsappLink = `https://wa.me/${company.whatsapp}?text=${encodeURIComponent("Hi feedXchange, I'd like to know more.")}`;
 
 /** A link that leaves the site (the WhatsApp chat): opened with a plain <a> in a new tab instead of a router link. */
 export const isExternalLink = (to: string) => /^https?:\/\//i.test(to);
@@ -166,7 +166,7 @@ export interface Testimonial {
 
 export const testimonials: Testimonial[] = [
   {
-    quote: "FeedXchange streamlined our entire supply chain. We now source feed ingredients in days instead of weeks.",
+    quote: "feedXchange streamlined our entire supply chain. We now source feed ingredients in days instead of weeks.",
     name: "Praveen N.",
     role: "Procurement Head, Elite Agro Foods",
   },
@@ -201,7 +201,7 @@ export const testimonials: Testimonial[] = [
     role: "Nutritionist, Coastal Aqua Feeds",
   },
   {
-    quote: "Finding reliable Soya DOC suppliers was our biggest headache. FeedXchange solved it in a week.",
+    quote: "Finding reliable Soya DOC suppliers was our biggest headache. feedXchange solved it in a week.",
     name: "Mahesh V.",
     role: "Owner, Sai Poultry Farms",
   },
@@ -228,22 +228,22 @@ export const dealingPartners: DealingPartner[] = [
   {
     kind: "poultry",
     title: "Poultry Farms",
-    text: "FeedXchange connects poultry farms to verified raw material suppliers for best deals on quality ingredients (Soya DOC, DORB, GN DOC etc) at competitive rates.",
+    text: "feedXchange connects poultry farms to verified raw material suppliers for best deals on quality ingredients (Soya DOC, DORB, GN DOC etc) at competitive rates.",
   },
   {
     kind: "fish",
     title: "Fish Farms",
-    text: "FeedXchange links fish farms with trusted suppliers for high-quality ingredients (GN Oil Cake, DORB, Soya DOC etc) and nutrition, ensuring healthy stock and better yields.",
+    text: "feedXchange links fish farms with trusted suppliers for high-quality ingredients (GN Oil Cake, DORB, Soya DOC etc) and nutrition, ensuring healthy stock and better yields.",
   },
   {
     kind: "prawn",
     title: "Prawn Feed",
-    text: "Prawn Feed units benefit from FeedXchange's network of reliable certified suppliers for procurement of Soya DOC Hi-Pro etc.",
+    text: "Prawn Feed units benefit from feedXchange's network of reliable certified suppliers for procurement of Soya DOC Hi-Pro etc.",
   },
   {
     kind: "cattle",
     title: "Cattle Farms",
-    text: "Cattle farms can source bulk feed and supplements through FeedXchange network streamlining procurement and improving herd health.",
+    text: "Cattle farms can source bulk feed and supplements through feedXchange network streamlining procurement and improving herd health.",
   },
 ];
 
@@ -315,7 +315,7 @@ export const milestones: Step[] = [
   { title: "1996", text: "Sri Sai Raghavendra Trade Services begins as canvassing agents for feed ingredients in Vijayawada." },
   { title: "2013", text: "Mani Kiran joins and starts bringing digital tools into the business." },
   { title: "2018", text: "Peram Teja joins to anchor day-to-day trading operations." },
-  { title: "Today", text: "FeedXchange.in takes three decades of trade online." },
+  { title: "Today", text: "feedXchange.in takes three decades of trade online." },
 ];
 
 export const platformFeatures: Service[] = [
@@ -368,9 +368,9 @@ export const faqCategories: FaqCategory[] = [
     icon: InfoIcon,
     items: [
       {
-        question: "What is FeedXchange.in?",
+        question: "What is feedXchange.in?",
         answer:
-          "FeedXchange.in is India’s first dedicated B2B digital portal designed exclusively for the animal feed ingredient trade. Backed by the legacy of Sri Sai Raghavendra Trade Services, the platform connects buyers and sellers of raw materials (such as Deoiled Cakes, Grains, DDGS, Crude Oil etc) while providing transparent pricing, contract tracking, and integrated logistics.",
+          "feedXchange.in is India’s first dedicated B2B digital portal designed exclusively for the animal feed ingredient trade. Backed by the legacy of Sri Sai Raghavendra Trade Services, the platform connects buyers and sellers of raw materials (such as Deoiled Cakes, Grains, DDGS, Crude Oil etc) while providing transparent pricing, contract tracking, and integrated logistics.",
       },
       {
         question: "Who can register on the platform?",
@@ -385,7 +385,7 @@ export const faqCategories: FaqCategory[] = [
       {
         question: "Who can see my KYC documents?",
         answer:
-          "Your KYC documents are never displayed publicly. However, to ensure complete transparency between trading partners, once a contract is officially executed through FeedXchange, the Buyer can view the Seller’s KYC documents and the Seller can view the Buyer’s KYC documents. Access is strictly limited to the specific parties involved in a confirmed contract.",
+          "Your KYC documents are never displayed publicly. However, to ensure complete transparency between trading partners, once a contract is officially executed through feedXchange, the Buyer can view the Seller’s KYC documents and the Seller can view the Buyer’s KYC documents. Access is strictly limited to the specific parties involved in a confirmed contract.",
       },
       {
         question: "Is there a fee to use the portal?",
@@ -417,7 +417,7 @@ export const faqCategories: FaqCategory[] = [
       {
         question: "Can I view my old, completed contracts?",
         answer:
-          "Yes! One of the major benefits of FeedXchange.in is your personalized dashboard. You can access a full history of all your past contracts, associated vehicles, and shared KYC documents for your own auditing and record-keeping purposes.",
+          "Yes! One of the major benefits of feedXchange.in is your personalized dashboard. You can access a full history of all your past contracts, associated vehicles, and shared KYC documents for your own auditing and record-keeping purposes.",
       },
       {
         question: "What happens if there is a dispute over the quality of the materials?",
@@ -427,7 +427,7 @@ export const faqCategories: FaqCategory[] = [
       {
         question: "What happens if a buyer does not pay or a seller does not deliver?",
         answer:
-          "FeedXchange (Sri Sai Raghavendra Trade Services) acts strictly as a Canvassing Agent and Facilitator—we are not a party to the sale contract. While we step in to mediate between the Buyer and the Seller to help resolve issues, we do not guarantee payment by any Buyer or supply, quality, or timely delivery by any Seller, and we are not financially liable for any default by either party. All financial settlements are agreed and executed directly between the Buyer and the Seller.",
+          "feedXchange (Sri Sai Raghavendra Trade Services) acts strictly as a Canvassing Agent and Facilitator—we are not a party to the sale contract. While we step in to mediate between the Buyer and the Seller to help resolve issues, we do not guarantee payment by any Buyer or supply, quality, or timely delivery by any Seller, and we are not financially liable for any default by either party. All financial settlements are agreed and executed directly between the Buyer and the Seller.",
       },
     ],
   },
@@ -437,9 +437,9 @@ export const faqCategories: FaqCategory[] = [
     icon: CreditCardIcon,
     items: [
       {
-        question: "Do I make payments for the goods through the FeedXchange portal?",
+        question: "Do I make payments for the goods through the feedXchange portal?",
         answer:
-          "No. To maintain absolute transparency, all payments for the physical goods are transferred directly from the Buyer's bank account to the Manufacturer/Supplier's bank account. FeedXchange does not act as a payment gateway for raw materials.",
+          "No. To maintain absolute transparency, all payments for the physical goods are transferred directly from the Buyer's bank account to the Manufacturer/Supplier's bank account. feedXchange does not act as a payment gateway for raw materials.",
       },
       {
         question: "How do canvassing fees work?",

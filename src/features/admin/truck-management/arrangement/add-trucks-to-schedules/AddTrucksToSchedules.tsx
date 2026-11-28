@@ -26,7 +26,7 @@ const PERIOD_OPTIONS: FilterOption<Period>[] = [
 
 /**
  * Transporters > Schedules Management > Add Trucks to Schedules: the accepted schedules still short of trucks (add, edit and delete
- * trucks on them) and the instant trucks (edit until loaded). A transporter sees its own; FeedXchange staff see every transporter's.
+ * trucks on them) and the instant trucks (edit until loaded). A transporter sees its own; feedXchange staff see every transporter's.
  * Filters: which kind of truck, and a date period (schedule date for scheduled trucks, assigned date for instant trucks).
  */
 const AddTrucksToSchedules = () => {

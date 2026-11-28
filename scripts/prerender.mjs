@@ -93,7 +93,7 @@ const answerEngines = ["Googlebot", "Bingbot", "GPTBot", "OAI-SearchBot", "ChatG
 const rules = "Allow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /hubs/\nDisallow: /app.html\n";
 writeFileSync(
   join(dist, "robots.txt"),
-  `# FeedXchange: India's B2B marketplace for animal feed ingredients\n\nUser-agent: *\n${rules}\n${answerEngines.map((bot) => `User-agent: ${bot}`).join("\n")}\n${rules}\nSitemap: ${siteUrl}/sitemap.xml\n`,
+  `# feedXchange: India's B2B marketplace for animal feed ingredients\n\nUser-agent: *\n${rules}\n${answerEngines.map((bot) => `User-agent: ${bot}`).join("\n")}\n${rules}\nSitemap: ${siteUrl}/sitemap.xml\n`,
 );
 
 // llms.txt (llmstxt.org): a plain summary of the site for AI assistants, with links to the pages worth reading.
@@ -228,6 +228,25 @@ const finishSnapshot = (html) => {
   return out;
 };
 
+/**
+ * Link previews (WhatsApp, Telegram, LinkedIn, Facebook) read only the start of a page, and the inlined critical CSS pushes the
+ * page's own title / description / og: / twitter: tags well past 150 KB. They are moved to the top of <head>, right after the
+ * charset and viewport, so every preview finds the title, description and image.
+ */
+const SHARE_TAG = /<title>[\s\S]*?<\/title>|<meta\s+(?:name="(?:description|twitter:[^"]+)"|property="og:[^"]+")[^>]*>|<link\s+rel="canonical"[^>]*>/g;
+const hoistShareTags = (html) => {
+  const headEnd = html.indexOf("</head>");
+  if (headEnd < 0) return html;
+  const head = html.slice(0, headEnd);
+  const tags = head.match(SHARE_TAG) ?? [];
+  if (tags.length === 0) return html;
+  const rest = head.replace(SHARE_TAG, "");
+  const anchor = /<meta\s+name="viewport"[^>]*>/.exec(rest) ?? /<meta\s+charset[^>]*>/i.exec(rest) ?? /<head[^>]*>/.exec(rest);
+  if (!anchor) return html;
+  const at = anchor.index + anchor[0].length;
+  return rest.slice(0, at) + tags.join("") + rest.slice(at) + html.slice(headEnd);
+};
+
 const browser = await puppeteer.launch({ executablePath, headless: true, args: ["--no-sandbox", "--disable-gpu"] });
 let failures = 0;
 try {
@@ -245,6 +264,7 @@ try {
       if (!/<h1[\s>]/.test(html)) throw new Error("no <h1> in the rendered page");
       html = finishSnapshot(html);
       if (beasties) html = (await beasties.process(html)).replace("</head>", `${fontFaces}</head>`);
+      html = hoistShareTags(html);
       const target = route === "/" ? join(dist, "index.html") : join(dist, `${route.slice(1)}.html`);
       mkdirSync(dirname(target), { recursive: true });
       writeFileSync(target, html);

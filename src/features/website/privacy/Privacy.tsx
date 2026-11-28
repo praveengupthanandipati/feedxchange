@@ -6,7 +6,7 @@ import { useSeo } from "../seo/useSeo";
 const Privacy = () => {
   useSeo({
     title: "Privacy Policy",
-    description: "How FeedXchange collects, uses and protects the business, KYC and contact information you share when you trade feed ingredients on the platform.",
+    description: "How feedXchange collects, uses and protects the business, KYC and contact information you share when you trade feed ingredients on the platform.",
     breadcrumbs: [],
   });
 

@@ -52,7 +52,7 @@ type ResponseKey = "Pending" | "FreightProposed" | "Accepted" | "PartiallyAccept
 type Icon = typeof TruckIcon;
 const RESPONSES: { key: ResponseKey; label: string; icon: Icon }[] = [
   { key: "Pending", label: "Awaiting response", icon: ClockIcon },
-  // freight bargaining: the transporter proposed a different freight; FeedXchange or the requester must approve or revise it
+  // freight bargaining: the transporter proposed a different freight; feedXchange or the requester must approve or revise it
   { key: "FreightProposed", label: "Freight awaiting approval", icon: CirclePauseIcon },
   { key: "Accepted", label: "Accepted", icon: CircleCheckBigIcon },
   { key: "PartiallyAccepted", label: "Partly accepted", icon: CircleMinusIcon },
@@ -281,7 +281,7 @@ const RowDetail = ({ row, isTransporter, colSpan }: { row: ScheduleDashboardRow;
             <div><dt><MapPinIcon aria-hidden /> Delivery at</dt><dd>{r.deliveryAddress || "-"}</dd></div>
             <div><dt><SendIcon aria-hidden /> Requested</dt><dd>{r.notifiedDateTime ? formatApiDateTime(r.notifiedDateTime) : "-"}</dd></div>
             <div><dt><InboxIcon aria-hidden /> Responded</dt><dd>{r.responseDateTime ? formatApiDateTime(r.responseDateTime) : "-"}</dd></div>
-            {r.requestRemarks && <div><dt><MessageSquareIcon aria-hidden /> FeedXchange remarks</dt><dd>{r.requestRemarks}</dd></div>}
+            {r.requestRemarks && <div><dt><MessageSquareIcon aria-hidden /> feedXchange remarks</dt><dd>{r.requestRemarks}</dd></div>}
             {r.responseRemarks && <div><dt><MessageSquareIcon aria-hidden /> Transporter remarks</dt><dd>{r.responseRemarks}</dd></div>}
             {(r.cancelledQuantityMT ?? 0) > 0 && <div><dt><BanIcon aria-hidden /> Cancelled quantity</dt><dd>{mt(r.cancelledQuantityMT ?? 0)}</dd></div>}
           </dl>
@@ -310,7 +310,7 @@ const RowDetail = ({ row, isTransporter, colSpan }: { row: ScheduleDashboardRow;
 
 /**
  * Transporters > Schedules Management: every truck request (any response), how much was accepted, and how far the truck arrangement
- * has got, with the trucks themselves. A transporter sees its own requests; FeedXchange staff see every transporter's (and the contract).
+ * has got, with the trucks themselves. A transporter sees its own requests; feedXchange staff see every transporter's (and the contract).
  */
 const SchedulesManagement = () => {
   const { roleName, businessUnitType } = useAuth();
@@ -519,7 +519,7 @@ const SchedulesManagement = () => {
                 )}
                 <button type="button" role="menuitem" className="schedules-mgmt__download-item" onClick={() => download("pdf")} disabled={downloading !== null}>
                   <FileTextIcon aria-hidden />
-                  <span><b>PDF report</b><small>With the FeedXchange header, for printing or sharing</small></span>
+                  <span><b>PDF report</b><small>With the feedXchange header, for printing or sharing</small></span>
                   {downloading === "pdf" && <RefreshCwIcon aria-hidden className="is-spinning" />}
                 </button>
                 <button type="button" role="menuitem" className="schedules-mgmt__download-item" onClick={() => download("csv")} disabled={downloading !== null}>

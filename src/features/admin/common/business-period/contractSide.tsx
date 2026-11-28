@@ -5,7 +5,7 @@ export type ContractSide = "Sell" | "Buy" | "Buy & Sell";
 
 /**
  * The profile ids that count as "your side": the chosen business, or (on "All") the owner's own business and its linked businesses.
- * `null` for FeedXchange staff, who have no business of their own, so no Side column is shown.
+ * `null` for feedXchange staff, who have no business of their own, so no Side column is shown.
  */
 export const sideProfileIds = (options: DashboardProfileOption[], selectedId: number | null): number[] | null =>
   options.some((option) => option.isOwn) ? (selectedId !== null ? [selectedId] : options.map((option) => option.profileId)) : null;

@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { apiBaseQuery } from "../api/baseQuery";
 
-// Shapes of the /api/BusinessDashboard endpoints (FeedXchange -> Business Dashboard). The server works out every figure;
+// Shapes of the /api/BusinessDashboard endpoints (feedXchange -> Business Dashboard). The server works out every figure;
 // the screen only formats, filters and sorts them. Needs the BUSINESS_DASHBOARD permission.
 
 /** PendingApproval / Executing (Open, Partially Dispatched) / Executed (Dispatched, Closed) / Rejected. */
