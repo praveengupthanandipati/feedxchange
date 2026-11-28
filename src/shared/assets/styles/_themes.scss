@@ -220,9 +220,9 @@ $tints: (
 @mixin scale-tokens {
   @include tint-tokens;
   // type
-  --fx-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+  --fx-font-body: "Inter", "Inter Fallback", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji";
-  --fx-font-heading: "Poppins", var(--fx-font-body);
+  --fx-font-heading: "Poppins", "Poppins Fallback", var(--fx-font-body);
   --fx-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   --fx-text-xs: max(11px, 0.75rem);
   --fx-text-sm: 0.875rem;

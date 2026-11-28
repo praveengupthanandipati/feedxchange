@@ -190,6 +190,28 @@
     }
   }
 
+  // A truck's optional extra delivery locations, under its row.
+  &__stops {
+    margin-top: calc(-1 * v.$spacing-2);
+
+    .delivery-locations__qty {
+      height: 2.5rem;
+      padding: 0 v.$spacing-3;
+      border: 1px solid v.line(v.$color-border);
+      border-radius: v.$radius-md;
+      font: inherit;
+    }
+  }
+
+  &__stops-chip {
+    padding: 0 v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background: v.alpha(v.$color-navy, 0.08);
+    color: v.fg(v.$color-navy);
+    font-size: v.$font-size-sm;
+    cursor: help;
+  }
+
   &__row-no {
     @include m.flex(row, center, center, 0);
     width: 1.5rem;
@@ -305,6 +327,37 @@
     margin: 0;
     color: v.fg(v.$color-danger);
     font-size: v.$font-size-sm;
+  }
+
+  // An occupied truck the user confirmed adding.
+  &__warn {
+    margin: 0;
+    color: v.fg(v.$color-warning);
+    font-size: v.$font-size-sm;
+  }
+
+  // The trips of an occupied truck, inside the confirmation dialog.
+  &__busy-trips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: v.$font-size-sm;
+
+    li {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid v.line(v.$color-border);
+      border-left: 3px solid v.fg(v.$color-warning);
+      border-radius: v.$radius-md;
+      background: v.alpha(v.$color-warning, 0.08);
+    }
+  }
+
+  &__busy-line {
+    display: block;
+    color: v.fg(v.$color-text-muted);
   }
 
   &__success {

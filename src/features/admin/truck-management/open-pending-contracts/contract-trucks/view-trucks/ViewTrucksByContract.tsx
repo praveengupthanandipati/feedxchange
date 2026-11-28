@@ -80,6 +80,7 @@ const ViewTrucksByContract = () => {
         </div>
 
         <PendingContractSelector
+          withParties
           value={contractNumber}
           onChange={(value) => setSearchParams({ contract: value })}
         />

@@ -10,7 +10,8 @@ export interface DoTruck {
   truckType: string | null;
   driverName: string | null;
   driverMobile: string | null;
-  transporterId: number;
+  /** Null when the trip has no transporter (then `transporter` is empty). */
+  transporterId: number | null;
   transporter: string;
   quantityMT: number;
   lrNumber: string | null;
@@ -41,6 +42,32 @@ export interface DoContract {
   trucks: DoTruck[];
 }
 
+/** One of a transporter's Assigned trucks, with the DO the seller entered for it (doNumber null = still pending). */
+export interface DoTransporterTruck {
+  contractDispatchId: number;
+  contractNumber: string;
+  contractDate: string;
+  seller: string;
+  buyer: string;
+  productName: string;
+  truckNumber: string;
+  truckType: string | null;
+  driverName: string | null;
+  driverMobile: string | null;
+  quantityMT: number;
+  freightPerMT: number;
+  lrNumber: string | null;
+  assignedOn: string;
+  fromCity: string | null;
+  toCity: string | null;
+  isReassigned: boolean;
+  chainLegs: number;
+  doNumber: string | null;
+  doDate: string | null;
+  doMessage: string | null;
+  doEnteredOn: string | null;
+}
+
 export interface EnterDoPayload {
   contractDispatchId: number;
   doNumber: string;
@@ -68,6 +95,10 @@ export const truckDeliveryOrdersApi = createApi({
         `/api/TruckDeliveryOrders/Contracts?issued=${issued}${profileId ? `&profileId=${profileId}` : ""}`,
       providesTags: ["DoContracts"],
     }),
+    getMyDoTrucks: builder.query<DoTransporterTruck[], void>({
+      query: () => "/api/TruckDeliveryOrders/MyTrucks",
+      providesTags: ["DoContracts"],
+    }),
     enterDeliveryOrder: builder.mutation<DoEntered, EnterDoPayload>({
       query: (body) => ({ url: "/api/TruckDeliveryOrders/Enter", method: "POST", body }),
       invalidatesTags: ["DoContracts"],
@@ -75,4 +106,4 @@ export const truckDeliveryOrdersApi = createApi({
   }),
 });
 
-export const { useGetDoContractsQuery, useEnterDeliveryOrderMutation } = truckDeliveryOrdersApi;
+export const { useGetDoContractsQuery, useGetMyDoTrucksQuery, useEnterDeliveryOrderMutation } = truckDeliveryOrdersApi;

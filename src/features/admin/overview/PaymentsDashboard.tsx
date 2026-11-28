@@ -45,7 +45,7 @@ function money(value: number): string {
 
 const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
   const { can } = useAuth();
-  const canViewInvoices = can("seller-invoice.view");
+  const canViewInvoices = can("seller-invoice.view", "ADD_SELLER_INVOICE", "VIEW_SELLER_INVOICES");
   const [loadInvoices] = useLazyGetInvoicesQuery();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(canViewInvoices);
@@ -226,7 +226,7 @@ const PaymentsDashboard = ({ entries }: PaymentsDashboardProps) => {
           <>
           <div className="payments-dashboard__grid">
             {metrics.map(({ label, value, icon: Icon, color }) => (
-              <Link className={`payments-dashboard__card ${color}`} to="/admin/payments/seller-invoice" key={label}>
+              <Link className={`payments-dashboard__card ${color}`} to="/admin/payments/seller-invoice/view" key={label}>
                 <span className="payments-dashboard__icon"><Icon aria-hidden /></span>
                 <span className="payments-dashboard__content">
                   <span className="payments-dashboard__label">{label}</span>

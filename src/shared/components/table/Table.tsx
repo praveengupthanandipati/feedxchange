@@ -51,6 +51,9 @@ interface TableProps<T> {
   exportSubtitle?: string;
   /** Below 768px each row becomes a card of "label: value" lines instead of a table that scrolls sideways. */
   mobileCards?: boolean;
+  /** A totals row under the last row: the content of each column by its key (columns left out stay empty; the first shown column gets `totalsLabel`). */
+  totals?: Record<string, ReactNode>;
+  totalsLabel?: ReactNode;
 }
 
 /** Columns menu: a checkbox per column the user may hide. */
@@ -142,6 +145,8 @@ function Table<T>({
   variant = "light",
   className = "",
   onRowClick,
+  totals,
+  totalsLabel,
   loading = false,
   stickyFirstColumn = false,
   pageSize,
@@ -187,11 +192,13 @@ function Table<T>({
 
   // export: the visible columns, and every row the screen passes (or every row of the table, in its current sort)
   const exportRows = exportData ?? sortedData;
+  // the totals row goes into the downloads too (text values only), under the same columns
+  const exportTotals = totals ? shownColumns.map((column, index) => (index === 0 ? (typeof totalsLabel === "string" ? totalsLabel : "Total") : typeof totals[column.key] === "string" ? (totals[column.key] as string) : "")) : undefined;
   const [exporting, setExporting] = useState(false);
   const runPdf = async () => {
     setExporting(true);
     try {
-      await exportTablePdf(exportName ?? "Export", shownColumns, exportRows, exportSubtitle);
+      await exportTablePdf(exportName ?? "Export", shownColumns, exportRows, exportSubtitle, exportTotals);
     } finally {
       setExporting(false);
     }
@@ -261,7 +268,7 @@ function Table<T>({
               <th
                 key={column.key}
                 style={{ width: column.width, textAlign: column.align }}
-                className={`${column.sortable ? "is-sortable" : ""} ${column.priority === "low" ? "is-low-priority" : ""}`}
+                className={`${column.sortable ? "is-sortable" : ""} ${column.priority === "low" ? "is-low-priority" : ""} ${column.align === "right" ? "is-align-right" : column.align === "center" ? "is-align-center" : ""}`}
                 onClick={() => handleSort(column)}
                 aria-sort={
                   column.sortable
@@ -366,6 +373,18 @@ function Table<T>({
             })
           )}
         </tbody>
+        {totals && (
+          <tfoot>
+            <tr className="table__totals-row">
+              {selectable && <td className="table__select-col" />}
+              {shownColumns.map((column, index) => (
+                <td key={column.key} style={{ textAlign: column.align }}>
+                  {index === 0 ? <strong>{totalsLabel ?? "Total"}</strong> : (totals[column.key] ?? null)}
+                </td>
+              ))}
+            </tr>
+          </tfoot>
+        )}
       </table>
       </div>
   );
@@ -386,7 +405,7 @@ function Table<T>({
               <button
                 type="button"
                 className="table-toolbar__btn"
-                onClick={() => exportTableCsv(exportName, shownColumns, exportRows)}
+                onClick={() => exportTableCsv(exportName, shownColumns, exportRows, exportTotals)}
                 disabled={exportRows.length === 0}
                 title="Download these rows as a CSV file (opens in Excel)"
               >

@@ -97,16 +97,23 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
 
   const patch = (rowNumber: number, change: Partial<RowState>) => setRows((prev) => ({ ...prev, [rowNumber]: { ...(prev[rowNumber] ?? emptyRow()), ...change } }));
 
+  /** The transporter and the driver are optional: a new trip can be created without them. */
+  const driverGiven = (state: RowState) =>
+    state.driverMode === "existing" ? Boolean(state.driverId) : Boolean(state.driverName.trim() || state.driverMobile.trim());
+
   /** The steps the user has to accept when "create a new trip" is chosen for this row. */
   const stepsFor = (selection: TripSelection, state: RowState): string[] => {
     const steps: string[] = [];
-    const transporterLabel = transporterOptions.find((o) => o.value === state.transporterId)?.label ?? selection.transporterName ?? "the selected transporter";
+    const transporterLabel = state.transporterId ? (transporterOptions.find((o) => o.value === state.transporterId)?.label ?? "the selected transporter") : null;
     if (!selection.truckInMaster) steps.push(`Add truck ${selection.truckNumber} to the truck master.`);
-    if (!selection.mappedDriver) {
-      if (state.driverMode === "new") steps.push(`Add driver ${state.driverName.trim() || "(new driver)"} to the driver master.`);
+    const withDriver = Boolean(selection.mappedDriver) || driverGiven(state);
+    if (!selection.mappedDriver && driverGiven(state)) {
+      if (state.driverMode === "new") steps.push(`Add driver ${state.driverName.trim() || state.driverMobile.trim()} to the driver master.`);
       steps.push("Map the driver to the truck.");
     }
-    steps.push(`Assign truck ${selection.truckNumber} to contract ${selection.contractNumber} with ${transporterLabel} as the transporter, as a new trip with status Loaded (${selection.invoiceQtyMT} MT).`);
+    steps.push(
+      `Assign truck ${selection.truckNumber} to contract ${selection.contractNumber} ${transporterLabel ? `with ${transporterLabel} as the transporter` : "without a transporter"}${withDriver ? "" : " and without a driver"}, as a new trip with status Loaded (${selection.invoiceQtyMT} MT).`,
+    );
     steps.push("Create the invoice against that trip.");
     return steps;
   };
@@ -114,11 +121,6 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
   const rowComplete = (selection: TripSelection, state: RowState): boolean => {
     if (!state.choice) return false;
     if (state.choice !== "new") return true;
-    if (!state.transporterId) return false;
-    if (!selection.mappedDriver) {
-      if (state.driverMode === "existing" && !state.driverId) return false;
-      if (state.driverMode === "new" && (!state.driverName.trim() || !state.driverMobile.trim())) return false;
-    }
     const steps = stepsFor(selection, state);
     return steps.every((_, index) => state.accepted[index] === true);
   };
@@ -134,8 +136,8 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
           createNewTrip: true,
           accepted: true,
           tripSetup: {
-            transporterProfileId: Number(state.transporterId),
-            ...(selection.mappedDriver
+            transporterProfileId: state.transporterId ? Number(state.transporterId) : null,
+            ...(selection.mappedDriver || !driverGiven(state)
               ? {}
               : state.driverMode === "existing"
                 ? { driverId: Number(state.driverId) }
@@ -244,7 +246,7 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
                 {state.choice === "new" && (
                   <div className="si-trips__setup">
                     <div className="si-trips__field">
-                      <label>Transporter for this trip <span className="si-req" aria-hidden>*</span></label>
+                      <label>Transporter for this trip <small className="si-muted">(optional)</small></label>
                       <SearchableSelect options={transporterOptions} value={state.transporterId} onChange={(v) => patch(selection.rowNumber, { transporterId: v, accepted: [] })} placeholder="Select transporter" ariaLabel="Transporter" />
                     </div>
 
@@ -264,18 +266,18 @@ const TripSelectionDialog = ({ selections, onConfirm, onCancel, prefill }: TripS
                         </div>
                         {state.driverMode === "existing" ? (
                           <div className="si-trips__field">
-                            <label>Driver <span className="si-req" aria-hidden>*</span></label>
-                            <SearchableSelect options={driverOptions} value={state.driverId} onChange={(v) => patch(selection.rowNumber, { driverId: v })} placeholder="Select driver" ariaLabel="Driver" />
+                            <label>Driver <small className="si-muted">(optional)</small></label>
+                            <SearchableSelect options={driverOptions} value={state.driverId} onChange={(v) => patch(selection.rowNumber, { driverId: v, accepted: [] })} placeholder="Select driver" ariaLabel="Driver" />
                           </div>
                         ) : (
                           <div className="si-trips__fields">
                             <div className="si-trips__field">
-                              <label>Driver name <span className="si-req" aria-hidden>*</span></label>
-                              <input className="si-input" value={state.driverName} onChange={(e) => patch(selection.rowNumber, { driverName: e.target.value })} />
+                              <label>Driver name <small className="si-muted">(optional)</small></label>
+                              <input className="si-input" value={state.driverName} onChange={(e) => patch(selection.rowNumber, { driverName: e.target.value, accepted: [] })} />
                             </div>
                             <div className="si-trips__field">
-                              <label>Mobile number <span className="si-req" aria-hidden>*</span></label>
-                              <input className="si-input" inputMode="tel" value={state.driverMobile} onChange={(e) => patch(selection.rowNumber, { driverMobile: e.target.value })} />
+                              <label>Mobile number <small className="si-muted">(optional)</small></label>
+                              <input className="si-input" inputMode="tel" value={state.driverMobile} onChange={(e) => patch(selection.rowNumber, { driverMobile: e.target.value, accepted: [] })} />
                             </div>
                             <div className="si-trips__field">
                               <label>Licence number (optional)</label>

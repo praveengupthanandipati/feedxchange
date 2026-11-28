@@ -4,6 +4,7 @@ import { TruckIcon } from "../../../../shared/components/icon";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import InfoTooltip from "../../../../shared/components/tooltip/InfoTooltip";
 import type { PendingContractRow } from "./pendingContracts.data";
+import { SideTag, type ContractSide } from "../../common/business-period/contractSide";
 
 const TruncatedName = ({ value }: { value: string }) => (
   <span className="pending-contracts-table__name">
@@ -20,10 +21,13 @@ const PartyCell = ({ name }: { name: string }) => {
 
 interface ColumnHandlers {
   onOpenTruckDetails: (row: PendingContractRow) => void;
+  /** Business owner: Sell / Buy for the signed-in business. Leave out for staff (no Side column). */
+  sideOf?: (row: PendingContractRow) => ContractSide | null;
 }
 
 export function buildPendingContractColumns({
   onOpenTruckDetails,
+  sideOf,
 }: ColumnHandlers): TableColumn<PendingContractRow>[] {
   return [
   {
@@ -72,6 +76,18 @@ export function buildPendingContractColumns({
     sortable: true,
     sortValue: (row) => row.dateValue,
   },
+  ...(sideOf
+    ? [
+        {
+          key: "side",
+          header: "Side",
+          sortable: true,
+          render: (row: PendingContractRow) => <SideTag side={sideOf(row)} />,
+          sortValue: (row: PendingContractRow) => sideOf(row) ?? "",
+          exportValue: (row: PendingContractRow) => sideOf(row) ?? "",
+        },
+      ]
+    : []),
   {
     key: "seller",
     header: "Seller",

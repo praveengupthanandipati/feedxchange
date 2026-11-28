@@ -1,4 +1,4 @@
-import type { InvoiceToClear, Receipt, ReceiptMode } from "../../../../core/store/paymentAdviceApi";
+import type { InvoiceToClear, PaymentDetail, PaymentPart, Receipt, ReceiptMode } from "../../../../core/store/paymentAdviceApi";
 
 // Form model, validation and the allocation preview of the Payment Advice page. The server applies the same rules and its figures are final.
 
@@ -120,14 +120,181 @@ export function createEmptyPaymentForm(mode: PaymentMode = "online", kind: Payme
   return { kind, contractId: "", mode, date: todayInput(), reference: "", bankName: "", amount: "", towards: "", remarks: "" };
 }
 
-export function validatePaymentForm(values: PaymentFormValues): PaymentFormErrors {
+export function validatePaymentForm(values: PaymentFormValues, options: { requireContract?: boolean } = {}): PaymentFormErrors {
   const errors: PaymentFormErrors = {};
   modeFields[values.mode].forEach((field) => {
     if (field.required && !values[field.key].trim()) errors[field.key] = "Required";
   });
   if (!errors.amount && !(Number(values.amount) > 0)) errors.amount = "Enter a valid amount";
-  if (values.kind === "advance" && !values.contractId) errors.contractId = "Choose the contract this advance is for";
+  if (values.kind === "advance" && options.requireContract !== false && !values.contractId) errors.contractId = "Choose the contract this advance is for";
   return errors;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// One payment split over several contracts (advances) and / or a regular part
+// ---------------------------------------------------------------------------------------------------------------
+
+export type SplitBasis = "amount" | "percent";
+
+export interface SplitRow {
+  key: string;
+  contractId: string;
+  basis: SplitBasis;
+  /** The amount (₹) or the percent of the payment, as typed. */
+  value: string;
+  /** Editing a payment: the existing receipt (part) this row is, with what was done with it. */
+  part?: PaymentPart;
+}
+
+export interface SplitRegular {
+  enabled: boolean;
+  /** "rest" = whatever is left after the contracts. */
+  basis: SplitBasis | "rest";
+  value: string;
+  /** Editing a payment: the existing regular receipt. */
+  part?: PaymentPart;
+}
+
+export interface SplitState {
+  rows: SplitRow[];
+  regular: SplitRegular;
+}
+
+let splitSeq = 0;
+export const newSplitRow = (): SplitRow => ({ key: `split-${Date.now()}-${splitSeq++}`, contractId: "", basis: "amount", value: "" });
+export const createEmptySplit = (): SplitState => ({ rows: [newSplitRow()], regular: { enabled: false, basis: "rest", value: "" } });
+
+const numberOf = (text: string) => {
+  const value = Number(text);
+  return Number.isFinite(value) ? value : 0;
+};
+
+export interface ResolvedSplit {
+  /** The amount each contract row gets. */
+  rowAmounts: Record<string, number>;
+  regularAmount: number;
+  /** Everything given to contracts and the regular part. */
+  allocated: number;
+  /** Payment total - allocated (0 when the parts add up). */
+  left: number;
+  rowErrors: Record<string, string>;
+  /** A problem with the split as a whole (parts do not add up ...). */
+  problem?: string;
+  valid: boolean;
+}
+
+/** What each part of the split gets (the server repeats this and is final). A lone contract with no figure takes the whole payment. */
+export function resolveSplit(split: SplitState, total: number): ResolvedSplit {
+  const rowAmounts: Record<string, number> = {};
+  const rowErrors: Record<string, string> = {};
+  const lone = split.rows.length === 1 && !split.regular.enabled;
+  const seen = new Set<string>();
+  split.rows.forEach((row) => {
+    let amount = 0;
+    if (!row.value.trim()) {
+      if (lone) amount = total;
+    } else {
+      amount = row.basis === "percent" ? round2((total * numberOf(row.value)) / 100) : round2(numberOf(row.value));
+    }
+    rowAmounts[row.key] = amount;
+    if (!row.contractId) rowErrors[row.key] = "Choose the contract";
+    else if (seen.has(row.contractId)) rowErrors[row.key] = "This contract is already in the list";
+    else if (!(amount > 0)) rowErrors[row.key] = row.basis === "percent" ? "Enter the %" : "Enter the amount";
+    else if (row.basis === "percent" && numberOf(row.value) > 100) rowErrors[row.key] = "A percent cannot be more than 100";
+    if (row.contractId) seen.add(row.contractId);
+  });
+
+  const advanceSum = round2(Object.values(rowAmounts).reduce((sum, v) => sum + v, 0));
+  let regularAmount = 0;
+  if (split.regular.enabled) {
+    if (split.regular.basis === "rest") regularAmount = round2(Math.max(total - advanceSum, 0));
+    else if (split.regular.basis === "percent") regularAmount = round2((total * numberOf(split.regular.value)) / 100);
+    else regularAmount = round2(numberOf(split.regular.value));
+  }
+
+  const allocated = round2(advanceSum + regularAmount);
+  const left = round2(total - allocated);
+  let problem: string | undefined;
+  if (split.regular.enabled && !(regularAmount > 0)) problem = split.regular.basis === "rest" ? "Nothing is left for the regular part." : "Enter the amount or % of the regular part.";
+  else if (Math.abs(left) > 0.02) problem = left > 0 ? `${money(left)} of the payment is not given to any contract.` : `The parts are ${money(-left)} more than the payment.`;
+  const valid = total > 0 && !problem && Object.keys(rowErrors).length === 0;
+  return { rowAmounts, regularAmount, allocated, left, rowErrors, problem, valid };
+}
+
+export interface SplitPart {
+  kind: "Advance" | "Regular";
+  contractId: number | null;
+  amount: number;
+}
+
+/** The parts to send to the API. */
+export function splitPayload(split: SplitState, resolved: ResolvedSplit): SplitPart[] {
+  const parts: SplitPart[] = split.rows.map((row) => ({ kind: "Advance", contractId: Number(row.contractId), amount: resolved.rowAmounts[row.key] }));
+  if (split.regular.enabled) parts.push({ kind: "Regular", contractId: null, amount: resolved.regularAmount });
+  return parts;
+}
+
+/** The form values of a whole payment (for Edit payment). */
+export function formFromDetail(detail: PaymentDetail): PaymentFormValues {
+  return {
+    kind: detail.parts.some((p) => p.receipt.kind === "Advance") ? "advance" : "regular",
+    contractId: "",
+    mode: fromApiMode(detail.paymentMode),
+    date: detail.receiptDate.slice(0, 10),
+    reference: detail.reference ?? "",
+    bankName: detail.bankName ?? "",
+    amount: String(detail.totalAmount),
+    towards: detail.towards ?? "",
+    remarks: detail.remarks ?? "",
+  };
+}
+
+/** The parts of a whole payment as the split editor shows them: one row per advance, and the regular part. */
+export function splitFromDetail(detail: PaymentDetail): SplitState {
+  const rows: SplitRow[] = detail.parts
+    .filter((p) => p.receipt.kind === "Advance")
+    .map((p) => ({ key: `part-${p.receipt.receiptId}`, contractId: String(p.receipt.contractId ?? ""), basis: "amount" as const, value: String(p.receipt.amount), part: p }));
+  const regular = detail.parts.find((p) => p.receipt.kind === "Regular");
+  return {
+    rows,
+    regular: regular ? { enabled: true, basis: "amount", value: String(regular.receipt.amount), part: regular } : { enabled: false, basis: "rest", value: "" },
+  };
+}
+
+export interface EditImpact {
+  /** Parts whose allocations have to be deleted for the edit to go through. */
+  reverse: { receiptNumber: string; allocated: number; why: string }[];
+  /** Edits that cannot be done at all. */
+  blocked: string[];
+}
+
+/** What editing the payment into this split does to the existing parts (the server repeats the check and is final). */
+export function editImpact(split: SplitState, detail: PaymentDetail, resolved: ResolvedSplit): EditImpact {
+  const reverse: EditImpact["reverse"] = [];
+  const blocked: string[] = [];
+  const kept = new Map<number, { kind: "Advance" | "Regular"; contractId: number | null; amount: number }>();
+  split.rows.forEach((row) => {
+    if (row.part) kept.set(row.part.receipt.receiptId, { kind: "Advance", contractId: row.contractId ? Number(row.contractId) : null, amount: resolved.rowAmounts[row.key] ?? 0 });
+  });
+  if (split.regular.enabled && split.regular.part) kept.set(split.regular.part.receipt.receiptId, { kind: "Regular", contractId: null, amount: resolved.regularAmount });
+
+  detail.parts.forEach((p) => {
+    const r = p.receipt;
+    const next = kept.get(r.receiptId);
+    const floor = round2((r.refundedAmount ?? 0) + (r.convertedAmount ?? 0));
+    if (!next) {
+      if (floor > 0) blocked.push(`${r.receiptNumber} has been refunded or converted, so it cannot be removed.`);
+      else if (r.allocatedAmount > 0) reverse.push({ receiptNumber: r.receiptNumber, allocated: r.allocatedAmount, why: "removed" });
+      return;
+    }
+    const identityChanged = next.kind !== r.kind || (next.contractId ?? null) !== (r.contractId ?? null);
+    if (identityChanged && floor > 0) blocked.push(`${r.receiptNumber} has been refunded or converted, so its type and contract cannot be changed.`);
+    else if (!identityChanged && next.amount < floor - 0.004) blocked.push(`${r.receiptNumber}: the amount cannot be less than what was refunded or converted (${money(floor)}).`);
+    else if (r.allocatedAmount > 0 && (identityChanged || next.amount < round2(floor + r.allocatedAmount) - 0.004)) {
+      reverse.push({ receiptNumber: r.receiptNumber, allocated: r.allocatedAmount, why: identityChanged ? "contract / type changed" : "amount reduced below what is allocated" });
+    }
+  });
+  return { reverse, blocked };
 }
 
 /** The form values of an existing receipt (for Edit). */
@@ -197,4 +364,14 @@ export function planAdvance(invoices: InvoiceToClear[], receipts: Receipt[]): Re
       plan[invoice.invoiceId] = { amount, percent, short: amount < due };
     });
   return plan;
+}
+
+/** One line for a receipt in the summary of a split payment: its number, what it is and its amount (a converted payment says where it came from). */
+export function groupPartLabel(r: Receipt, withNumber: boolean): string {
+  const what = r.convertedFromReceiptNumber
+    ? `regular ${money(r.amount)} (converted from advance ${r.convertedFromReceiptNumber})`
+    : r.kind === "Advance"
+      ? `advance ${r.contractNumber ?? ""} ${money(r.amount)}`.replace("  ", " ")
+      : `regular ${money(r.amount)}`;
+  return withNumber ? `${r.receiptNumber} ${what}` : what;
 }

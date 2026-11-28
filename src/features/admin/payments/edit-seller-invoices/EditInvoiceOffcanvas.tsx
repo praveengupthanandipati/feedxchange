@@ -81,14 +81,14 @@ interface Props {
 const EditInvoiceOffcanvas = ({ invoice, onClose, onSaved }: Props) => {
   const open = invoice !== null;
   const [form, setForm] = useState<FormState | null>(null);
-  const [draft, setDraft] = useState({ date: "", amount: "", isTdsTcs: false, remarks: "" });
+  const [draft, setDraft] = useState({ date: "", kind: "deduction" as "deduction" | "addition", amount: "", isTdsTcs: false, remarks: "" });
   const [error, setError] = useState("");
   const [update, { isLoading }] = useUpdateInvoiceMutation();
 
   useEffect(() => {
     if (invoice) {
       setForm(fromInvoice(invoice));
-      setDraft({ date: isoDate(invoice.invoiceDate), amount: "", isTdsTcs: false, remarks: "" });
+      setDraft({ date: isoDate(invoice.invoiceDate), kind: "deduction", amount: "", isTdsTcs: false, remarks: "" });
       setError("");
     }
   }, [invoice]);
@@ -120,8 +120,10 @@ const EditInvoiceOffcanvas = ({ invoice, onClose, onSaved }: Props) => {
   const payable = round2(total - deductionsTotal);
 
   const addDeduction = () => {
-    if (!draft.amount.trim() || num(draft.amount) <= 0) return;
-    set("deductions", [...form.deductions, { key: `d-${draftSeq++}`, ...draft }]);
+    if (!draft.amount.trim() || !(Math.abs(num(draft.amount)) > 0)) return;
+    // stored the way the server keeps it: positive = deduction, negative = addition
+    const signed = draft.kind === "addition" ? -Math.abs(num(draft.amount)) : Math.abs(num(draft.amount));
+    set("deductions", [...form.deductions, { key: `d-${draftSeq++}`, date: draft.date, amount: String(signed), isTdsTcs: draft.isTdsTcs, remarks: draft.remarks }]);
     setDraft((d) => ({ ...d, amount: "", remarks: "", isTdsTcs: false }));
   };
 
@@ -259,20 +261,25 @@ const EditInvoiceOffcanvas = ({ invoice, onClose, onSaved }: Props) => {
             <div><dt>GST</dt><dd>{money(gst)}</dd></div>
             <div><dt>Round off</dt><dd>{money(roundOff)}</dd></div>
             <div className="is-strong"><dt>Total</dt><dd>{money(total)}</dd></div>
-            <div><dt>Deductions</dt><dd>− {money(deductionsTotal)}</dd></div>
+            {deductionsTotal !== 0 && (
+              <div>
+                <dt>{deductionsTotal > 0 ? "Deductions" : "Additions"}</dt>
+                <dd>{deductionsTotal > 0 ? "−" : "+"} {money(Math.abs(deductionsTotal))}</dd>
+              </div>
+            )}
             <div className="is-strong"><dt>Payable</dt><dd>{money(payable)}</dd></div>
           </dl>
 
-          <h3>Deductions</h3>
+          <h3>Deductions &amp; additions</h3>
           {form.deductions.length > 0 && (
             <ul className="edit-invoice-offcanvas__deductions">
               {form.deductions.map((d) => (
                 <li key={d.key}>
                   <span>{d.date}</span>
-                  <span>{money(num(d.amount))}</span>
+                  <span>{num(d.amount) < 0 ? `+ ${money(-num(d.amount))} (addition)` : `− ${money(num(d.amount))} (deduction)`}</span>
                   <span>{d.isTdsTcs ? "TDS/TCS" : ""}</span>
                   <span>{d.remarks || "—"}</span>
-                  <button type="button" aria-label="Remove deduction" onClick={() => set("deductions", form.deductions.filter((x) => x.key !== d.key))}>
+                  <button type="button" aria-label="Remove this line" onClick={() => set("deductions", form.deductions.filter((x) => x.key !== d.key))}>
                     <Trash2Icon aria-hidden />
                   </button>
                 </li>
@@ -281,6 +288,10 @@ const EditInvoiceOffcanvas = ({ invoice, onClose, onSaved }: Props) => {
           )}
           <div className="edit-invoice-offcanvas__add-deduction">
             <DatePickerInput id="edit-deduction-date" value={draft.date} onChange={(v) => setDraft((d) => ({ ...d, date: v }))} />
+            <select aria-label="Adjustment type" value={draft.kind} onChange={(e) => setDraft((d) => ({ ...d, kind: e.target.value as "deduction" | "addition" }))}>
+              <option value="deduction">Deduction (−)</option>
+              <option value="addition">Addition (+)</option>
+            </select>
             <input inputMode="decimal" placeholder="Amount" value={draft.amount} onChange={(e) => setDraft((d) => ({ ...d, amount: e.target.value }))} />
             <input placeholder="Remarks" value={draft.remarks} onChange={(e) => setDraft((d) => ({ ...d, remarks: e.target.value }))} />
             <label>

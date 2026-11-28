@@ -1,0 +1,213 @@
+@use "../../../../shared/assets/styles/variables" as v;
+
+// Optional extra delivery locations of one truck (Add Instant Truck, Add Truck to Schedule).
+.delivery-locations {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-2;
+  padding: v.$spacing-3;
+  border: 1px dashed v.line(v.$color-border);
+  border-radius: v.$radius-md;
+  background: v.$color-bg-muted;
+
+  &--collapsed {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-2;
+    font-size: v.$font-size-sm;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+      color: v.fg(v.$color-primary);
+    }
+  }
+
+  &__hint {
+    color: v.fg(v.$color-text-muted);
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+  }
+
+  // # | address | qty | remove: every control the form's height, so the stops line up with each other and with the fields above
+  &__stop {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr) 8rem var(--fx-control-height);
+    align-items: center;
+    gap: v.$spacing-2;
+  }
+
+  &__no {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: v.$radius-pill;
+    background: v.fg(v.$color-primary);
+    color: v.$color-bg;
+    font-size: v.$font-size-sm;
+    font-weight: 600;
+  }
+
+  // stop 1 is the delivery address chosen above: shown as a read-only field
+  &__primary {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
+    min-width: 0;
+    height: var(--fx-control-height);
+    padding: 0 v.$spacing-3;
+    border: 1px solid var(--fx-field-border);
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+    font-size: v.$font-size-sm;
+  }
+
+  &__primary-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  &__primary-tag {
+    flex: none;
+    padding: 0 v.$spacing-2;
+    border-radius: v.$radius-pill;
+    background: v.$color-bg-muted;
+    color: v.fg(v.$color-text-muted);
+    font-size: 0.75rem;
+  }
+
+  &__address {
+    min-width: 0;
+  }
+
+  &__qty {
+    width: 100%;
+    min-width: 0;
+    height: var(--fx-control-height);
+  }
+
+  &__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--fx-control-height);
+    height: var(--fx-control-height);
+    border: 1px solid var(--fx-field-border);
+    border-radius: v.$radius-md;
+    background: v.$color-bg;
+    color: v.fg(v.$color-danger);
+    cursor: pointer;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  &__add {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-1;
+    padding: v.$spacing-1 0;
+    border: 0;
+    background: none;
+    color: v.fg(v.$color-primary);
+    font-size: v.$font-size-sm;
+    font-weight: 600;
+    cursor: pointer;
+
+    svg {
+      width: 0.9rem;
+      height: 0.9rem;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  @media (max-width: 600px) {
+    &__stop {
+      grid-template-columns: 1.75rem minmax(0, 1fr) var(--fx-control-height);
+    }
+
+    &__primary,
+    &__address {
+      grid-column: 2 / -1;
+    }
+
+    &__qty {
+      grid-column: 2 / 3;
+    }
+  }
+}
+
+// The stops of a saved truck (Update Truck Status).
+.delivery-stops-line {
+  margin: v.$spacing-1 0 0;
+  font-size: v.$font-size-sm;
+  color: v.fg(v.$color-text-muted);
+
+  strong {
+    color: inherit;
+    font-weight: 600;
+  }
+}
+
+// Add Instant Truck: the picked transporter's serving states on a full-width row of their own, laid out across it.
+.instant-truck-form__route-hint {
+  grid-column: 1 / -1;
+  margin-top: calc(-1 * v.$spacing-2);
+
+  .transporter-route-hint {
+    margin: 0;
+  }
+
+  // one line: name · picks up from … · delivers to … (wraps only when the screen is too narrow)
+  .transporter-route-hint__item {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-1 v.$spacing-4;
+    padding: v.$spacing-1 v.$spacing-3;
+  }
+
+  .serving-chips {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$spacing-1 v.$spacing-4;
+  }
+
+  .serving-chips .serving-chips__group {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  // the fixed label width lines up stacked rows; on one line it only leaves gaps
+  .serving-chips .serving-chips__label {
+    min-width: 0;
+  }
+}

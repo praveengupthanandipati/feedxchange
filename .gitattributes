@@ -1,0 +1,3 @@
+# index.html holds an inline script whose SHA-256 hash is allowed by the Content-Security-Policy (deploy/security-headers.conf,
+# public/web.config). The hash covers its exact bytes, so the file must keep LF line endings on every checkout (Windows included).
+index.html text eol=lf

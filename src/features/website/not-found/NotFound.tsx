@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { ArrowLeftIcon } from "../../../shared/components/icon";
 import { Link } from "react-router-dom";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../seo/useSeo";
 import { sitePaths } from "../routes/paths";
 
 const NotFound = () => {
-  usePageTitle("Page not found", "This page does not exist.");
+  useSeo({ title: "Page not found", description: "This page does not exist. Browse feed ingredients, prices and FAQs on FeedXchange.", noindex: true });
 
   // The server answers 200 for unknown addresses (it serves the app), so tell search engines this is not a real page.
   useEffect(() => {

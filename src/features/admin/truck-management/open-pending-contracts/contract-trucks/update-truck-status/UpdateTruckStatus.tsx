@@ -15,11 +15,14 @@ import {
   downloadTruckInvoice,
   getApiErrorMessage,
   useGetContractTruckDispatchStatusesQuery,
+  useGetDeliveryPointsByContractQuery,
   useGetTruckInvoicesByContractQuery,
   useUpdateContractTruckStatusMutation,
   useUploadTruckInvoiceMutation,
+  type DeliveryPoint,
   type TruckInvoice,
 } from "../../../../../../core/store/contractTrucksApi";
+import "../../../contract-trucks/DeliveryLocationsEditor.scss";
 import { useGetContractByContractNumberQuery } from "../../../../../../core/store/contractsApi";
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
 import { usePermission } from "../../../../../../core/auth/AuthContext";
@@ -52,16 +55,20 @@ interface UpdateTruckStatusRowProps {
   buyerId: number;
   /** The invoice already stored for this truck, if any. */
   invoice?: TruckInvoice;
+  /** The truck's delivery stops when it goes to more than one location (empty otherwise). */
+  deliveryPoints?: DeliveryPoint[];
 }
 
-const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, buyerId, invoice }: UpdateTruckStatusRowProps) => {
+const stopName = (point: DeliveryPoint) => [point.officeName, point.city].filter(Boolean).join(", ") || `Address #${point.addressId}`;
+
+const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, buyerId, invoice, deliveryPoints = [] }: UpdateTruckStatusRowProps) => {
   const [selectedStatusId, setSelectedStatusId] = useState(String(truck.dispatchStatusId));
   /**
    * Loaded is not saved by hand here: picking it shows "Upload Invoice" (attach the invoice copy) and turns Update
    * into "Create Invoice", which opens Create Seller Invoice for this truck; saving that invoice marks it Loaded.
    * Any other status is picked and saved here as before.
    */
-  const canEnterSellerInvoice = usePermission("seller-invoice.view");
+  const canEnterSellerInvoice = usePermission("seller-invoice.view", "ADD_SELLER_INVOICE");
   const handleStatusPick = (value: string) => {
     setError("");
     setSelectedStatusId(value);
@@ -121,7 +128,7 @@ const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, 
         dispatch: String(truck.contractTruckId),
         qty: String(truck.raw?.quantityMT ?? ""),
       });
-      navigate(`/admin/payments/seller-invoice?${query.toString()}`);
+      navigate(`/admin/payments/seller-invoice/add?${query.toString()}`);
       return;
     }
 
@@ -287,6 +294,20 @@ const UpdateTruckStatusRow = ({ contractNumber, truck, statusOptions, sellerId, 
         </div>
       </div>
 
+      {deliveryPoints.length > 1 && (
+        <p className="delivery-stops-line">
+          Delivers to {deliveryPoints.length} locations:{" "}
+          {deliveryPoints.map((point, index) => (
+            <span key={point.stopNo}>
+              {index > 0 && " → "}
+              <strong>
+                {point.stopNo}. {stopName(point)}
+              </strong>
+              {point.quantityMT != null && ` (${point.quantityMT} MT)`}
+            </span>
+          ))}
+        </p>
+      )}
       {saved && <p className="update-truck-status-card__success">Status updated.</p>}
       {error && <p className="update-truck-status-card__error">{error}</p>}
       {invoiceFileName && (
@@ -316,6 +337,7 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
   const { data: dispatchStatuses } = useGetContractTruckDispatchStatusesQuery();
   const { data: contract } = useGetContractByContractNumberQuery(contractNumber);
   const { data: invoices } = useGetTruckInvoicesByContractQuery({ contractId: contract?.id ?? 0 }, { skip: !contract?.id });
+  const { data: deliveryPoints } = useGetDeliveryPointsByContractQuery({ contractId: contract?.id ?? 0 }, { skip: !contract?.id });
 
   const statusOptions = (dispatchStatuses ?? []).map((status) => ({
     value: String(status.dispatchStatusId),
@@ -355,6 +377,7 @@ const UpdateTruckStatusContent = ({ contractNumber }: { contractNumber: string }
           truck={truck}
           statusOptions={statusOptions}
           invoice={invoices?.find((item) => item.contractDispatchId === truck.contractTruckId)}
+          deliveryPoints={deliveryPoints?.filter((point) => point.contractDispatchId === truck.contractTruckId)}
           sellerId={contract?.sellerId ?? 0}
           buyerId={contract?.buyerId ?? 0}
         />
@@ -390,6 +413,7 @@ const UpdateTruckStatus = () => {
         </div>
 
         <PendingContractSelector
+          withParties
           value={contractNumber}
           onChange={(value) => setSearchParams({ contract: value })}
         />

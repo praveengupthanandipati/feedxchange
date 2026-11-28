@@ -5,7 +5,7 @@ import CtaBanner from "../components/sections/CtaBanner";
 import DealingIcon from "../components/sections/DealingIcon";
 import PageHero from "../components/sections/PageHero";
 import { about, clientele, milestones, pillars, platformFeatures, team } from "../data/content";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../seo/useSeo";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 
 /** "Mithinti VGS Prakash" → "MP". */
@@ -15,7 +15,14 @@ const initials = (name: string) => {
 };
 
 const About = () => {
-  usePageTitle("About Us", "Who we are: a trusted marketplace connecting feed ingredient sellers, buyers and transporters across India.");
+  useSeo({
+    title: "About Us: Feed Ingredient Traders Since 1996",
+    description:
+      "FeedXchange is built by Sri Sai Raghavendra Trade Services, Vijayawada, trading feed raw materials since 1996: de-oiled cakes, grains, DDGS for India's feed makers.",
+    keywords: ["Sri Sai Raghavendra Trade Services", "feed ingredient traders Vijayawada", "feed raw material traders Andhra Pradesh"],
+    pageType: "AboutPage",
+    breadcrumbs: [],
+  });
   const reducedMotion = useReducedMotion();
   const [founder, ...members] = team;
 

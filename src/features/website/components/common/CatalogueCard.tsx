@@ -12,7 +12,18 @@ const CatalogueCard = ({ item, index = 0 }: { item: CatalogueProduct; index?: nu
   <li className="catalogue-card" style={{ animationDelay: `${(index % 5) * 60}ms` }}>
     <Link to={productPath(item.slug)} className="catalogue-card__link">
       <div className="catalogue-card__image">
-        <img src={item.image ?? placeholderImage} alt="" width={320} height={240} loading="lazy" decoding="async" />
+        <img
+          src={item.image ?? placeholderImage}
+          alt=""
+          width={320}
+          height={240}
+          loading="lazy"
+          decoding="async"
+          // a picture that fails to load (missing on the server) falls back to the placeholder instead of a broken image
+          onError={(event) => {
+            if (event.currentTarget.src !== new URL(placeholderImage, location.href).href) event.currentTarget.src = placeholderImage;
+          }}
+        />
         <span className="catalogue-card__tag">{item.categoryName}</span>
       </div>
       <h3>{item.name}</h3>

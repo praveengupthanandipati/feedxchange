@@ -681,10 +681,10 @@ const ManageScheduleSummary = ({ contractNumber }: { contractNumber: string }) =
 
 const ManageSchedule = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { selectedContract, setSelectedContract } = useSelectedContract();
-  // Falls back to the contract picked earlier, so opening this screen from the menu
-  // without one in the URL still shows data rather than an empty state.
-  const contractNumber = searchParams.get("contract") ?? selectedContract ?? "";
+  const { setSelectedContract } = useSelectedContract();
+  // Nothing is loaded or shown until a contract is chosen here or the page is opened with one in the link:
+  // opening this screen from the menu does not bring back the contract picked on another screen.
+  const contractNumber = searchParams.get("contract") ?? "";
 
   useEffect(() => {
     if (contractNumber) setSelectedContract(contractNumber);
@@ -706,6 +706,7 @@ const ManageSchedule = () => {
         </div>
 
         <PendingContractSelector
+          withParties
           value={contractNumber}
           onChange={(value) => setSearchParams({ contract: value })}
         />

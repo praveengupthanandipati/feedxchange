@@ -11,7 +11,7 @@ import { getErrorMessage } from "../../../../../../core/api/getErrorMessage";
 import { useBusinessFilter } from "../../../../common/business-period/useBusinessFilter";
 import SearchableSelectField from "../../../../../../shared/components/dropdown/SearchableSelectField";
 import { CircleAlertIcon, CircleCheckBigIcon, FileTextIcon, RefreshCwIcon, SearchIcon, TruckIcon, XIcon } from "../../../../../../shared/components/icon";
-import { Badge, Button, Card, EmptyState, Input, Skeleton } from "../../../../../../shared/components/ui";
+import { Badge, Button, Card, EmptyState, Input, PageHeader, Skeleton } from "../../../../../../shared/components/ui";
 import { formatDate, formatDateTime, formatQty } from "../../../../business-dashboard/businessDashboard.utils";
 import "./PendingDoContracts.scss";
 
@@ -282,6 +282,18 @@ const PendingDoContracts = () => {
 
   return (
     <div className="pending-do">
+      {/* the shared page header (as on the dashboards): title on the left, Business / search / refresh on the right */}
+      <PageHeader
+        title="Delivery Orders &amp; re-assign truck"
+        actions={
+          <div className="pending-do__filters">
+            {business.options.length > 1 && <SearchableSelectField label="Business" value={business.value} onChange={business.setValue} options={businessOptions} />}
+            <Input icon={SearchIcon} type="search" placeholder="Contract, buyer, product, truck, transporter…" aria-label="Search contracts and trucks" value={search} onChange={(event) => setSearch(event.target.value)} fieldClassName="pending-do__search" />
+            <Button iconOnly icon={RefreshCwIcon} aria-label="Refresh" title="Refresh" onClick={() => query.refetch()} loading={query.isFetching && !query.isLoading} />
+          </div>
+        }
+      />
+
       <div className="pending-do__toolbar">
         <div className="pending-do__tabs" role="tablist" aria-label="DO status">
           {(["pending", "issued"] as const).map((key) => (
@@ -289,11 +301,6 @@ const PendingDoContracts = () => {
               {key === "pending" ? "DO pending" : "DO entered"}
             </button>
           ))}
-        </div>
-        <div className="pending-do__filters">
-          {business.options.length > 1 && <SearchableSelectField label="Business" value={business.value} onChange={business.setValue} options={businessOptions} />}
-          <Input icon={SearchIcon} type="search" placeholder="Contract, buyer, product, truck, transporter…" aria-label="Search contracts and trucks" value={search} onChange={(event) => setSearch(event.target.value)} fieldClassName="pending-do__search" />
-          <Button iconOnly icon={RefreshCwIcon} aria-label="Refresh" title="Refresh" onClick={() => query.refetch()} loading={query.isFetching && !query.isLoading} />
         </div>
       </div>
 

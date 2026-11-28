@@ -1,9 +1,13 @@
 import LegalPage from "../components/legal/LegalPage";
 import { termsSections, termsUpdated } from "../data/terms";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../seo/useSeo";
 
 const Terms = () => {
-  usePageTitle("Terms and Conditions", "The terms that govern buying, selling and moving feed ingredients on FeedXchange.");
+  useSeo({
+    title: "Terms and Conditions",
+    description: "The terms that govern registering, buying, selling and transporting animal feed ingredients on FeedXchange, India's B2B feed ingredient marketplace.",
+    breadcrumbs: [],
+  });
 
   return <LegalPage title="Terms and Conditions" updated={termsUpdated} sections={termsSections} badge="Fair & transparent trade" />;
 };

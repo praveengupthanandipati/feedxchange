@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import SignupForm from "../components/join/SignupForm";
 import PageHero from "../components/sections/PageHero";
 import { whatsappLink } from "../data/content";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../seo/useSeo";
 import { sitePaths } from "../routes/paths";
 
 const benefits = [
@@ -26,7 +26,13 @@ const benefits = [
 
 /** Target of every "Join with us" button: why join, beside the signup form. */
 const JoinUs = () => {
-  usePageTitle("Join with us", "Register as a seller, buyer or transporter and start trading feed ingredients on FeedXchange.");
+  useSeo({
+    title: "Register Free as Seller, Buyer or Transporter",
+    description:
+      "Register free on FeedXchange as a feed ingredient seller, buyer (poultry, aqua, cattle feed mill) or transporter. KYC once, then trade and track every contract.",
+    keywords: ["register feed ingredient seller", "feed mill buyer registration", "transporter registration India"],
+    breadcrumbs: [],
+  });
 
   return (
     <>

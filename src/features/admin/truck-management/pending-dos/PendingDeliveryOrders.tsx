@@ -22,6 +22,8 @@ import {
   pendingDeliveryOrderRows,
   type PendingDeliveryOrderRow,
 } from "./pendingDeliveryOrders.data";
+import { isTransporterRole } from "../../../../core/auth/session";
+import TransporterDeliveryOrders from "./TransporterDeliveryOrders";
 import "./PendingDeliveryOrders.scss";
 
 const PAGE_SIZE = 10;
@@ -104,7 +106,7 @@ const PendingDoCards = ({ rows, onAddDo }: MobileCardsProps) => {
   );
 };
 
-const PendingDeliveryOrders = () => {
+const SellerPendingDeliveryOrders = () => {
   const [sellerFilter, setSellerFilter] = useState("All");
   const [buyerFilter, setBuyerFilter] = useState("All");
   const [keyword, setKeyword] = useState("");
@@ -292,5 +294,8 @@ const PendingDeliveryOrders = () => {
     </div>
   );
 };
+
+/** A transporter sees its own Assigned trucks split by whether the seller has entered the DO; everyone else keeps the seller view. */
+const PendingDeliveryOrders = () => (isTransporterRole() ? <TransporterDeliveryOrders /> : <SellerPendingDeliveryOrders />);
 
 export default PendingDeliveryOrders;

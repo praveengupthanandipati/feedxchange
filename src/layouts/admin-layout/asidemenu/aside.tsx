@@ -20,6 +20,9 @@ const CONTRACT_SCOPED_ITEM_IDS = ["contract-dispatch-management", "pending-contr
 
 const SCROLL_INDICATOR_TIMEOUT = 800;
 
+// Wide report screens: opening one folds the left menu away to give the report the full width (it can be opened again with the arrow).
+const COLLAPSE_MENU_ON_ROUTES = ["/admin/reports/seller-buyer-accounts"];
+
 interface AsideProps {
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
@@ -90,6 +93,9 @@ const Aside = ({ mobileOpen = false, onCloseMobile }: AsideProps) => {
       )?.id ?? null
     );
   }, [navSections, location.pathname]);
+  useEffect(() => {
+    if (COLLAPSE_MENU_ON_ROUTES.includes(location.pathname)) setCollapsed(true);
+  }, [location.pathname]);
   const [openSectionId, setOpenSectionId] = useState<string | null>(null);
   useEffect(() => {
     setOpenSectionId(activeSectionId);

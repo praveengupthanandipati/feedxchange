@@ -1,0 +1,32 @@
+# FeedXchange
+
+> FeedXchange (feedxchange.in) is India's first dedicated B2B digital marketplace for animal feed ingredients. Feed mills, poultry, fish, prawn and cattle farms buy raw materials such as de-oiled cakes (DOC), soybean meal, DDGS, de-oiled rice bran (DORB), maize and edible oils from KYC-verified sellers, with live indicative prices, contract tracking and truck logistics on one platform.
+
+Key facts:
+
+- Operator: built and run by Sri Sai Raghavendra Trade Services, feed raw material traders since 1996.
+- Office: 174, 1st floor, Mahatma Gandhi Wholesale Commercial Complex, Mahendra Nagar, Gollapudi, Vijayawada, Andhra Pradesh 521225, India. Serves buyers and sellers across India.
+- Contact: +91 92475 98399 (phone and WhatsApp), contact@feedxchange.in, Monday to Saturday 9am to 6pm IST.
+- Who can register: feed manufacturers, poultry farms, fish and prawn farms, cattle feed plants, ingredient sellers, transporters and referral aggregators. Registration and use of the portal are currently free.
+- Prices shown are indicative (usually ex-factory or ex-warehouse, before GST and freight); the final price is confirmed when the contract is executed.
+- Payments for goods go directly from the buyer's bank account to the supplier's; FeedXchange is not a payment gateway. A canvassing / service fee may apply under the trading agreement.
+- Quality disputes are mediated by FeedXchange; proven poor quality results in a debit to the supplier.
+
+## Main pages
+
+- [Home]({{SITE_URL}}/): what the marketplace offers, popular categories and how trading works
+- [Products and prices]({{SITE_URL}}/products): all feed ingredients with today's indicative prices, by category
+- [FAQs]({{SITE_URL}}/faqs): registration, fees, prices, GST and freight, payments, quality disputes, referrals
+- [About]({{SITE_URL}}/about): the company, its history since 1996 and the team
+- [Register]({{SITE_URL}}/join): sign up as a seller, buyer or transporter
+- [Contact]({{SITE_URL}}/contact): phone, WhatsApp, email and office address
+
+## Feed ingredients
+
+{{PRODUCTS}}
+
+## Optional
+
+- [Blog]({{SITE_URL}}/blogs): feed ingredient market notes and price trends
+- [Terms and Conditions]({{SITE_URL}}/terms)
+- [Privacy Policy]({{SITE_URL}}/privacy)

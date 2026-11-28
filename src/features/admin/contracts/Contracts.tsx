@@ -242,9 +242,29 @@ const Contracts = () => {
     );
   };
 
+  // Business owner: show whether the business is the seller or the buyer of each contract. The "side" is the chosen business, or
+  // (on "All") the owner's own business and its linked businesses. Staff have no "own" business, so no column.
+  const isBusinessOwner = business.options.some((option) => option.isOwn);
+  const sideIds = useMemo(
+    () => (business.selectedId !== null ? [business.selectedId] : business.options.map((option) => option.profileId)),
+    [business.selectedId, business.options],
+  );
   const columns = useMemo(
-    () => buildContractColumns({ onEdit: handleEdit, onDelete: handleDelete, onDuplicate: handleDuplicate }),
-    [],
+    () =>
+      buildContractColumns({
+        onEdit: handleEdit,
+        onDelete: handleDelete,
+        onDuplicate: handleDuplicate,
+        roleOf: isBusinessOwner
+          ? (contract) => {
+              const seller = sideIds.includes(Number(contract.sellerId));
+              const buyer = sideIds.includes(Number(contract.buyerId));
+              return seller && buyer ? "Buy & Sell" : seller ? "Sell" : buyer ? "Buy" : null;
+            }
+          : undefined,
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isBusinessOwner, sideIds],
   );
 
   useEffect(() => {

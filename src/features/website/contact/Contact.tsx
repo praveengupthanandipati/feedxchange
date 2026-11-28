@@ -3,10 +3,17 @@ import { FaWhatsapp } from "react-icons/fa";
 import ContactForm from "../components/contact/ContactForm";
 import PageHero from "../components/sections/PageHero";
 import { company, whatsappLink } from "../data/content";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../seo/useSeo";
 
 const Contact = () => {
-  usePageTitle("Contact Us", "Talk to the FeedXchange team about buying, selling or moving feed ingredients.");
+  useSeo({
+    title: "Contact Us: Vijayawada, Andhra Pradesh",
+    description:
+      "Call +91 92475 98399, WhatsApp or email contact@feedxchange.in to buy, sell or transport feed ingredients. Office in Gollapudi, Vijayawada; Mon-Sat 9am-6pm.",
+    keywords: ["FeedXchange contact", "feed ingredient supplier Vijayawada", "feed raw material dealer Andhra Pradesh"],
+    pageType: "ContactPage",
+    breadcrumbs: [],
+  });
 
   return (
     <>

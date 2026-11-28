@@ -10,12 +10,20 @@ import ContractSummaryPanel from "../../../contract-trucks/ContractSummaryPanel"
 import PendingContractSelector from "../../../contract-trucks/PendingContractSelector";
 import DriverSelectFields from "../../../contract-trucks/DriverSelectFields";
 import AddressSelectField from "../../../contract-trucks/AddressSelectField";
+import DeliveryLocationsEditor, {
+  emptyDeliveryStops,
+  toDeliveryPoints,
+  validateDeliveryStops,
+  type DeliveryStopsState,
+} from "../../../contract-trucks/DeliveryLocationsEditor";
 import { useSelectedContract } from "../../../../../../core/context/SelectedContractContext";
 import {
   useGetContractByContractNumberQuery,
   useGetTruckAssignmentTypesQuery,
 } from "../../../../../../core/store/contractsApi";
 import { useGetTransporterProfileSummaryQuery } from "../../../../../../core/store/transportersApi";
+import { useRouteTransporters } from "../../../../usermanagement/transporters/useRouteTransporters";
+import TransporterRouteHint from "../../../../usermanagement/transporters/TransporterRouteHint";
 import { useAddTruckDetailsMutation, useGetAllActiveTruckDetailsQuery } from "../../../../../../core/store/trucksApi";
 import { useAddDriverMutation, useGetAllActiveDriversQuery, useLazyGetDriverByMobileQuery } from "../../../../../../core/store/driversApi";
 import { describeBusyTruck, findBusyTruck, getApiErrorMessage, useAddContractTrucksMutation, useGetBusyTrucksQuery } from "../../../../../../core/store/contractTrucksApi";
@@ -42,6 +50,8 @@ interface FormState {
   freight: string;
   lrNumber: string;
   trackingUrl: string;
+  /** Optional extra delivery locations (stop 2 onwards) and stop 1's quantity. */
+  deliveryStops: DeliveryStopsState;
 }
 
 const initialFormState: FormState = {
@@ -59,6 +69,7 @@ const initialFormState: FormState = {
   freight: "",
   lrNumber: "",
   trackingUrl: "",
+  deliveryStops: emptyDeliveryStops(),
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -103,6 +114,8 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState("");
   const [saved, setSaved] = useState(false);
+  // The delivery address's name, for stop 1 of the delivery locations.
+  const [deliveryLabel, setDeliveryLabel] = useState("");
 
   const { data: transporters, isError: transportersFailed } = useGetTransporterProfileSummaryQuery();
   const { data: trucks, refetch: refetchTrucks, isError: trucksFailed } = useGetAllActiveTruckDetailsQuery();
@@ -114,10 +127,20 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
   const [addContractTrucks, { isLoading: saving }] = useAddContractTrucksMutation();
   const notify = useNotifyPrompt();
 
-  const transporterOptions = useMemo(
-    () => (transporters ?? []).map((t) => ({ value: String(t.profileId), label: t.legalName })),
-    [transporters],
-  );
+  // As on Schedule Dispatch: the route comes first, then only the transporters serving the loading state -> delivery state are offered.
+  const route = useRouteTransporters({
+    transporters,
+    sellerId,
+    buyerId,
+    loadingAddressId: form.loadingAddress,
+    deliveryAddressId: form.deliveryAddress,
+  });
+  const { eligibleIds, statesReady } = route;
+  // a change of address can leave the picked transporter off the route: clear it
+  useEffect(() => {
+    if (!statesReady) return;
+    setForm((prev) => (prev.transporter && !eligibleIds.has(prev.transporter) ? { ...prev, transporter: "" } : prev));
+  }, [statesReady, eligibleIds]);
   // Every truck is listed; picking one that is still on an Assigned trip (until Loaded / Cancelled or its approx. travel time is over) shows a message and blocks saving.
   const { data: busyTrucks } = useGetBusyTrucksQuery(undefined, { refetchOnMountOrArgChange: true });
   const truckOptions = useMemo(
@@ -196,11 +219,15 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       nextErrors.trackingUrl = "Enter a valid URL starting with http:// or https://";
     }
 
+    const stopsError = validateDeliveryStops(form.deliveryStops, form.deliveryAddress, form.loadingAddress, form.qty);
+    if (stopsError) nextErrors.deliveryStops = stopsError;
+
     return nextErrors;
   };
 
   const handleReset = () => {
-    setForm({ ...initialFormState, date: getCurrentDateValue(), time: getCurrentTimeValue() });
+    setForm({ ...initialFormState, deliveryStops: emptyDeliveryStops(), date: getCurrentDateValue(), time: getCurrentTimeValue() });
+    setDeliveryLabel("");
     setErrors({});
     setSubmitError("");
   };
@@ -288,6 +315,8 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
         toAddressId: Number(form.deliveryAddress),
         dispatchStatusId: DEFAULT_DISPATCH_STATUS_ID,
         createdBy: currentUserId,
+        // Only when the truck goes to more than one location; otherwise the request is exactly as before.
+        ...(toDeliveryPoints(form.deliveryStops, form.deliveryAddress) ? { deliveryPoints: toDeliveryPoints(form.deliveryStops, form.deliveryAddress) } : {}),
       }).unwrap();
 
       if (!succeeded) {
@@ -359,19 +388,84 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
       </div>
 
       <div className="assign-truck-drawer__grid">
+        {/* The route comes first (as on Schedule Dispatch): the transporters offered are the ones serving the loading -> delivery states. */}
+        <div className="assign-truck-drawer__field">
+          <label className="assign-truck-drawer__label">
+            Select Loading Address <span className="assign-truck-drawer__required">*</span>
+          </label>
+          <AddressSelectField
+            profileId={sellerId}
+            value={form.loadingAddress}
+            onChange={(addressId) => setField("loadingAddress", addressId)}
+            placeholder="Select Loading Address"
+            ariaLabel="Select Loading Address"
+            modalTitle="New Loading Address"
+          />
+          {errors.loadingAddress && <p className="assign-truck-drawer__error">{errors.loadingAddress}</p>}
+        </div>
+
+        <div className="assign-truck-drawer__field">
+          <label className="assign-truck-drawer__label">
+            Select Delivery Address <span className="assign-truck-drawer__required">*</span>
+          </label>
+          <AddressSelectField
+            profileId={buyerId}
+            value={form.deliveryAddress}
+            onChange={(addressId, addressLabel) => {
+              setField("deliveryAddress", addressId);
+              setDeliveryLabel(addressLabel);
+            }}
+            placeholder="Select Delivery Address"
+            ariaLabel="Select Delivery Address"
+            modalTitle="New Delivery Address"
+            defaultUnloading
+          />
+          {errors.deliveryAddress && (
+            <p className="assign-truck-drawer__error">{errors.deliveryAddress}</p>
+          )}
+        </div>
+
         <div className="assign-truck-drawer__field">
           <label className="assign-truck-drawer__label">
             Select Transporter <span className="assign-truck-drawer__required">*</span>
           </label>
           <SearchableSelect
-            options={transporterOptions}
+            options={route.options}
+            disabled={!route.enabled}
             value={form.transporter}
             onChange={(value) => setField("transporter", value)}
-            placeholder="Select Transporter"
+            // one transporter here, not several as on Schedule Dispatch
+            placeholder={route.placeholder.replace("Transporter(s)", "Transporter")}
             ariaLabel="Select Transporter"
           />
           {errors.transporter && <p className="assign-truck-drawer__error">{errors.transporter}</p>}
+          {route.emptyMessage && <p className="assign-truck-drawer__notice">{route.emptyMessage}</p>}
         </div>
+
+        {/* The picked transporter's serving states, across the full width so the address fields beside it keep their height. */}
+        {form.transporter && (
+          <div className="instant-truck-form__route-hint">
+            <TransporterRouteHint
+              selectedIds={[form.transporter]}
+              transporters={transporters}
+              sellerId={sellerId}
+              buyerId={buyerId}
+              loadingAddressId={form.loadingAddress}
+              deliveryAddressId={form.deliveryAddress}
+            />
+          </div>
+        )}
+
+        <DeliveryLocationsEditor
+          idPrefix="instant"
+          buyerId={buyerId}
+          primaryAddressId={form.deliveryAddress}
+          loadingAddressId={form.loadingAddress}
+          primaryLabel={form.deliveryAddress ? deliveryLabel || "Delivery address above" : "Select the delivery address above"}
+          value={form.deliveryStops}
+          onChange={(deliveryStops) => setField("deliveryStops", deliveryStops)}
+          error={errors.deliveryStops}
+        />
 
         <div className="assign-truck-drawer__field">
           <label className="assign-truck-drawer__label">
@@ -400,39 +494,6 @@ const AddInstantTruckForm = ({ contractNumber }: { contractNumber: string }) => 
           phoneError={errors.driverPhone}
           directEntry
         />
-
-        <div className="assign-truck-drawer__field">
-          <label className="assign-truck-drawer__label">
-            Select Loading Address <span className="assign-truck-drawer__required">*</span>
-          </label>
-          <AddressSelectField
-            profileId={sellerId}
-            value={form.loadingAddress}
-            onChange={(addressId) => setField("loadingAddress", addressId)}
-            placeholder="Select Loading Address"
-            ariaLabel="Select Loading Address"
-            modalTitle="New Loading Address"
-          />
-          {errors.loadingAddress && <p className="assign-truck-drawer__error">{errors.loadingAddress}</p>}
-        </div>
-
-        <div className="assign-truck-drawer__field">
-          <label className="assign-truck-drawer__label">
-            Select Delivery Address <span className="assign-truck-drawer__required">*</span>
-          </label>
-          <AddressSelectField
-            profileId={buyerId}
-            value={form.deliveryAddress}
-            onChange={(addressId) => setField("deliveryAddress", addressId)}
-            placeholder="Select Delivery Address"
-            ariaLabel="Select Delivery Address"
-            modalTitle="New Delivery Address"
-            defaultUnloading
-          />
-          {errors.deliveryAddress && (
-            <p className="assign-truck-drawer__error">{errors.deliveryAddress}</p>
-          )}
-        </div>
 
         <div className="assign-truck-drawer__field">
           <label className="assign-truck-drawer__label" htmlFor="schedule-date">
@@ -571,6 +632,7 @@ const AddInstantTruck = () => {
         </div>
 
         <PendingContractSelector
+          withParties
           value={contractNumber}
           onChange={(value) =>
             // Merged, so a truck carried in by Reassign survives picking the contract.

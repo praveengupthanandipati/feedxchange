@@ -9,6 +9,30 @@
   width: 100%;
   max-width: 48rem;
 
+  // Seller, Buyer and Contract side by side (stacked on small screens)
+  &--parties {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-3;
+    max-width: none;
+
+    @include m.respond-to(lg) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.7fr);
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-1;
+    min-width: 0;
+  }
+
+  &__hint {
+    grid-column: 1 / -1;
+    color: v.fg(v.$color-text-muted);
+  }
+
   &__label {
     @include m.font-base(v.$font-weight-semibold);
     color: v.fg(v.$color-text-muted);

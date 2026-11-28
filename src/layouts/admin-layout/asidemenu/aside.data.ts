@@ -227,20 +227,20 @@ export const asideNavSections: AsideNavSection[] = [
     ],
   },
   {
-    id: "payments-management",
-    title: "Payments Management",
+    id: "contracts-invoices-payments",
+    title: "Contracts Invoices & Payments",
     items: [
       {
         id: "payments",
         label: "Payments",
         icon: FolderIcon,
         children: [
-          { id: "payments-pending-contracts", permissions: ["seller-invoice.view"], label: "Pending Contracts", path: "/admin/payments/pending-contracts" },
-          { id: "payments-seller-invoice", permissions: ["seller-invoice.view"], label: "Seller Invoice", path: "/admin/payments/seller-invoice" },
-          { id: "payments-seller-invoice-edit", permissions: ["seller-invoice.view"], label: "Edit Seller Invoices", path: "/admin/payments/seller-invoice-edit" },
-          { id: "payments-payment-advice", permissions: ["payment-advice"], label: "Payment Advice", path: "/admin/payments/payment-advice" },
-          { id: "payments-payment-allocation", permissions: ["payment-allocation"], label: "Payment Allocation", path: "/admin/payments/payment-allocation" },
-          { id: "payments-refunds", permissions: ["refunds.view"], label: "Refunds", path: "/admin/payments/refunds" },
+          { id: "payments-add-seller-invoice", permissions: ["seller-invoice.view", "ADD_SELLER_INVOICE"], label: "Add Seller Invoice", path: "/admin/payments/seller-invoice/add" },
+          { id: "payments-view-seller-invoices", permissions: ["seller-invoice.view", "VIEW_SELLER_INVOICES"], label: "View Seller Invoices", path: "/admin/payments/seller-invoice/view" },
+          { id: "payments-add-payment-advice", permissions: ["payment-advice", "ADD_PAYMENT_ADVICE"], label: "Add Payment Advice", path: "/admin/payments/payment-advice/add" },
+          { id: "payments-view-payment-advices", permissions: ["payment-advice", "VIEW_PAYMENT_ADVICES"], label: "View Payment Advices", path: "/admin/payments/payment-advice/view" },
+          { id: "payments-add-refunds", permissions: ["refunds.view", "ADD_REFUNDS"], label: "Add Refunds", path: "/admin/payments/refunds/add" },
+          { id: "payments-view-refunds", permissions: ["refunds.view", "VIEW_REFUNDS"], label: "View Refunds", path: "/admin/payments/refunds/view" },
         ],
       },
     ],

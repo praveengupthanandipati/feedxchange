@@ -578,6 +578,10 @@ export interface ContractFullReceipt {
   status: Nullable<string>;
   remarks: Nullable<string>;
   allocatedToThisContract: number;
+  /** Advance only: moved to regular payments (converted). */
+  convertedToRegular?: number;
+  /** A regular payment made by converting an advance: that advance receipt. */
+  convertedFromReceiptNumber?: Nullable<string>;
   allocations: {
     invoiceNumber: Nullable<string>;
     allocationType: Nullable<string>;

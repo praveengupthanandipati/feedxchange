@@ -329,7 +329,7 @@ const PaymentAllocationUnavailable = () => (
       icon={LayersIcon}
       title="Payment Allocation Is Not Available Yet"
       description="Allocate receipts to invoices from Payment Advice for now. This screen will open once its data is connected."
-      action={{ label: "Go to Payment Advice", to: "/admin/payments/payment-advice" }}
+      action={{ label: "Go to Payment Advice", to: "/admin/payments/payment-advice/add" }}
     />
   </div>
 );

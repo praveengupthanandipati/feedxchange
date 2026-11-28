@@ -12,6 +12,8 @@ interface RoutePermissionRule {
 
 const OPEN_PENDING = "/admin/truck-management/open-pending-contracts";
 const TRANSPORTERS = "/admin/truck-management/transporters";
+/** The six Contracts Invoices & Payments Sub Modules */
+const PAYMENT_SCREENS = ["ADD_SELLER_INVOICE", "VIEW_SELLER_INVOICES", "ADD_PAYMENT_ADVICE", "VIEW_PAYMENT_ADVICES", "ADD_REFUNDS", "VIEW_REFUNDS"];
 
 export const routePermissionRules: RoutePermissionRule[] = [
   { path: "/", any: ["dashboard"] },
@@ -33,8 +35,8 @@ export const routePermissionRules: RoutePermissionRule[] = [
 
   // Truck management
   { path: "/admin/truck-management/pending-contracts", any: ["pending-contracts"] },
-  { path: "/admin/truck-management/pending-delivery-orders", any: ["pending-delivery-orders"] },
-  { path: "/admin/truck-management/pending-delivery-orders/*", any: ["pending-delivery-orders"] },
+  { path: "/admin/truck-management/pending-delivery-orders", any: ["pending-delivery-orders", "ISSUE_DELIVERY_ORDER"] },
+  { path: "/admin/truck-management/pending-delivery-orders/*", any: ["pending-delivery-orders", "ISSUE_DELIVERY_ORDER"] },
   { path: "/admin/truck-management/add-dispatch-by-user", any: ["dispatch-by-user.manage"] },
   { path: "/admin/truck-management/seller-dispatches-new", any: ["dispatch-by-admin.view"] },
   { path: "/admin/truck-management/seller-dispatches-new/*", any: ["dispatch-by-admin.view"] },
@@ -62,17 +64,18 @@ export const routePermissionRules: RoutePermissionRule[] = [
 
   // Overview page of each Sub Module: shown when any page inside it is
   { path: "/admin/truck-management/transporters/overview", any: ["freight-approval", "transport-dashboard", "truck-master.view", "drivers-master.view", "driver-truck-mapping.view", "truck-trips.view"] },
-  { path: "/admin/payments/overview", any: ["payment-advice", "refunds.view", "seller-invoice.view", "payment-allocation"] },
+  { path: "/admin/payments/overview", any: ["payment-advice", "refunds.view", "seller-invoice.view", "payment-allocation", ...PAYMENT_SCREENS] },
   { path: "/admin/product-management/overview", any: ["products.view", "products.manage", "categories.view", "price.tracking", "price.history", "price.formula"] },
   { path: "/admin/reports/overview", any: ["reports"] },
 
-  // Payments
-  { path: "/admin/payments/pending-contracts", any: ["seller-invoice.view"] },
-  { path: "/admin/payments/seller-invoice", any: ["seller-invoice.view"] },
-  { path: "/admin/payments/seller-invoice-edit", any: ["seller-invoice.view"] },
-  { path: "/admin/payments/payment-advice", any: ["payment-advice"] },
+  // Contracts Invoices & Payments (the Sub Module keys; the API's own keys still work)
+  { path: "/admin/payments/seller-invoice/add", any: ["seller-invoice.view", "ADD_SELLER_INVOICE"] },
+  { path: "/admin/payments/seller-invoice/view", any: ["seller-invoice.view", "VIEW_SELLER_INVOICES"] },
+  { path: "/admin/payments/payment-advice/add", any: ["payment-advice", "ADD_PAYMENT_ADVICE"] },
+  { path: "/admin/payments/payment-advice/view", any: ["payment-advice", "VIEW_PAYMENT_ADVICES"] },
+  { path: "/admin/payments/refunds/add", any: ["refunds.view", "ADD_REFUNDS"] },
+  { path: "/admin/payments/refunds/view", any: ["refunds.view", "VIEW_REFUNDS"] },
   { path: "/admin/payments/payment-allocation", any: ["payment-allocation"] },
-  { path: "/admin/payments/refunds", any: ["refunds.view"] },
 
   ...["business-owners", "transporters", "promoters"].map((base) => ({
     path: `/admin/${base}/notification-preferences`,

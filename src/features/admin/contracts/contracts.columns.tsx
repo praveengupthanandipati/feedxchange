@@ -111,9 +111,11 @@ interface ColumnHandlers {
   onDelete: (contract: Contract) => void;
   /** Opens New Contract as a duplicate of this contract (the copy icon beside the number). */
   onDuplicate?: (contract: Contract) => void;
+  /** Business owner: whether the signed-in business is the seller or the buyer of a contract. Leave out for staff (no column). */
+  roleOf?: (contract: Contract) => "Sell" | "Buy" | "Buy & Sell" | null;
 }
 
-export function buildContractColumns({ onEdit, onDelete, onDuplicate }: ColumnHandlers): TableColumn<Contract>[] {
+export function buildContractColumns({ onEdit, onDelete, onDuplicate, roleOf }: ColumnHandlers): TableColumn<Contract>[] {
   return [
     {
       key: "date",
@@ -142,6 +144,30 @@ export function buildContractColumns({ onEdit, onDelete, onDuplicate }: ColumnHa
       render: (row) => <StatusBadge status={row.status} />,
       exportValue: (row) => row.status,
     },
+    ...(roleOf
+      ? [
+          {
+            key: "myRole",
+            header: "Side",
+            sortable: true,
+            render: (row: Contract) => {
+              const role = roleOf(row);
+              if (!role) return "—";
+              const color = role === "Sell" ? "#15803d" : role === "Buy" ? "#1d4ed8" : "#7c3aed";
+              return (
+                <span
+                  style={{ display: "inline-block", padding: "2px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, color, background: `${color}1a`, whiteSpace: "nowrap" }}
+                  title={role === "Sell" ? "Your business is the seller of this contract" : role === "Buy" ? "Your business is the buyer of this contract" : "Your businesses are both the seller and the buyer"}
+                >
+                  {role}
+                </span>
+              );
+            },
+            sortValue: (row: Contract) => roleOf(row) ?? "",
+            exportValue: (row: Contract) => roleOf(row) ?? "",
+          },
+        ]
+      : []),
     {
       key: "seller",
       header: "Seller",

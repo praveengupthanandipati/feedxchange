@@ -1,142 +1,838 @@
-@use "../../../../shared/assets/styles/variables" as v;
-@use "../../../../shared/assets/styles/mixins" as m;
+// Seller / Buyer Accounts: a title bar, one filter bar, then a report menu on the left and the report on the right.
+$navy: var(--fx-brand-navy, #1e3a6e);
+$line: var(--fx-gray-90-line, rgba(0, 0, 0, 0.1));
+$soft: var(--fx-gray-98-2, rgba(0, 0, 0, 0.035));
 
-.seller-buyer-accounts-page {
-  padding-bottom: v.$spacing-6;
+.sba-page {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem 1rem;
+  max-width: 100%;
 }
 
-.seller-buyer-accounts-card {
-  @include m.card(v.$spacing-5);
-  overflow: visible;
+// ------------------------------------------------------------ title bar
+.sba-top {
   display: flex;
-  flex-direction: column;
-  gap: v.$spacing-4;
+  flex-wrap: wrap;
+  gap: 0.1rem 1rem;
+  align-items: baseline;
+
+  justify-content: space-between;
 
   h1 {
-    color: v.fg(v.$color-primary);
-    font-size: v.$font-size-xl;
     margin: 0;
-  }
-}
-
-// ============================================================
-// Controls row: business select, role select, Find Details, name label
-// ============================================================
-.seller-buyer-accounts-controls {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: v.$spacing-3;
-  align-items: center;
-
-  @include m.respond-to(md) {
-    grid-template-columns: minmax(0, 16rem) minmax(0, 10rem) auto 1fr;
+    font-size: 1.25rem;
+    color: $navy;
   }
 
-  &__party {
-    font-size: v.$font-size-sm;
-    color: v.fg(v.$color-text-muted);
-
-    @include m.respond-to(md) {
-      text-align: right;
-    }
+  // what the reports below are showing, at the right of the title
+  .sba-now {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    align-items: baseline;
+    min-width: 0;
+    max-width: 100%;
+    margin-left: auto;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid $line;
+    background: $soft;
+    font-size: 0.8rem;
+    opacity: 1;
+    white-space: nowrap;
+    overflow: hidden;
 
     strong {
-      color: v.fg(v.$color-text);
-      font-weight: v.$font-weight-semibold;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 22rem;
+    }
+
+    span {
+      flex: none;
+    }
+  }
+
+  .sba-now__sep {
+    opacity: 0.55;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.82rem;
+    opacity: 0.7;
+  }
+}
+
+.sba-now {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: baseline;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: $soft;
+  border: 1px solid $line;
+  font-size: 0.85rem;
+
+  &__sep {
+    opacity: 0.6;
+  }
+
+  small {
+    width: 100%;
+    text-align: right;
+    opacity: 0.65;
+  }
+}
+
+// ------------------------------------------------------------ filter bar
+.sba-filterbar {
+  display: grid;
+  gap: 0.6rem 0.75rem;
+  grid-template-columns: 1fr;
+  align-items: end;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid $line;
+  background: var(--fx-white, #fff);
+
+  @media (min-width: 1200px) {
+    grid-template-columns: minmax(0, 1.5fr) auto minmax(0, 1.5fr) minmax(14rem, 0.9fr);
+  }
+}
+
+.sba-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.65;
+}
+
+.sba-label--split small {
+  font-size: 0.7rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.sba-party {
+  display: grid;
+  gap: 0.35rem 0.5rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-width: 0;
+
+  .sba-label {
+    grid-column: 1 / -1;
+  }
+}
+
+.sba-swap {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  border: 1px solid $line;
+  background: $soft;
+  color: $navy;
+  cursor: pointer;
+
+  &:hover {
+    background: $navy;
+    color: #fff;
+  }
+
+  @media (min-width: 1200px) {
+    display: inline-flex;
+  }
+}
+
+.sba-toggle {
+  display: inline-flex;
+  border: 1px solid $line;
+  border-radius: 8px;
+  overflow: hidden;
+
+  button {
+    height: 2.3rem;
+    padding: 0 0.8rem;
+    border: 0;
+    background: var(--fx-white, #fff);
+    font: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+
+    &.is-active {
+      background: $navy;
+      color: #fff;
+      font-weight: 600;
     }
   }
 }
 
-.seller-buyer-accounts-find-btn {
-  @include m.flex(row, center, center, v.$spacing-2);
-  @include m.font-base(v.$font-weight-semibold);
-  @include m.focus-ring(v.$color-orange);
-  height: var(--fx-control-height);
-  padding: 0 v.$spacing-4;
-  border: none;
-  border-radius: v.$radius-md;
-  background-color: v.$color-orange;
-  color: v.on(v.$color-navy-dark);
-  font-size: v.$font-size-sm;
-  cursor: pointer;
-  transition: background-color v.$transition-fast;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: v.$color-orange-dark;
-  }
-}
-
-// ============================================================
-// Tabs
-// ============================================================
-
-// Mobile: a single dropdown replaces the horizontal tab row so it never
-// overflows or requires side-scrolling on small screens.
-.seller-buyer-accounts-tabs-mobile {
-  display: block;
-
-  @include m.respond-to(sm) {
-    display: none;
-  }
+.sba-date {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
 
   select {
-    @include m.font-base(v.$font-weight-semibold);
-    @include m.field-focus-ring;
-    width: 100%;
-    height: var(--fx-control-height);
-    padding: 0 v.$spacing-3;
-    border: 1px solid var(--fx-field-border);
-    border-radius: v.$radius-md;
-    background-color: v.$color-bg;
-    color: v.fg(v.$color-text);
-    font-size: v.$font-size-sm;
+    height: 2.3rem;
+    padding: 0 0.6rem;
+    border: 1px solid $line;
+    border-radius: 8px;
+    background: var(--fx-white, #fff);
+    font: inherit;
+  }
+
+  small {
+    opacity: 0.65;
+    font-size: 0.75rem;
   }
 }
 
-.seller-buyer-accounts-tabs {
-  display: none;
-  gap: v.$spacing-2;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: v.$spacing-2;
-  border-bottom: 1px solid v.line(v.$color-border);
+.sba-custom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  font-size: 0.8rem;
 
-  @include m.respond-to(sm) {
-    display: flex;
+  input {
+    min-width: 0;
+    flex: 1 1 7rem;
+    height: 2rem;
+    padding: 0 0.4rem;
+    border: 1px solid $line;
+    border-radius: 6px;
+    font: inherit;
+  }
+}
+
+// ------------------------------------------------------------ body: menu + report
+.sba-body {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  align-items: start;
+
+  @media (min-width: 992px) {
+    grid-template-columns: 15rem minmax(0, 1fr);
+  }
+}
+
+.sba-side {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0.7rem;
+  border-radius: 12px;
+  border: 1px solid $line;
+  background: var(--fx-white, #fff);
+
+  @media (min-width: 992px) {
+    position: sticky;
+    top: 0.75rem;
   }
 
-  button {
-    @include m.font-base(v.$font-weight-semibold);
-    @include m.focus-ring(v.$color-orange);
-    flex-shrink: 0;
-    height: 2.25rem;
-    padding: 0 v.$spacing-4;
-    border: none;
-    border-radius: v.$radius-md;
-    background-color: transparent;
-    color: v.fg(v.$color-text-muted);
-    font-size: v.$font-size-sm;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: background-color v.$transition-fast, color v.$transition-fast;
+  &__group {
+    display: grid;
+    gap: 0.25rem;
+  }
 
-    &:hover:not(.is-active) {
-      background-color: v.$color-bg-muted;
-      color: v.fg(v.$color-text);
+  // the group heading opens the whole group (all contracts / the whole profile)
+  &__text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  svg {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0.55rem 0.7rem;
+    border: 0;
+    border-radius: 8px;
+    background: $soft;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: $navy;
+    cursor: pointer;
+    text-align: left;
+
+    small {
+      font-size: 0.65rem;
+      font-weight: 600;
+      opacity: 0.6;
+      letter-spacing: 0.04em;
+    }
+
+    &:hover {
+      background: rgba(30, 58, 110, 0.12);
     }
 
     &.is-active {
-      background-color: v.$color-navy;
-      color: v.on(v.$color-white);
+      background: $navy;
+      color: #fff;
+
+      small {
+        opacity: 0.85;
+      }
+    }
+  }
+
+  &__items {
+    display: grid;
+    gap: 0.1rem;
+    padding-left: 0.4rem;
+    border-left: 2px solid $line;
+    margin-left: 0.5rem;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.45rem 0.7rem;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      font: inherit;
+      font-size: 0.85rem;
+      text-align: left;
+      cursor: pointer;
+
+      &:hover {
+        background: $soft;
+      }
+
+      &.is-active {
+        background: rgba(30, 58, 110, 0.1);
+        color: $navy;
+        font-weight: 700;
+      }
     }
   }
 }
 
-.seller-buyer-accounts-placeholder {
-  padding: v.$spacing-6;
-  border-radius: v.$radius-md;
-  background-color: v.$color-bg-muted;
-  color: v.fg(v.$color-text-muted);
+.sba-main {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+// ------------------------------------------------------------ one report
+.sba-report {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid $line;
+  background: var(--fx-white, #fff);
+  min-width: 0;
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    align-items: center;
+
+    h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: $navy;
+      white-space: nowrap;
+    }
+  }
+}
+
+.sba-pills {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+}
+
+// a key figure as a small rounded pill: label, value, and an optional note, on one line
+.sba-pill {
+  display: inline-flex;
+  flex: none;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid $line;
+  background: $soft;
+  font-size: 0.8rem;
+  white-space: nowrap;
+
+  &__icon {
+    flex: none;
+    align-self: center;
+    width: 0.95rem;
+    height: 0.95rem;
+    opacity: 0.75;
+  }
+
+  &__label {
+    opacity: 0.7;
+  }
+
+  &__value {
+    font-size: 0.9rem;
+  }
+
+  &__note {
+    opacity: 0.6;
+    font-size: 0.72rem;
+  }
+
+  &--good {
+    border-color: rgba(21, 128, 61, 0.45);
+    background: rgba(21, 128, 61, 0.08);
+  }
+
+  &--warn {
+    border-color: rgba(217, 119, 6, 0.5);
+    background: rgba(217, 119, 6, 0.09);
+  }
+
+  &--bad {
+    border-color: rgba(185, 28, 28, 0.45);
+    background: rgba(185, 28, 28, 0.08);
+  }
+
+  &--default {
+    border-color: rgba(30, 58, 110, 0.3);
+  }
+}
+
+.sba-empty {
+  padding: 2.5rem 1rem;
   text-align: center;
+  border: 1px dashed $line;
+  border-radius: 12px;
+  background: var(--fx-white, #fff);
+
+  p {
+    margin: 0.3rem 0 0;
+    opacity: 0.7;
+  }
+}
+
+.sba-error {
+  margin: 0;
+  color: #b91c1c;
+}
+
+.sba-note {
+  margin: 0;
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+
+.sba-sub {
+  display: block;
+  opacity: 0.7;
+}
+
+.sba-wrap {
+  white-space: normal;
+  word-break: break-word;
+}
+
+.sba-link {
+  font-weight: 600;
+  color: $navy;
+}
+
+.sba-bad {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.sba-warn {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.sba-good {
+  color: #15803d;
+  font-weight: 600;
+}
+
+// ------------------------------------------------------------ expanded contract: its invoices
+.sba-expander {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  button {
+    display: inline-flex;
+    padding: 0.1rem;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+}
+
+.sba-expanded {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem 0.8rem 2rem;
+  background: var(--fx-gray-98-2, rgba(0, 0, 0, 0.03));
+  border-left: 3px solid var(--fx-brand-navy, #1e3a6e);
+}
+
+.sba-aggs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sba-agg {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0 0.5rem;
+  align-items: baseline;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--fx-gray-90-line, rgba(0, 0, 0, 0.1));
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: var(--fx-white, #fff);
+  font-size: 0.8rem;
+
+  span {
+    opacity: 0.7;
+  }
+
+  strong {
+    font-size: 0.95rem;
+  }
+
+  small {
+    grid-column: 1 / -1;
+    opacity: 0.7;
+    font-size: 0.72rem;
+  }
+}
+
+.sba-status {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sba-adjust {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &__link {
+    display: inline-flex;
+    padding: 0.15rem;
+    border-radius: 6px;
+    color: var(--fx-brand-navy, #1e3a6e);
+
+    svg {
+      width: 0.95rem;
+      height: 0.95rem;
+    }
+
+    &:hover {
+      background: rgba(30, 58, 110, 0.12);
+    }
+  }
+}
+
+.sba-totals-status {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.sba-toolbar-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.sba-expand-actions {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.sba-row-actions {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.sba-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+
+  &--approve {
+    background: #15803d;
+  }
+
+  &--truck {
+    background: var(--fx-brand-navy, #1e3a6e);
+  }
+}
+
+// ------------------------------------------------------------ Payments Pending: age groups pivot
+.sba-pivot {
+  display: grid;
+  gap: 0.5rem;
+
+  &__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.9rem;
+    align-items: center;
+    font-size: 0.8rem;
+
+    label {
+      display: inline-flex;
+      gap: 0.4rem;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    input {
+      width: 10rem;
+      height: 2rem;
+      padding: 0 0.5rem;
+      border: 1px solid var(--fx-gray-90-line, rgba(0, 0, 0, 0.18));
+      border-radius: 6px;
+      font: inherit;
+    }
+
+    small {
+      opacity: 0.65;
+    }
+  }
+
+  &__reset {
+    padding: 0.25rem 0.7rem;
+    border: 1px solid var(--fx-gray-90-line, rgba(0, 0, 0, 0.18));
+    border-radius: 8px;
+    background: var(--fx-white, #fff);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  &__scroll {
+    overflow-x: auto;
+    border: 1px solid var(--fx-gray-90-line, rgba(0, 0, 0, 0.1));
+    border-radius: 10px;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+
+    th,
+    td {
+      padding: 0.4rem 0.7rem;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    thead th {
+      background: var(--fx-gray-98-2, rgba(0, 0, 0, 0.04));
+      border-bottom: 2px solid var(--fx-brand-navy, #1e3a6e);
+    }
+
+    tbody td {
+      border-bottom: 1px solid var(--fx-gray-90-line, rgba(0, 0, 0, 0.07));
+    }
+
+    tfoot td {
+      font-weight: 700;
+      border-top: 2px solid var(--fx-brand-navy, #1e3a6e);
+      background: var(--fx-gray-98-2, rgba(0, 0, 0, 0.04));
+    }
+
+    .is-num {
+      text-align: right;
+    }
+
+    .is-act {
+      width: 2rem;
+      text-align: center;
+    }
+
+    tr.is-out td:not(.is-act) {
+      opacity: 0.4;
+      text-decoration: line-through;
+    }
+  }
+
+  &__warn {
+    color: #b45309;
+  }
+
+  &__bad {
+    color: #b91c1c;
+  }
+
+  &__x {
+    display: inline-flex;
+    padding: 0.2rem;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    svg {
+      width: 0.95rem;
+      height: 0.95rem;
+    }
+  }
+}
+
+// Adjustments: info icon in the cell, card drawn on the page (outside the table's scroll box)
+.sba-adj-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sba-adj-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  color: var(--fx-gray-40, #6b7280);
+  cursor: help;
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: $navy;
+  }
+}
+
+.sba-adj-card {
+  position: fixed;
+  z-index: 1070;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--fx-radius-2, 8px);
+  background: #10213f;
+  color: #fff;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  text-align: left;
+  box-shadow: var(--fx-shadow-lg, 0 10px 30px rgba(0, 0, 0, 0.25));
+  pointer-events: none;
+
+  &.is-above {
+    transform: translateY(-100%);
+  }
+
+  &__title {
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li + li {
+      margin-top: 0.35rem;
+      padding-top: 0.35rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    white-space: nowrap;
+  }
+
+  &__tag {
+    margin-left: 0.35rem;
+    padding: 0 0.3rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.18);
+    font-size: 0.7rem;
+  }
+
+  &__remarks {
+    margin-top: 0.1rem;
+    color: rgba(255, 255, 255, 0.75);
+    white-space: normal;
+  }
+
+  &__total {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.45rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    font-weight: 700;
+
+    &:empty {
+      display: none;
+    }
+  }
 }

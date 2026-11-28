@@ -19,6 +19,12 @@ import {
 import { useGetTransporterProfileSummaryQuery } from "../../../../../../core/store/transportersApi";
 import { useAddTruckDetailsMutation, useGetAllActiveTruckDetailsQuery } from "../../../../../../core/store/trucksApi";
 import DriverSelectFields from "../../../contract-trucks/DriverSelectFields";
+import DeliveryLocationsEditor, {
+  emptyDeliveryStops,
+  toDeliveryPoints,
+  validateDeliveryStops,
+  type DeliveryStopsState,
+} from "../../../contract-trucks/DeliveryLocationsEditor";
 import {
   useGetScheduleTrucksDispatchDetailsQuery,
   useAddMultipleTrucksMutation,
@@ -44,6 +50,8 @@ interface TruckRow {
   qty: string;
   lrNumber: string;
   trackingUrl: string;
+  /** Optional extra delivery locations of this truck (stop 1 is the schedule's delivery address). */
+  deliveryStops: DeliveryStopsState;
 }
 
 type TruckRowErrors = Partial<Record<Exclude<keyof TruckRow, "id">, string>>;
@@ -60,6 +68,7 @@ const newTruckRow = (qty = ""): TruckRow => ({
   qty,
   lrNumber: "",
   trackingUrl: "",
+  deliveryStops: emptyDeliveryStops(),
 });
 
 interface AddTruckToScheduleFormProps {
@@ -198,6 +207,11 @@ const AddTruckToScheduleForm = ({
         rowError.trackingUrl = "Enter a valid URL starting with http:// or https://";
       }
 
+      const stopsError = detail
+        ? validateDeliveryStops(row.deliveryStops, String(detail.toAddressId), String(detail.fromAddressId), row.qty)
+        : "";
+      if (stopsError) rowError.deliveryStops = stopsError;
+
       if (Object.keys(rowError).length > 0) rowErrors[row.id] = rowError;
     });
 
@@ -285,6 +299,10 @@ const AddTruckToScheduleForm = ({
           lrNumber: row.lrNumber.trim(),
           trackingUrl: row.trackingUrl.trim() || undefined,
           quantityMT: Number(row.qty),
+          // Only when the truck goes to more than one location; otherwise the truck is sent exactly as before.
+          ...(toDeliveryPoints(row.deliveryStops, String(detail.toAddressId))
+            ? { deliveryPoints: toDeliveryPoints(row.deliveryStops, String(detail.toAddressId)) }
+            : {}),
         })),
       }).unwrap();
 
@@ -447,6 +465,17 @@ const AddTruckToScheduleForm = ({
                 />
                 {rowErrors.trackingUrl && <p className="assign-truck-drawer__error">{rowErrors.trackingUrl}</p>}
               </div>
+
+              <DeliveryLocationsEditor
+                idPrefix={row.id}
+                buyerId={contract?.buyerId ?? 0}
+                primaryAddressId={String(detail.toAddressId)}
+                loadingAddressId={String(detail.fromAddressId)}
+                primaryLabel={detail.deliveryAddress || "The schedule's delivery address"}
+                value={row.deliveryStops}
+                onChange={(deliveryStops) => updateRow(row.id, { deliveryStops })}
+                error={rowErrors.deliveryStops}
+              />
               </div>
 
               <div className="add-truck-rows__actions">

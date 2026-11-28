@@ -95,6 +95,8 @@ const SellerInvoice = () => {
     return () => clearTimeout(timer);
   }, [saveToast]);
 
+  // The invoice row the user last worked on: the "Select contract" box at the top always shows that row's contract.
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const patchRow = (id: string, patch: Partial<SellerInvoiceRow>) => setRows((prev) => prev.map((row) => (row.id === id ? { ...row, ...patch } : row)));
 
   /** Total MTs is no longer on the form: it is sent as the invoice quantity. */
@@ -102,7 +104,10 @@ const SellerInvoice = () => {
     setRows((prev) => prev.map((row) => (row.id === id ? { ...row, invoiceQty: value, totalMts: value } : row)));
 
   // a different contract number means the linked contract is no longer known until it is looked up again
-  const handleContractNumberChange = (id: string, value: string) => patchRow(id, { contractNumber: value, contract: null, contractError: "" });
+  const handleContractNumberChange = (id: string, value: string) => {
+    setActiveRowId(id);
+    patchRow(id, { contractNumber: value, contract: null, contractError: "" });
+  };
 
   /** The row with a contract linked. The invoice quantity is not taken from the contract: it is typed from the invoice. */
   const withContract = (row: SellerInvoiceRow, contract: InvoiceContract): SellerInvoiceRow => ({
@@ -118,6 +123,7 @@ const SellerInvoice = () => {
 
   /** Looks a typed contract number up (the rate and GST are needed to calculate the invoice). */
   const resolveContract = async (row: SellerInvoiceRow): Promise<void> => {
+    setActiveRowId(row.id);
     if (!needsLookup(row)) return;
     const number = row.contractNumber.trim();
     try {
@@ -166,6 +172,10 @@ const SellerInvoice = () => {
     void resolveContract(first);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    if (!activeRowId) return;
+    setPickedContract(rows.find((row) => row.id === activeRowId)?.contract?.contractNumber ?? "");
+  }, [rows, activeRowId]);
   const [overviewDetails, setOverviewDetails] = useState<string | null>(null);
   const handleContractPick = (contract: InvoiceContract) => {
     setPickedContract(contract.contractNumber);
@@ -173,11 +183,13 @@ const SellerInvoice = () => {
     const added = target ? null : withContract(createEmptySellerInvoiceRow(), contract);
     setRows((prev) => (target ? prev.map((row) => (row.id === target.id ? withContract(row, contract) : row)) : [...prev, added!]));
     const id = target?.id ?? added!.id;
+    setActiveRowId(id);
     window.setTimeout(() => document.querySelector(`[data-invoice-id="${id}"]`)?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
   };
 
   const handleSelectPartiesSelect = (contract: InvoiceContract) => {
     if (!selectPartiesRowId) return;
+    setActiveRowId(selectPartiesRowId);
     setRows((prev) => prev.map((row) => (row.id === selectPartiesRowId ? withContract(row, contract) : row)));
     setSelectPartiesRowId(null);
   };
@@ -186,6 +198,7 @@ const SellerInvoice = () => {
     setInvoiceDate(formatTodayInput());
     setRows([createEmptySellerInvoiceRow()]);
     setPickedContract("");
+    setActiveRowId(null);
     setShowErrors(false);
     setServerError("");
   };
@@ -218,7 +231,39 @@ const SellerInvoice = () => {
 
       // Nothing was saved: the trip is not obvious (or has to be created), so the user decides / accepts the steps first.
       if (result.requiresTripSelection && (result.tripSelections?.length ?? 0) > 0) {
-        setTripPrompt(result.tripSelections ?? []);
+        const selections = result.tripSelections ?? [];
+        // Every invoice only needs a new trip (nothing to choose between): accept all the steps and save again, without the dialog.
+        // The typed transporter / driver details are used; the transporter and the driver stay optional.
+        if (!choices && selections.every((sel) => sel.kind === "NewTrip" && sel.allowCreateNew)) {
+          const auto: Record<number, TripChoice> = {};
+          for (const sel of selections) {
+            const row = latest[sel.rowNumber - 1];
+            const draft = row?.notAssigned ? row : null;
+            const driverGiven = draft ? (draft.driverMode === "existing" ? Boolean(draft.driverId) : Boolean(draft.driverName.trim() || draft.driverMobile.trim())) : false;
+            auto[sel.rowNumber] = {
+              createNewTrip: true,
+              accepted: true,
+              tripSetup: {
+                transporterProfileId: draft?.transporterId ? Number(draft.transporterId) : (sel.transporterProfileId ?? null),
+                ...(!draft || sel.mappedDriver || !driverGiven
+                  ? {}
+                  : draft.driverMode === "existing"
+                    ? { driverId: Number(draft.driverId) }
+                    : {
+                        newDriver: {
+                          driverName: draft.driverName.trim(),
+                          mobileNumber: draft.driverMobile.trim(),
+                          licenseNumber: draft.licenseNumber.trim(),
+                          licenseExpiryDate: draft.licenseExpiry || null,
+                        },
+                      }),
+              },
+            };
+          }
+          await handleSaveInvoices(auto);
+          return;
+        }
+        setTripPrompt(selections);
         return;
       }
 
@@ -300,7 +345,7 @@ const SellerInvoice = () => {
 
       <div className="si-page-header">
         <div>
-          <h1>Seller Invoices</h1>
+          <h1>Add Seller Invoice</h1>
           <p className="si-muted">Enter the invoices raised by the seller. Amounts, GST and the financial year are worked out for you.</p>
         </div>
         {/* Top left: the financial year first, then the invoice date (kept inside that year). */}

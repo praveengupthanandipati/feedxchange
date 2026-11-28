@@ -15,6 +15,24 @@ export interface ScheduleCreatedResult {
   dispatchScheduleId: number;
 }
 
+/** One delivery location of a truck that unloads at more than one of the buyer's addresses. */
+export interface DeliveryPointInput {
+  addressId: number;
+  /** Optional: how much is unloaded here. */
+  quantityMT?: number;
+}
+
+/** A saved stop of a truck with more than one delivery location (stop 1 = its delivery address). */
+export interface DeliveryPoint {
+  contractDispatchId: number;
+  stopNo: number;
+  addressId: number;
+  officeName: string | null;
+  city: string | null;
+  stateName: string | null;
+  quantityMT: number | null;
+}
+
 export interface AddContractTruckPayload {
   contractId: number;
   truckAssignmentTypeId: number;
@@ -36,6 +54,8 @@ export interface AddContractTruckPayload {
   toAddressId: number;
   dispatchStatusId: number;
   createdBy: number;
+  /** Optional: two or more delivery locations in order (the first is toAddressId). Left off for a single delivery address. */
+  deliveryPoints?: DeliveryPointInput[];
 }
 
 export interface AddMultipleTrucksItem {
@@ -46,6 +66,8 @@ export interface AddMultipleTrucksItem {
   /** Optional live-tracking link (http/https). */
   trackingUrl?: string;
   quantityMT: number;
+  /** Optional: two or more delivery locations in order (the first is the request's toAddressId). Left off for a single delivery address. */
+  deliveryPoints?: DeliveryPointInput[];
 }
 
 /** Trucks that share one transporter, freight and route go up together. */
@@ -70,7 +92,8 @@ export interface UpdateContractTruckPayload {
   // UpdateContractTrucks still takes this under its older name; AddContractTrucks wants
   // dispatchScheduleTransporterId.
   scheduledNotificationId: number;
-  transporterProfileId: number;
+  /** Not changed by the update; null for a trip without a transporter. */
+  transporterProfileId: number | null;
   truckId: number;
   driverId: number;
   assignedOn: string;
@@ -222,12 +245,13 @@ export interface TruckByContract {
   truckAssignmentTypeId: number;
   truckAssignmentTypeName: string;
   dispatchScheduleTransporterId: number | null;
-  transporterProfileId: number;
-  legalName: string;
+  /** Null when the trip has none (e.g. a trip created while raising a seller invoice). */
+  transporterProfileId: number | null;
+  legalName: string | null;
   truckId: number;
   registrationNumber: string;
-  driverId: number;
-  driverName: string;
+  driverId: number | null;
+  driverName: string | null;
   assignedOn: string;
   lrNumber: string;
   /** The tracking link saved on the trip, if any. */
@@ -290,12 +314,13 @@ export interface ContractTruckChainViewerLeg extends ContractTruckChainLeg {
   rootContractDispatchId: number;
   truckAssignmentTypeId: number;
   truckAssignmentTypeName: string;
-  transporterProfileId: number;
-  transporterName: string;
+  /** Null when the trip has none (e.g. a trip created while raising a seller invoice). */
+  transporterProfileId: number | null;
+  transporterName: string | null;
   truckId: number;
   registrationNumber: string;
-  driverId: number;
-  driverName: string;
+  driverId: number | null;
+  driverName: string | null;
   loadingOffice: string;
   deliveryOffice: string;
   actualFromAddressId: number;
@@ -311,10 +336,11 @@ export interface ContractTruckChainTruck {
   rootContractDispatchId: number;
   truckId: number;
   registrationNumber: string;
-  driverId: number;
-  driverName: string;
-  transporterProfileId: number;
-  transporterName: string;
+  /** Null when the trip has none (e.g. a trip created while raising a seller invoice). */
+  driverId: number | null;
+  driverName: string | null;
+  transporterProfileId: number | null;
+  transporterName: string | null;
   quantityMT: number;
   dispatchStatusId: number;
   dispatchStatusName: string;
@@ -544,6 +570,16 @@ export const contractTrucksApi = createApi({
       invalidatesTags: ["TruckInvoice"],
     }),
 
+    getDeliveryPointsByContract: builder.query<DeliveryPoint[], { contractId: number }>({
+      query: (params) => ({
+        url: "/api/ContractTrucks/GetDeliveryPointsByContract",
+        method: "GET",
+        params,
+      }),
+      transformResponse: unwrapArray<DeliveryPoint>,
+      providesTags: ["ContractTruck"],
+    }),
+
     getTruckInvoicesByContract: builder.query<TruckInvoice[], { contractId: number }>({
       query: (params) => ({
         url: "/api/ContractTrucks/GetTruckInvoicesByContract",
@@ -699,6 +735,7 @@ export const {
   useUpdateContractTruckStatusMutation,
   useUploadTruckInvoiceMutation,
   useGetTruckInvoicesByContractQuery,
+  useGetDeliveryPointsByContractQuery,
   useScheduleContractTrucksMutation,
   useGetTransporterScheduleResponseStatusesQuery,
   useGetScheduleTrucksDispatchDetailsQuery,

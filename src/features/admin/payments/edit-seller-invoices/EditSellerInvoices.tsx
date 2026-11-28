@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import PartyName from "../../../../shared/components/party/PartyName";
-import { ChevronLeftIcon, ChevronRightIcon, CircleCheckBigIcon, CircleXIcon, EyeIcon, EyeOffIcon, PenIcon } from "../../../../shared/components/icon";
+import { CircleCheckBigIcon, CircleXIcon, EyeIcon, EyeOffIcon, PenIcon, SearchIcon } from "../../../../shared/components/icon";
+import { Badge, Input, Select, type BadgeTone } from "../../../../shared/components/ui";
 import Table from "../../../../shared/components/table/Table";
 import type { TableColumn } from "../../../../shared/components/table/table.types";
 import ConfirmDialog from "../../../../shared/components/dialog/ConfirmDialog";
@@ -8,14 +10,32 @@ import EditInvoiceOffcanvas from "./EditInvoiceOffcanvas";
 import {
   apiErrorMessage,
   useCancelInvoiceMutation,
-  useGetInvoiceFinancialYearsQuery,
   useGetInvoicesQuery,
   type Invoice,
 } from "../../../../core/store/sellerInvoiceApi";
 import { useNotifyPrompt } from "../../../../shared/notifications/useNotifyPrompt";
+// the dashboards' table toolbar (bd-toolbar) and note (bd-note) styles
+import "../../business-dashboard/BusinessDashboard.scss";
+import { DATE_PRESETS, presetRange } from "../dateRanges";
+import { useBusinessFilter } from "../../common/business-period/useBusinessFilter";
 import "./EditSellerInvoices.scss";
 
+/** Rows per page of the table (the same as the dashboards' tables). */
 const PAGE_SIZE = 10;
+/** Invoices loaded at once (the API's limit); the table then searches, sorts and pages them on screen. */
+const MAX_ROWS = 200;
+
+const statusTone = (status: string): BadgeTone =>
+  status === "Paid" ? "success" : status === "Partially Paid" ? "info" : status === "Pending" ? "warning" : status === "Cancelled" ? "danger" : "neutral";
+
+/** "2026-6" before "2026-11": the year and the running number compared as numbers. */
+const contractSortKey = (contractNumber: string): string | number => {
+  const m = /^(\d+)-(\d+)$/.exec(contractNumber.trim());
+  return m ? Number(m[1]) * 1_000_000 + Number(m[2]) : contractNumber;
+};
+
+const matches = (needle: string, ...values: (string | number | null | undefined)[]) =>
+  !needle || values.some((value) => value != null && String(value).toLowerCase().includes(needle));
 
 const STATUS_FILTERS = [
   { value: "Uncleared", label: "Uncleared (can be edited)" },
@@ -36,67 +56,88 @@ function formatDate(iso: string): string {
   return `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
 }
 
-/** The deductions of one invoice, in the row opened under it. */
-const DeductionLines = ({ invoice }: { invoice: Invoice }) => (
-  <div className="edit-invoices__deduction-lines">
-    <div className="edit-invoices__deduction-card">
-    <div className="edit-invoices__deduction-head">
-      <span className="edit-invoices__deduction-title">Deductions on {invoice.invoiceNumber}</span>
-      <span className="edit-invoices__deduction-count">
-        {invoice.deductions.length} deduction{invoice.deductions.length === 1 ? "" : "s"}
-      </span>
+/**
+ * The deductions and additions of one invoice, set out as a statement:
+ * invoice amount, each adjustment (deductions in red with a minus, additions in green with a plus), the total of the adjustments and the amount to be paid.
+ */
+const DeductionLines = ({ invoice }: { invoice: Invoice }) => {
+  const good = "var(--color-success, #15803d)";
+  const bad = "var(--color-danger, #b91c1c)";
+  const cell: React.CSSProperties = { border: "1px solid var(--color-border, #d4d8de)", padding: "3px 10px", lineHeight: 1.3, fontSize: "var(--fx-text-sm)", color: "var(--color-text, inherit)" };
+  const num: React.CSSProperties = { ...cell, textAlign: "right", whiteSpace: "nowrap", fontWeight: 600 };
+  const signed = (amount: number) => (amount < 0 ? `+ ${money(-amount)}` : `− ${money(amount)}`);
+  const colorOf = (amount: number) => (amount < 0 ? good : bad);
+  const net = invoice.deductionsTotal;
+  const lines = invoice.deductions;
+  return (
+    <div className="edit-invoices__deduction-lines">
+      <div className="edit-invoices__deduction-card" style={{ overflowX: "auto", fontSize: "var(--fx-text-sm)" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <tbody>
+            <tr>
+              <th colSpan={4} style={{ ...cell, textAlign: "center", fontWeight: 700 }}>Invoice amount ({invoice.invoiceNumber})</th>
+              <td style={{ ...num, fontWeight: 700 }}>{money(invoice.totalAmount)}</td>
+            </tr>
+            {lines.map((d, index) => (
+              <tr key={d.deductionId}>
+                {index === 0 && (
+                  <th scope="rowgroup" rowSpan={lines.length} style={{ ...cell, textAlign: "left", fontWeight: 600, verticalAlign: "middle" }}>
+                    Adjustments:
+                  </th>
+                )}
+                <td style={{ ...cell, whiteSpace: "nowrap" }}>{formatDate(d.date)}</td>
+                <td style={cell}>
+                  {d.remarks || (d.amount < 0 ? "Addition" : "Deduction")}
+                  {d.isTdsTcs && <span className="edit-invoices__tag"> TDS/TCS</span>}
+                </td>
+                <td style={{ ...num, color: colorOf(d.amount) }}>{signed(d.amount)}</td>
+                <td style={cell} />
+              </tr>
+            ))}
+            <tr>
+              <th colSpan={4} style={{ ...cell, textAlign: "left", fontWeight: 600 }}>Total adjustments (less deductions, plus additions)</th>
+              <td style={{ ...num, color: net === 0 ? undefined : colorOf(net) }}>{net === 0 ? money(0) : signed(net)}</td>
+            </tr>
+            <tr>
+              <th colSpan={4} style={{ ...cell, textAlign: "center", fontWeight: 700 }}>Amount to be paid</th>
+              <td style={{ ...num, fontWeight: 700 }}>{money(invoice.payableAmount)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col" className="is-num">Amount</th>
-          <th scope="col">Type</th>
-          <th scope="col">Remarks</th>
-        </tr>
-      </thead>
-      <tbody>
-        {invoice.deductions.map((d) => (
-          <tr key={d.deductionId}>
-            <td>{formatDate(d.date)}</td>
-            <td className="is-num">{money(d.amount)}</td>
-            <td>{d.isTdsTcs ? <span className="edit-invoices__tag">TDS/TCS</span> : "Other"}</td>
-            <td>{d.remarks || "—"}</td>
-          </tr>
-        ))}
-      </tbody>
-      <tfoot>
-        <tr>
-          <th scope="row">Total</th>
-          <td className="is-num">{money(invoice.deductionsTotal)}</td>
-          <td colSpan={2} />
-        </tr>
-      </tfoot>
-    </table>
-    </div>
-  </div>
-);
+  );
+};
 
-/** Edit Seller Invoices: invoices that are not cleared can be edited or cancelled; cleared (paid) and cancelled ones are locked. */
+/** View Seller Invoices: invoices that are not cleared can be edited or cancelled; cleared (paid) and cancelled ones are locked. */
 const EditSellerInvoices = () => {
-  const [status, setStatus] = useState("Uncleared");
-  const [financialYear, setFinancialYear] = useState("");
-  const [contractNumber, setContractNumber] = useState("");
-  const [appliedContract, setAppliedContract] = useState("");
-  const [page, setPage] = useState(1);
+  // opened from a report with ?invoice=<number>&invoiceId=<id>: that invoice is searched, whatever its status, and its adjustments are opened
+  const [linkParams] = useSearchParams();
+  const linkedInvoice = linkParams.get("invoice") ?? "";
+  const [status, setStatus] = useState(linkedInvoice ? "" : "Uncleared");
+  const [search, setSearch] = useState(linkedInvoice);
+  // Business: staff start on "All", an owner on their own business; "include linked" adds the businesses linked under the chosen one
+  const business = useBusinessFilter();
+  const [includeLinked, setIncludeLinked] = useState(false);
+  // Seller and Buyer are optional filters (chosen from the parties of the loaded invoices)
+  const [sellerFilter, setSellerFilter] = useState("");
+  const [buyerFilter, setBuyerFilter] = useState("");
+  const [datePreset, setDatePreset] = useState("");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+  const dateRange = datePreset === "custom" ? { from: customFrom || undefined, to: customTo || undefined } : presetRange(datePreset);
 
   const [editing, setEditing] = useState<Invoice | null>(null);
   const [cancelling, setCancelling] = useState<Invoice | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [toast, setToast] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
   // Invoices whose deductions are open in a row below them.
-  const [openDeductions, setOpenDeductions] = useState<string[]>([]);
+  const [openDeductions, setOpenDeductions] = useState<string[]>(() => (linkParams.get("invoiceId") ? [linkParams.get("invoiceId") as string] : []));
   const toggleDeductions = (key: string) =>
     setOpenDeductions((prev) => (prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key]));
 
-  const { data: years = [] } = useGetInvoiceFinancialYearsQuery(undefined, { refetchOnMountOrArgChange: true });
   const { data, isFetching, isError, error } = useGetInvoicesQuery(
-    { status, financialYear: financialYear || undefined, contractNumber: appliedContract || undefined, page, pageSize: PAGE_SIZE },
+    { status, businessProfileId: business.selectedId ?? undefined, includeLinked: business.selectedId !== null && includeLinked, from: dateRange.from, to: dateRange.to, page: 1, pageSize: MAX_ROWS },
     { refetchOnMountOrArgChange: true },
   );
   const [cancelInvoice, { isLoading: cancelBusy }] = useCancelInvoiceMutation();
@@ -108,9 +149,27 @@ const EditSellerInvoices = () => {
     return () => clearTimeout(timer);
   }, [toast]);
 
-  const items = data?.items ?? [];
   const total = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const truncated = total > (data?.items.length ?? 0);
+  const sellerOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    (data?.items ?? []).forEach((i) => map.set(String(i.sellerId), i.sellerName));
+    return [...map.entries()].sort((x, y) => x[1].localeCompare(y[1]));
+  }, [data]);
+  const buyerOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    (data?.items ?? []).forEach((i) => map.set(String(i.buyerId), i.buyerName));
+    return [...map.entries()].sort((x, y) => x[1].localeCompare(y[1]));
+  }, [data]);
+  const items = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    return (data?.items ?? []).filter(
+      (i) =>
+        (!sellerFilter || String(i.sellerId) === sellerFilter) &&
+        (!buyerFilter || String(i.buyerId) === buyerFilter) &&
+        matches(needle, i.invoiceNumber, i.contractNumber, i.sellerName, i.buyerName, i.truckNumber, i.financialYear, i.status),
+    );
+  }, [data, search, sellerFilter, buyerFilter]);
 
   const confirmCancel = async () => {
     if (!cancelling) return;
@@ -156,31 +215,60 @@ const EditSellerInvoices = () => {
         );
       },
     },
-    { key: "invoiceNumber", header: "Invoice #" },
-    { key: "contractNumber", header: "Contract #" },
-    { key: "sellerName", header: "Seller", render: (row) => <PartyName name={row.sellerName} id={row.sellerId} /> },
-    { key: "buyerName", header: "Buyer", render: (row) => <PartyName name={row.buyerName} id={row.buyerId} /> },
-    { key: "invoiceDate", header: "Date", render: (row) => formatDate(row.invoiceDate) },
-    { key: "financialYear", header: "FY" },
-    { key: "truckNumber", header: "Truck", render: (row) => row.truckNumber ?? "—" },
-    { key: "invoiceQty", header: "Qty (MT)", align: "right" },
-    { key: "totalAmount", header: "Total", align: "right", render: (row) => money(row.totalAmount) },
+    { key: "invoiceNumber", header: "Invoice #", sortable: true, hideable: false },
+    { key: "contractNumber", header: "Contract #", sortable: true, sortValue: (row) => contractSortKey(row.contractNumber) },
+    {
+      key: "sellerName",
+      header: "Seller",
+      sortable: true,
+      render: (row) => <PartyName name={row.sellerName} id={row.sellerId} />,
+      sortValue: (row) => row.sellerName ?? "",
+      exportValue: (row) => row.sellerName ?? "",
+    },
+    {
+      key: "buyerName",
+      header: "Buyer",
+      sortable: true,
+      render: (row) => <PartyName name={row.buyerName} id={row.buyerId} />,
+      sortValue: (row) => row.buyerName ?? "",
+      exportValue: (row) => row.buyerName ?? "",
+    },
+    {
+      key: "invoiceDate",
+      header: "Date",
+      sortable: true,
+      render: (row) => formatDate(row.invoiceDate),
+      sortValue: (row) => row.invoiceDate,
+      exportValue: (row) => formatDate(row.invoiceDate),
+    },
+    { key: "financialYear", header: "FY", sortable: true, priority: "low" },
+    { key: "truckNumber", header: "Truck", sortable: true, render: (row) => row.truckNumber ?? "—", sortValue: (row) => row.truckNumber ?? "" },
+    { key: "invoiceQty", header: "Qty (MT)", sortable: true, align: "right" },
+    { key: "totalAmount", header: "Total", sortable: true, align: "right", render: (row) => money(row.totalAmount), sortValue: (row) => row.totalAmount },
     {
       key: "deductions",
-      header: "Deductions",
+      header: "Deductions / additions",
+      sortable: true,
       align: "right",
-      render: (row) => (row.deductions.length === 0 ? "—" : money(row.deductionsTotal)),
+      render: (row) => (row.deductions.length === 0 ? "—" : row.deductionsTotal < 0 ? `+ ${money(-row.deductionsTotal)}` : `− ${money(row.deductionsTotal)}`),
+      sortValue: (row) => row.deductionsTotal,
+      exportValue: (row) => (row.deductions.length === 0 ? "" : money(row.deductionsTotal)),
     },
-    { key: "payableAmount", header: "Payable", align: "right", render: (row) => money(row.payableAmount) },
-    { key: "paidAmount", header: "Paid", align: "right", render: (row) => money(row.paidAmount) },
+    { key: "payableAmount", header: "Payable", sortable: true, align: "right", render: (row) => money(row.payableAmount), sortValue: (row) => row.payableAmount },
+    { key: "paidAmount", header: "Paid", sortable: true, align: "right", render: (row) => money(row.paidAmount), sortValue: (row) => row.paidAmount },
     {
       key: "status",
       header: "Status",
-      render: (row) => <span className={`edit-invoices__status edit-invoices__status--${row.status.toLowerCase().replace(/\s+/g, "-")}`}>{row.status}</span>,
+      sortable: true,
+      render: (row) => <Badge tone={statusTone(row.status)}>{row.status}</Badge>,
+      sortValue: (row) => row.status,
+      exportValue: (row) => row.status,
     },
     {
       key: "actions",
       header: "Actions",
+      hideable: false,
+      exportable: false,
       render: (row) => (
         <div className="edit-invoices__actions">
           <button
@@ -219,86 +307,102 @@ const EditSellerInvoices = () => {
 
       <div className="edit-invoices__card">
         <div className="edit-invoices__header">
-          <h1>Edit Seller Invoices</h1>
-        </div>
-
-        <div className="edit-invoices__filters">
-          <label>
-            <span>Status</span>
-            <select
-              value={status}
-              onChange={(e) => {
-                setStatus(e.target.value);
-                setPage(1);
-              }}
-            >
-              {STATUS_FILTERS.map((f) => (
-                <option key={f.label} value={f.value}>
-                  {f.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span>Financial year</span>
-            <select
-              value={financialYear}
-              onChange={(e) => {
-                setFinancialYear(e.target.value);
-                setPage(1);
-              }}
-            >
-              <option value="">All</option>
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </label>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setAppliedContract(contractNumber.trim());
-              setPage(1);
-            }}
-          >
-            <label>
-              <span>Contract #</span>
-              <input value={contractNumber} onChange={(e) => setContractNumber(e.target.value)} placeholder="Contract number" />
-            </label>
-            <button type="submit">Search</button>
-          </form>
+          <h1>View Seller Invoices</h1>
         </div>
 
         {isError && <p className="edit-invoices__error">{apiErrorMessage(error, "Could not load the invoices.")}</p>}
+        {truncated && (
+          <p className="bd-note" role="note">
+            Showing the latest {data?.items.length} of {total} invoices. Choose a financial year or a status to see the others.
+          </p>
+        )}
 
         <Table
+          toolbar={
+            <div className="bd-toolbar">
+              <div className="bd-toolbar__filters" style={{ alignItems: "center" }}>
+                <Select aria-label="Invoice date" value={datePreset} onChange={(event) => setDatePreset(event.target.value)}>
+                  {DATE_PRESETS.map((d) => (
+                    <option key={d.value} value={d.value}>
+                      {d.label}
+                    </option>
+                  ))}
+                </Select>
+                {datePreset === "custom" && (
+                  <>
+                    <Input type="date" aria-label="From date" value={customFrom} max={customTo || undefined} onChange={(event) => setCustomFrom(event.target.value)} />
+                    <Input type="date" aria-label="To date" value={customTo} min={customFrom || undefined} onChange={(event) => setCustomTo(event.target.value)} />
+                  </>
+                )}
+                <Select aria-label="Seller" value={sellerFilter} onChange={(event) => setSellerFilter(event.target.value)}>
+                  <option value="">All sellers</option>
+                  {sellerOptions.map(([id, name]) => (
+                    <option key={id} value={id}>
+                      {name}
+                    </option>
+                  ))}
+                </Select>
+                <Select aria-label="Buyer" value={buyerFilter} onChange={(event) => setBuyerFilter(event.target.value)}>
+                  <option value="">All buyers</option>
+                  {buyerOptions.map(([id, name]) => (
+                    <option key={id} value={id}>
+                      {name}
+                    </option>
+                  ))}
+                </Select>
+                <Input
+                  icon={SearchIcon}
+                  type="search"
+                  placeholder="Invoice, contract, seller, buyer, truck…"
+                  aria-label="Search invoices"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  fieldClassName="bd-toolbar__search"
+                />
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  {business.options.length > 0 && (
+                    <Select aria-label="Business" value={business.value} onChange={(event) => business.setValue(event.target.value)}>
+                      <option value="all">All businesses</option>
+                      {business.options.map((o) => (
+                        <option key={o.profileId} value={String(o.profileId)}>
+                          {o.name}
+                          {o.city ? ` (${o.city})` : ""}
+                          {o.isOwn ? " – your business" : ""}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                  {business.selectedId !== null && (
+                    <label className="bd-toolbar__check" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, whiteSpace: "nowrap" }}>
+                      <input type="checkbox" checked={includeLinked} onChange={(event) => setIncludeLinked(event.target.checked)} />
+                      Include linked businesses
+                    </label>
+                  )}
+                </div>
+                <Select aria-label="Status" value={status} onChange={(event) => setStatus(event.target.value)}>
+                  {STATUS_FILTERS.map((f) => (
+                    <option key={f.label} value={f.value}>
+                      {f.label}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+          }
           exportName="Seller Invoices"
-          columnToggle
           columns={columns}
           data={items}
           rowKey={(row) => String(row.invoiceId)}
           expandedRowKeys={openDeductions}
           renderExpandedRow={(row) => <DeductionLines invoice={row} />}
+          pageSize={PAGE_SIZE}
+          variant="light"
+          mobileCards
+          columnToggle
+          loading={isFetching && !data}
           emptyMessage={isFetching ? "Loading…" : "No invoices match these filters."}
           className="edit-invoices__table"
         />
-
-        <div className="edit-invoices__pagination">
-          <p>{total === 0 ? "Showing 0 Results" : `Showing ${(page - 1) * PAGE_SIZE + 1}-${Math.min(page * PAGE_SIZE, total)} of ${total} Results`}</p>
-          <div>
-            <button type="button" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} aria-label="Previous page">
-              <ChevronLeftIcon aria-hidden />
-            </button>
-            <span>
-              {page} / {totalPages}
-            </span>
-            <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} aria-label="Next page">
-              <ChevronRightIcon aria-hidden />
-            </button>
-          </div>
-        </div>
       </div>
 
       <EditInvoiceOffcanvas

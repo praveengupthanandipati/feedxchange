@@ -15,7 +15,9 @@ const useNoIndex = () => {
   useEffect(() => {
     document.title = "feedXchange";
     document.head
-      .querySelectorAll('meta[name="description"], meta[name="twitter:card"], meta[property^="og:"], link[rel="canonical"]')
+      .querySelectorAll(
+        'meta[name="description"], meta[name="keywords"], meta[name="robots"], meta[name^="twitter:"], meta[property^="og:"], link[rel="canonical"], script[data-fx-seo]',
+      )
       .forEach((element) => element.remove());
     const meta = document.createElement("meta");
     meta.name = "robots";

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useGetProfileAddressQuery } from "../../../../core/store/userProfilesCommonApi";
+import { useGetProfileAddressWithSelectedQuery } from "../../../../core/store/userProfilesCommonApi";
 import type { Transporter } from "../../../../core/store/transportersApi";
 
 const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
@@ -29,8 +29,15 @@ interface Args {
  * A side whose address has no state recorded is not filtered on.
  */
 export function useRouteTransporters({ transporters, sellerId, buyerId, loadingAddressId, deliveryAddressId, keepIds }: Args) {
-  const { currentData: sellerAddresses } = useGetProfileAddressQuery(String(sellerId), { skip: !sellerId || !loadingAddressId });
-  const { currentData: buyerAddresses } = useGetProfileAddressQuery(String(buyerId), { skip: !buyerId || !deliveryAddressId });
+  // the party's addresses plus the chosen one: a one-off address (added for this truck only) is in no profile's list
+  const { currentData: sellerAddresses } = useGetProfileAddressWithSelectedQuery(
+    { profileId: String(sellerId), includeAddressId: Number(loadingAddressId) || undefined },
+    { skip: !sellerId || !loadingAddressId },
+  );
+  const { currentData: buyerAddresses } = useGetProfileAddressWithSelectedQuery(
+    { profileId: String(buyerId), includeAddressId: Number(deliveryAddressId) || undefined },
+    { skip: !buyerId || !deliveryAddressId },
+  );
 
   const loadingState = sellerAddresses?.find((a) => String(a.addressId) === loadingAddressId)?.stateName?.trim() ?? "";
   const deliveryState = buyerAddresses?.find((a) => String(a.addressId) === deliveryAddressId)?.stateName?.trim() ?? "";

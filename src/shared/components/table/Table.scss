@@ -459,3 +459,25 @@
   align-items: center;
   gap: v.$spacing-2;
 }
+
+// the totals row under the last row
+.table .table__totals-row td {
+  font-weight: 700;
+  border-top: 2px solid var(--fx-brand-navy, #1e3a6e);
+  background: var(--fx-gray-98-2, rgba(0, 0, 0, 0.04));
+}
+
+// a heading sits at the same edge as its figures: numbers are right aligned, so the heading is too (sort arrows go in front of it)
+.table th.is-align-right .table__header-label {
+  justify-content: flex-end;
+}
+
+.table th.is-align-right .table__sort-icons {
+  order: -1;
+  margin-left: 0;
+  margin-right: 0.35rem;
+}
+
+.table th.is-align-center .table__header-label {
+  justify-content: center;
+}

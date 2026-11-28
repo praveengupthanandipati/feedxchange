@@ -9,12 +9,22 @@ import StatsBand from "../components/sections/StatsBand";
 import Testimonials from "../components/sections/Testimonials";
 import WhyChooseUs from "../components/sections/WhyChooseUs";
 import { whatsappLink } from "../data/content";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../seo/useSeo";
+import { useCatalogue } from "../hooks/useCatalogue";
 import { sitePaths } from "../routes/paths";
 
 /** Website index page. */
 const Home = () => {
-  usePageTitle("Feed Ingredient Trading Platform", "Trade feed ingredients with confidence: live prices, verified sellers and tracked deliveries on one platform.");
+  // the home page's product sections come from the catalogue: keep the prerendered copy up until it is in
+  const { isLoading: catalogueLoading } = useCatalogue();
+  useSeo({
+    ready: !catalogueLoading,
+    title: "B2B Animal Feed Ingredients Marketplace India",
+    fullTitle: "FeedXchange | B2B Animal Feed Ingredients Marketplace India",
+    description:
+      "Buy and sell animal feed ingredients online in India: de-oiled cakes, soybean meal, DDGS, rice bran (DORB) and maize. Live prices, verified sellers, tracked trucks.",
+    keywords: ["buy feed ingredients online", "feed raw material suppliers India", "live feed ingredient prices", "maize DDGS", "soya DOC"],
+  });
 
   return (
     <>

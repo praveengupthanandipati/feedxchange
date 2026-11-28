@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { TriangleAlertIcon } from "../icon";
 import "./ConfirmDialog.scss";
@@ -17,6 +17,8 @@ interface ConfirmDialogProps {
   onReasonChange?: (value: string) => void;
   /** Disables the confirm button — e.g. while the reason is still empty. */
   confirmDisabled?: boolean;
+  /** Optional details shown under the message (e.g. what the action affects). */
+  children?: ReactNode;
 }
 
 const ConfirmDialog = ({
@@ -31,6 +33,7 @@ const ConfirmDialog = ({
   reasonValue,
   onReasonChange,
   confirmDisabled = false,
+  children,
 }: ConfirmDialogProps) => {
   useEffect(() => {
     if (!open) return;
@@ -60,6 +63,7 @@ const ConfirmDialog = ({
           {title}
         </h2>
         <p className="confirm-dialog__message">{message}</p>
+        {children && <div className="confirm-dialog__details">{children}</div>}
         {reasonLabel && onReasonChange && (
           <div className="confirm-dialog__reason">
             <label htmlFor="confirm-dialog-reason">{reasonLabel}</label>

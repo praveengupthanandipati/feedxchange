@@ -35,9 +35,9 @@ const readPeriod = (): PeriodKey => {
 
 /** Shortcuts: a button each, and Alt + the letter anywhere on the dashboard (not while typing). */
 const SHORTCUTS = [
-  { key: "c", label: "Create Contract", to: "/admin/contracts/new", permission: "contracts.manage", icon: FileTextIcon },
-  { key: "i", label: "Create Seller Invoice", to: "/admin/payments/seller-invoice", permission: "seller-invoice.view", icon: ReceiptIcon },
-  { key: "p", label: "Create Payment", to: "/admin/payments/payment-advice", permission: "payment-advice", icon: WalletIcon },
+  { key: "c", label: "Create Contract", to: "/admin/contracts/new", permission: ["contracts.manage"], icon: FileTextIcon },
+  { key: "i", label: "Create Seller Invoice", to: "/admin/payments/seller-invoice/add", permission: ["seller-invoice.view", "ADD_SELLER_INVOICE"], icon: ReceiptIcon },
+  { key: "p", label: "Create Payment", to: "/admin/payments/payment-advice/add", permission: ["payment-advice", "ADD_PAYMENT_ADVICE"], icon: WalletIcon },
 ] as const;
 
 const percent = (fraction: number) => `${fraction > 0 ? "+" : ""}${(fraction * 100).toLocaleString("en-IN", { maximumFractionDigits: 1 })}%`;
@@ -128,7 +128,7 @@ const HomeOverview = ({ afterKpis, children }: { afterKpis?: (live: LiveFigures)
   const withParties = useContractParties(contracts, period, now);
   const metrics = useMemo(() => (withParties ? buildHomeMetrics(withParties, period, now) : null), [withParties, period, now]);
   const activeBusinesses = useMemo(() => (businesses ?? []).filter((profile) => profile.status?.toLowerCase() === "active").length, [businesses]);
-  const shortcuts = SHORTCUTS.filter((shortcut) => can(shortcut.permission));
+  const shortcuts = SHORTCUTS.filter((shortcut) => can(...shortcut.permission));
   const periodLabel = PERIODS.find((item) => item.key === period)?.label ?? "";
   const previousLabel = period === "fy" ? "last FY" : period === "month" ? "last month" : period === "fortnight" ? "previous 14 days" : "day before";
 

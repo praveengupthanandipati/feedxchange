@@ -82,7 +82,7 @@ const EditContractTruckModal = ({
     const { date, time } = splitApiDateTimeForForm(truck.assignedOn);
     setForm({
       truck: String(truck.truckId),
-      driverId: String(truck.driverId),
+      driverId: truck.driverId != null ? String(truck.driverId) : "",
       driverPhone: "",
       loadingAddress: String(truck.fromAddressId),
       deliveryAddress: String(truck.toAddressId),

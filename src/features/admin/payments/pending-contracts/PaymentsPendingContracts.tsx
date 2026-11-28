@@ -17,7 +17,7 @@ const PaymentsPendingContracts = () => {
   const financialYearOptions = useMemo(() => financialYearOptionsUpTo(financialYearOf()).reverse(), []);
 
   const handleAddInvoice = (contract: InvoiceContract) =>
-    navigate(`/admin/payments/seller-invoice?contract=${encodeURIComponent(contract.contractNumber)}`);
+    navigate(`/admin/payments/seller-invoice/add?contract=${encodeURIComponent(contract.contractNumber)}`);
 
   return (
     <div className="seller-invoice-page">

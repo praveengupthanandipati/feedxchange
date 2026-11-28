@@ -3,7 +3,8 @@ import { ArrowRightIcon, UserIcon } from "../../../shared/components/icon";
 import { API_URL } from "../../../core/api/api";
 import { useGetAllBloggersQuery } from "../../../core/store/bloggersApi";
 import PageHero from "../components/sections/PageHero";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../seo/useSeo";
+import { absoluteUrl } from "../seo/schema";
 
 const isHttpUrl = (value: string | null | undefined) => /^https?:\/\//i.test(value ?? "");
 
@@ -15,10 +16,37 @@ const formatDate = (value: string | null) => {
 
 /** Blogs: the active posts from GetAllBloggers (public), in their admin priority order. */
 const Blogs = () => {
-  usePageTitle("Blogs", "Market notes, price trends and practical guides for feed ingredient buyers and sellers.");
   const { data, isLoading, isError } = useGetAllBloggersQuery();
 
   const posts = useMemo(() => (data ?? []).filter((post) => post.isActive).sort((a, b) => a.priority - b.priority), [data]);
+  useSeo({
+    title: "Feed Ingredient Market Insights & Price Trends",
+    description:
+      "Feed ingredient market news, price trends and practical guides on soybean meal, DDGS, de-oiled cakes and rice bran for buyers and sellers in India.",
+    keywords: ["feed ingredient market trends", "soybean meal price trend", "DDGS market India", "poultry feed cost"],
+    pageType: "CollectionPage",
+    breadcrumbs: [],
+    ready: !isLoading,
+    schema: posts.length
+      ? [
+          {
+            "@type": "Blog",
+            "@id": absoluteUrl("/blogs#blog"),
+            name: "FeedXchange Blog",
+            url: absoluteUrl("/blogs"),
+            blogPost: posts.map((post) => ({
+              "@type": "BlogPosting",
+              headline: post.name?.trim() || "FeedXchange update",
+              ...(post.description ? { abstract: post.description.trim().slice(0, 300) } : {}),
+              ...(post.createdAt ? { datePublished: post.createdAt } : {}),
+              ...(post.createdByName ? { author: { "@type": "Person", name: post.createdByName } } : {}),
+              ...(post.fileName && !/^https?:/i.test(post.fileName) ? { image: `${API_URL}${post.fileName}` } : {}),
+              url: absoluteUrl("/blogs"),
+            })),
+          },
+        ]
+      : [],
+  });
 
   const status = isLoading
     ? "Loading blog posts…"

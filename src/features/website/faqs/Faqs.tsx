@@ -3,7 +3,8 @@ import { ArrowRightIcon, MessageCircleIcon, PlusIcon } from "../../../shared/com
 import CtaBanner from "../components/sections/CtaBanner";
 import PageHero from "../components/sections/PageHero";
 import { faqCategories, whatsappLink } from "../data/content";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../seo/useSeo";
+import { faqPageSchema } from "../seo/schema";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 
 const totalQuestions = faqCategories.reduce((sum, category) => sum + category.items.length, 0);
@@ -13,7 +14,14 @@ const totalQuestions = faqCategories.reduce((sum, category) => sum + category.it
  * jumps to each group and highlights the one in view. Each group is an accordion.
  */
 const Faqs = () => {
-  usePageTitle("FAQ's", "Answers to common questions about trading, payments, quality checks and deliveries on FeedXchange.");
+  useSeo({
+    title: "FAQs: Buying & Selling Feed Ingredients Online",
+    description:
+      "Answers on trading feed ingredients with FeedXchange: who can register, fees, indicative prices, GST and freight, payments, quality disputes and referrals.",
+    keywords: ["feed ingredient trading FAQ", "how to buy feed raw materials online", "FeedXchange fees"],
+    breadcrumbs: [],
+    schema: [faqPageSchema("/faqs", faqCategories.flatMap((category) => category.items))],
+  });
   // Keyed "categoryId-index"; the first question starts open.
   const [openKey, setOpenKey] = useState<string | null>(`${faqCategories[0].id}-0`);
   const [activeId, setActiveId] = useState(faqCategories[0].id);

@@ -37,6 +37,8 @@ interface AddressSelectFieldProps {
    * profile's address list, so without it the saved id matches no option and the field shows empty.
    */
   savedLabel?: string;
+  /** Addresses not to offer (e.g. ones already used as other delivery locations of the same truck). The current value is always kept. */
+  excludeIds?: string[];
 }
 
 /**
@@ -54,6 +56,7 @@ const AddressSelectField = ({
   modalTitle,
   defaultUnloading = false,
   savedLabel,
+  excludeIds,
 }: AddressSelectFieldProps) => {
   // The party's address list. currentData, not data: after the party changes, data still holds the previous
   // party's addresses until the new list arrives.
@@ -106,6 +109,11 @@ const AddressSelectField = ({
     return list;
   }, [addresses, addedOptions, value, savedLabel]);
 
+  const shownOptions = useMemo(
+    () => (excludeIds?.length ? options.filter((option) => option.value === value || !excludeIds.includes(option.value)) : options),
+    [options, excludeIds, value],
+  );
+
   const handleChange = (addressId: string) => {
     const label = options.find((option) => option.value === addressId)?.label ?? "";
     onChange(addressId, label);
@@ -126,7 +134,7 @@ const AddressSelectField = ({
   return (
     <>
       <SearchableSelect
-        options={options}
+        options={shownOptions}
         value={value}
         onChange={handleChange}
         onAddNew={(query) => {

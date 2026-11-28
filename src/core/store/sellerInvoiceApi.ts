@@ -193,11 +193,66 @@ export interface Invoice {
   deductions: InvoiceDeduction[];
 }
 
+/** An invoice with its committed payment days and how fast it was (or is being) paid (Seller / Buyer account reports). */
+export interface InvoiceAging {
+  invoiceId: number;
+  contractId: number;
+  contractNumber: string;
+  sellerId: number;
+  sellerName: string;
+  buyerId: number;
+  buyerName: string;
+  productName: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  truckNumber: string | null;
+  numberOfBags: number | null;
+  invoiceQty: number;
+  /** Freight on the invoice (already part of the invoice total). */
+  freightAmount: number;
+  /** Invoice total before adjustments. */
+  invoiceTotal: number;
+  /** Deductions less additions (positive = taken off, negative = added). */
+  adjustmentsTotal: number;
+  /** The lines behind adjustmentsTotal (positive amount = deduction, negative = addition). Missing on an older API. */
+  adjustments?: InvoiceDeduction[];
+  payableAmount: number;
+  paidAmount: number;
+  balanceAmount: number;
+  status: "Pending" | "Partially Paid" | "Paid";
+  /** Days the contract gives to pay an invoice. */
+  committedDays: number | null;
+  dueDate: string | null;
+  /** Due date minus today: negative = overdue by that many days. */
+  daysToDue: number | null;
+  firstPaymentDate: string | null;
+  lastPaymentDate: string | null;
+  /** Money-weighted average of (payment date - invoice date). */
+  avgPaymentDays: number | null;
+  /** Average payment days minus committed days: above zero = paid late. */
+  delayDays: number | null;
+}
+
+export interface InvoiceAgingQuery {
+  sellerId?: number;
+  buyerId?: number;
+  /** yyyy-MM-dd, on the invoice date */
+  from?: string;
+  to?: string;
+}
+
 export interface InvoiceListQuery {
   financialYear?: string;
   sellerId?: number;
   buyerId?: number;
   contractNumber?: string;
+  /** Only invoices of contracts where this business is the seller or buyer. */
+  businessProfileId?: number;
+  /** With businessProfileId: also its linked (child) businesses. */
+  includeLinked?: boolean;
+  /** Invoice date range, yyyy-mm-dd, both ends included. */
+  from?: string;
+  to?: string;
   /** Uncleared | Pending | Partially Paid | Paid | Cancelled. Empty = everything except cancelled. */
   status?: string;
   page?: number;
@@ -260,6 +315,14 @@ export const sellerInvoiceApi = createApi({
       },
       providesTags: ["Invoices"],
     }),
+    getInvoiceAging: builder.query<InvoiceAging[], InvoiceAgingQuery>({
+      query: (q) => {
+        const params = new URLSearchParams();
+        Object.entries(q).forEach(([k, v]) => v !== undefined && v !== "" && params.set(k, String(v)));
+        return `/api/SellerInvoices/GetInvoiceAging?${params.toString()}`;
+      },
+      providesTags: ["Invoices"],
+    }),
     getInvoiceFinancialYears: builder.query<string[], void>({ query: () => "/api/SellerInvoices/GetFinancialYears", providesTags: ["Invoices"] }),
     updateInvoice: builder.mutation<Invoice, UpdateInvoicePayload>({
       query: (body) => ({ url: "/api/SellerInvoices/UpdateInvoice", method: "POST", body }),
@@ -283,6 +346,7 @@ export const {
   useLazyGetInvoicesQuery,
   useGetInvoicesQuery,
   useGetInvoiceFinancialYearsQuery,
+  useGetInvoiceAgingQuery,
   useUpdateInvoiceMutation,
   useCancelInvoiceMutation,
 } = sellerInvoiceApi;

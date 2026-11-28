@@ -537,6 +537,8 @@ export const PaymentsTab = ({ d }: Props) => {
                   <td>
                     <strong>{text(r.receiptNumber)}</strong>
                     <div className="cd-muted">{text(r.kind)}{r.towards ? ` · ${r.towards}` : ""}</div>
+                    {(r.convertedToRegular ?? 0) > 0 && <div className="cd-muted">{money(r.convertedToRegular ?? 0, sym)} converted to regular payments</div>}
+                    {r.convertedFromReceiptNumber && <div className="cd-muted">Converted from advance {r.convertedFromReceiptNumber}</div>}
                   </td>
                   <td>{date(r.receiptDate)}</td>
                   <td>

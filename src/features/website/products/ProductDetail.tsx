@@ -9,8 +9,9 @@ import EnquiryForm from "../components/products/EnquiryForm";
 import PriceHistory from "../components/products/PriceHistory";
 import PageHero from "../components/sections/PageHero";
 import { useCatalogue } from "../hooks/useCatalogue";
-import { usePageTitle } from "../hooks/usePageTitle";
-import { sitePaths } from "../routes/paths";
+import { useSeo } from "../seo/useSeo";
+import { productSchema } from "../seo/schema";
+import { productPath, sitePaths } from "../routes/paths";
 import NotFound from "../not-found/NotFound";
 
 const highlights = ["Sourced from KYC-verified sellers", "Specification sheet with every lot", "Transport and tracking available"];
@@ -19,7 +20,39 @@ const ProductDetail = () => {
   const { slug } = useParams();
   const { products: catalogue, findBySlug, isLoading } = useCatalogue();
   const product = findBySlug(slug);
-  usePageTitle(product?.name ?? (isLoading ? "Products" : "Product not found"), product?.description);
+  const seoDescription = product
+    ? (product.description ||
+        `${product.name} (${product.categoryName}) for poultry, aqua and cattle feed: today's indicative price, specifications and KYC-verified sellers across India on FeedXchange.`
+      ).slice(0, 160)
+    : "Feed ingredient details, prices and verified sellers on FeedXchange.";
+  useSeo({
+    title: product ? `${product.name} Price Today & Suppliers in India` : isLoading ? "Products" : "Product not found",
+    description: seoDescription,
+    keywords: product ? [product.name, `${product.name} price`, `${product.name} suppliers`, `buy ${product.name} online`, product.categoryName] : [],
+    image: product?.image ?? undefined,
+    imageAlt: product?.name,
+    ogType: product ? "product" : "website",
+    breadcrumbs: product ? [{ name: "Products", path: sitePaths.products }] : undefined,
+    noindex: !isLoading && !product,
+    ready: !isLoading,
+    schema: product
+      ? [
+          productSchema(
+            {
+              name: product.name,
+              slug: product.slug,
+              description: seoDescription,
+              categoryName: product.categoryName,
+              image: product.image,
+              price: product.price,
+              weightClause: product.weightClause,
+              nutrients: product.nutrition.map((n) => ({ label: n.name, value: [n.min, n.max].filter(Boolean).join(" - ") })),
+            },
+            productPath(product.slug),
+          ),
+        ]
+      : [],
+  });
 
   if (isLoading) return <PageHero title="Loading product…" text="One moment, fetching the latest details." parent={{ label: "Products", to: sitePaths.products }} />;
   if (!product) return <NotFound />;
@@ -52,7 +85,16 @@ const ProductDetail = () => {
             {/* ---------- Product ---------- */}
             <article className="pd-card pd-product" aria-labelledby="pd-name" data-reveal>
               <div className="pd-product__image">
-                <img src={product.image ?? placeholderImage} alt={product.name} width={320} height={240} />
+                <img
+                  src={product.image ?? placeholderImage}
+                  alt={product.name}
+                  width={320}
+                  height={240}
+                  // a picture that fails to load (missing on the server) falls back to the placeholder instead of a broken image
+                  onError={(event) => {
+                    if (event.currentTarget.src !== new URL(placeholderImage, location.href).href) event.currentTarget.src = placeholderImage;
+                  }}
+                />
                 <span className="catalogue-card__tag">{product.categoryName}</span>
               </div>
 

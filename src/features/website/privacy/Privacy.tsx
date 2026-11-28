@@ -1,10 +1,14 @@
 import { MailIcon, MapPinIcon } from "../../../shared/components/icon";
 import LegalPage from "../components/legal/LegalPage";
 import { privacyContact, privacySections, privacyUpdated } from "../data/privacy";
-import { usePageTitle } from "../hooks/usePageTitle";
+import { useSeo } from "../seo/useSeo";
 
 const Privacy = () => {
-  usePageTitle("Privacy Policy", "How FeedXchange collects, uses and protects the information you share when you trade on the platform.");
+  useSeo({
+    title: "Privacy Policy",
+    description: "How FeedXchange collects, uses and protects the business, KYC and contact information you share when you trade feed ingredients on the platform.",
+    breadcrumbs: [],
+  });
 
   return (
     <LegalPage

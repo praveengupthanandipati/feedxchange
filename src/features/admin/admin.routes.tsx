@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { Navigate, Route } from "react-router-dom";
+import { Navigate, Route, useLocation } from "react-router-dom";
 import AdminFallback from "./not-found/AdminFallback";
 import ComingSoon from "./coming-soon/ComingSoon";
 import { homePathForRole } from "../../core/routes/adminPaths";
@@ -110,7 +110,6 @@ const AccountStatement = lazy(() => import("./reports/account-statement/AccountS
 const PendingPayments = lazy(() => import("./reports/pending-payments/PendingPayments"));
 const PendingSupplies = lazy(() => import("./reports/pending-supplies/PendingSupplies"));
 const MonthlyReports = lazy(() => import("./reports/monthly-reports/MonthlyReports"));
-const PaymentsPendingContracts = lazy(() => import("./payments/pending-contracts/PaymentsPendingContracts"));
 const Sellerinvoice = lazy(() => import("./payments/seller-invoice/SellerInvoice"));
 const EditSellerInvoices = lazy(() => import("./payments/edit-seller-invoices/EditSellerInvoices"));
 const Paymentadvice = lazy(() => import("./payments/payment-advice/Paymentadvice"));
@@ -122,6 +121,12 @@ const UserAccess = lazy(() => import("./roles/UserAccess"));
 
 /** /admin itself: sends the user to their role's own start screen (the Transporter Dashboard for a Transporter Admin). */
 const AdminHome = () => <Navigate to={homePathForRole(getRoleKey())} replace />;
+
+/** An old screen address that moved: goes to the new one, keeping the query (e.g. ?contract=). */
+const MovedTo = ({ to }: { to: string }) => {
+  const { search, hash } = useLocation();
+  return <Navigate to={`${to}${search}${hash}`} replace />;
+};
 
 /**
  * The admin application's routes, relative to /admin (the shell in app.routes.tsx mounts them there, behind the login check and the
@@ -245,12 +250,19 @@ export const adminRoutes = (
     <Route path="reports/pending-payments" element={<PendingPayments />} />
     <Route path="reports/pending-supplies" element={<PendingSupplies />} />
     <Route path="reports/monthly-reports" element={<MonthlyReports />} />
-    <Route path="payments/pending-contracts" element={<PaymentsPendingContracts />} />
-    <Route path="payments/seller-invoice" element={<Sellerinvoice />} />
-    <Route path="payments/seller-invoice-edit" element={<EditSellerInvoices />} />
-    <Route path="payments/payment-advice" element={<Paymentadvice />} />
+    {/* Contracts Invoices & Payments: one screen per Sub Module (ADD_SELLER_INVOICE ... VIEW_REFUNDS) */}
+    <Route path="payments/seller-invoice/add" element={<Sellerinvoice />} />
+    <Route path="payments/seller-invoice/view" element={<EditSellerInvoices />} />
+    <Route path="payments/payment-advice/add" element={<Paymentadvice mode="add" />} />
+    <Route path="payments/payment-advice/view" element={<Paymentadvice mode="view" />} />
+    <Route path="payments/refunds/add" element={<Refunds mode="add" />} />
+    <Route path="payments/refunds/view" element={<Refunds mode="view" />} />
     <Route path="payments/payment-allocation" element={<PaymentAllocation />} />
-    <Route path="payments/refunds" element={<Refunds />} />
+    {/* the addresses these screens had before (bookmarks, old links) */}
+    <Route path="payments/seller-invoice" element={<MovedTo to="/admin/payments/seller-invoice/add" />} />
+    <Route path="payments/seller-invoice-edit" element={<MovedTo to="/admin/payments/seller-invoice/view" />} />
+    <Route path="payments/payment-advice" element={<MovedTo to="/admin/payments/payment-advice/add" />} />
+    <Route path="payments/refunds" element={<MovedTo to="/admin/payments/refunds/add" />} />
     <Route path="masters/notify-subscriptions" element={<ComingSoon />} />
     <Route path="masters/roles-permissions" element={<ComingSoon />} />
     <Route path="masters/templates" element={<ComingSoon />} />

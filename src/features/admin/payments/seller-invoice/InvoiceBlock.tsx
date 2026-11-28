@@ -6,7 +6,7 @@ import SearchableSelect from "../../../../shared/components/dropdown/SearchableS
 import { useGetAllActiveDriversQuery } from "../../../../core/store/driversApi";
 import { useGetTransporterProfileSummaryQuery } from "../../../../core/store/transportersApi";
 import { useGetAllTrucksByContractQuery } from "../../../../core/store/contractTrucksApi";
-import { calculateRow, createEmptyDeduction, money, normalizeTruckNumber, validateRow, type DeductionEntry, type SellerInvoiceRow } from "./sellerInvoice.data";
+import { calculateRow, createEmptyDeduction, money, normalizeTruckNumber, validateRow, type AdjustmentKind, type DeductionEntry, type SellerInvoiceRow } from "./sellerInvoice.data";
 
 interface InvoiceBlockProps {
   index: number;
@@ -28,8 +28,8 @@ interface InvoiceBlockProps {
  * One invoice on a grid of six EQUAL columns, so the invoice details and the deductions line up:
  *   row 1  Contract (2 columns) | Invoice No | Truck No | Bags | Invoice Qty
  *   row 2  Freight  | Amount     | GST %    | Total | Round Off Total | Remarks
- *   then one row per deduction: Date | Amount | TDS/TCS | Remarks (2 columns) | remove
- * Invoice amount and GST are calculated but can be overwritten; everything else is typed.
+ *   then one row per adjustment: Date | Deduction/Addition | Amount | TDS/TCS | Remarks + remove (2 columns)
+ * Invoice amount is calculated but can be overwritten; GST % is read-only (from the contract); everything else is typed.
  */
 const InvoiceBlock = ({
   index,
@@ -114,6 +114,8 @@ const InvoiceBlock = ({
   );
 
   const setDeduction = (id: string, patch: Partial<DeductionEntry>) => onChange(row.id, { deductions: row.deductions.map((d) => (d.id === id ? { ...d, ...patch } : d)) });
+  const deductionOut = row.deductions.filter((d) => d.kind === "deduction").reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+  const additionIn = row.deductions.filter((d) => d.kind === "addition").reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
   const addDeduction = () => onChange(row.id, { deductions: [...row.deductions, createEmptyDeduction(invoiceDate)] });
 
   return (
@@ -240,11 +242,12 @@ const InvoiceBlock = ({
             <input
               type="text"
               inputMode="decimal"
-              className={`si-input si-input--amount${bad("gstPercent")}`}
+              className="si-input si-input--amount"
               aria-label={`GST percentage (invoice ${index})`}
-              title="GST percentage on the invoice amount (the product's default is filled in)"
-              value={row.gstPercent.trim() ? row.gstPercent : amounts ? String(amounts.gstPercent) : contract ? String(contract.gstPercent) : "5"}
-              onChange={(event) => onChange(row.id, { gstPercent: event.target.value })}
+              title="GST percentage comes from the contract"
+              readOnly
+              tabIndex={-1}
+              value={contract ? String(contract.gstPercent) : ""}
             />
             <small className="si-calc-note">GST: {amounts ? money(amounts.gst) : "—"}</small>
           </>,
@@ -289,7 +292,7 @@ const InvoiceBlock = ({
                   <input className="si-input" readOnly tabIndex={-1} value={row.truckNumber} placeholder="Enter it in the Truck Number box above" aria-label="Truck number" />
                 </div>
                 <div className="si-truck-details__field">
-                  <span className="si-f__label">Transporter <span className="si-req" aria-hidden>*</span> <small className="si-muted">(for a truck not in the truck master)</small></span>
+                  <span className="si-f__label">Transporter <small className="si-muted">(optional)</small></span>
                   <SearchableSelect options={transporterOptions} value={row.transporterId} onChange={(value) => onChange(row.id, { transporterId: value })} placeholder="Select transporter" ariaLabel={`Transporter (invoice ${index})`} />
                 </div>
               </div>
@@ -306,18 +309,18 @@ const InvoiceBlock = ({
               {row.driverMode === "existing" ? (
                 <div className="si-truck-details__grid">
                   <div className="si-truck-details__field">
-                    <span className="si-f__label">Driver <span className="si-req" aria-hidden>*</span></span>
+                    <span className="si-f__label">Driver <small className="si-muted">(optional)</small></span>
                     <SearchableSelect options={driverOptions} value={row.driverId} onChange={(value) => onChange(row.id, { driverId: value })} placeholder="Select driver" ariaLabel={`Driver (invoice ${index})`} />
                   </div>
                 </div>
               ) : (
                 <div className="si-truck-details__grid">
                   <div className="si-truck-details__field">
-                    <span className="si-f__label">Driver name <span className="si-req" aria-hidden>*</span></span>
+                    <span className="si-f__label">Driver name <small className="si-muted">(optional)</small></span>
                     <input className="si-input" value={row.driverName} onChange={(event) => onChange(row.id, { driverName: event.target.value })} />
                   </div>
                   <div className="si-truck-details__field">
-                    <span className="si-f__label">Mobile number <span className="si-req" aria-hidden>*</span></span>
+                    <span className="si-f__label">Mobile number <small className="si-muted">(optional)</small></span>
                     <input className="si-input" inputMode="tel" value={row.driverMobile} onChange={(event) => onChange(row.id, { driverMobile: event.target.value })} />
                   </div>
                   <div className="si-truck-details__field">
@@ -325,7 +328,7 @@ const InvoiceBlock = ({
                     <input className="si-input" value={row.licenseNumber} onChange={(event) => onChange(row.id, { licenseNumber: event.target.value })} />
                   </div>
                   <div className="si-truck-details__field">
-                    <span className="si-f__label">Licence expiry (optional)</span>
+                    <span className="si-f__label">Licence expiry <small className="si-muted">(optional)</small></span>
                     <input className="si-input" type="date" value={row.licenseExpiry} onChange={(event) => onChange(row.id, { licenseExpiry: event.target.value })} />
                   </div>
                 </div>
@@ -339,14 +342,27 @@ const InvoiceBlock = ({
           const problem = showErrors ? errors.deductions[d.id] : undefined;
           return (
             <div key={d.id} className={`si-ded${problem ? " has-error" : ""}`}>
-              {field("Deduction date", <DatePickerInput id={`si-ded-date-${d.id}`} value={d.date} onChange={(value) => setDeduction(d.id, { date: value })} />)}
+              {field("Date", <DatePickerInput id={`si-ded-date-${d.id}`} value={d.date} onChange={(value) => setDeduction(d.id, { date: value })} />)}
               {field(
-                "Deduction amount (₹)",
+                "Adjustment",
+                <select
+                  className="si-input"
+                  aria-label="Adjustment type"
+                  title="A deduction reduces the payable amount; an addition increases it"
+                  value={d.kind}
+                  onChange={(event) => setDeduction(d.id, { kind: event.target.value as AdjustmentKind })}
+                >
+                  <option value="deduction">Deduction (−)</option>
+                  <option value="addition">Addition (+)</option>
+                </select>,
+              )}
+              {field(
+                d.kind === "addition" ? "Addition amount (₹)" : "Deduction amount (₹)",
                 <input
                   type="text"
                   inputMode="decimal"
                   className={`si-input${problem ? " has-error" : ""}`}
-                  aria-label="Deduction amount"
+                  aria-label={d.kind === "addition" ? "Addition amount" : "Deduction amount"}
                   title={problem}
                   value={d.amount}
                   onChange={(event) => setDeduction(d.id, { amount: event.target.value })}
@@ -358,19 +374,22 @@ const InvoiceBlock = ({
                   <input type="checkbox" checked={d.tdsTcs} onChange={(event) => setDeduction(d.id, { tdsTcs: event.target.checked })} /> TDS / TCS
                 </span>
               </label>
-              {field("Deduction remarks", <input type="text" className="si-input" aria-label="Deduction remarks" value={d.remarks} onChange={(event) => setDeduction(d.id, { remarks: event.target.value })} />, 2)}
-              <div className="si-f si-f--end">
-                <span className="si-f__label">&nbsp;</span>
-                <button
-                  type="button"
-                  className="si-icon-btn si-icon-btn--danger"
-                  aria-label="Remove deduction"
-                  title="Remove this deduction"
-                  onClick={() => onChange(row.id, { deductions: row.deductions.filter((x) => x.id !== d.id) })}
-                >
-                  <Trash2Icon aria-hidden />
-                </button>
-              </div>
+              {field(
+                "Remarks",
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <input type="text" className="si-input" aria-label="Remarks" value={d.remarks} onChange={(event) => setDeduction(d.id, { remarks: event.target.value })} />
+                  <button
+                    type="button"
+                    className="si-icon-btn si-icon-btn--danger"
+                    aria-label="Remove this line"
+                    title="Remove this line"
+                    onClick={() => onChange(row.id, { deductions: row.deductions.filter((x) => x.id !== d.id) })}
+                  >
+                    <Trash2Icon aria-hidden />
+                  </button>
+                </div>,
+                2,
+              )}
               {problem && <small className="si-error-text si-ded__error">{problem}</small>}
             </div>
           );
@@ -379,12 +398,13 @@ const InvoiceBlock = ({
 
       <div className="si-ded-foot">
         <button type="button" className="si-link-btn" onClick={addDeduction}>
-          <PlusIcon aria-hidden /> Add deduction
+          <PlusIcon aria-hidden /> Add deduction / addition
         </button>
         {amounts && (
           <span className="si-ded-foot__sum">
             {amounts.freight > 0 && <>Freight {money(amounts.freight)} (included) · </>}
-            {amounts.deductions > 0 && <>Deductions − {money(amounts.deductions)} · </>}
+            {deductionOut > 0 && <>Deductions − {money(deductionOut)} · </>}
+            {additionIn > 0 && <>Additions + {money(additionIn)} · </>}
             Payable <strong>{money(amounts.payable)}</strong>
           </span>
         )}

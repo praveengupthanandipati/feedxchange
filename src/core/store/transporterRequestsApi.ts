@@ -60,7 +60,8 @@ export interface RespondToRequestPayload {
 export interface AssignedTruck {
   contractDispatchId: number;
   truckId: number;
-  driverId: number;
+  /** Null when the trip has no driver. */
+  driverId: number | null;
   trackingUrl: string | null;
   /** True while the truck is still Assigned (not Loaded / Cancelled) and the signed-in user is the transporter. */
   editable: boolean;
@@ -70,6 +71,8 @@ export interface AssignedTruck {
   driverName: string | null;
   driverPhone: string | null;
   quantityMT: number;
+  /** Its delivery locations in order, when it unloads at more than one (empty otherwise). */
+  deliveryStops?: { stopNo: number; label: string; quantityMT: number | null }[];
   lrNumber: string | null;
   status: string;
   cancelled: boolean;
@@ -88,6 +91,10 @@ export interface AcceptedSchedule {
   deliveryPlace: string | null;
   loadingAddress: string | null;
   deliveryAddress: string | null;
+  /** The schedule's delivery address: delivery location 1 of a truck that unloads at more than one place. */
+  toAddressId?: number;
+  /** The buyer's active addresses (not the loading one): where else a truck may unload. */
+  buyerAddresses?: { addressId: number; label: string }[];
   billChange: boolean;
   acceptedQuantityMT: number;
   acceptedFreightPerMT: number;
@@ -101,8 +108,27 @@ export interface LookupTruck {
   truckNumber: string;
   trackingUrl: string | null;
   defaultDriverId: number | null;
-  /** Set when the truck is on another trip right now: it cannot be added until then. */
+  /** Set when the truck is on another trip right now: it can be added only after the user confirms (confirmBusy). */
   busyMessage: string | null;
+  /** The Assigned trips a busy truck is on, shown in the confirmation. */
+  busyTrips?: BusyTrip[];
+}
+
+/** A trip an occupied truck is on. Only the transporter's own trips carry the contract, route and load. */
+export interface BusyTrip {
+  /** 0 when the trip is not the transporter's own. */
+  contractDispatchId: number;
+  ownTrip: boolean;
+  contractNumber: string | null;
+  productName: string | null;
+  fromCity: string | null;
+  toCity: string | null;
+  driverName: string | null;
+  quantityMT: number | null;
+  lrNumber: string | null;
+  assignedOn: string;
+  /** Null: busy until that trip is Loaded or Cancelled. */
+  busyUntil: string | null;
 }
 
 export interface LookupDriver {
@@ -111,6 +137,8 @@ export interface LookupDriver {
   mobileNumber: string;
   /** Set when the driver is on another trip right now: the driver cannot be added until then. */
   busyMessage?: string | null;
+  /** The trucks of the driver's Assigned trips: a busy driver may go with a confirmed occupied truck when all of them are that truck. */
+  busyTruckIds?: number[];
 }
 
 export interface TruckLookups {
@@ -171,11 +199,23 @@ export interface UpdateScheduleTruckPayload {
   lrNumber?: string;
   /** Blank removes the link. */
   trackingUrl?: string;
+  /** The new truck is on another trip and the user confirmed using it anyway. */
+  confirmBusy?: boolean;
 }
 
 export interface AddTrucksPayload {
   dispatchScheduleTransporterId: number;
-  trucks: { truckId: number; driverId: number; quantityMT: number; lrNumber?: string; trackingUrl?: string }[];
+  /** confirmBusy: the user saw that the truck is on another trip and confirmed adding it anyway. */
+  trucks: {
+    truckId: number;
+    driverId: number;
+    quantityMT: number;
+    lrNumber?: string;
+    trackingUrl?: string;
+    confirmBusy?: boolean;
+    /** Optional: two or more delivery locations in order (the first is the schedule's delivery address). */
+    deliveryPoints?: { addressId: number; quantityMT?: number }[];
+  }[];
 }
 
 // Added to the contract trucks API so the existing ContractTruck cache tag refreshes both lists after a response.

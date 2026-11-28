@@ -6,6 +6,7 @@ import SearchableSelectField from "../../../../shared/components/dropdown/Search
 import { describePeriod, type Period } from "../../business-dashboard/businessDashboard.utils";
 import BusinessPeriodFields from "../../common/business-period/BusinessPeriodFields";
 import { useBusinessFilter } from "../../common/business-period/useBusinessFilter";
+import { sideOf, sideProfileIds } from "../../common/business-period/contractSide";
 import { ALL_TIME, inPeriod } from "../../common/business-period/period";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
@@ -194,9 +195,16 @@ const PendingContracts = () => {
     setSelectedContract(row.id);
   };
 
+  // Business owner: Side = Sell / Buy for the chosen business (or, on "All", the own and linked businesses). Staff get no Side column.
+  const sideIds = useMemo(() => sideProfileIds(business.options, business.selectedId), [business.options, business.selectedId]);
   const pendingContractColumns = useMemo(
-    () => buildPendingContractColumns({ onOpenTruckDetails: handleOpenTruckDetails }),
-    [],
+    () =>
+      buildPendingContractColumns({
+        onOpenTruckDetails: handleOpenTruckDetails,
+        sideOf: sideIds ? (row) => sideOf(sideIds, row.sellerId, row.buyerId) : undefined,
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sideIds],
   );
 
   useEffect(() => {

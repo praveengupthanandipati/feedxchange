@@ -462,12 +462,6 @@ const ReassignTruck = () => {
   if (!contractTruckId) {
     return (
       <div className="reassign-truck">
-        <p className="reassign-truck__breadcrumb">
-          <Link to="/admin/truck-management/open-pending-contracts">Contracts</Link> / Delivery Orders &amp; re-assign
-        </p>
-        <div className="truck-chain__header">
-          <h1 className="reassign-truck__heading">Delivery Orders &amp; re-assign truck</h1>
-        </div>
         <PendingDoContracts />
       </div>
     );

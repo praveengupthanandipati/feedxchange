@@ -9,11 +9,37 @@
   gap: v.$spacing-3;
   min-width: 0;
 
+  // Business, search and refresh stay on ONE line; the page header drops them under the title only when there is no room beside it.
+  &__filters {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: v.$spacing-2;
+
+    @include m.respond-below(md) {
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    > .searchable-select-field {
+      flex: 0 1 18rem;
+    }
+
+    > .pending-do__search {
+      flex: 1 1 12rem;
+      max-width: 22rem;
+    }
+
+    > button {
+      flex: 0 0 auto;
+    }
+  }
+
   &__toolbar {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
+    align-items: center;
     gap: v.$spacing-3;
   }
 
@@ -42,15 +68,8 @@
     }
   }
 
-  &__filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: v.$spacing-2;
-  }
-
   &__search {
-    min-width: min(20rem, 100%);
+    min-width: min(12rem, 100%);
   }
 
   &__count {
@@ -271,4 +290,20 @@
     justify-content: flex-end;
     gap: v.$spacing-2;
   }
+}
+
+// Transporter's Pending Delivery Orders: two sections of trucks; two-line cells like the tables above.
+.pdo-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+
+  small {
+    color: v.fg(v.$color-text-muted);
+  }
+}
+
+.pdo-section__intro {
+  margin: 0 0 v.$spacing-3;
 }

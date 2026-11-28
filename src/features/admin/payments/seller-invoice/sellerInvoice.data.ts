@@ -1,8 +1,13 @@
 import type { InvoiceContract, InvoiceRowInput } from "../../../../core/store/sellerInvoiceApi";
 
+/** An adjustment on the invoice: a deduction takes money off what is payable, an addition adds to it. */
+export type AdjustmentKind = "deduction" | "addition";
+
 export interface DeductionEntry {
   id: string;
   date: string;
+  /** The amount as typed: always positive; `kind` says which way it goes. */
+  kind: AdjustmentKind;
   amount: string;
   tdsTcs: boolean;
   remarks: string;
@@ -93,7 +98,7 @@ export function createEmptySellerInvoiceRow(): SellerInvoiceRow {
 }
 
 export function createEmptyDeduction(date: string): DeductionEntry {
-  return { id: nextDeductionId(), date, amount: "", tdsTcs: false, remarks: "" };
+  return { id: nextDeductionId(), date, kind: "deduction", amount: "", tdsTcs: false, remarks: "" };
 }
 
 export function toNumber(value: string): number {
@@ -131,7 +136,7 @@ export function calculateRow(row: SellerInvoiceRow): RowAmounts | null {
   // freight, when entered, is part of the invoice amount (so of the GST base and the total)
   const autoAmount = round2(qty * row.contract.pricePerMT + freight);
   const amount = row.invoiceAmountEdited ? round2(toNumber(row.invoiceAmount)) : autoAmount;
-  const gstPercent = row.gstPercent.trim() ? toNumber(row.gstPercent) : defaultGstPercent(row);
+  const gstPercent = defaultGstPercent(row);
   const gst = round2((amount * gstPercent) / 100);
   const total = round2(amount + gst);
   const finalTotal = row.roundedTotal.trim() ? round2(toNumber(row.roundedTotal)) : total;
@@ -140,8 +145,15 @@ export function calculateRow(row: SellerInvoiceRow): RowAmounts | null {
   return { autoAmount, amount, gstPercent, gst, total, roundOff, finalTotal, freight, deductions, payable: round2(finalTotal - deductions) };
 }
 
+/** The amount the way it is stored and sent: positive = deduction (less payable), negative = addition (more payable). */
+export const signedAdjustment = (d: DeductionEntry): number => {
+  const amount = Math.abs(toNumber(d.amount) || 0);
+  return d.kind === "addition" ? -amount : amount;
+};
+
+/** Net of all adjustments: positive = deducted overall, negative = added overall. */
 export function deductionsTotal(deductions: DeductionEntry[]): number {
-  return deductions.reduce((sum, item) => sum + (toNumber(item.amount) || 0), 0);
+  return deductions.reduce((sum, item) => sum + signedAdjustment(item), 0);
 }
 
 /** A deduction line with nothing entered is ignored (not an error), so a spare "Add deduction" line costs the user nothing. */
@@ -178,20 +190,19 @@ export function validateRow(row: SellerInvoiceRow): RowErrors {
   else if (row.contract && qty > row.contract.maxAllowedQtyMT) errors.invoiceQty = `At most ${row.contract.maxAllowedQtyMT} MT more can be invoiced on this contract.`;
 
   if (row.totalMts.trim() && toNumber(row.totalMts) < qty) errors.totalMts = "Cannot be less than the invoice quantity.";
-  if (row.gstPercent.trim() && (toNumber(row.gstPercent) < 0 || toNumber(row.gstPercent) > 100)) errors.gstPercent = "GST % must be between 0 and 100.";
   if (row.freight.trim() && toNumber(row.freight) < 0) errors.freight = "Cannot be negative.";
   if (row.invoiceAmountEdited && toNumber(row.invoiceAmount) < 0) errors.invoiceAmount = "Cannot be negative.";
 
   row.deductions.filter((d) => !isBlankDeduction(d)).forEach((d) => {
-    if (!(toNumber(d.amount) > 0)) errors.deductions[d.id] = "Enter the deduction amount.";
-    else if (!d.date) errors.deductions[d.id] = "Choose the deduction date.";
+    if (!(toNumber(d.amount) > 0)) errors.deductions[d.id] = "Enter the amount.";
+    else if (!d.date) errors.deductions[d.id] = "Choose the date.";
   });
 
   const amounts = calculateRow(row);
   if (amounts && Math.abs(amounts.roundOff) > 100) errors.roundedTotal = "The round-off can be at most 100 up or down from the total.";
   if (amounts && amounts.deductions > amounts.finalTotal) {
     const first = row.deductions.find((d) => !isBlankDeduction(d));
-    if (first && !errors.deductions[first.id]) errors.deductions[first.id] = "Deductions cannot be more than the invoice total.";
+    if (first && !errors.deductions[first.id]) errors.deductions[first.id] = "Deductions (net of additions) cannot be more than the invoice total.";
   }
   return errors;
 }
@@ -228,9 +239,8 @@ export function financialYearOf(isoDate: string): string {
   return `${start}-${String((start + 1) % 100).padStart(2, "0")}`;
 }
 
-function calcGstForSave(row: SellerInvoiceRow): number | null {
-  if (!row.gstPercent.trim() || toNumber(row.gstPercent) === defaultGstPercent(row)) return null;
-  return calculateRow(row)?.gst ?? null;
+function calcGstForSave(_row: SellerInvoiceRow): number | null {
+  return null;
 }
 
 export function toRowInput(row: SellerInvoiceRow): InvoiceRowInput {
@@ -250,7 +260,7 @@ export function toRowInput(row: SellerInvoiceRow): InvoiceRowInput {
     remarks: row.remarks.trim() || undefined,
     deductions: row.deductions
       .filter((d) => !isBlankDeduction(d))
-      .map((d) => ({ date: d.date, amount: toNumber(d.amount), isTdsTcs: d.tdsTcs, remarks: d.remarks.trim() || undefined })),
+      .map((d) => ({ date: d.date, amount: signedAdjustment(d), isTdsTcs: d.tdsTcs, remarks: d.remarks.trim() || undefined })),
   };
 }
 

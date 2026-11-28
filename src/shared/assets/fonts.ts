@@ -21,3 +21,5 @@ import "@fontsource/poppins/latin-700.css";
 import "@fontsource/poppins/latin-ext-700.css";
 import "@fontsource/poppins/latin-800.css";
 import "@fontsource/poppins/latin-ext-800.css";
+// size-matched Arial while the fonts above download, so text does not reflow when they arrive (font-fallbacks.css)
+import "./styles/font-fallbacks.css";

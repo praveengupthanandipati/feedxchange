@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { CircleCheckBigIcon, PenLineIcon, PlusIcon, SaveIcon, Trash2Icon, TruckIcon, XIcon } from "../../../../../shared/components/icon";
 import SearchableSelect from "../../../../../shared/components/dropdown/SearchableSelect";
@@ -17,8 +17,18 @@ import {
   useDeleteScheduleTruckMutation,
   type AcceptedSchedule,
   type AssignedTruck,
+  type BusyTrip,
+  type LookupDriver,
+  type LookupTruck,
   type TruckLookups,
 } from "../../../../../core/store/transporterRequestsApi";
+import DeliveryLocationsEditor, {
+  emptyDeliveryStops,
+  toDeliveryPoints,
+  validateDeliveryStops,
+  type DeliveryStopsState,
+} from "../../contract-trucks/DeliveryLocationsEditor";
+import "../../contract-trucks/DeliveryLocationsEditor.scss";
 import "./AcceptedSchedules.scss";
 
 interface TruckRow {
@@ -32,14 +42,49 @@ interface TruckRow {
   qty: string;
   lrNumber: string;
   trackingUrl: string;
+  /** The truck is on another trip and the user confirmed adding it anyway (sent to the API as confirmBusy). */
+  confirmBusy: boolean;
+  /** Optional extra delivery locations of this truck (stop 1 is the schedule's delivery address). */
+  deliveryStops: DeliveryStopsState;
 }
-type RowErrors = Partial<Record<"truck" | "driverName" | "driverPhone" | "qty" | "trackingUrl", string>>;
+type RowErrors = Partial<Record<"truck" | "driverName" | "driverPhone" | "qty" | "trackingUrl" | "deliveryStops", string>>;
 
 let rowSeq = 0;
-const newRow = (qty = ""): TruckRow => ({ id: `row-${Date.now()}-${rowSeq++}`, truck: "", driverName: "", driverPhone: "", qty, lrNumber: "", trackingUrl: "" });
+const newRow = (qty = ""): TruckRow => ({ id: `row-${Date.now()}-${rowSeq++}`, truck: "", driverName: "", driverPhone: "", qty, lrNumber: "", trackingUrl: "", confirmBusy: false, deliveryStops: emptyDeliveryStops() });
 
 const mt = (value: number) => `${Math.round(value * 1000) / 1000} MT`;
 const normalizeTruckNumber = (value: string) => value.replace(/[^a-z0-9]/gi, "").toUpperCase();
+
+/** The trips an occupied truck is on, as shown when the user is asked to confirm adding it again. */
+const BusyTripList = ({ trips }: { trips: BusyTrip[] }) =>
+  trips.length === 0 ? null : (
+    <ul className="accepted-schedules__busy-trips">
+      {trips.map((trip, index) => (
+        <li key={trip.contractDispatchId || `other-${index}`}>
+          {trip.ownTrip ? (
+            <>
+              <strong>Contract {trip.contractNumber ?? "—"}</strong>
+              {trip.productName && <span> · {trip.productName}</span>}
+              <span className="accepted-schedules__busy-line">
+                {trip.fromCity ?? "—"} → {trip.toCity ?? "—"}
+                {trip.quantityMT != null && ` · ${mt(trip.quantityMT)}`}
+              </span>
+              <span className="accepted-schedules__busy-line">
+                {trip.driverName ? `Driver ${trip.driverName}` : "No driver"}
+                {trip.lrNumber && ` · LR ${trip.lrNumber}`}
+              </span>
+            </>
+          ) : (
+            <strong>A trip of another transporter</strong>
+          )}
+          <small className="accepted-schedules__busy-line">
+            Scheduled {formatApiDateTime(trip.assignedOn)}
+            {trip.busyUntil ? ` · busy until about ${formatApiDateTime(trip.busyUntil)}` : " · busy until it is Loaded or Cancelled"}
+          </small>
+        </li>
+      ))}
+    </ul>
+  );
 
 interface AddTrucksFormProps {
   /** What the form needs of the schedule: what is left on it (and the offer, when adding). An instant truck passes its contract's. */
@@ -52,6 +97,11 @@ interface AddTrucksFormProps {
   onClose: () => void;
   /** Edit mode: this truck, already on the schedule and still Assigned, is changed instead of new trucks being added. */
   editing?: AssignedTruck;
+  /**
+   * Adding to a schedule: a truck may also unload at other addresses of the buyer. toAddressId is the schedule's delivery address
+   * (location 1). Left out (editing, instant trucks), the form has a single delivery address as before.
+   */
+  delivery?: { toAddressId: number; label: string; options: { value: string; label: string }[] };
 }
 
 /**
@@ -59,7 +109,9 @@ interface AddTrucksFormProps {
  * the list can be typed in (it is added to the truck master on save), and so can a driver's name and contact number (added to the
  * transporter's drivers on save).
  */
-export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, editing, limitScope = "schedule" }: AddTrucksFormProps) => {
+export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, editing, limitScope = "schedule", delivery }: AddTrucksFormProps) => {
+  // Extra delivery locations only when adding to a schedule whose buyer has another address to offer.
+  const multiStop = !editing && Boolean(delivery?.toAddressId) && (delivery?.options.length ?? 0) > 0;
   const [addTrucks, { isLoading: adding }] = useAddTrucksToScheduleMutation();
   const [updateTruck, { isLoading: updating }] = useUpdateScheduleTruckMutation();
   const saving = adding || updating;
@@ -74,8 +126,8 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
       ? [{
           ...newRow(String(editing.quantityMT)),
           truck: String(editing.truckId),
-          driverName: String(editing.driverId),
-          driverPhone: String(editing.driverId),
+          driverName: editing.driverId != null ? String(editing.driverId) : "",
+          driverPhone: editing.driverId != null ? String(editing.driverId) : "",
           lrNumber: editing.lrNumber ?? "",
           trackingUrl: editing.trackingUrl ?? "",
         }]
@@ -90,18 +142,32 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
 
   const trucks = useMemo(() => lookups?.trucks ?? [], [lookups]);
   const drivers = useMemo(() => lookups?.drivers ?? [], [lookups]);
-  // Only trucks and drivers that are free now: one on another trip is left out of the list (the API refuses it too).
-  // When editing, the truck and driver already on this trip count as free: they are "busy" only with this trip.
+  // A truck on another trip is listed too (marked "on a trip"), when adding and when editing: picking it shows that trip and asks the
+  // user to confirm. When editing, the truck and driver already on this trip count as free: they are "busy" only with this trip.
+  // A busy driver is offered only with the occupied truck it is already on.
   const ownTruckId = editing?.truckId;
   const ownDriverId = editing?.driverId;
-  const freeTrucks = useMemo(() => trucks.filter((t) => !t.busyMessage || t.truckId === ownTruckId), [trucks, ownTruckId]);
+  const isBusyTruck = (t: LookupTruck | undefined): boolean => Boolean(t?.busyMessage) && t!.truckId !== ownTruckId;
   const freeDrivers = useMemo(() => drivers.filter((d) => !d.busyMessage || d.driverId === ownDriverId), [drivers, ownDriverId]);
-  const truckOptions = useMemo(() => freeTrucks.map((t) => ({ value: String(t.truckId), label: t.truckNumber })), [freeTrucks]);
-  // Both driver fields hold the driver id; one lists the names, the other the contact numbers.
-  const driverNameOptions = useMemo(() => freeDrivers.map((d) => ({ value: String(d.driverId), label: d.driverName })), [freeDrivers]);
-  const driverPhoneOptions = useMemo(() => freeDrivers.filter((d) => d.mobileNumber).map((d) => ({ value: String(d.driverId), label: d.mobileNumber })), [freeDrivers]);
+  const truckOptions = trucks.map((t) => ({ value: String(t.truckId), label: isBusyTruck(t) ? `${t.truckNumber} · on a trip` : t.truckNumber }));
   const driverById = (value: string) => drivers.find((d) => String(d.driverId) === value);
-  const isFreeDriver = (driverId: number | null | undefined) => Boolean(driverId) && freeDrivers.some((d) => d.driverId === driverId);
+  /** A busy driver may go with a confirmed occupied truck when every trip the driver is on is with that truck. */
+  const goesWithTruck = (driver: LookupDriver | undefined, truckId: number | undefined, confirmed: boolean) =>
+    Boolean(driver?.busyMessage) && confirmed && Boolean(truckId) && Boolean(driver?.busyTruckIds?.length) && driver!.busyTruckIds!.every((id) => id === truckId);
+  const canUseDriver = (driverId: number | null | undefined, truckId: number | undefined, confirmed: boolean) => {
+    const driver = drivers.find((d) => d.driverId === driverId);
+    return Boolean(driver) && (freeDrivers.includes(driver!) || goesWithTruck(driver, truckId, confirmed));
+  };
+  /** The drivers a row may pick: the free ones, plus the crew of the occupied truck it confirmed. */
+  const rowDrivers = (row: TruckRow) => {
+    const truckId = knownTruck(row.truck)?.truckId;
+    return drivers.filter((d) => canUseDriver(d.driverId, truckId, row.confirmBusy));
+  };
+  // Both driver fields hold the driver id; one lists the names, the other the contact numbers.
+  const driverNameOptions = (row: TruckRow) => rowDrivers(row).map((d) => ({ value: String(d.driverId), label: d.driverName }));
+  const driverPhoneOptions = (row: TruckRow) => rowDrivers(row).filter((d) => d.mobileNumber).map((d) => ({ value: String(d.driverId), label: d.mobileNumber }));
+  // The occupied truck the user just picked, waiting for confirmation (the row is filled in only once confirmed).
+  const [busyPick, setBusyPick] = useState<{ rowId: string; value: string; truck: LookupTruck } | null>(null);
 
   /** The listed truck a row points at: picked from the list, or typed with the number of one of the transporter's trucks. */
   const knownTruck = (value: string) =>
@@ -136,6 +202,26 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
     update(row.id, { [field]: next, ...(wasListed ? { [other]: "" } : {}) });
   };
 
+  /** Puts a truck on a row; confirmed: it is on another trip and the user agreed to add it anyway. */
+  const setTruck = (row: TruckRow, value: string, confirmed: boolean) => {
+    const picked = knownTruck(value);
+    const truckId = picked?.truckId;
+    // A driver kept from before must still be allowed with the new truck (a busy driver goes only with its own occupied truck).
+    const keptDriver = driverById(row.driverName) ?? driverById(row.driverPhone);
+    const dropDriver = Boolean(keptDriver) && keptDriver!.driverId !== ownDriverId && !canUseDriver(keptDriver!.driverId, truckId, confirmed);
+    const driverEmpty = dropDriver || (!row.driverName && !row.driverPhone);
+    // Filled in: the truck's usual driver when allowed, otherwise (a confirmed occupied truck) the driver of the trip it is on.
+    const crew = confirmed ? (picked?.busyTrips ?? []).map((t) => drivers.find((d) => d.driverName === t.driverName)?.driverId) : [];
+    const suggested = [picked?.defaultDriverId, ...crew].find((id) => canUseDriver(id, truckId, confirmed));
+    update(row.id, {
+      truck: value,
+      confirmBusy: confirmed,
+      trackingUrl: row.trackingUrl || picked?.trackingUrl || "",
+      ...(dropDriver ? { driverName: "", driverPhone: "" } : {}),
+      ...(driverEmpty && suggested ? { driverName: String(suggested), driverPhone: String(suggested) } : {}),
+    });
+  };
+
   const validate = () => {
     const rowErrors: Record<string, RowErrors> = {};
     let total = 0;
@@ -145,7 +231,7 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
       if (!row.truck.trim()) e.truck = "Select or type a truck number.";
       else if (!truck && normalizeTruckNumber(row.truck).length < 4) e.truck = "Enter a valid truck number.";
       else if (rows.some((o) => o.id !== row.id && o.truck.trim() && truckKey(o.truck) === truckKey(row.truck))) e.truck = "This truck is already in another row.";
-      else if (truck?.busyMessage && truck.truckId !== ownTruckId) e.truck = truck.busyMessage;
+      else if (isBusyTruck(truck) && !row.confirmBusy) e.truck = `${truck!.truckNumber} is on another trip. Pick it again and confirm to add it anyway.`;
       const ref = driverRef(row);
       if (!row.driverName.trim()) e.driverName = "Select a driver, or type a new driver's name.";
       if (!row.driverPhone.trim()) e.driverPhone = "Select or type the driver's contact number.";
@@ -154,7 +240,7 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
         else if (ref.id) {
           const driver = driverById(String(ref.id));
           if (!driver) e.driverPhone = "This driver is not on your list.";
-          else if (driver.busyMessage && driver.driverId !== ownDriverId) e.driverPhone = driver.busyMessage;
+          else if (driver.busyMessage && driver.driverId !== ownDriverId && !goesWithTruck(driver, truck?.truckId, row.confirmBusy)) e.driverPhone = driver.busyMessage;
         } else {
           if (ref.name.length < 2) e.driverName = "Enter the driver's name.";
           if (!/^\d{10}$/.test(ref.phone)) e.driverPhone = "Enter a 10-digit mobile number.";
@@ -165,6 +251,10 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
       else if (!/^\d+(\.\d+)?$/.test(row.qty.trim()) || Number(row.qty) <= 0) e.qty = "Enter a quantity greater than 0.";
       else total += Number(row.qty);
       if (row.trackingUrl.trim() && !/^https?:\/\/.+/i.test(row.trackingUrl.trim())) e.trackingUrl = "Start with http:// or https://";
+      if (multiStop) {
+        const stopsError = validateDeliveryStops(row.deliveryStops, String(delivery!.toAddressId), "", row.qty);
+        if (stopsError) e.deliveryStops = stopsError;
+      }
       if (Object.keys(e).length) rowErrors[row.id] = e;
     });
     const totalMsg = total <= limit + 1e-9
@@ -237,6 +327,7 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
           quantityMT: Number(row.qty),
           lrNumber: row.lrNumber.trim() || undefined,
           trackingUrl: row.trackingUrl.trim(),
+          ...(row.confirmBusy && isBusyTruck(knownTruck(row.truck)) ? { confirmBusy: true } : {}),
         }).unwrap();
         // The server tells the buyer and seller of every contract the truck is on (all of a re-assigned truck's contracts).
         setNotifiedContracts(result?.notifiedContracts ?? 0);
@@ -258,6 +349,11 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
           quantityMT: Number(r.qty),
           lrNumber: r.lrNumber.trim() || undefined,
           trackingUrl: r.trackingUrl.trim() || undefined,
+          ...(r.confirmBusy && isBusyTruck(knownTruck(r.truck)) ? { confirmBusy: true } : {}),
+          // Only when the truck goes to more than one location; otherwise it is sent exactly as before.
+          ...(multiStop && toDeliveryPoints(r.deliveryStops, String(delivery!.toAddressId))
+            ? { deliveryPoints: toDeliveryPoints(r.deliveryStops, String(delivery!.toAddressId)) }
+            : {}),
         })),
       }).unwrap();
       setDone(true);
@@ -277,6 +373,26 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
   return (
     <div className="accepted-schedules__form">
       {createPortal(notify.element, document.body)}
+      <ConfirmDialog
+        open={Boolean(busyPick)}
+        title={`${busyPick?.truck.truckNumber ?? "This truck"} is already on a trip`}
+        message={
+          editing
+            ? `It is still Assigned on the trip below (not loaded yet). Use it for this trip instead of ${editing.truckNumber ?? "the current truck"}?`
+            : "It is still Assigned on the trip below (not loaded yet). Add it to this schedule as well?"
+        }
+        confirmLabel={editing ? "Yes, use this truck" : "Yes, add this truck"}
+        cancelLabel="Pick another truck"
+        onCancel={() => setBusyPick(null)}
+        onConfirm={() => {
+          const pick = busyPick;
+          setBusyPick(null);
+          const row = rows.find((r) => r.id === pick?.rowId);
+          if (pick && row) setTruck(row, pick.value, true);
+        }}
+      >
+        <BusyTripList trips={busyPick?.truck.busyTrips ?? []} />
+      </ConfirmDialog>
       {done ? (
         <div className="accepted-schedules__success">
           <CircleCheckBigIcon aria-hidden />{" "}
@@ -302,7 +418,8 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
               const isNewDriver = Boolean(row.driverName.trim() && row.driverPhone.trim()) && ref !== "mixed" && !ref.id;
               const isNewTruck = Boolean(row.truck.trim()) && !knownTruck(row.truck);
               return (
-                <div className="accepted-schedules__row" key={row.id}>
+                <Fragment key={row.id}>
+                <div className="accepted-schedules__row">
                   <span className="accepted-schedules__row-no">{index + 1}</span>
                   <div className="accepted-schedules__field">
                     <label>Truck <b>*</b></label>
@@ -311,12 +428,12 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
                       value={row.truck}
                       onChange={(value) => {
                         const picked = knownTruck(value);
-                        update(row.id, {
-                          truck: value,
-                          trackingUrl: row.trackingUrl || picked?.trackingUrl || "",
-                          // The truck's usual driver is filled in only when that driver is free.
-                          ...(!row.driverName && !row.driverPhone && isFreeDriver(picked?.defaultDriverId) ? { driverName: String(picked!.defaultDriverId), driverPhone: String(picked!.defaultDriverId) } : {}),
-                        });
+                        // An occupied truck: show the trip it is on and ask first.
+                        if (picked && isBusyTruck(picked)) {
+                          setBusyPick({ rowId: row.id, value, truck: picked });
+                          return;
+                        }
+                        setTruck(row, value, false);
                       }}
                       placeholder="Select or type a truck number"
                       ariaLabel="Truck"
@@ -325,6 +442,8 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
                     />
                     {e.truck ? (
                       <p className="accepted-schedules__error">{e.truck}</p>
+                    ) : row.confirmBusy && isBusyTruck(knownTruck(row.truck)) ? (
+                      <p className="accepted-schedules__warn">On another trip: you confirmed {editing ? "using" : "adding"} it.</p>
                     ) : (
                       isNewTruck && <p className="accepted-schedules__muted">New truck: added to your trucks on save.</p>
                     )}
@@ -332,7 +451,7 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
                   <div className="accepted-schedules__field">
                     <label>Driver Name <b>*</b></label>
                     <SearchableSelect
-                      options={driverNameOptions.filter((o) => !takenDrivers.includes(o.value))}
+                      options={driverNameOptions(row).filter((o) => !takenDrivers.includes(o.value))}
                       value={row.driverName}
                       onChange={(value) => pickDriver(row, "driverName", value)}
                       placeholder="Select or type a driver name"
@@ -345,7 +464,7 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
                   <div className="accepted-schedules__field">
                     <label>Driver Contact No <b>*</b></label>
                     <SearchableSelect
-                      options={driverPhoneOptions.filter((o) => !takenDrivers.includes(o.value))}
+                      options={driverPhoneOptions(row).filter((o) => !takenDrivers.includes(o.value))}
                       value={row.driverPhone}
                       onChange={(value) => pickDriver(row, "driverPhone", value)}
                       placeholder="Select or type a contact no"
@@ -386,6 +505,21 @@ export const AddTrucksForm = ({ schedule, lookups, refreshLookups, onClose, edit
                     )}
                   </div>
                 </div>
+                {multiStop && (
+                  <div className="accepted-schedules__stops">
+                    <DeliveryLocationsEditor
+                      idPrefix={row.id}
+                      buyerId={0}
+                      primaryLabel={delivery!.label}
+                      addressOptions={delivery!.options}
+                      primaryAddressId={String(delivery!.toAddressId)}
+                      value={row.deliveryStops}
+                      onChange={(deliveryStops) => update(row.id, { deliveryStops })}
+                      error={e.deliveryStops}
+                    />
+                  </div>
+                )}
+                </Fragment>
               );
             })}
           </div>
@@ -487,6 +621,14 @@ const ScheduleCard = ({ schedule, lookups, refreshLookups, showTransporter }: { 
               <span>{t.driverName ?? "-"}{t.driverPhone ? ` · ${t.driverPhone}` : ""}</span>
               <span>{mt(t.quantityMT)}</span>
               {t.lrNumber && <span>LR {t.lrNumber}</span>}
+              {(t.deliveryStops?.length ?? 0) > 1 && (
+                <span
+                  className="accepted-schedules__stops-chip"
+                  title={t.deliveryStops!.map((s) => `${s.stopNo}. ${s.label}${s.quantityMT != null ? ` (${mt(s.quantityMT)})` : ""}`).join("\n")}
+                >
+                  {t.deliveryStops!.length} delivery locations
+                </span>
+              )}
               <span className="accepted-schedules__chip">{t.status}</span>
               {/* Editable until it is Loaded. */}
               {t.editable && (
@@ -548,7 +690,25 @@ const ScheduleCard = ({ schedule, lookups, refreshLookups, showTransporter }: { 
           onClose={() => setEditingId(null)}
         />
       )}
-      {open && !full && !editingTruck && <AddTrucksForm schedule={schedule} lookups={lookups} refreshLookups={refreshLookups} onClose={() => setOpen(false)} />}
+      {open && !full && !editingTruck && (
+        <AddTrucksForm
+          schedule={schedule}
+          lookups={lookups}
+          refreshLookups={refreshLookups}
+          onClose={() => setOpen(false)}
+          delivery={
+            schedule.toAddressId
+              ? {
+                  toAddressId: schedule.toAddressId,
+                  label: schedule.deliveryAddress ?? schedule.deliveryPlace ?? "The schedule's delivery address",
+                  options: (schedule.buyerAddresses ?? [])
+                    .filter((a) => a.addressId !== schedule.toAddressId)
+                    .map((a) => ({ value: String(a.addressId), label: a.label })),
+                }
+              : undefined
+          }
+        />
+      )}
     </article>
   );
 };

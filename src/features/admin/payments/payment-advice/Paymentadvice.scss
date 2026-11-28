@@ -350,6 +350,14 @@
     &--delete {
       background-color: v.$color-danger;
     }
+
+    &--allocate {
+      background-color: v.$color-navy-dark;
+    }
+
+    &--convert {
+      background-color: v.$color-success;
+    }
   }
 }
 

@@ -93,3 +93,75 @@ field data. The admin login's SEO score is low on purpose (`noindex`).
 
 The font files make the "all assets" total larger (a file per weight and character range), but a browser downloads only
 the ones a page uses.
+
+### SEO and performance pass (26 Nov 2026)
+
+Measured with `scripts/serve-dist.mjs`, which now compresses text (brotli / gzip) like production should (deploy/nginx.conf
+and public/web.config now turn compression on) and forwards `/api` and `/images` to the API, so the pages load real data.
+One Lighthouse 13.5 run each, simulated throttling. QA data: some product pictures are 300-650 KB uploads and three return 404
+(that is what keeps Best practices at 96 on pages that show them).
+
+| Page | Device | Performance | Accessibility | Best practices | SEO | FCP | LCP | TBT | CLS |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| / | mobile | 55 | 100 | 96 | 100 | 4.2 s | 8.0 s | 400 ms | 0.035 |
+| / | desktop | 82 | 100 | 96 | 100 | 1.0 s | 2.4 s | 0 ms | 0.117 |
+| /products | mobile | 74 | 100 | 96 | 100 | 3.4 s | 4.9 s | 70 ms | 0.001 |
+| /products | desktop | 98 | 100 | 96 | 100 | 0.8 s | 1.1 s | 0 ms | 0.001 |
+| /products/maize-ddgs | mobile | 71 | 100 | 96 | 100 | 3.8 s | 5.4 s | 60 ms | 0 |
+| /products/maize-ddgs | desktop | 97 | 100 | 96 | 100 | 0.8 s | 1.2 s | 0 ms | 0 |
+| /faqs | mobile | 77 | 100 | 100 | 100 | 3.4 s | 4.5 s | 60 ms | 0 |
+| /faqs | desktop | 99 | 100 | 100 | 100 | 0.7 s | 0.9 s | 0 ms | 0 |
+| /about | mobile | 76 | 100 | 100 | 100 | 3.4 s | 4.3 s | 170 ms | 0.015 |
+| /about | desktop | 97 | 100 | 100 | 100 | 0.8 s | 1.2 s | 0 ms | 0.001 |
+
+The real (unthrottled) home page paints in about 0.6 s; the mobile scores are held back by the uploaded banner and product
+pictures, the render-blocking CSS (index.css + WebsiteLayout.css, ~55 KB compressed) and the Inter / Poppins Latin-extended
+font files Chrome fetches on the home page.
+
+#### After the second pass (27 Nov 2026)
+
+Lighthouse 13.5, all categories, production build on `scripts/serve-dist.mjs` (compressed, /api forwarded to QA). Changes: real
+404 for missing `/.well-known/*` files (Agentic browsing read the HTML shell as an invalid `ai-catalog.json`), the app's twin is
+laid out invisibly so the hand-over moves nothing, Poppins 700 (the heading weight) preloaded, metric-matched fallback fonts.
+Best practices stays at 96 where a product picture is missing on QA (the API now leaves out pictures whose file is gone, which
+fixes it once deployed).
+
+| Page | Device | Performance | Accessibility | Best practices | SEO | Agentic | FCP | LCP | TBT | CLS |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| / | mobile | 62 | 100 | 96 | 100 | 3/3 | 3.9 s | 7.5 s | 210 ms | 0.001 |
+| / | desktop | 85 | 100 | 96 | 100 | 3/3 | 1.0 s | 2.4 s | 0 ms | 0 |
+| /products | mobile | 73 | 100 | 96 | 100 | 3/3 | 3.3 s | 5.3 s | 80 ms | 0 |
+| /products | desktop | 90 | 100 | 96 | 100 | 3/3 | 0.7 s | 2.0 s | 0 ms | 0 |
+| /products/maize-ddgs | mobile | 71 | 100 | 96 | 100 | 3/3 | 3.7 s | 5.4 s | 100 ms | 0 |
+| /products/maize-ddgs | desktop | 97 | 100 | 96 | 100 | 3/3 | 0.8 s | 1.2 s | 0 ms | 0 |
+| /faqs | mobile | 76 | 100 | 100 | 100 | 3/3 | 3.3 s | 4.6 s | 80 ms | 0 |
+| /faqs | desktop | 98 | 100 | 100 | 100 | 3/3 | 0.7 s | 1.0 s | 0 ms | 0 |
+| /about | mobile | 74 | 100 | 100 | 100 | 3/3 | 3.4 s | 4.4 s | 210 ms | 0 |
+| /about | desktop | 97 | 100 | 100 | 100 | 3/3 | 0.8 s | 1.1 s | 0 ms | 0 |
+| /contact | mobile | 78 | 100 | 100 | 100 | 3/3 | 3.3 s | 4.3 s | 100 ms | 0 |
+| /contact | desktop | 99 | 100 | 100 | 100 | 3/3 | 0.7 s | 0.9 s | 0 ms | 0 |
+
+Run Lighthouse on a production build (`npm run build`, then `npm run serve:dist`, port 4173), never on `npm run dev` (5173):
+the dev server sends unbundled, uncompressed modules and no prerendered pages, so its Performance score (about 37) says nothing
+about the live site.
+
+#### With critical CSS (27 Nov 2026)
+
+Each prerendered page now carries the CSS its own HTML needs inline (beasties 0.5.5, scripts/prerender.mjs) and loads the full
+stylesheets at the end of <body>; the layout with only the inlined CSS was checked against the full CSS on 9 pages at desktop and
+phone width (identical apart from 1-2 px text widths).
+
+| Page | Device | Performance | Accessibility | Best practices | SEO | Agentic | FCP | LCP | TBT | CLS |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| / | mobile | 65 | 100 | 96 | 100 | 3/3 | 3.5 s | 6.0 s | 260 ms | 0.001 |
+| / | desktop | 96 | 100 | 96 | 100 | 3/3 | 0.9 s | 1.2 s | 0 ms | 0.002 |
+| /products | mobile | 78 | 100 | 96 | 100 | 3/3 | 3.0 s | 4.6 s | 60 ms | 0.001 |
+| /products | desktop | 90 | 100 | 96 | 100 | 3/3 | 0.7 s | 2.0 s | 0 ms | 0.002 |
+| /products/maize-ddgs | mobile | 75 | 100 | 96 | 100 | 3/3 | 3.2 s | 4.5 s | 180 ms | 0 |
+| /products/maize-ddgs | desktop | 97 | 100 | 96 | 100 | 3/3 | 0.8 s | 1.2 s | 0 ms | 0 |
+| /faqs | mobile | 76 | 100 | 100 | 100 | 3/3 | 3.2 s | 4.4 s | 170 ms | 0 |
+| /faqs | desktop | 99 | 100 | 100 | 100 | 3/3 | 0.7 s | 0.9 s | 0 ms | 0 |
+| /about | mobile | 81 | 100 | 100 | 100 | 3/3 | 3.1 s | 3.9 s | 90 ms | 0.002 |
+| /about | desktop | 98 | 100 | 100 | 100 | 3/3 | 0.8 s | 1.0 s | 0 ms | 0.001 |
+| /contact | mobile | 77 | 100 | 100 | 100 | 3/3 | 3.2 s | 4.4 s | 110 ms | 0 |
+| /contact | desktop | 99 | 100 | 100 | 100 | 3/3 | 0.7 s | 0.9 s | 0 ms | 0 |

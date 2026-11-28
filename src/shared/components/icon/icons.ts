@@ -4,6 +4,7 @@ import {
   Activity,
   ArrowDown,
   ArrowLeft,
+  ArrowLeftRight,
   ArrowRight,
   ArrowUp,
   ArrowUpRight,
@@ -135,6 +136,7 @@ import { createIcon } from "./Icon";
 export const ActivityIcon = createIcon(Activity, "ActivityIcon");
 export const ArrowDownIcon = createIcon(ArrowDown, "ArrowDownIcon");
 export const ArrowLeftIcon = createIcon(ArrowLeft, "ArrowLeftIcon");
+export const ArrowLeftRightIcon = createIcon(ArrowLeftRight, "ArrowLeftRightIcon");
 export const ArrowRightIcon = createIcon(ArrowRight, "ArrowRightIcon");
 export const ArrowUpIcon = createIcon(ArrowUp, "ArrowUpIcon");
 export const ArrowUpRightIcon = createIcon(ArrowUpRight, "ArrowUpRightIcon");

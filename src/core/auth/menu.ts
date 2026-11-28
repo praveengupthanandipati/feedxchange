@@ -54,9 +54,10 @@ export const allPages = (menu: AccessMenu): AccessPage[] => menu.modules.flatMap
 
 /** The page a URL belongs to. Fixed paths win over ones with parameters ("/admin/products/new" over "/admin/products/:id"). */
 export const findPageForPath = (menu: AccessMenu, pathname: string): AccessPage | null => {
-  const matches = allPages(menu).filter(
-    (page) => page.routePath && matchPath({ path: page.routePath, end: true }, pathname),
-  );
+  const pages = allPages(menu);
+  let matches = pages.filter((page) => page.routePath && matchPath({ path: page.routePath, end: true }, pathname));
+  // A screen opened from a menu screen (e.g. Add Truck on Manage Schedule) lists its route as a related path of that page and follows its access.
+  if (matches.length === 0) matches = pages.filter((page) => (page.relatedPaths ?? []).some((path) => matchPath({ path, end: true }, pathname)));
   if (matches.length === 0) return null;
   const params = (path: string) => (path.match(/:/g) ?? []).length;
   // on a tie (two pages sharing one route) the one the user may open wins

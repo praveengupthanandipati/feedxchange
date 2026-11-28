@@ -3,8 +3,10 @@ import type { Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
 /**
- * Preloads the two font files every page uses first (Inter 400 for text, Poppins 600 for headings), so text is drawn in
- * the right typeface sooner. Their names carry a content hash, so the links are written after the bundle is known.
+ * Preloads the font files every page uses first (Inter 400 for text, Poppins 700 for headings - h1-h4 are font-weight 700 -
+ * and Poppins 600 for buttons and labels), so text is drawn in the right typeface from the first paint instead of re-wrapping
+ * when the font arrives (that re-wrap of the hero heading was the mobile layout shift). Their names carry a content hash, so
+ * the links are written after the bundle is known.
  */
 const preloadFonts = (): Plugin => ({
   name: 'fx-preload-fonts',
@@ -13,7 +15,7 @@ const preloadFonts = (): Plugin => ({
     order: 'post',
     handler(_html, context) {
       const files = Object.keys(context.bundle ?? {})
-      const wanted = [/inter-latin-400-normal-[\w-]+\.woff2$/, /poppins-latin-600-normal-[\w-]+\.woff2$/]
+      const wanted = [/inter-latin-400-normal-[\w-]+\.woff2$/, /poppins-latin-700-normal-[\w-]+\.woff2$/, /poppins-latin-600-normal-[\w-]+\.woff2$/]
       return wanted
         .map((pattern) => files.find((file) => pattern.test(file)))
         .filter((file): file is string => Boolean(file))
