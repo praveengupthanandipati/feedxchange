@@ -72,7 +72,12 @@ const Footer = () => {
           <h3>Get in touch</h3>
           <ul>
             <li>
-              <MapPinIcon aria-hidden /> <span>{company.address}</span>
+              <MapPinIcon aria-hidden />
+              <span>
+                Sri Sai Raghavendra Trade Services
+                <br />
+                {company.address}
+              </span>
             </li>
             <li>
               <FaWhatsapp aria-hidden /> <a href={whatsappLink} target="_blank" rel="noopener noreferrer">WhatsApp {company.phone}</a>

@@ -41,6 +41,9 @@ export const termsSections: PolicySection[] = [
       { text: "We facilitate the procurement of high-quality raw materials directly from manufacturers/suppliers." },
       { text: "The final contract of sale and purchase is executed directly between the Buyer and the Manufacturer/Seller." },
       { text: "The Company does not take ownership of the goods at any point during the transaction." },
+      {
+        text: "The Company facilitates introductions and contract execution but is not a party to the sale. The Company does not guarantee payment by any Buyer or supply, quality, or timely delivery by any Seller, and is not liable for any default by either party.",
+      },
     ],
   },
   {
@@ -53,7 +56,7 @@ export const termsSections: PolicySection[] = [
       },
       {
         label: "Canvassing Fees",
-        text: "Depending on the specific trade practices and the individual agreement between the Company and the User, a canvassing or service fee may be applicable for our facilitation and mediation services. If applicable, these fees will be mutually agreed upon prior to contract execution, billed separately, and payable directly to Us.",
+        text: "Depending on the specific trade practices and the individual agreement between the Company and the User, a canvassing or service fee may be applicable for our facilitation and mediation services. If applicable, these fees will be mutually agreed upon prior to contract execution, billed separately, and payable directly to Us. Applicable GST and other statutory levies on canvassing or service fees are charged additionally at prevailing rates.",
       },
       {
         label: "Portal Access",
@@ -68,11 +71,11 @@ export const termsSections: PolicySection[] = [
     points: [
       {
         label: "Vehicle Assignment",
-        text: "Upon execution of a contract, the involved parties (Buyer, Seller, or the Company acting as a broker) may choose to arrange transportation offline or utilize the Portal to broadcast loading requirements to enrolled Transporters.",
+        text: "Upon execution of a contract, the involved parties (Buyer, Seller, or the Company in its capacity as Canvassing Agents) may choose to arrange transportation offline or utilize the Portal to broadcast loading requirements to enrolled Transporters.",
       },
       {
         label: "Transporter Dashboard",
-        text: "Transporters are provided with a dedicated interface to access active requirements, negotiate or bargain on freight values, and arrange trucks accordingly. This functionality permits the transacting parties, including the facilitating broker, to directly assign logistical vehicles against the specific executed contracts.",
+        text: "Transporters are provided with a dedicated interface to access active requirements, negotiate or bargain on freight values, and arrange trucks accordingly. This functionality permits the transacting parties, including the Company in its capacity as Canvassing Agents, to directly assign logistical vehicles against the specific executed contracts.",
       },
       {
         label: "Limitation of Transport Liability",
@@ -111,6 +114,10 @@ export const termsSections: PolicySection[] = [
     id: "accounts-kyc",
     title: "User Account, KYC, and Data Transparency",
     points: [
+      {
+        label: "Eligibility and Authority",
+        text: "Users must be registered businesses or their authorised signatories. By registering, you confirm you are authorised to bind the business you represent.",
+      },
       { label: "Account Creation", text: "To access full features, Users must register and provide accurate, up-to-date business information." },
       {
         label: "KYC Collection",
@@ -147,6 +154,13 @@ export const termsSections: PolicySection[] = [
     ],
   },
   {
+    id: "suspension-termination",
+    title: "Account Suspension and Termination",
+    intro: [
+      "The Company may suspend or terminate any account, with or without notice, for KYC failure, misrepresentation, misuse of the Portal or of counterparty documents, or breach of these Terms.",
+    ],
+  },
+  {
     id: "intellectual-property",
     title: "Intellectual Property and Trademarks",
     intro: [
@@ -154,10 +168,24 @@ export const termsSections: PolicySection[] = [
     ],
   },
   {
+    id: "limitation-of-liability",
+    title: "Disclaimer and Limitation of Liability",
+    intro: [
+      "The Portal and its content, including indicative prices and market data, are provided on an as-is basis without warranties of any kind. To the fullest extent permitted by law, the Company's aggregate liability arising from use of the Portal is limited to the fees, if any, paid by the User for Portal access in the preceding twelve months.",
+    ],
+  },
+  {
+    id: "force-majeure",
+    title: "Force Majeure",
+    intro: [
+      "The Company is not liable for any failure or delay caused by events beyond its reasonable control, including market disruption, transport strikes, natural events, or failure of telecommunications or hosting infrastructure.",
+    ],
+  },
+  {
     id: "modifications",
     title: "Modifications to the Terms",
     intro: [
-      "We reserve the right to update or modify these Terms and Conditions at any time. Changes will be effective immediately upon posting on the Portal. Continued use of the Portal signifies your acceptance of the revised terms.",
+      "We may update or modify these Terms and Conditions from time to time. Material changes, such as the introduction of subscription fees or access charges, or changes to your rights and obligations, will be notified to Users in advance and take effect on the date stated in that notice. Minor changes, such as corrections and clarifications, take effect immediately upon posting on the Portal. Continued use of the Portal after a change takes effect signifies your acceptance of the revised terms.",
     ],
   },
   {
